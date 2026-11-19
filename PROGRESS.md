@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | a464f4a | roop | R-01 | done | merge: R-01 Frontend scaffold + design system (auto-merge) |
 | 2026-11-19 | ffdc766 | roop | R-01 | done | chore(tasks): handoff R-01 - done |
 | 2026-11-19 | cfaec62 | roop | R-01 | done | chore(tasks): R-01 done - frontend scaffold, auth, mocks, UI kit |
 | 2026-11-19 | 96a74fc | roop | R-01 | in-progress | ci(automation): run auto-merge checks on Node 22.22.2 |
@@ -108,4 +109,3 @@
 | 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |
 | 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
 | 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |
-| 2026-11-19 | 4d5b9cd | nikhil | N-01 | review | merge: N-01 agent I/O JSON schemas + fixtures into collaboration |
