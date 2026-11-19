@@ -6,7 +6,8 @@ import { queryKeys } from '@/api/queries';
 import { ApiError } from '@/api/client';
 import { Button, Card, EmptyState, ErrorState, Field, Input, Select } from '@/components/ui';
 import { SupplierTable } from '@/features/suppliers/list/SupplierTable';
-import { RISK_OPTIONS, STATUS_OPTIONS, filtersFromParams } from '@/features/suppliers/list/params';
+import { RISK_OPTIONS, filtersFromParams } from '@/features/suppliers/list/params';
+import { STATUS_OPTIONS } from '@/features/suppliers/status';
 
 const DEBOUNCE_MS = 300;
 
@@ -51,6 +52,15 @@ export default function SupplierIntelligence() {
     queryFn: () => listSuppliers(filters),
     placeholderData: keepPreviousData,
   });
+
+  const totalCount = data?.count ?? 0;
+  const outOfRange = !!data && !isPlaceholderData && data.results.length === 0 && totalCount > 0 && filters.page > 1;
+  const lastPage = Math.max(1, Math.ceil(totalCount / pageSize));
+  // ?page=N beyond the last page: clamp to the last page (replace, no history entry).
+  useEffect(() => {
+    if (outOfRange) update({ page: String(lastPage) }, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outOfRange, lastPage]);
 
   const hasFilters = !!(filters.search || filters.status || filters.risk_level || searchText);
   const totalPages = data ? Math.max(1, Math.ceil(data.count / pageSize)) : 1;

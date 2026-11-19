@@ -7,7 +7,7 @@ import { renderWithProviders } from '@/test/renderWithProviders';
 import { loginAs } from '@/test/loginAs';
 import { server } from '@/mocks/server';
 import { dashboardSummary } from '@/mocks/fixtures';
-import { compactInr, shortDate } from './format';
+import { compactInr, shortDate } from '@/lib/format';
 
 // jsdom has no layout: give charts a fixed size.
 vi.mock('recharts', async (orig) => {
@@ -49,6 +49,13 @@ describe('ExecutiveOverview', () => {
     );
     expect(screen.getByRole('img', { name: /exposure/i })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /risk cases/i })).toBeInTheDocument();
+  });
+
+  it('gives each chart a text alternative with latest value and range', async () => {
+    renderWithProviders({ path: '/' });
+    await screen.findByRole('img', { name: /exposure/i });
+    expect(screen.getByText(/^Exposure: latest .* range .* to .*\.$/)).toBeInTheDocument();
+    expect(screen.getByText(/^Open risk cases: latest .* range .* to .*\.$/)).toBeInTheDocument();
   });
 
   it('shows loading skeletons first', async () => {

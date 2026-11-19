@@ -1,5 +1,6 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { loginAs } from '@/test/loginAs';
@@ -39,12 +40,28 @@ describe('SupplierIntelligence list', () => {
   });
 
   it('debounces search and narrows results', async () => {
-    const r = renderWithProviders({ path: '/suppliers' });
-    await screen.findByRole('link', { name: PUNE });
-    await userEvent.type(screen.getByLabelText('Search'), 'pune');
-    expect(query(r).has('search')).toBe(false);
-    await waitFor(() => expect(rowsOf()).toHaveLength(1));
-    expect(query(r).get('search')).toBe('pune');
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      const r = renderWithProviders({ path: '/suppliers' });
+      await screen.findByRole('link', { name: PUNE });
+      await user.type(screen.getByLabelText('Search'), 'pune');
+      expect(query(r).has('search')).toBe(false);
+      await act(async () => {
+        vi.advanceTimersByTime(300);
+      });
+      await waitFor(() => expect(rowsOf()).toHaveLength(1));
+      expect(query(r).get('search')).toBe('pune');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('clamps an out-of-range page to the last page', async () => {
+    const r = renderWithProviders({ path: '/suppliers?page=9' });
+    await screen.findByText('Page 2 of 2');
+    expect(query(r).get('page')).toBe('2');
+    await waitFor(() => expect(rowsOf()).toHaveLength(2));
   });
 
   it('shows empty state for no match and Clear restores list', async () => {

@@ -1,13 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { Supplier } from '@/api/types';
-import { Badge, SeverityBadge, TBody, TD, TH, THead, TR, Table, type BadgeTone } from '@/components/ui';
-import { STATUS_OPTIONS } from './params';
-
-const STATUS_TONE: Record<Supplier['status'], BadgeTone> = {
-  ACTIVE: 'success',
-  ON_HOLD: 'warning',
-  INACTIVE: 'neutral',
-};
+import { Badge, SeverityBadge, TBody, TD, TH, THead, TR, Table } from '@/components/ui';
+import { SUPPLIER_STATUS } from '../status';
 
 const HEADERS = ['Supplier', 'Country', 'Category', 'Status', 'Risk', 'Open POs', 'On-time %'];
 
@@ -47,8 +41,8 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
                   <TD>{s.country}</TD>
                   <TD>{s.category}</TD>
                   <TD>
-                    <Badge tone={STATUS_TONE[s.status]}>
-                      {STATUS_OPTIONS.find((o) => o.value === s.status)?.label ?? s.status}
+                    <Badge tone={SUPPLIER_STATUS[s.status]?.tone ?? 'neutral'}>
+                      {SUPPLIER_STATUS[s.status]?.label ?? s.status}
                     </Badge>
                   </TD>
                   <TD>

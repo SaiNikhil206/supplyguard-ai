@@ -4,7 +4,7 @@ import { ApiError } from '@/api/client';
 import type { SupplierDetail as SupplierDetailData } from '@/api/types';
 import { Badge, Button, ErrorState, KpiTile, Money, SeverityBadge, Skeleton } from '@/components/ui';
 import { DisruptionHistory } from '@/features/suppliers/detail/DisruptionHistory';
-import { supplierStatusMeta } from '@/features/suppliers/detail/format';
+import { SUPPLIER_STATUS } from '@/features/suppliers/status';
 
 function Breadcrumb({ name }: { name?: string }) {
   return (
@@ -42,8 +42,15 @@ function LoadingView() {
   );
 }
 
+const METER_TINT = {
+  LOW: 'bg-sev-low',
+  MEDIUM: 'bg-sev-medium',
+  HIGH: 'bg-sev-high',
+  CRITICAL: 'bg-sev-critical',
+} as const;
+
 function Header({ s }: { s: SupplierDetailData }) {
-  const status = supplierStatusMeta[s.status];
+  const status = SUPPLIER_STATUS[s.status];
   const score = Math.max(0, Math.min(100, s.risk_score));
   return (
     <header className="space-y-2">
@@ -65,7 +72,7 @@ function Header({ s }: { s: SupplierDetailData }) {
             aria-valuetext={`${score} out of 100`}
             className="h-2 w-28 overflow-hidden rounded-full bg-surface-2"
           >
-            <span className="block h-full bg-text/60" style={{ width: `${score}%` }} />
+            <span className={`block h-full ${METER_TINT[s.risk_level]}`} style={{ width: `${score}%` }} />
           </span>
           <span className="tabular-nums text-muted">{score}/100</span>
         </span>

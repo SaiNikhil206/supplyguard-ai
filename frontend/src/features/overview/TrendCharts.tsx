@@ -10,7 +10,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { TrendPoint } from '@/api/types';
-import { compactInr, shortDate } from './format';
+import { compactInr, shortDate } from '@/lib/format';
 
 const rgb = (name: string) => `rgb(var(--${name}))`;
 const axisTick = { fill: rgb('text-muted'), fontSize: 12 };
@@ -22,9 +22,19 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
+/** Screen-reader text alternative: latest value and min-max over the period. */
+function summarize(data: TrendPoint[], label: string, fmt: (n: number) => string): string {
+  if (data.length === 0) return `No ${label} data.`;
+  const values = data.map((p) => p.value);
+  const last = data[data.length - 1];
+  return `${label}: latest ${fmt(last.value)} on ${shortDate(last.date)}; range ${fmt(Math.min(...values))} to ${fmt(Math.max(...values))} from ${shortDate(data[0].date)} to ${shortDate(last.date)}.`;
+}
+
 export function ExposureTrendChart({ data }: { data: TrendPoint[] }) {
   return (
-    <div role="img" aria-label="Area chart of exposure over time" className="h-64 w-full">
+    <>
+      <p className="sr-only">{summarize(data, 'Exposure', compactInr)}</p>
+      <div role="img" aria-label="Area chart of exposure over time" className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid stroke={rgb('border')} strokeDasharray="3 3" vertical={false} />
@@ -38,13 +48,16 @@ export function ExposureTrendChart({ data }: { data: TrendPoint[] }) {
           <Area type="monotone" dataKey="value" stroke={rgb('primary')} fill={rgb('primary')} fillOpacity={0.2} strokeWidth={2} />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+      </div>
+    </>
   );
 }
 
 export function CasesTrendChart({ data }: { data: TrendPoint[] }) {
   return (
-    <div role="img" aria-label="Bar chart of open risk cases over time" className="h-64 w-full">
+    <>
+      <p className="sr-only">{summarize(data, 'Open risk cases', String)}</p>
+      <div role="img" aria-label="Bar chart of open risk cases over time" className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <CartesianGrid stroke={rgb('border')} strokeDasharray="3 3" vertical={false} />
@@ -59,6 +72,7 @@ export function CasesTrendChart({ data }: { data: TrendPoint[] }) {
           <Bar dataKey="value" fill={rgb('warning')} radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+      </div>
+    </>
   );
 }

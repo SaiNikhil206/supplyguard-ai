@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, EmptyState, SeverityBadge } from '@/components/ui';
 import type { SupplierDisruption } from '@/api/types';
-import { eventTypeLabel, formatDateTime } from './format';
+import { formatDateTime } from '@/lib/format';
+import { eventTypeLabel } from './format';
 
 export function DisruptionHistory({ items }: { items: SupplierDisruption[] }) {
   const sorted = [...items].sort((a, b) => new Date(b.event_time).getTime() - new Date(a.event_time).getTime());
