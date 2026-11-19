@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (R-09 in review)
-- **Current task:** R-09 CI pipeline - `review` (auto-merge merges it into collaboration)
-- **Branch:** `roop/R-09-ci`
-- **Where I left off:** `.github/workflows/ci.yml` + ESLint + lint/ruff in `scripts/run_checks.py` done and reviewed. First GitHub run not observed (repo private, `gh` not logged in).
-- **Next step:** Check Actions -> CI is green on `roop/R-09-ci`, then run CI manually on `collaboration`; agree with Nikhil + Uday to change R-09 acceptance to "`ci-ok` required on `main` only", set that protection, mark R-09 done.
-- **Blockers:** Team decision on required checks (SHARED). Uday: pin ruff in `backend/requirements-dev.txt`; run `ruff format backend` so CI can add format-check; keep simplejwt refresh lifetime short + rotation off; `/me` shape provisional. Team: drop `[skip ci]` from bot commits (`scripts/gitflow.py`, `progress.yml`) or dispatch CI before milestone PRs.
+- **Last updated:** 2026-11-19 (R-03 screens built on mocks)
+- **Current task:** R-03 Executive Overview + Supplier Intelligence - `in-progress` (waits on R-02 for real data); R-09 in `review`
+- **Branch:** `roop/R-03-overview-suppliers` (nested `--overview`, `--supplier-list`, `--supplier-detail` merged, kept on GitHub)
+- **Where I left off:** All 3 screens done against MSW mocks, 96 tests green, reviewer-lite APPROVE WITH NITS. Nits listed in R-03 Notes.
+- **Next step:** Optional polish pass for R-03 nits; when Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
+- **Blockers:** R-02 waits on Uday U-03/U-04. R-09 needs team decision: `ci-ok` required on `main` only. Uday: pin ruff, `ruff format backend`, short refresh lifetime + rotation off, `/me` shape provisional. Team: drop `[skip ci]` from bot commits.
 
 ---
 
@@ -53,7 +53,7 @@
 - **Acceptance:**
   - [ ] Real seed data shown; loading / empty / error states handled
 - **Done in:** -
-- **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04); "real seed data" acceptance ticks only after R-02. Plan: overview screen | implementer | sonnet/medium | `roop/R-03-overview-suppliers--overview`; supplier list | implementer | sonnet/medium | `roop/R-03-overview-suppliers--supplier-list`; supplier detail + route | implementer | sonnet/medium | `roop/R-03-overview-suppliers--supplier-detail`; tests+build | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
+- **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04). Built in 3 visible parallel sessions: `--overview` (6 KPI tiles + Recharts exposure/cases trends), `--supplier-list` (URL filters search/status/risk, risk badges, pagination), `--supplier-detail` (`/suppliers/:id`, KPIs, disruption history, 404 view), all merged; lint/typecheck/96 tests/build green; reviewer-lite APPROVE WITH NITS. Left: (1) after R-02 swap to real API + check field names, tick "real seed data"; (2) nits: one supplier-status meta shared by list+detail, shared date/INR formatters in `src/lib/format.ts`, sr-only text summary for charts, fake timers in list debounce test, clamp out-of-range `?page`. Note for R-04: case links use `/risk?case=<RC-id>`.
 
 ### R-04: Risk Command Center + case detail
 - **Status:** todo
