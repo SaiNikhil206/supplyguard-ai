@@ -65,8 +65,8 @@
 - **Last updated:** 2026-11-19 (R-03 screens built on mocks)
 - **Current task:** R-03 Executive Overview + Supplier Intelligence - `in-progress` (waits on R-02 for real data); R-09 in `review`
 - **Branch:** `roop/R-03-overview-suppliers` (nested `--overview`, `--supplier-list`, `--supplier-detail` merged, kept on GitHub)
-- **Where I left off:** All 3 screens done against MSW mocks, 96 tests green, reviewer-lite APPROVE WITH NITS. Nits listed in R-03 Notes.
-- **Next step:** Optional polish pass for R-03 nits; when Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
+- **Where I left off:** All 3 screens done against MSW mocks; review nits fixed in `--polish` and merged; 101 tests, lint, typecheck, build green.
+- **Next step:** When Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
 - **Blockers:** R-02 waits on Uday U-03/U-04. R-09 needs team decision: `ci-ok` required on `main` only. Uday: pin ruff, `ruff format backend`, short refresh lifetime + rotation off, `/me` shape provisional. Team: drop `[skip ci]` from bot commits.
 
 ### Nikhil
@@ -89,6 +89,11 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | e5ac2eb | roop | R-03 | in-progress | merge: R-03 --polish sub-branch into task branch |
+| 2026-11-19 | 498238b | nikhil | N-05 | in-progress | test(agents): v1.2.0 demo run passes all grader checks |
+| 2026-11-19 | fce0b3d | roop | R-03 | in-progress | refactor(frontend): R-03 review nits - shared status/format, chart a11y, deterministic tests |
+| 2026-11-19 | 7f0f7d0 | nikhil | N-05 | in-progress | feat(agents): first real Agentstudio run, prompt v1.2.0 |
+| 2026-11-19 | 0b37b88 | roop | R-03 | in-progress | chore(tasks): handoff R-03 - screens on mocks, waiting on R-02 |
 | 2026-11-19 | 01204b1 | roop | R-03 | in-progress | merge: R-03 --supplier-detail sub-branch into task branch |
 | 2026-11-19 | 57d4de8 | roop | R-03 | in-progress | merge: R-03 --supplier-list sub-branch into task branch |
 | 2026-11-19 | 308448b | roop | R-03 | in-progress | merge: R-03 --overview sub-branch into task branch |
@@ -104,8 +109,3 @@
 | 2026-11-19 | 0d95fec | roop | R-09 | in-progress | ci: address R-09 re-review nits |
 | 2026-11-19 | fba72b3 | nikhil | N-01 | review | merge: N-01 Agent I/O JSON schemas + fixtures (auto-merge) |
 | 2026-11-19 | fa79ece | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - offline part done, waiting on U-01 |
-| 2026-11-19 | f8604c7 | nikhil | N-05 | in-progress | feat(ai): Risk Analyst agent definition, eval inputs and grader |
-| 2026-11-19 | 7665fdc | roop | R-09 | in-progress | merge: R-09 --gate sub-branch into task branch |
-| 2026-11-19 | febba11 | roop | S-02 | in-progress | chore(workflow): remove autopilot |
-| 2026-11-19 | 47ac1ba | roop | R-09 | in-progress | ci: run CI on task branches + nightly, ci-ok aggregate, lint/ruff in auto-merge gate |
-| 2026-11-19 | a0d1b93 | nikhil | N-01 | review | fix(ai): N-01 reviewer follow-ups - PO header date, S-01 proposal list, option-type fixtures |

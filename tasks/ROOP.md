@@ -12,8 +12,8 @@
 - **Last updated:** 2026-11-19 (R-03 screens built on mocks)
 - **Current task:** R-03 Executive Overview + Supplier Intelligence - `in-progress` (waits on R-02 for real data); R-09 in `review`
 - **Branch:** `roop/R-03-overview-suppliers` (nested `--overview`, `--supplier-list`, `--supplier-detail` merged, kept on GitHub)
-- **Where I left off:** All 3 screens done against MSW mocks, 96 tests green, reviewer-lite APPROVE WITH NITS. Nits listed in R-03 Notes.
-- **Next step:** Optional polish pass for R-03 nits; when Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
+- **Where I left off:** All 3 screens done against MSW mocks; review nits fixed in `--polish` and merged; 101 tests, lint, typecheck, build green.
+- **Next step:** When Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
 - **Blockers:** R-02 waits on Uday U-03/U-04. R-09 needs team decision: `ci-ok` required on `main` only. Uday: pin ruff, `ruff format backend`, short refresh lifetime + rotation off, `/me` shape provisional. Team: drop `[skip ci]` from bot commits.
 
 ---
@@ -53,7 +53,7 @@
 - **Acceptance:**
   - [ ] Real seed data shown; loading / empty / error states handled
 - **Done in:** -
-- **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04). Built in 3 visible parallel sessions: `--overview` (6 KPI tiles + Recharts exposure/cases trends), `--supplier-list` (URL filters search/status/risk, risk badges, pagination), `--supplier-detail` (`/suppliers/:id`, KPIs, disruption history, 404 view), all merged; lint/typecheck/96 tests/build green; reviewer-lite APPROVE WITH NITS. Left: (1) after R-02 swap to real API + check field names, tick "real seed data"; (2) nits: one supplier-status meta shared by list+detail, shared date/INR formatters in `src/lib/format.ts`, sr-only text summary for charts, fake timers in list debounce test, clamp out-of-range `?page`. Note for R-04: case links use `/risk?case=<RC-id>`.
+- **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04). Built in 3 visible parallel sessions: `--overview` (6 KPI tiles + Recharts exposure/cases trends), `--supplier-list` (URL filters search/status/risk, risk badges, pagination), `--supplier-detail` (`/suppliers/:id`, KPIs, disruption history, 404 view), all merged; lint/typecheck/96 tests/build green; reviewer-lite APPROVE WITH NITS. Polish session (`--polish`) fixed all nits: shared `src/features/suppliers/status.ts` + `src/lib/format.ts`, sr-only chart summaries, fake-timer debounce test, out-of-range `?page` clamp, severity-tinted risk meter; 101 tests green. Left: after R-02 swap to real API + check field names, tick "real seed data". (Nits were: one supplier-status meta shared by list+detail, shared date/INR formatters in `src/lib/format.ts`, sr-only text summary for charts, fake timers in list debounce test, clamp out-of-range `?page`.) Note for R-04: case links use `/risk?case=<RC-id>`.
 
 ### R-04: Risk Command Center + case detail
 - **Status:** todo
