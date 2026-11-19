@@ -1,6 +1,6 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
 import type { ErrorCode, Paginated } from '@/api/types';
-import { SCENARIOS } from '@/features/risk/inbox/scenarios';
+import { SCENARIOS } from './scenarios';
 import {
   addSimulatedCase,
   dashboardSummary,
@@ -211,8 +211,12 @@ export const handlers: HttpHandler[] = [
           scenario: ['This field is required.'],
         });
       }
-      // Unknown names fall back to the first scenario (the real backend decides its own list).
-      const scenario = SCENARIOS.find((s) => s.name === body.scenario) ?? SCENARIOS[0];
+      const scenario = SCENARIOS.find((s) => s.name === body.scenario);
+      if (!scenario) {
+        return errorResponse(400, 'VALIDATION_ERROR', `Unknown scenario "${body.scenario}".`, request, {
+          scenario: [`Choose one of: ${SCENARIOS.map((s) => s.name).join(', ')}.`],
+        });
+      }
       const { eventId } = addSimulatedCase(scenario);
       return HttpResponse.json(
         {

@@ -12,7 +12,7 @@ import type {
   Supplier,
   SupplierDetail,
 } from '@/api/types';
-import type { SimulateScenarioOption } from '@/features/risk/inbox/scenarios';
+import type { SimulateScenarioOption } from './scenarios';
 
 export const TENANT = { id: 'TEN-ACME', name: 'Acme Manufacturing' };
 export const DEMO_PASSWORD = 'demo123';
