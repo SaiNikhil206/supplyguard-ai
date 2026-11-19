@@ -89,7 +89,17 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 47ac1ba | roop | R-09 | in-progress | ci: run CI on task branches + nightly, ci-ok aggregate, lint/ruff in auto-merge gate |
+| 2026-11-19 | a0d1b93 | nikhil | N-01 | review | fix(ai): N-01 reviewer follow-ups - PO header date, S-01 proposal list, option-type fixtures |
+| 2026-11-19 | 0aaf825 | uday | U-12 | in-progress | chore(tasks): handoff U-12 - in-progress, compose up not yet verified |
+| 2026-11-19 | fe30fdc | uday | U-12 | in-progress | fix(deploy): safe tunnel defaults, Render free-plan migrate, proxy settings |
+| 2026-11-19 | 6fd83da | uday | U-01 | blocked | docs(boomi): fill U-01 environment facts from read-only platform check |
+| 2026-11-19 | 7c5973a | uday | S-01 | blocked | chore(tasks): S-01 blocked on the v1 freeze call |
+| 2026-11-19 | 0380d2c | uday | U-12 | in-progress | feat(deploy): full local stack, tunnel guide and Render blueprint |
+| 2026-11-19 | 410f634 | uday | S-01 | blocked | docs(contracts): S-01 decision sheet for the v1 freeze call |
 | 2026-11-19 | 5384b03 | uday | U-02 | done | merge: U-02 Backend scaffold (auto-merge) |
+| 2026-11-19 | 77ad3a9 | roop | R-09 | in-progress | merge: R-09 --workflow sub-branch into task branch |
+| 2026-11-19 | a9aafea | roop | R-09 | in-progress | merge: R-09 --lint sub-branch into task branch |
 | 2026-11-19 | a09cbdd | roop | R-09 | in-progress | build(frontend): add ESLint flat config and lint script |
 | 2026-11-19 | 0823f4a | uday | U-01 | blocked | docs(boomi): U-01 Boomi environment checklist, waiting on platform checks |
 | 2026-11-19 | f9813db | roop | R-09 | in-progress | ci: add CI workflow for backend, frontend and python suites |
@@ -99,13 +109,3 @@
 | 2026-11-19 | 4005eb2 | uday | U-02 | done | fix(backend): apply U-02 review notes (error body, accounts.User, compose hardening) |
 | 2026-11-19 | a464f4a | roop | R-01 | done | merge: R-01 Frontend scaffold + design system (auto-merge) |
 | 2026-11-19 | ffdc766 | roop | R-01 | done | chore(tasks): handoff R-01 - done |
-| 2026-11-19 | cfaec62 | roop | R-01 | done | chore(tasks): R-01 done - frontend scaffold, auth, mocks, UI kit |
-| 2026-11-19 | 96a74fc | roop | R-01 | in-progress | ci(automation): run auto-merge checks on Node 22.22.2 |
-| 2026-11-19 | 89e9f67 | nikhil | N-03 | review | merge: N-03 Mock ERP service (auto-merge) |
-| 2026-11-19 | 9f884ef | nikhil | N-03 | review | chore(tasks): N-03 handoff - N-01/N-02 auto-merged, N-03 ready |
-| 2026-11-19 | dcc2320 | roop | R-01 | in-progress | merge: R-01 --schema-fixes sub-branch into task branch |
-| 2026-11-19 | 8dcf1b8 | uday | U-02 | review | merge: U-02 Backend scaffold (auto-merge) |
-| 2026-11-19 | 4d2b535 | roop | R-01 | in-progress | fix(frontend): align API types and mocks with agent schemas |
-| 2026-11-19 | 63cdd3f | nikhil | N-02 | review | merge: N-02 Synthetic demo dataset (auto-merge) |
-| 2026-11-19 | 659d556 | roop | S-02 | in-progress | ci(checks): auto-discover every top-level tests/ suite |
-| 2026-11-19 | 53a38f3 | uday | U-02 | review | chore(tasks): U-02 verified with docker compose on Postgres 16 |
