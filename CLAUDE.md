@@ -7,14 +7,20 @@ SupplyGuard AI: multi-tenant SaaS (React + Django REST + PostgreSQL) with a Boom
 Hard deadline: **31 Dec 2026**. Plan + sprints: `docs/PROJECT_PLAN.md`. Requirements: `docs/BRD_HLD_LLD.md`. Interfaces: `docs/CONTRACTS.md`.
 
 ## 2. Who owns what
-| Member | Task file | Branch prefix | Owns |
-|---|---|---|---|
-| Roop (lead) | `tasks/ROOP.md` | `roop/` | `boomi/` (except `flow/`, `agents/`), `mock-erp/`, `data/`, `backend/apps/integrations/`, `deploy/`, docker-compose |
-| Nikhil | `tasks/NIKHIL.md` | `nikhil/` | `ai/`, `backend/apps/intelligence/`, `backend/apps/workflow/`, `boomi/flow/`, `boomi/agents/` |
-| Uday | `tasks/UDAY.md` | `uday/` | `backend/` project + `apps/{tenants,accounts,core,audit}`, `frontend/`, `.github/workflows/ci.yml` |
-| Everyone | `tasks/SHARED.md` | driver's prefix | `docs/CONTRACTS.md` (changes need all 3) |
+There is no team lead; shared tasks have a named driver (`tasks/SHARED.md`).
+
+| Member | Background | Task file | Branch prefix | Owns |
+|---|---|---|---|---|
+| Roop | Frontend (React) | `tasks/ROOP.md` | `roop/` | `frontend/`, `backend/apps/portal/` (UI read APIs), `boomi/flow/`, `boomi/marketplace/`, `.github/workflows/ci.yml`, `docs/DEMO_SCRIPT.md` |
+| Nikhil | Data engineer (Python, AI/ML) | `tasks/NIKHIL.md` | `nikhil/` | `ai/`, `data/`, `mock-erp/`, `backend/apps/intelligence/`, `backend/apps/workflow/`, `boomi/agents/`, `boomi/processes/correlation/`, `tests/e2e/` |
+| Uday | Data engineer (Python, AI/ML) | `tasks/UDAY.md` | `uday/` | `backend/` project + `apps/{tenants,accounts,core,audit,integrations}`, `boomi/processes/` (except `correlation/`), `boomi/api/`, `deploy/`, `docker-compose.yml`, `docs/BOOMI_ENV.md`, `docs/INSTALL.md` |
+| Everyone | - | `tasks/SHARED.md` | driver's prefix | `docs/CONTRACTS.md` (changes need all 3) |
 
 **Identify the member** from the command argument (`/resume nikhil`), else from `git config user.name`, else ask. Work only on that member's tasks. Do not edit another stream's folders - if you need a change there, write it in your task's Notes and in the Handoff "Blockers" line, and tell the user.
+
+**Explain in the member's language.** Claude writes most of the code, so the person must still understand and verify it. At the start of each task give a short "what this is and why" (max 6 lines) in that member's terms, and before asking them to check something, say exactly what to look at.
+- Roop (React): explain backend, Boomi and data ideas through frontend analogies - components, props/state, API calls, forms, routing.
+- Nikhil and Uday (Python data engineers): explain Django, Boomi and React ideas through data-pipeline analogies - ETL steps, schemas, jobs, connectors, DataFrames.
 
 ## 3. Session protocol (mandatory)
 **Start:** `git fetch && git checkout collaboration && git pull` -> `python scripts/progress.py <member>` -> read that member's task file (Handoff block first) -> pick the `in-progress` task, else the first `todo` task whose Depends are all `done` -> create/checkout its branch from `collaboration`.

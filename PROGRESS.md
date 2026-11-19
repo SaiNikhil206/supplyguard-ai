@@ -6,9 +6,9 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 0 | 0 | 0 | 0 | 13 | 0 | 0% | R-01 |
-| Nikhil | 0 | 0 | 0 | 0 | 12 | 0 | 0% | N-01 |
-| Uday | 0 | 0 | 0 | 0 | 13 | 0 | 0% | U-01 |
+| Roop | 0 | 0 | 0 | 0 | 12 | 0 | 0% | R-01 |
+| Nikhil | 0 | 0 | 0 | 0 | 14 | 0 | 0% | N-01 |
+| Uday | 0 | 0 | 0 | 0 | 12 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
 ## Task board
@@ -16,73 +16,73 @@
 | ID | Task | Owner | Sprint | Status | Checks | Done in |
 |---|---|---|---|---|---|---|
 | S-02 | Sprint-end integration demos | Shared | every sprint (23 Nov, 30 Nov, 7 Dec, 14 Dec, 20 Dec, 26 Dec) | todo | 0/6 | - |
-| N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-23 Nov) | todo | 0/3 | - |
-| R-01 | Boomi environment and service verification | Roop | S0 (19-23 Nov) | todo | 0/3 | - |
-| R-02 | Mock ERP service | Roop | S0 (19-23 Nov) | todo | 0/4 | - |
-| R-03 | Synthetic demo dataset | Roop | S0 (19-23 Nov) | todo | 0/3 | - |
+| N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-20 Nov) | todo | 0/3 | - |
+| N-02 | Synthetic demo dataset | Nikhil | S0 (20-22 Nov) | todo | 0/3 | - |
+| N-03 | Mock ERP service | Nikhil | S0-S1 (22-25 Nov) | todo | 0/4 | - |
+| R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | todo | 0/3 | - |
 | S-01 | Freeze contracts v1 | Shared | S0 (19-20 Nov) | in-progress | 0/3 | - |
-| U-01 | Backend scaffold | Uday | S0 (19-21 Nov) | todo | 0/3 | - |
-| U-02 | Core data model + seed loader | Uday | S0 (20-23 Nov) | todo | 0/4 | - |
-| N-02 | Deterministic impact + risk scoring engine | Nikhil | S1 (24-30 Nov) | todo | 0/4 | - |
-| R-04 | Boomi ERP read processes + canonical profiles | Roop | S1 (24-30 Nov) | todo | 0/3 | - |
-| R-05 | Event Streams topics + disruption subscriber | Roop | S1 (24-30 Nov) | todo | 0/2 | - |
-| R-06 | Django integrations app - event intake + Boomi client | Roop | S1 (24-30 Nov) | todo | 0/5 | - |
-| R-11 | Local + hosted deployment | Roop | S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | todo | 0/3 | - |
-| U-03 | Auth, tenant isolation, RBAC | Uday | S1 (24-27 Nov) | todo | 0/3 | - |
-| U-04 | Read APIs (suppliers, dashboard, risk cases) | Uday | S1 (26-30 Nov) | todo | 0/2 | - |
-| U-05 | Audit service + correlation-id middleware | Uday | S1 (24-27 Nov) | todo | 0/2 | - |
-| U-06 | Frontend scaffold + design system | Uday | S1 (24-30 Nov) | todo | 0/2 | - |
-| U-12 | CI pipeline | Uday | S1 (24-26 Nov) | todo | 0/1 | - |
-| N-03 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-7 Dec) | todo | 0/3 | - |
-| N-04 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (1-7 Dec) | todo | 0/3 | - |
-| N-05 | Agent output validator + persistence | Nikhil | S2 (1-7 Dec) | todo | 0/3 | - |
-| N-06 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (5-9 Dec) | todo | 0/2 | - |
-| R-07 | Boomi correlation + impact orchestration process | Roop | S2 (1-7 Dec) | todo | 0/2 | - |
-| R-08 | Boomi API Management | Roop | S2 (1-7 Dec) | todo | 0/2 | - |
-| U-07 | Executive Overview + Supplier Intelligence screens | Uday | S2 (1-7 Dec) | todo | 0/1 | - |
-| U-08 | Risk Command Center + case detail | Uday | S2-S3 (4-10 Dec) | todo | 0/2 | - |
-| N-07 | What-if simulator backend | Nikhil | S3 (8-14 Dec) | todo | 0/2 | - |
-| N-08 | Boomi Flow approval workflow | Nikhil | S3 (8-14 Dec) | todo | 0/2 | - |
-| N-09 | Workflow app - state machine + decisions | Nikhil | S3 (8-14 Dec) | todo | 0/3 | - |
-| R-09 | Approved-action execution process | Roop | S3 (8-14 Dec) | todo | 0/2 | - |
-| R-10 | Error handling, retry, dead-letter | Roop | S3-S4 (12-17 Dec) | todo | 0/3 | - |
-| U-09 | AI Recommendations + Approval Center | Uday | S3 (8-14 Dec) | todo | 0/2 | - |
-| N-10 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
-| U-10 | What-if Simulator UI | Uday | S4 (15-18 Dec) | todo | 0/1 | - |
-| U-11 | Integration Center, Audit Center, Tenant Settings | Uday | S4 (15-20 Dec) | todo | 0/1 | - |
-| N-11 | AI governance + approval tests | Nikhil | S5 (21-26 Dec) | todo | 0/2 | - |
+| U-01 | Boomi environment and service verification | Uday | S0 (19-20 Nov) | todo | 0/3 | - |
+| U-02 | Backend scaffold | Uday | S0 (19-21 Nov) | todo | 0/3 | - |
+| U-03 | Core data model + seed loader | Uday | S0 (21-23 Nov) | todo | 0/4 | - |
+| N-04 | Deterministic impact + risk scoring engine | Nikhil | S1 (25-30 Nov) | todo | 0/4 | - |
+| R-02 | Read APIs for the UI (Django `apps/portal`) | Roop | S1 (26-30 Nov) | todo | 0/3 | - |
+| R-09 | CI pipeline | Roop | S1 (24-26 Nov) | todo | 0/1 | - |
+| U-04 | Auth, tenant isolation, RBAC, users + settings APIs | Uday | S1 (24-27 Nov) | todo | 0/3 | - |
+| U-05 | Audit service + correlation-id middleware | Uday | S1 (24-26 Nov) | todo | 0/2 | - |
+| U-06 | Event intake + Boomi client (Django `apps/integrations`) | Uday | S1 (26-30 Nov) | todo | 0/5 | - |
+| U-07 | Boomi ERP read processes + canonical profiles | Uday | S1 (25-30 Nov) | todo | 0/3 | - |
+| U-12 | Local + hosted deployment | Uday | S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | todo | 0/3 | - |
+| N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | todo | 0/3 | - |
+| N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | todo | 0/3 | - |
+| N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | todo | 0/3 | - |
+| N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
+| N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
+| R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | todo | 0/1 | - |
+| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | todo | 0/2 | - |
+| U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | todo | 0/2 | - |
+| U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
+| N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | todo | 0/3 | - |
+| N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | todo | 0/2 | - |
+| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | todo | 0/2 | - |
+| R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | todo | 0/2 | - |
+| U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
+| U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
+| N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
+| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | todo | 0/1 | - |
+| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | todo | 0/1 | - |
+| N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | todo | 0/2 | - |
+| N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
+| R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | todo | 0/1 | - |
 | R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | todo | 0/1 | - |
-| R-13 | End-to-end integration tests | Roop | S5 (21-26 Dec) | todo | 0/2 | - |
 | S-03 | End-to-end demo dry run | Shared | S5 (24 Dec) | todo | 0/1 | - |
 | S-04 | Security review | Shared | S5 (22-23 Dec) | todo | 0/1 | - |
-| U-13 | UX polish + demo mode | Uday | S5 (21-26 Dec) | todo | 0/1 | - |
-| N-12 | Demo script, deck, video storyboard | Nikhil | S6 (27-31 Dec) | todo | 0/2 | - |
+| R-11 | Demo script, deck, video storyboard | Roop | S6 (27-31 Dec) | todo | 0/2 | - |
 | S-05 | Final submission package | Shared | S6 (27-31 Dec) | todo | 0/1 | - |
 
 ## Where each member left off
 
 ### Roop
-- **Last updated:** 2026-11-19 (setup)
+- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
 - **Current task:** -
 - **Branch:** -
-- **Where I left off:** Project structure and task split created. Nothing implemented yet.
-- **Next step:** Start R-01 (Boomi environment check) and S-01 (freeze contracts with team).
+- **Where I left off:** Task split done. Nothing implemented yet.
+- **Next step:** Start R-01 (frontend scaffold with mock API) today - it does not wait for the backend.
 - **Blockers:** none
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (setup)
+- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
 - **Current task:** -
 - **Branch:** -
-- **Where I left off:** Project structure and task split created. Nothing implemented yet.
-- **Next step:** Start N-01 today (drafting the schemas is your input to the S-01 contracts freeze - review CONTRACTS sections 6-7 while doing it).
+- **Where I left off:** Task split done. Nothing implemented yet.
+- **Next step:** Start N-01 today (agent schemas - your input to the S-01 contracts freeze), then N-02 dataset.
 - **Blockers:** none
 
 ### Uday
-- **Last updated:** 2026-11-19 (setup)
+- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
 - **Current task:** -
 - **Branch:** -
-- **Where I left off:** Project structure and task split created. Nothing implemented yet.
-- **Next step:** Start U-01 (backend scaffold) today - Roop and Nikhil depend on U-02 models by 23 Nov.
+- **Where I left off:** Task split done. Nothing implemented yet.
+- **Next step:** Start U-01 (Boomi env check) and U-02 (backend scaffold) today - everyone depends on U-03 models by 23 Nov.
 - **Blockers:** none
 
 ## Recent tracked commits

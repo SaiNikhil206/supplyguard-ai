@@ -1,15 +1,15 @@
 # Tasks - Shared (whole team)
 
-Each shared task has one **driver** who is accountable; everybody contributes.
+There is no team lead. Each shared task has one **driver** who is accountable for getting it done; everybody contributes.
 
 > Same format as the personal task files - `scripts/progress.py` parses it.
 
 ## Handoff
-- **Last updated:** 2026-11-19 (setup)
+- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
 - **Current task:** S-01
 - **Branch:** -
 - **Where I left off:** Contracts v0.1 drafted in `docs/CONTRACTS.md`.
-- **Next step:** 30-min call: walk through CONTRACTS, agree changes, Roop tags v1.
+- **Next step:** 30-min call: walk through CONTRACTS, agree changes, Uday tags v1.
 - **Blockers:** none
 
 ---
@@ -17,24 +17,24 @@ Each shared task has one **driver** who is accountable; everybody contributes.
 ### S-01: Freeze contracts v1
 - **Status:** in-progress
 - **Sprint:** S0 (19-20 Nov) | **Est:** 0.5d | **Depends:** -
-- **Driver:** Roop
-- **Branch:** `roop/S-01-contracts`
+- **Driver:** Uday
+- **Branch:** `uday/S-01-contracts`
 - **Model hint:** opus / high
 - **Deliverables:** `docs/CONTRACTS.md` v1 agreed by all three; changelog entry.
 - **Acceptance:**
-  - [ ] Nikhil approved sections 6-7
-  - [ ] Uday approved sections 1, 2, 4
-  - [ ] Roop approved sections 3, 5, 8
+  - [ ] Roop approved sections 4 (UI-facing endpoints) and 2 (roles shown in the UI)
+  - [ ] Nikhil approved sections 3, 5, 6, 7
+  - [ ] Uday approved sections 1, 2, 4, 8
 - **Done in:** -
 - **Notes:** -
 
 ### S-02: Sprint-end integration demos
 - **Status:** todo
 - **Sprint:** every sprint (23 Nov, 30 Nov, 7 Dec, 14 Dec, 20 Dec, 26 Dec) | **Est:** 1h each | **Depends:** -
-- **Driver:** Roop
+- **Driver:** rotating - Uday (m1, m4), Nikhil (m2, m5), Roop (m3, m6)
 - **Branch:** -
 - **Model hint:** haiku / low (`/status all` to prepare)
-- **Deliverables:** merge `collaboration` -> `main`, tag `m1`..`m6`, 15-min demo of the milestone in `docs/PROJECT_PLAN.md`, notes appended to `progress/SESSION_LOG.md`.
+- **Deliverables:** that sprint's driver merges `collaboration` -> `main` via PR, tags `m1`..`m6`, runs a 15-min demo of the milestone in `docs/PROJECT_PLAN.md`, appends notes to `progress/SESSION_LOG.md`.
 - **Acceptance:**
   - [ ] m1 (S0) [ ] m2 (S1) [ ] m3 (S2) [ ] m4 (S3) [ ] m5 (S4) [ ] m6 (S5)
 - **Done in:** -
@@ -42,11 +42,11 @@ Each shared task has one **driver** who is accountable; everybody contributes.
 
 ### S-03: End-to-end demo dry run
 - **Status:** todo
-- **Sprint:** S5 (24 Dec) | **Est:** 0.5d | **Depends:** R-09, N-08, U-09
-- **Driver:** Nikhil
+- **Sprint:** S5 (24 Dec) | **Est:** 0.5d | **Depends:** U-10, R-05, R-06
+- **Driver:** Roop
 - **Branch:** -
 - **Model hint:** -
-- **Deliverables:** full 7-scene run on hosted environment, list of issues filed as tasks.
+- **Deliverables:** full 7-scene run on the hosted environment, issues filed as tasks.
 - **Acceptance:**
   - [ ] Completed without manual DB edits
 - **Done in:** -
@@ -54,7 +54,7 @@ Each shared task has one **driver** who is accountable; everybody contributes.
 
 ### S-04: Security review
 - **Status:** todo
-- **Sprint:** S5 (22-23 Dec) | **Est:** 0.5d | **Depends:** U-03, R-10
+- **Sprint:** S5 (22-23 Dec) | **Est:** 0.5d | **Depends:** U-04, U-11
 - **Driver:** Uday
 - **Branch:** `uday/S-04-security-review`
 - **Model hint:** opus / high (run `/security-review` on the branch diff)
@@ -66,11 +66,11 @@ Each shared task has one **driver** who is accountable; everybody contributes.
 
 ### S-05: Final submission package
 - **Status:** todo
-- **Sprint:** S6 (27-31 Dec) | **Est:** 1d | **Depends:** R-12, N-12, U-13
+- **Sprint:** S6 (27-31 Dec) | **Est:** 1d | **Depends:** R-12, R-11, R-10
 - **Driver:** Roop
 - **Branch:** `roop/S-05-submission`
 - **Model hint:** opus / high review, haiku / low checklist
-- **Deliverables:** demo video, deck, Marketplace package, README polish, `docs/TEST_REPORT.md` final, submission form, tag `v1.0`.
+- **Deliverables:** demo video, deck, Marketplace package, README polish, final `docs/TEST_REPORT.md` (Nikhil), submission form, tag `v1.0`.
 - **Acceptance:**
   - [ ] Submitted before 31 Dec 2026
 - **Done in:** -

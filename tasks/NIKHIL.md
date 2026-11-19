@@ -1,28 +1,29 @@
-# Tasks - Nikhil (AI Intelligence & Workflow)
+# Tasks - Nikhil (Data & AI · dataset, mock ERP, impact engine, agents, workflow rules)
 
-**Stream:** Impact/risk engine, Boomi Agentstudio agents, agent output validation, what-if simulator, Boomi Flow approvals, case state machine, demo script.
-**Owns:** `ai/`, `backend/apps/intelligence/`, `backend/apps/workflow/`, `boomi/flow/`, `boomi/agents/`, `docs/DEMO_SCRIPT.md`
+**Background:** Data engineer (Python, AI/ML). Claude explains frontend and Boomi concepts in data-pipeline terms (ETL steps, schemas, jobs, DataFrames).
+**Stream:** Synthetic data + mock ERP, impact/risk scoring, Boomi Agentstudio agents, AI output validation, Boomi correlation process, agent invocation, case state machine, what-if engine, Data Hub (optional), AI + end-to-end tests.
+**Owns:** `ai/`, `data/`, `mock-erp/`, `backend/apps/intelligence/`, `backend/apps/workflow/`, `boomi/agents/`, `boomi/processes/correlation/`, `tests/e2e/`
 
 > Status values: `todo` · `in-progress` · `blocked` · `review` · `done`. Only change the `Status`, `Done in`, checkboxes and Notes lines - keep the format, `scripts/progress.py` parses it.
 > Model hint = what the advisor (Opus 5.5) should delegate the bulk of the work to. See `docs/AI_WORKFLOW.md`.
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (setup)
+- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
 - **Current task:** -
 - **Branch:** -
-- **Where I left off:** Project structure and task split created. Nothing implemented yet.
-- **Next step:** Start N-01 today (drafting the schemas is your input to the S-01 contracts freeze - review CONTRACTS sections 6-7 while doing it).
+- **Where I left off:** Task split done. Nothing implemented yet.
+- **Next step:** Start N-01 today (agent schemas - your input to the S-01 contracts freeze), then N-02 dataset.
 - **Blockers:** none
 
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
 - **Status:** todo
-- **Sprint:** S0 (19-23 Nov) | **Est:** 1d | **Depends:** -
+- **Sprint:** S0 (19-20 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `nikhil/N-01-agent-schemas`
 - **Model hint:** opus / high (schema design is a contract)
-- **Deliverables:** `ai/schemas/risk_analysis.schema.json`, `ai/schemas/recovery_plan.schema.json`, `ai/schemas/agent_input.schema.json` (what the agents receive); valid + invalid fixtures in `ai/fixtures/`; schema test.
+- **Deliverables:** `ai/schemas/risk_analysis.schema.json`, `ai/schemas/recovery_plan.schema.json`, `ai/schemas/agent_input.schema.json`; valid + invalid fixtures in `ai/fixtures/`; schema test.
 - **Acceptance:**
   - [ ] Schemas match CONTRACTS section 6 exactly
   - [ ] Required `missing_data` / `assumptions` / `evidence` fields enforced
@@ -30,12 +31,39 @@
 - **Done in:** -
 - **Notes:** -
 
-### N-02: Deterministic impact + risk scoring engine
+### N-02: Synthetic demo dataset
 - **Status:** todo
-- **Sprint:** S1 (24-30 Nov) | **Est:** 3d | **Depends:** U-02, R-03
-- **Branch:** `nikhil/N-02-impact-engine`
+- **Sprint:** S0 (20-22 Nov) | **Est:** 1d | **Depends:** S-01
+- **Branch:** `nikhil/N-02-seed-data`
+- **Model hint:** sonnet / medium (generator script), haiku / low to sanity-check
+- **Deliverables:** `data/generate_seed.py` (deterministic, seeded RNG) -> `data/seed/{tenants,suppliers,purchase_orders,inventory,alternate_suppliers,shipments}.json`; 2 tenants (TEN-ACME, TEN-GLOBEX), 100 suppliers, 500 POs, 3 locations, 20 active shipments, 3 deliberate duplicate suppliers (for N-12); `data/scenarios/*.json` canonical events for TC-01..TC-09 and the demo (SUP-1008 factory outage, 48 h).
+- **Acceptance:**
+  - [ ] Demo scenario numbers documented in `data/README.md` (affected POs, exposure, 2 alternates)
+  - [ ] TC-04 scenario has enough inventory to cover the delay; TC-05 scenario has no alternates
+  - [ ] Uday's seed loader (U-03) and the mock ERP (N-03) load the same files
+- **Done in:** -
+- **Notes:** -
+
+### N-03: Mock ERP service
+- **Status:** todo
+- **Sprint:** S0-S1 (22-25 Nov) | **Est:** 2d | **Depends:** S-01, N-02
+- **Branch:** `nikhil/N-03-mock-erp`
+- **Model hint:** sonnet / medium
+- **Deliverables:** `mock-erp/` FastAPI app (Python 3.12) implementing CONTRACTS section 5, loads `data/seed/*.json`, in-memory store with reset endpoint, request log (for TC-06 assertions), `Idempotency-Key` enforcement on PATCH, chaos endpoint, Dockerfile, pytest.
+- **Acceptance:**
+  - [ ] All endpoints in CONTRACTS section 5 respond with seed data
+  - [ ] Same `Idempotency-Key` twice -> second call returns first result, no double update
+  - [ ] `_chaos timeout` makes PATCH hang > 30 s; `off` restores
+  - [ ] Runs via `docker compose up mock-erp`
+- **Done in:** -
+- **Notes:** Uday's U-07 (Boomi ERP reads) needs this by 25 Nov.
+
+### N-04: Deterministic impact + risk scoring engine
+- **Status:** todo
+- **Sprint:** S1 (25-30 Nov) | **Est:** 3d | **Depends:** U-03, N-02
+- **Branch:** `nikhil/N-04-impact-engine`
 - **Model hint:** opus / high for the scoring design, sonnet / medium to implement + tests
-- **Deliverables:** `backend/apps/intelligence/impact.py`: given event + ERP snapshot -> affected POs (affected_qty, estimated_delay, exposure_amount), inventory coverage per item, shortage flags, risk_score 0-100 with documented formula and tenant thresholds; `POST /internal/risk-cases` handler logic (endpoint shell is in Roop's app, calls this service).
+- **Deliverables:** `backend/apps/intelligence/impact.py`: event + ERP snapshot -> affected POs (affected_qty, estimated_delay, exposure_amount), inventory coverage per item, shortage flags, risk_score 0-100 with documented formula and tenant thresholds; service called by the `POST /internal/risk-cases` endpoint (endpoint shell in Uday's `integrations` app).
 - **Acceptance:**
   - [ ] TC-03: multiple open POs all evaluated
   - [ ] TC-04: sufficient inventory -> no shortage claimed
@@ -44,23 +72,23 @@
 - **Done in:** -
 - **Notes:** -
 
-### N-03: Supplier Risk Analyst agent (Agentstudio)
+### N-05: Supplier Risk Analyst agent (Agentstudio)
 - **Status:** todo
-- **Sprint:** S2 (1-7 Dec) | **Est:** 2d | **Depends:** N-01, R-01
-- **Branch:** `nikhil/N-03-risk-analyst`
+- **Sprint:** S2 (1-4 Dec) | **Est:** 2d | **Depends:** N-01, U-01
+- **Branch:** `nikhil/N-05-risk-analyst`
 - **Model hint:** opus / high (prompt + guardrails); use the boomi-agentstudio skill if installed
-- **Deliverables:** agent in Agentstudio with instructions, tools (ERP lookups via R-04 processes), guardrails: no invented capacity/price/dates, separate facts vs estimates, must fill `missing_data`. Prompt + config versioned in `boomi/agents/risk_analyst/`.
+- **Deliverables:** agent in Agentstudio with instructions, tools (ERP lookups via Uday's U-07 processes), guardrails: no invented capacity/price/dates, separate facts vs estimates, must fill `missing_data`. Prompt + config versioned in `boomi/agents/risk_analyst/`.
 - **Acceptance:**
-  - [ ] Output for demo scenario validates against `risk_analysis.schema.json`
+  - [ ] Output for the demo scenario validates against `risk_analysis.schema.json`
   - [ ] Every claim has an `evidence` entry pointing to snapshot data
   - [ ] 5 adversarial prompts (asking it to guess capacity etc.) -> it reports missing data instead
 - **Done in:** -
 - **Notes:** -
 
-### N-04: Recovery Planning agent (Agentstudio)
+### N-06: Recovery Planning agent (Agentstudio)
 - **Status:** todo
-- **Sprint:** S2 (1-7 Dec) | **Est:** 2d | **Depends:** N-01, N-03
-- **Branch:** `nikhil/N-04-recovery-agent`
+- **Sprint:** S2 (3-6 Dec) | **Est:** 2d | **Depends:** N-01, N-05
+- **Branch:** `nikhil/N-06-recovery-agent`
 - **Model hint:** opus / high
 - **Deliverables:** agent comparing ALTERNATE_SUPPLIER, INVENTORY_TRANSFER, REVISED_SCHEDULE, SPLIT_ORDER; ranks by urgency, inventory, qualification, cost, priority; config in `boomi/agents/recovery_planner/`.
 - **Acceptance:**
@@ -70,35 +98,60 @@
 - **Done in:** -
 - **Notes:** -
 
-### N-05: Agent output validator + persistence
+### N-07: Agent output validator + persistence
 - **Status:** todo
-- **Sprint:** S2 (1-7 Dec) | **Est:** 1.5d | **Depends:** N-01, N-02, U-02
-- **Branch:** `nikhil/N-05-validator`
+- **Sprint:** S2 (4-7 Dec) | **Est:** 1.5d | **Depends:** N-01, N-04, U-03
+- **Branch:** `nikhil/N-07-validator`
 - **Model hint:** sonnet / medium; opus / high review
 - **Deliverables:** `backend/apps/intelligence/validation.py` + `POST /internal/risk-cases/{id}/analysis`: JSON-schema check, cross-check every referenced supplier/PO/item/qty/price against the stored snapshot, flag unsupported options (`status=UNSUPPORTED`, not actionable), persist Recommendation rows, transition case to RECOMMENDATION_READY.
 - **Acceptance:**
   - [ ] Option referencing a non-existent supplier is flagged, not shown as actionable
   - [ ] Raw agent output stored for audit (AC-07)
-  - [ ] Tests for valid, schema-invalid, and fact-mismatch payloads
+  - [ ] Tests for valid, schema-invalid and fact-mismatch payloads
 - **Done in:** -
 - **Notes:** -
 
-### N-06: Agent invocation wiring + offline fallback
+### N-08: Boomi correlation + impact orchestration process
 - **Status:** todo
-- **Sprint:** S2-S3 (5-9 Dec) | **Est:** 1.5d | **Depends:** N-03, N-04, R-07
-- **Branch:** `nikhil/N-06-agent-invocation`
+- **Sprint:** S2 (3-7 Dec) | **Est:** 2d | **Depends:** U-07, U-08, N-04
+- **Branch:** `nikhil/N-08-correlation`
+- **Model hint:** sonnet / medium via `boomi-builder`
+- **Deliverables:** process `SG_Disruption_Correlate` (in `boomi/processes/correlation/`): event -> Uday's ERP read processes (supplier/POs/inventory/alternates) -> `POST /internal/risk-cases` (snapshot) -> invoke agents (N-09) -> post analysis back. Errors routed to error handling (U-11).
+- **Acceptance:**
+  - [ ] Demo scenario creates RiskCase with correct AffectedPOs in < 10 s
+  - [ ] TC-03: all open POs of the supplier evaluated
+- **Done in:** -
+- **Notes:** -
+
+### N-09: Agent invocation wiring + offline fallback
+- **Status:** todo
+- **Sprint:** S2-S3 (6-10 Dec) | **Est:** 1.5d | **Depends:** N-05, N-06, N-08
+- **Branch:** `nikhil/N-09-agent-invocation`
 - **Model hint:** sonnet / medium (use the claude-api skill for the fallback client)
-- **Deliverables:** Boomi step (in R-07 process) or Agent Garden API call that runs both agents in sequence; Django fallback `apps.intelligence.agents` using Claude API with the same schemas (CONTRACTS section 8) behind setting `AGENT_BACKEND=boomi|claude|mock`; `mock` returns fixtures for offline demo.
+- **Deliverables:** step in N-08 (or Agent Garden API call) that runs both agents in sequence; Django fallback `apps.intelligence.agents` using the Claude API with the same schemas (CONTRACTS section 8) behind `AGENT_BACKEND=boomi|claude|mock`; `mock` returns fixtures for offline demo.
 - **Acceptance:**
   - [ ] All three backends produce schema-valid output for the demo scenario
   - [ ] Switching backend needs only an env var
 - **Done in:** -
 - **Notes:** -
 
-### N-07: What-if simulator backend
+### N-10: Workflow app - state machine + decisions
 - **Status:** todo
-- **Sprint:** S3 (8-14 Dec) | **Est:** 1.5d | **Depends:** N-02
-- **Branch:** `nikhil/N-07-what-if`
+- **Sprint:** S3 (8-11 Dec) | **Est:** 2d | **Depends:** U-03, U-04, U-05
+- **Branch:** `nikhil/N-10-state-machine`
+- **Model hint:** opus / high design, sonnet / medium implement
+- **Deliverables:** `backend/apps/workflow/services.py` `transition()` enforcing CONTRACTS section 7; `POST /recommendations/{id}/decision` with role check (`PROCUREMENT_MANAGER` only), creates Approval, triggers execution (U-10) only on APPROVE; every transition audited.
+- **Acceptance:**
+  - [ ] Table-driven test covering every allowed and forbidden transition
+  - [ ] TC-06: reject -> no execution call, comments audited
+  - [ ] OPS_MANAGER / VIEWER cannot decide (403)
+- **Done in:** -
+- **Notes:** Roop's R-05 and R-06 need this by 11 Dec.
+
+### N-11: What-if simulator backend
+- **Status:** todo
+- **Sprint:** S3 (11-14 Dec) | **Est:** 1.5d | **Depends:** N-04
+- **Branch:** `nikhil/N-11-what-if`
 - **Model hint:** sonnet / medium
 - **Deliverables:** `POST /what-if` (supplier_id, duration_days, event_type) and `POST /risk-cases/{id}/what-if`; reuses impact engine on a fresh snapshot; returns affected POs, inventory gaps, exposure, best option estimate, assumptions; no DB writes except an audit row.
 - **Acceptance:**
@@ -107,63 +160,38 @@
 - **Done in:** -
 - **Notes:** -
 
-### N-08: Boomi Flow approval workflow
+### N-12: Data Hub supplier golden record (OPTIONAL)
 - **Status:** todo
-- **Sprint:** S3 (8-14 Dec) | **Est:** 2.5d | **Depends:** N-05, R-01
-- **Branch:** `nikhil/N-08-flow-approval`
+- **Sprint:** S4 (15-20 Dec) | **Est:** 1.5d | **Depends:** U-01 (only if Data Hub enabled)
+- **Branch:** `nikhil/N-12-data-hub`
 - **Model hint:** sonnet / medium
-- **Deliverables:** Flow app: approval task with evidence + options, Approve / Reject / Request changes, comment, escalation after N hours; on Approve calls R-09 process; on every decision calls `POST /recommendations/{id}/decision` (or Django calls Flow - pick one direction and document in `boomi/flow/README.md`). Fallback: SaaS-only approval.
-- **Acceptance:**
-  - [ ] Approve in Flow -> execution starts; Reject -> no execution
-  - [ ] Decision visible in SaaS Approval Center and audit within 5 s
-- **Done in:** -
-- **Notes:** -
-
-### N-09: Workflow app - state machine + decisions
-- **Status:** todo
-- **Sprint:** S3 (8-14 Dec) | **Est:** 2d | **Depends:** U-02, U-03, U-05
-- **Branch:** `nikhil/N-09-state-machine`
-- **Model hint:** opus / high design, sonnet / medium implement
-- **Deliverables:** `backend/apps/workflow/services.py` `transition()` enforcing CONTRACTS section 7; `POST /recommendations/{id}/decision` with role check (`PROCUREMENT_MANAGER` only), creates Approval, triggers execution only on APPROVE; every transition audited.
-- **Acceptance:**
-  - [ ] Table-driven test covering every allowed and forbidden transition
-  - [ ] TC-06: reject -> no execution call, comments audited
-  - [ ] OPS_MANAGER / VIEWER cannot decide (403)
-- **Done in:** -
-- **Notes:** -
-
-### N-10: Data Hub supplier golden record (OPTIONAL)
-- **Status:** todo
-- **Sprint:** S4 (15-20 Dec) | **Est:** 1.5d | **Depends:** R-01 (only if Data Hub enabled)
-- **Branch:** `nikhil/N-10-data-hub`
-- **Model hint:** sonnet / medium
-- **Deliverables:** supplier model in Data Hub, match rule on name+tax id, 3 seeded duplicates resolved; integration process uses golden ID.
+- **Deliverables:** supplier model in Data Hub, match rule on name + tax id, the 3 seeded duplicates resolved; integration processes use the golden ID.
 - **Acceptance:**
   - [ ] Duplicate suppliers in seed collapse to one golden record
-  - [ ] If Data Hub not enabled: mark this task `done` with Notes "skipped - not licensed"
+  - [ ] If Data Hub not enabled: mark `done` with Notes "skipped - not licensed"
 - **Done in:** -
 - **Notes:** -
 
-### N-11: AI governance + approval tests
+### N-13: AI governance + approval tests
 - **Status:** todo
-- **Sprint:** S5 (21-26 Dec) | **Est:** 1.5d | **Depends:** N-05, N-09
-- **Branch:** `nikhil/N-11-ai-tests`
+- **Sprint:** S5 (21-24 Dec) | **Est:** 1.5d | **Depends:** N-07, N-10
+- **Branch:** `nikhil/N-13-ai-tests`
 - **Model hint:** sonnet / medium write, haiku / low run
-- **Deliverables:** tests for TC-04, TC-05, TC-06, hallucination/guardrail suite, unauthorized approval attempts; results added to `docs/TEST_REPORT.md`.
+- **Deliverables:** tests for TC-04, TC-05, TC-06, hallucination/guardrail suite, unauthorized approval attempts; results in `docs/TEST_REPORT.md`.
 - **Acceptance:**
   - [ ] All listed TCs pass and are in the report
-  - [ ] AC-03 evidence: screenshot or JSON showing facts vs estimates vs missing data
+  - [ ] AC-03 evidence: JSON or screenshot showing facts vs estimates vs missing data
 - **Done in:** -
 - **Notes:** -
 
-### N-12: Demo script, deck, video storyboard
+### N-14: End-to-end integration tests
 - **Status:** todo
-- **Sprint:** S6 (27-31 Dec) | **Est:** 2d | **Depends:** S-03 dry run
-- **Branch:** `nikhil/N-12-demo-script`
-- **Model hint:** opus / high for story, haiku / low for formatting
-- **Deliverables:** `docs/DEMO_SCRIPT.md` (7-8 min, 7 scenes from PRODUCT_STRATEGY), slide deck outline, video shot list, Q&A prep (architecture, governance, Marketplace).
+- **Sprint:** S5 (22-26 Dec) | **Est:** 1.5d | **Depends:** U-10, U-11, N-10
+- **Branch:** `nikhil/N-14-e2e-tests`
+- **Model hint:** sonnet / medium to write, haiku / low to run and report
+- **Deliverables:** `tests/e2e/` scripts that fire each scenario in `data/scenarios/` and assert outcomes; results table in `docs/TEST_REPORT.md`.
 - **Acceptance:**
-  - [ ] Two timed rehearsals under 8 min
-  - [ ] Every Boomi service has a visible moment
+  - [ ] TC-01, 02, 03, 07, 08, 09 automated and passing
+  - [ ] Event-to-risk latency measured and recorded (target < 10 s)
 - **Done in:** -
 - **Notes:** -

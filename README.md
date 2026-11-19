@@ -4,7 +4,7 @@
 
 > Predict -> Understand -> Recover -> Verify. SupplyGuard AI detects supplier disruptions, finds affected purchase orders, explains the risk with evidence, recommends recovery options, routes them for human approval and executes the approved change through Boomi - with a full audit trail.
 
-**Deadline:** 31 Dec 2026 · **Team:** Roop (lead), Nikhil, Uday · **Live progress:** [PROGRESS.md](PROGRESS.md)
+**Deadline:** 31 Dec 2026 · **Team:** Roop (frontend), Nikhil (data & AI), Uday (backend & integration) · **Live progress:** [PROGRESS.md](PROGRESS.md)
 
 ## Start here (every team member)
 1. Clone and switch to the integration branch:
@@ -36,12 +36,12 @@ Check anyone's progress: `/status nikhil` in Claude Code, or `python scripts/pro
 
 ## Repository layout
 ```
-backend/      Django REST API (Uday: core, Roop: apps/integrations, Nikhil: apps/intelligence + apps/workflow)
-frontend/     React + Vite + TS + Tailwind SaaS UI (Uday)
-mock-erp/     FastAPI demo ERP that Boomi reads/writes (Roop)
-boomi/        Boomi process specs/exports, API, Flow, agents, Marketplace package (Roop; flow/ + agents/ Nikhil)
+backend/      Django REST API (Uday: core + apps/integrations, Nikhil: apps/intelligence + apps/workflow, Roop: apps/portal)
+frontend/     React + Vite + TS + Tailwind SaaS UI (Roop)
+mock-erp/     FastAPI demo ERP that Boomi reads/writes (Nikhil)
+boomi/        Boomi assets: processes/ + api/ (Uday), processes/correlation/ + agents/ (Nikhil), flow/ + marketplace/ (Roop)
 ai/           Agent JSON schemas, fixtures, prompts (Nikhil)
-data/         Synthetic seed data + test scenarios (Roop)
+data/         Synthetic seed data + test scenarios (Nikhil)
 scripts/      progress.py and helper scripts
 tasks/        Per-member task files (single source of task status)
 progress/     Session log

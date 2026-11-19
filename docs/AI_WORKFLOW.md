@@ -23,7 +23,7 @@ Other commands:
 |---|---|
 | `/status nikhil` / `/status all` | done / in progress / pending / overdue / next task, from task files + git trailers |
 | `/handoff` | save where you left off (task file + session log + PROGRESS.md), commit, push |
-| `/done R-06` | verify acceptance, mark done, push, open PR to `collaboration` |
+| `/done U-06` | verify acceptance, mark done, push, open PR to `collaboration` |
 | `/sync` | rebase your task branch on latest `collaboration`, resolve conflicts, run tests |
 
 Without Claude: `python scripts/progress.py uday` prints the same status.
@@ -62,7 +62,7 @@ Token hygiene:
 - One task per session where possible; `/handoff` and start a fresh session for the next task.
 
 ## 5. Nested sessions for parallel work
-For a big task (e.g. U-08 screen + U-09 screen, or N-03 + N-04 agents) the advisor can start separate Claude Code sessions / worktrees per subtask. Rules:
+For a big task (e.g. R-04 + R-05 screens, or N-05 + N-06 agents) the advisor can start separate Claude Code sessions / worktrees per subtask. Rules:
 - Each sub-session works on its own sub-branch `<member>/<TASK-ID>-<slug>--<sub>` cut from the task branch.
 - Sub-sessions never touch the same files.
 - The advisor merges sub-branches into the task branch, runs tests, then reviewer, then PR to `collaboration`.

@@ -1,184 +1,159 @@
-# Tasks - Roop (Team Lead · Integration & Platform)
+# Tasks - Roop (Frontend · React SaaS UI, approval screens, demo & Marketplace)
 
-**Stream:** Boomi Integration, Event Streams, API Management, mock ERP, event intake + execution in Django, deployment, Marketplace package.
-**Owns:** `boomi/`, `mock-erp/`, `data/`, `backend/apps/integrations/`, `deploy/`, `docs/BOOMI_ENV.md`, `docs/INSTALL.md`
-**Lead duties:** owns `docs/CONTRACTS.md` freeze (S-01), reviews PRs into `collaboration`, merges `collaboration` -> `main` at each milestone.
+**Background:** React / frontend developer. Claude explains backend, Boomi and data concepts in frontend terms (components, props, state, API calls, forms).
+**Stream:** All React screens, the read APIs those screens use, the Boomi Flow approval screens, CI, demo story, Marketplace package.
+**Owns:** `frontend/`, `backend/apps/portal/` (UI read APIs), `boomi/flow/`, `boomi/marketplace/`, `.github/workflows/ci.yml`, `docs/DEMO_SCRIPT.md`
 
 > Status values: `todo` · `in-progress` · `blocked` · `review` · `done`. Only change the `Status`, `Done in`, checkboxes and Notes lines - keep the format, `scripts/progress.py` parses it.
 > Model hint = what the advisor (Opus 5.5) should delegate the bulk of the work to. See `docs/AI_WORKFLOW.md`.
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (setup)
+- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
 - **Current task:** -
 - **Branch:** -
-- **Where I left off:** Project structure and task split created. Nothing implemented yet.
-- **Next step:** Start R-01 (Boomi environment check) and S-01 (freeze contracts with team).
+- **Where I left off:** Task split done. Nothing implemented yet.
+- **Next step:** Start R-01 (frontend scaffold with mock API) today - it does not wait for the backend.
 - **Blockers:** none
 
 ---
 
-### R-01: Boomi environment and service verification
+### R-01: Frontend scaffold + design system
 - **Status:** todo
-- **Sprint:** S0 (19-23 Nov) | **Est:** 1d | **Depends:** -
-- **Branch:** `roop/R-01-boomi-env`
-- **Model hint:** haiku / low (checklist + docs), you do the Boomi UI clicks
-- **Deliverables:** `docs/BOOMI_ENV.md` - account ID, environments, runtime (cloud atom / local atom), which of Integration, Event Streams, Agentstudio, Flow, API Management, Data Hub are enabled, team member access, chosen fallbacks (CONTRACTS section 8).
-- **Acceptance:**
-  - [ ] All 6 services checked and recorded as enabled / not enabled
-  - [ ] Nikhil and Uday have Boomi platform access
-  - [ ] Fallback decision recorded for every missing service
-- **Done in:** -
-- **Notes:** -
-
-### R-02: Mock ERP service
-- **Status:** todo
-- **Sprint:** S0 (19-23 Nov) | **Est:** 2d | **Depends:** S-01
-- **Branch:** `roop/R-02-mock-erp`
+- **Sprint:** S0-S1 (19-25 Nov) | **Est:** 2d | **Depends:** -
+- **Branch:** `roop/R-01-frontend-scaffold`
 - **Model hint:** sonnet / medium
-- **Deliverables:** `mock-erp/` FastAPI app (Python 3.12) implementing CONTRACTS section 5, loads `data/seed/*.json`, in-memory store with reset endpoint, `Idempotency-Key` enforcement on PATCH, chaos endpoint, Dockerfile, pytest tests.
+- **Deliverables:** `frontend/` Vite + React 18 + TypeScript + Tailwind + React Router + TanStack Query + Recharts; app shell (sidebar with the 9 screens, tenant/user badge, light/dark tokens); login page + token refresh; API client typed from `docs/CONTRACTS.md` section 4 (switch to types generated from `/api/schema/` with openapi-typescript once U-02 is live); MSW mock handlers so screens work before the backend exists (`VITE_API_MOCK=true`); Vitest + Testing Library.
 - **Acceptance:**
-  - [ ] All endpoints in CONTRACTS section 5 respond with seed data
-  - [ ] Same `Idempotency-Key` twice -> second call returns first result, no double update
-  - [ ] `_chaos timeout` makes PATCH hang > 30 s; `off` restores
-  - [ ] `docker compose up mock-erp` works
+  - [ ] `npm run build` and `npm test` green
+  - [ ] Login + protected routes work against MSW mocks
+  - [ ] Setting `VITE_API_MOCK=false` points the same code at the real backend
 - **Done in:** -
 - **Notes:** -
 
-### R-03: Synthetic demo dataset
+### R-02: Read APIs for the UI (Django `apps/portal`)
 - **Status:** todo
-- **Sprint:** S0 (19-23 Nov) | **Est:** 1d | **Depends:** S-01
-- **Branch:** `roop/R-03-seed-data`
-- **Model hint:** sonnet / medium (generator script), haiku to sanity-check
-- **Deliverables:** `data/generate_seed.py` (deterministic, seeded RNG) -> `data/seed/{tenants,suppliers,purchase_orders,inventory,alternate_suppliers,shipments}.json`; 2 tenants (TEN-ACME, TEN-GLOBEX), 100 suppliers, 500 POs, 3 locations, 20 active shipments; `data/scenarios/*.json` canonical events for TC-01..TC-09 and the demo (SUP-1008 factory outage, 48 h).
+- **Sprint:** S1 (26-30 Nov) | **Est:** 2d | **Depends:** U-03, U-04
+- **Branch:** `roop/R-02-read-apis`
+- **Model hint:** sonnet / medium (Claude explains DRF as "the backend side of the screens you build")
+- **Deliverables:** `backend/apps/portal/`: `GET /suppliers`, `GET /suppliers/{id}`, `GET /dashboard/summary`, `GET /risk-cases`, `GET /risk-cases/{id}` per CONTRACTS section 4; filters + pagination; built on Uday's tenant-scoped base classes (U-04); OpenAPI tags; pytest.
 - **Acceptance:**
-  - [ ] Demo scenario yields exactly the numbers documented in `data/README.md` (affected POs, exposure, 2 alternates)
-  - [ ] TC-04 scenario has enough inventory to cover the delay; TC-05 scenario has no alternates
-  - [ ] Uday's seed loader (U-02) and mock ERP both load the same files
+  - [ ] Every endpoint tenant-scoped (uses U-04 mixin) and tested
+  - [ ] `/risk-cases/{id}` returns event, affected POs, analysis, recommendations, approvals, executions, timeline in one call
+  - [ ] MSW mocks in `frontend/` updated to match the real responses
 - **Done in:** -
 - **Notes:** -
 
-### R-04: Boomi ERP read processes + canonical profiles
+### R-03: Executive Overview + Supplier Intelligence screens
 - **Status:** todo
-- **Sprint:** S1 (24-30 Nov) | **Est:** 3d | **Depends:** R-01, R-02
-- **Branch:** `roop/R-04-boomi-erp-read`
-- **Model hint:** sonnet / medium (use the boomi-integration skill if installed); opus / high for mapping design review
-- **Deliverables:** Boomi processes `SG_Get_Supplier`, `SG_Get_Open_POs_By_Supplier`, `SG_Get_Inventory`, `SG_Get_Alternate_Suppliers`; JSON profiles matching CONTRACTS; HTTP Client connection to mock ERP (URL from environment extension). Exported component XML/notes in `boomi/processes/`, test runs in `boomi/TEST_LOG.md`.
-- **Acceptance:**
-  - [ ] Each process test-run in Boomi returns canonical JSON
-  - [ ] Connection URL and credentials are environment extensions (no hard-coding)
-  - [ ] Exports committed under `boomi/`
-- **Done in:** -
-- **Notes:** -
-
-### R-05: Event Streams topics + disruption subscriber
-- **Status:** todo
-- **Sprint:** S1 (24-30 Nov) | **Est:** 2d | **Depends:** R-01, R-04
-- **Branch:** `roop/R-05-event-streams`
+- **Sprint:** S2 (1-5 Dec) | **Est:** 2d | **Depends:** R-01, R-02
+- **Branch:** `roop/R-03-overview-suppliers`
 - **Model hint:** sonnet / medium
-- **Deliverables:** topics `supplier.disruption`, `shipment.delay`, `recovery.status`; publisher process; subscriber process that runs correlation (R-07). If Event Streams unavailable, fallback from CONTRACTS section 8.
+- **Deliverables:** KPI tiles (suppliers, open POs, active shipments, exposure, open cases, recovered), trend charts; supplier list with filters + risk badges; supplier detail with KPIs and disruption history.
 - **Acceptance:**
-  - [ ] Publishing a canonical event triggers the subscriber within 2 s
-  - [ ] `correlation_id` preserved end to end
+  - [ ] Real seed data shown; loading / empty / error states handled
 - **Done in:** -
 - **Notes:** -
 
-### R-06: Django integrations app - event intake + Boomi client
+### R-04: Risk Command Center + case detail
 - **Status:** todo
-- **Sprint:** S1 (24-30 Nov) | **Est:** 2d | **Depends:** U-01, U-02, U-03
-- **Branch:** `roop/R-06-event-intake`
-- **Model hint:** sonnet / medium; opus / high review for idempotency + tenant check
-- **Deliverables:** `backend/apps/integrations/`: `POST /events/disruptions`, `POST /demo/simulate-disruption`, API-key auth for `SYSTEM`, duplicate detection on `event_id`, `BoomiClient` (httpx, timeout, bounded retry with backoff on transient errors only), publishes to Boomi; `GET /integrations/status`.
-- **Acceptance:**
-  - [ ] TC-01: valid event -> 202 + correlation_id, DisruptionEvent stored, Boomi called
-  - [ ] TC-02: unknown supplier -> flagged for data correction, no RiskCase
-  - [ ] TC-09: duplicate event_id -> same correlation_id, no second case
-  - [ ] Tenant mismatch between key and payload -> 403
-  - [ ] pytest coverage for all of the above
-- **Done in:** -
-- **Notes:** -
-
-### R-07: Boomi correlation + impact orchestration process
-- **Status:** todo
-- **Sprint:** S2 (1-7 Dec) | **Est:** 2d | **Depends:** R-04, R-05, N-02
-- **Branch:** `roop/R-07-correlation`
+- **Sprint:** S2-S3 (4-10 Dec) | **Est:** 2.5d | **Depends:** R-02, U-06
+- **Branch:** `roop/R-04-risk-center`
 - **Model hint:** sonnet / medium
-- **Deliverables:** process `SG_Disruption_Correlate`: event -> fetch supplier/POs/inventory/alternates -> `POST /internal/risk-cases` (snapshot) -> invoke agents (N-06) -> post analysis back. Errors routed to error handling (R-10).
+- **Deliverables:** live case inbox (poll every 3 s), severity filters, "Simulate Supplier Disruption" button (calls `/demo/simulate-disruption`), case detail: event, affected POs table, AI analysis with facts / estimates / assumptions / missing data visually distinct, evidence links, status timeline.
 - **Acceptance:**
-  - [ ] Demo scenario creates RiskCase with correct AffectedPOs in < 10 s
-  - [ ] TC-03: all open POs of supplier evaluated
+  - [ ] New case appears within 5 s of the simulate click
+  - [ ] Estimates and missing data visibly labelled (AC-03)
 - **Done in:** -
 - **Notes:** -
 
-### R-08: Boomi API Management
+### R-05: AI Recommendations + Approval Center
 - **Status:** todo
-- **Sprint:** S2 (1-7 Dec) | **Est:** 1.5d | **Depends:** R-04, R-05
-- **Branch:** `roop/R-08-api-management`
-- **Model hint:** haiku / low (docs), sonnet / medium for policies
-- **Deliverables:** API Proxy/Service in front of Boomi listener processes; API key policy; rate limit; Django `BoomiClient` uses gateway URL + key from env; `boomi/api/` contains the API definition (OpenAPI).
-- **Acceptance:**
-  - [ ] Calls without key are rejected by the gateway
-  - [ ] Django -> gateway -> Boomi process works end to end
-- **Done in:** -
-- **Notes:** -
-
-### R-09: Approved-action execution process
-- **Status:** todo
-- **Sprint:** S3 (8-14 Dec) | **Est:** 2.5d | **Depends:** R-04, N-08, N-09
-- **Branch:** `roop/R-09-execution`
-- **Model hint:** sonnet / medium; opus / high review (no write without approval)
-- **Deliverables:** process `SG_Execute_Approved_Action`: verifies approval reference, PATCHes mock ERP with `Idempotency-Key = execution_id`, re-reads PO to verify, `POST /internal/executions/{id}/result`, publishes `recovery.status`.
-- **Acceptance:**
-  - [ ] TC-07: approved option updates the PO and case becomes RECOVERED only after verification
-  - [ ] TC-06: rejected option never reaches ERP (asserted via mock ERP request log)
-- **Done in:** -
-- **Notes:** -
-
-### R-10: Error handling, retry, dead-letter
-- **Status:** todo
-- **Sprint:** S3-S4 (12-17 Dec) | **Est:** 2d | **Depends:** R-06, R-09
-- **Branch:** `roop/R-10-error-handling`
-- **Model hint:** sonnet / medium; opus / high review
-- **Deliverables:** error classification (validation / auth / business / transient / downstream) in Boomi + Django; bounded retry for transient only; failed message store (sanitized); `POST /executions/{id}/retry` with eligibility check.
-- **Acceptance:**
-  - [ ] TC-08: ERP timeout -> EXECUTION_FAILED, retry succeeds once, no duplicate PO update
-  - [ ] Validation/auth errors are never auto-retried
-  - [ ] No secrets in logs (grep check in test)
-- **Done in:** -
-- **Notes:** -
-
-### R-11: Local + hosted deployment
-- **Status:** todo
-- **Sprint:** S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | **Est:** 2d | **Depends:** U-01, R-02
-- **Branch:** `roop/R-11-deploy`
+- **Sprint:** S3 (8-12 Dec) | **Est:** 2d | **Depends:** R-04, N-10
+- **Branch:** `roop/R-05-approvals`
 - **Model hint:** sonnet / medium
-- **Deliverables:** root `docker-compose.yml` (postgres, backend, frontend, mock-erp); tunnel instructions for Boomi cloud atom in S1; hosted backend/frontend/mock-erp + managed Postgres in S4; `deploy/` configs; secrets only in host env vars; `docs/INSTALL.md`.
+- **Deliverables:** ranked option cards with cost / lead-time comparison, trade-offs, evidence; pending approvals queue; Approve / Reject / Request changes with comment (role-gated); execution status + retry button (U-11).
 - **Acceptance:**
-  - [ ] `docker compose up` gives a working stack on a fresh clone
-  - [ ] Hosted URLs reachable by Boomi; HTTPS
-  - [ ] `.env.example` complete, no real secrets committed
+  - [ ] Buttons hidden/disabled for roles that cannot decide
+  - [ ] UNSUPPORTED options shown but not approvable
+- **Done in:** -
+- **Notes:** -
+
+### R-06: Boomi Flow approval workflow
+- **Status:** todo
+- **Sprint:** S3 (9-14 Dec) | **Est:** 2.5d | **Depends:** N-07, N-10, U-01
+- **Branch:** `roop/R-06-flow-approval`
+- **Model hint:** sonnet / medium via `boomi-builder` (Claude explains Flow as "a low-code screen + form builder with a state diagram")
+- **Deliverables:** Flow app: approval page showing evidence + options, Approve / Reject / Request changes, comment, escalation after N hours; each decision calls `POST /recommendations/{id}/decision` (Nikhil's endpoint, N-10), which triggers execution (U-10) on approve. Direction and setup documented in `boomi/flow/README.md`. Fallback if Flow is not licensed: SaaS Approval Center (R-05) only.
+- **Acceptance:**
+  - [ ] Approve in Flow -> execution starts; Reject -> no execution
+  - [ ] Decision visible in the SaaS Approval Center and audit within 5 s
+- **Done in:** -
+- **Notes:** -
+
+### R-07: What-if Simulator UI
+- **Status:** todo
+- **Sprint:** S4 (15-17 Dec) | **Est:** 1.5d | **Depends:** N-11, R-01
+- **Branch:** `roop/R-07-what-if-ui`
+- **Model hint:** sonnet / medium
+- **Deliverables:** supplier picker, duration slider, event type; results: affected POs, inventory gap chart, exposure, best option, assumptions panel.
+- **Acceptance:**
+  - [ ] "Supplier A out 7 days" renders in < 3 s
+- **Done in:** -
+- **Notes:** -
+
+### R-08: Integration Center, Audit Center, Tenant Settings
+- **Status:** todo
+- **Sprint:** S4 (16-20 Dec) | **Est:** 2d | **Depends:** U-04, U-05, U-06
+- **Branch:** `roop/R-08-admin-screens`
+- **Model hint:** sonnet / medium
+- **Deliverables:** connection health cards (`/integrations/status`); audit table with filters + correlation-id trace view; settings (risk thresholds, users, roles) for ADMIN.
+- **Acceptance:**
+  - [ ] Searching a correlation id shows event -> analysis -> approval -> execution in order (AC-07)
+- **Done in:** -
+- **Notes:** -
+
+### R-09: CI pipeline
+- **Status:** todo
+- **Sprint:** S1 (24-26 Nov) | **Est:** 0.5d | **Depends:** R-01, U-02
+- **Branch:** `roop/R-09-ci`
+- **Model hint:** haiku / low
+- **Deliverables:** `.github/workflows/ci.yml`: backend ruff + pytest with Postgres service, frontend lint + typecheck + test + build, mock-erp tests; runs on PRs to `collaboration` and `main`.
+- **Acceptance:**
+  - [ ] CI green on `collaboration`; added as required check on both protected branches
+- **Done in:** -
+- **Notes:** -
+
+### R-10: UX polish + demo mode
+- **Status:** todo
+- **Sprint:** S5 (21-26 Dec) | **Est:** 1.5d | **Depends:** R-03, R-04, R-05, R-07, R-08
+- **Branch:** `roop/R-10-polish`
+- **Model hint:** sonnet / medium; opus / high for a final UI review
+- **Deliverables:** consistent spacing/typography, responsive down to 1280 px, skeleton loaders, toasts, "illustrative synthetic data" label, demo reset button (ADMIN), screenshots for the Marketplace listing.
+- **Acceptance:**
+  - [ ] Full demo path clicked through with zero console errors
+- **Done in:** -
+- **Notes:** -
+
+### R-11: Demo script, deck, video storyboard
+- **Status:** todo
+- **Sprint:** S6 (27-31 Dec) | **Est:** 2d | **Depends:** S-03
+- **Branch:** `roop/R-11-demo-script`
+- **Model hint:** opus / high for the story, haiku / low for formatting
+- **Deliverables:** `docs/DEMO_SCRIPT.md` (7-8 min, 7 scenes from `docs/PRODUCT_STRATEGY.md`), slide deck outline, video shot list, Q&A prep (architecture, AI governance, Marketplace) - Nikhil and Uday supply the technical answers.
+- **Acceptance:**
+  - [ ] Two timed rehearsals under 8 min
+  - [ ] Every Boomi service has a visible moment
 - **Done in:** -
 - **Notes:** -
 
 ### R-12: Marketplace accelerator package
 - **Status:** todo
-- **Sprint:** S5-S6 (24-30 Dec) | **Est:** 2d | **Depends:** R-09, N-08
+- **Sprint:** S5-S6 (24-30 Dec) | **Est:** 2d | **Depends:** U-10, R-06, N-09
 - **Branch:** `roop/R-12-marketplace`
 - **Model hint:** haiku / low for docs assembly, opus / high final review
-- **Deliverables:** Boomi packaged components for all SG processes, agents, Flow, API; `boomi/marketplace/` with listing text, install guide, config templates, sample data, architecture diagram, screenshots.
+- **Deliverables:** `boomi/marketplace/`: listing text, install guide, config templates, sample data, architecture diagram, screenshots; Boomi packaged components list (Uday and Nikhil package their own processes/agents, Roop assembles).
 - **Acceptance:**
-  - [ ] Package installs into a clean Boomi account following only the guide (dry run by Uday or Nikhil)
-- **Done in:** -
-- **Notes:** -
-
-### R-13: End-to-end integration tests
-- **Status:** todo
-- **Sprint:** S5 (21-26 Dec) | **Est:** 1.5d | **Depends:** R-09, R-10, N-09
-- **Branch:** `roop/R-13-e2e-tests`
-- **Model hint:** sonnet / medium to write, haiku / low to run and report
-- **Deliverables:** `tests/e2e/` scripts that fire each scenario in `data/scenarios/` and assert outcomes; results table in `docs/TEST_REPORT.md`.
-- **Acceptance:**
-  - [ ] TC-01, 02, 03, 07, 08, 09 automated and passing
-  - [ ] Event-to-risk latency measured and recorded (target < 10 s)
+  - [ ] Package installs into a clean Boomi account following only the guide (dry run by Nikhil or Uday)
 - **Done in:** -
 - **Notes:** -
