@@ -24,7 +24,7 @@ Output = `ai/schemas/risk_analysis.schema.json`.
 | Every claim has evidence pointing to snapshot data | grader enforces it (`claims_backed_by_evidence`); **needs a real run** |
 | 5 adversarial prompts -> missing data reported | cases + grader ready; **needs real runs** |
 
-**Not yet created in Agentstudio** - waiting on U-01 (`docs/BOOMI_ENV.md`: is Agentstudio enabled, does Nikhil have access). If Agentstudio is not available, CONTRACTS section 8 fallback applies: N-09 runs these instructions on `claude-sonnet-5-5`.
+**In Agentstudio (2026-11-19):** "SG Supplier Risk Analyst" saved as a draft in Uday's account (built by Nikhil with Uday's agreement): Structured mode, Claude Sonnet 4.5 (Boomi-managed), one task "Analyse supplier disruption risk" holding `agentstudio_task_instructions.txt` (plain-text copy of `instructions.md` v1.1.0), compact input schema, inlined output schema, guardrails per `agent.json`. **Not yet tested:** the Test Agent panel did not accept automated input, so the runs below are done by hand. Not deployed.
 
 The grader is a prompt-testing aid. It checks values, ids, dates and wording patterns, not meaning: a sentence can cite the right numbers and still mislead, so every graded run is also read by a person before it counts as evidence.
 
@@ -36,12 +36,11 @@ The grader is a prompt-testing aid. It checks values, ids, dates and wording pat
 5. Record the agent id and version in `agent.json` and in `boomi/TEST_LOG.md`.
 
 ## Run the acceptance tests against the real agent
-For each case (demo, then ADV-01..ADV-05):
+Agentstudio -> Agents -> SG Supplier Risk Analyst -> Test Agent panel (runtime "USA East Agent Garden Cloud 01"). For each of DEMO, ADV-01 .. ADV-05:
 ```
-python -m ai.eval.build_agent_input demo > input.json          # ADV-05 uses tc05_no_alternates
-# ADV-02: replace event.description with the case's event_description first
+python -m ai.eval.payload DEMO | clip       # copies the one-line JSON to the clipboard (Windows)
 ```
-1. Send `input.json` as the message (plus the case's `user_message`, if any).
+1. Paste it into the Test Agent box and send. (Structured mode takes one JSON; for adversarial cases the chat request is inside it as `user_message`, and ADV-02's injected description is already applied.)
 2. Save the agent's JSON reply as `eval/runs/<date>_<case>.json`.
 3. Grade it:
 ```
