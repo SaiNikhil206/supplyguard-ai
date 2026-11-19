@@ -1,7 +1,11 @@
 import { apiFetch } from '@/api/client';
 import type { Money, Role } from '@/api/types';
 
-/** PROVISIONAL shapes (docs/CONTRACTS.md is silent on /settings and /users bodies). */
+/**
+ * PROVISIONAL shapes (docs/CONTRACTS.md is silent on /settings and /users bodies).
+ * In particular `approval` (require_comment_on_reject, auto_escalate_hours) and
+ * `polling_seconds` are NOT in CONTRACTS; confirm with U-04 before relying on them.
+ */
 export interface TenantSettings {
   risk_thresholds: {
     critical_score: number;

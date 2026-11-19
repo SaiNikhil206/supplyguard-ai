@@ -4,6 +4,7 @@ import type { TenantSettings } from '@/api/admin/settings';
 import { Button, Field, Input } from '@/components/ui';
 import { fieldErrors, useSaveSettings } from './hooks';
 
+/** PROVISIONAL: approval settings and polling_seconds are not in docs/CONTRACTS.md yet. */
 export function ApprovalForm({ settings }: { settings: TenantSettings }) {
   const initial = {
     comment: settings.approval.require_comment_on_reject,
