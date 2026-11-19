@@ -92,7 +92,7 @@
 - **Notes:** -
 
 ### R-07: What-if Simulator UI
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S4 (15-17 Dec) | **Est:** 1.5d | **Depends:** N-11, R-01
 - **Branch:** `roop/R-07-what-if-ui`
 - **Model hint:** sonnet / medium
@@ -100,10 +100,10 @@
 - **Acceptance:**
   - [ ] "Supplier A out 7 days" renders in < 3 s
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-08: Integration Center, Audit Center, Tenant Settings
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S4 (16-20 Dec) | **Est:** 2d | **Depends:** U-04, U-05, U-06
 - **Branch:** `roop/R-08-admin-screens`
 - **Model hint:** sonnet / medium
@@ -111,7 +111,7 @@
 - **Acceptance:**
   - [ ] Searching a correlation id shows event -> analysis -> approval -> execution in order (AC-07)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-09: CI pipeline
 - **Status:** review
