@@ -89,7 +89,9 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
-| 2026-11-19 | c0cf42b | roop | R-01 | in-progress | merge: R-01 --review-fixes sub-branch into task branch |
+| 2026-11-19 | 2aed25a | nikhil | N-03 | review | chore(tasks): handoff N-03 - in review, compose pending on Uday |
+| 2026-11-19 | 462be3e | nikhil | N-03 | review | feat(mock-erp): FastAPI mock ERP with idempotent PATCH and chaos |
+| 2026-11-19 | 64a246f | roop | S-02 | in-progress | ci(automation): auto-merge ready task branches and auto-sync everyone |
 | 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |
 | 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
 | 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |
@@ -107,5 +109,3 @@
 | 2026-11-19 | e88c783 | roop | R-01 | in-progress | feat(frontend): Vite React TS scaffold, tokens, app shell, 9 routes |
 | 2026-11-19 | f717b25 | roop | R-01 | in-progress | chore(tasks): start R-01 frontend scaffold |
 | 2026-11-19 | e2906ed | roop | S-01 | in-progress | chore(tasks): re-assign tasks by role, remove team lead |
-| 2026-11-19 | 35d9259 | roop | S-01 | in-progress | fix(scripts): read Task/Status/Member trailers from full commit body |
-| 2026-11-19 | 75e0679 | roop | S-01 | in-progress | chore(setup): team task split, Claude workflow and progress tracking |
