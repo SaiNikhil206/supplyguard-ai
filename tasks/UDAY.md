@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (U-02 scaffold built, in review)
-- **Current task:** U-02
+- **Last updated:** 2026-11-19 (U-02 done and merged, review follow-ups applied)
+- **Current task:** -
 - **Branch:** `uday/U-02-backend-scaffold`
-- **Where I left off:** Backend scaffold done and committed; pytest + ruff green. Docker compose not run yet (Docker Desktop was off).
-- **Next step:** Run `docker compose up --build backend db`, tick the box, merge U-02. Then U-03 (needs S-01 contracts frozen) and U-01 (manual Boomi checks).
-- **Blockers:** none
+- **Where I left off:** U-02 merged into collaboration; follow-up fixes (error body, accounts.User, compose/Docker hardening) pushed on the same branch. Everyone who ran the old scaffold must `docker compose down -v` once.
+- **Next step:** U-01 (manual Boomi checks) and S-01 (freeze contracts with Roop + Nikhil), which unblocks U-03.
+- **Blockers:** U-03 waits on S-01; U-01 needs the Boomi UI.
 
 ---
 
@@ -32,7 +32,7 @@
 - **Notes:** `docs/BOOMI_ENV.md` filled in read-only on 2026-11-19 (nothing created/changed in Boomi). Findings: Flow NOT available (flow.boomi.com: no tenants); Integration, Event Streams, Agentstudio, API Management, Data Hub are access-verified only (not build-verified); only Uday has a Boomi login; only runtime is the local runtime on Uday's PC ESI-PC28, attached to the BIMBA-OPCUA-Test environment. Still needs Uday: (1) invite Roop + Nikhil in Settings > User Management, (2) confirm Flow fallback (proposed: approval in SaaS Approval Center only, affects R-06/R-12), (3) confirm account expiry is after 31 Dec 2026 (not shown in the UI), (4) choose reuse BIMBA environment vs new SG-Dev + second runtime. Then tick the two open boxes and set Status review. Checklist drafted by Roop's Claude session.
 
 ### U-02: Backend scaffold
-- **Status:** review
+- **Status:** done
 - **Sprint:** S0 (19-21 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `uday/U-02-backend-scaffold`
 - **Model hint:** sonnet / medium
@@ -41,8 +41,8 @@
   - [x] `docker compose up backend db` serves `/api/health` and `/api/schema/`
   - [x] `pytest` green with one smoke test
   - [x] All app shells registered in settings
-- **Done in:** -
-- **Notes:** Verified with Docker (Postgres 16): `/api/health` -> `{"status":"ok","db":"ok"}`, `/api/schema/` -> 200; pytest (3 tests) + ruff green. If host port 8000 is taken, run `BACKEND_PORT=8001 docker compose up --build backend db`. Tests default to in-memory SQLite (`D:DATABASE_URL` in pyproject); set `DATABASE_URL` to Postgres in CI. AUTH_USER_MODEL is still Django's default - U-03 introduces the custom User (`accounts.User`); recreate the `pgdata` volume after that lands. Health endpoint is `/api/health` (no trailing slash, no tenant data).
+- **Done in:** 8dcf1b8
+- **Notes:** Verified with Docker (Postgres 16): `/api/health` -> `{"status":"ok","db":"ok"}`, `/api/schema/` -> 200; pytest (17 tests) + ruff green. Review follow-ups done: compose passes `.env` through (`env_file`, optional); no compose default for `SECRET_KEY` and an empty value counts as unset (refuses to start with DEBUG=False); compose uses runserver (dev) and the image runs as non-root; `apps.core.exceptions.contract_exception_handler` returns the CONTRACTS section 1 error body (reads `request.correlation_id` once U-05 middleware sets it; Django's own HTML 404 for unknown URLs is not covered); custom `accounts.User` + migration 0001 exist now. If host port 8000 is taken, run `BACKEND_PORT=8001 docker compose up --build backend db`. Tests default to in-memory SQLite (`D:DATABASE_URL` in pyproject); set `DATABASE_URL` to Postgres in CI. AUTH_USER_MODEL is `accounts.User` (U-03 adds tenant FK + role as migration 0002). Anyone who ran the earlier scaffold must run `docker compose down -v` once to recreate the Postgres volume. Health endpoint is `/api/health` (no trailing slash, no tenant data).
 
 ### U-03: Core data model + seed loader
 - **Status:** todo
