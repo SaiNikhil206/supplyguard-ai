@@ -86,3 +86,12 @@ Template:
 - Next: R-01 merges automatically once its /done marks it `review`/`done` and pushes
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 12:30 - roop - R-01
+- Branch: roop/R-01-frontend-scaffold @ cfaec62
+- Did: Built `frontend/` (Vite 8 + React 18 + TS 5.9 + Tailwind + Router + TanStack Query + Recharts): app shell with 9 screens, light/dark tokens, login + JWT refresh (single-flight), typed API from CONTRACTS + ai/schemas, MSW mocks (mock users in README), UI kit. Nested branches --scaffold/--auth/--review-fixes/--schema-fixes (subagents) and --api/--ui (visible sessions). auto-merge.yml now runs Node 22.22.2.
+- Tests: frontend 10 files / 76 passed; build OK; run_checks ai/data/frontend PASS (backend not present)
+- Status now: done
+- Next: R-09 once U-02 lands; R-02 after U-03/U-04
+- Blockers: Uday U-02/U-03/U-04; backend asks in ROOP.md Handoff (refresh lifetime/rotation, /me shape)
+- Models used: advisor opus; implementer sonnet x5, reviewer opus x2, 2 visible sonnet sessions

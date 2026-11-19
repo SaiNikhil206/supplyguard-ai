@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 0 | 0 | 0 | 0 | 12 | 0 | 0% | R-01 |
+| Roop | 1 | 0 | 0 | 0 | 11 | 0 | 8% | - |
 | Nikhil | 0 | 0 | 3 | 0 | 11 | 0 | 0% | - |
 | Uday | 0 | 0 | 1 | 0 | 11 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
@@ -19,7 +19,7 @@
 | N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-20 Nov) | review | 2/3 | - |
 | N-02 | Synthetic demo dataset | Nikhil | S0 (20-22 Nov) | review | 2/3 | - |
 | N-03 | Mock ERP service | Nikhil | S0-S1 (22-25 Nov) | review | 3/4 | - |
-| R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | todo | 0/3 | - |
+| R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | done | 3/3 | cfaec62 |
 | S-01 | Freeze contracts v1 | Shared | S0 (19-20 Nov) | in-progress | 0/3 | - |
 | U-01 | Boomi environment and service verification | Uday | S0 (19-20 Nov) | todo | 0/3 | - |
 | U-02 | Backend scaffold | Uday | S0 (19-21 Nov) | review | 3/3 | - |
@@ -62,12 +62,12 @@
 ## Where each member left off
 
 ### Roop
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start R-01 (frontend scaffold with mock API) today - it does not wait for the backend.
-- **Blockers:** none
+- **Last updated:** 2026-11-19 (R-01 done)
+- **Current task:** - (R-01 done; auto-merge Action merges `roop/R-01-frontend-scaffold` into `collaboration`)
+- **Branch:** `roop/R-01-frontend-scaffold` (deleted by auto-merge once merged)
+- **Where I left off:** `frontend/` complete: shell + 9 placeholder screens, login/JWT refresh, MSW mocks (`src/mocks/`), typed API (`src/api/`), UI kit (`src/components/ui/`). 76 tests green.
+- **Next step:** Nothing ready yet. R-09 (CI) starts when Uday's U-02 lands; R-02 after U-03/U-04; R-07 after N-11. Meanwhile can draft R-03 screen layouts against MSW mocks.
+- **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ### Nikhil
 - **Last updated:** 2026-11-19 (N-03 implemented, in review)
@@ -89,8 +89,13 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | a464f4a | roop | R-01 | done | merge: R-01 Frontend scaffold + design system (auto-merge) |
+| 2026-11-19 | ffdc766 | roop | R-01 | done | chore(tasks): handoff R-01 - done |
+| 2026-11-19 | cfaec62 | roop | R-01 | done | chore(tasks): R-01 done - frontend scaffold, auth, mocks, UI kit |
+| 2026-11-19 | 96a74fc | roop | R-01 | in-progress | ci(automation): run auto-merge checks on Node 22.22.2 |
 | 2026-11-19 | 89e9f67 | nikhil | N-03 | review | merge: N-03 Mock ERP service (auto-merge) |
 | 2026-11-19 | 9f884ef | nikhil | N-03 | review | chore(tasks): N-03 handoff - N-01/N-02 auto-merged, N-03 ready |
+| 2026-11-19 | dcc2320 | roop | R-01 | in-progress | merge: R-01 --schema-fixes sub-branch into task branch |
 | 2026-11-19 | 8dcf1b8 | uday | U-02 | review | merge: U-02 Backend scaffold (auto-merge) |
 | 2026-11-19 | 4d2b535 | roop | R-01 | in-progress | fix(frontend): align API types and mocks with agent schemas |
 | 2026-11-19 | 63cdd3f | nikhil | N-02 | review | merge: N-02 Synthetic demo dataset (auto-merge) |
@@ -104,8 +109,3 @@
 | 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |
 | 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
 | 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |
-| 2026-11-19 | 4d5b9cd | nikhil | N-01 | review | merge: N-01 agent I/O JSON schemas + fixtures into collaboration |
-| 2026-11-19 | 422a05c | roop | S-02 | in-progress | docs(workflow): Claude merges PRs itself and continues to the next task |
-| 2026-11-19 | 2819fee | roop | R-01 | in-progress | merge: R-01 --auth sub-branch into task branch |
-| 2026-11-19 | fa0542d | roop | R-01 | in-progress | feat(frontend): login, AuthProvider, protected routes, user badge |
-| 2026-11-19 | 4333e31 | nikhil | N-01 | review | chore(tasks): handoff N-01 - in review, awaiting S-01 ratification |
