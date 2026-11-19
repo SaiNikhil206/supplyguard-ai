@@ -52,6 +52,26 @@ describe('Audit Center', () => {
     expect(screen.getByText(/Missing stage: no Execution events/)).toBeInTheDocument();
   });
 
+  it('renders SETTINGS and unknown entity events under Other events', async () => {
+    const base = {
+      actor: { type: 'USER', id: 'USR-001', name: 'Asha Admin' },
+      from_state: null,
+      to_state: null,
+      correlation_id: 'zz',
+      detail: 'x',
+    };
+    const results = [
+      { ...base, id: 'A1', at: '2026-11-01T10:00:00Z', entity_type: 'SETTINGS', entity_id: 'SET-1', action: 'UPDATED', detail: 'Threshold changed' },
+      { ...base, id: 'A2', at: '2026-11-01T10:01:00Z', entity_type: 'WIDGET', entity_id: 'W-1', action: 'POKED', detail: 'Unknown type' },
+    ];
+    server.use(http.get('*/api/v1/audit', () => HttpResponse.json({ count: 2, next: null, previous: null, results })));
+    renderWithProviders({ path: '/audit?correlation_id=zz&view=trace' });
+    const other = await screen.findByTestId('trace-other');
+    expect(within(other).getByText('Other events')).toBeInTheDocument();
+    expect(within(other).getByText(/Threshold changed/)).toBeInTheDocument();
+    expect(within(other).getByText(/Unknown type/)).toBeInTheDocument();
+  });
+
   it('shows empty state', async () => {
     renderWithProviders({ path: '/audit?entity_type=EXECUTION&action=UPDATED' });
     expect(await screen.findByText('No audit events match')).toBeInTheDocument();
