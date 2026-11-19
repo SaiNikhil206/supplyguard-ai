@@ -10,13 +10,18 @@ import IntegrationCenter from '@/pages/IntegrationCenter';
 import AuditCenter from '@/pages/AuditCenter';
 import TenantSettings from '@/pages/TenantSettings';
 import NotFound from '@/pages/NotFound';
+import Login from '@/pages/Login';
+import { ProtectedRoute } from '@/auth/ProtectedRoute';
 
-// TODO(auth subtask): add a public `/login` route here (outside AppShell) and wrap
-// the AppShell layout route element in <ProtectedRoute>.
 export const routes: RouteObject[] = [
+  { path: '/login', element: <Login /> },
   {
     path: '/',
-    element: <AppShell />,
+    element: (
+      <ProtectedRoute>
+        <AppShell />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <ExecutiveOverview /> },
       { path: 'suppliers', element: <SupplierIntelligence /> },

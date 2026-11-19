@@ -3,11 +3,20 @@ import { NavLink, Outlet } from 'react-router-dom';
 import clsx from 'clsx';
 import { navItems } from './nav';
 import { UserBadge } from './UserBadge';
+import { useAuth } from '@/auth/AuthProvider';
 import { useTheme } from '@/theme/ThemeProvider';
+
+const roleLabel = (r: string) =>
+  r
+    .toLowerCase()
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 
 export function AppShell() {
   const [open, setOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { me, signOut } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-bg text-text">
@@ -67,8 +76,14 @@ export function AppShell() {
             >
               {theme === 'dark' ? '☀ Light' : '☾ Dark'}
             </button>
-            {/* TODO(auth subtask): pass real user/tenant/role */}
-            <UserBadge />
+            <UserBadge name={me?.user.full_name} tenant={me?.tenant.name} role={me ? roleLabel(me.role) : undefined} />
+            <button
+              type="button"
+              onClick={signOut}
+              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-surface-2"
+            >
+              Sign out
+            </button>
           </div>
         </header>
         <main className="flex-1 p-6">
