@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|---|---|
 | Roop | 0 | 0 | 0 | 0 | 12 | 0 | 0% | R-01 |
 | Nikhil | 0 | 0 | 2 | 0 | 12 | 0 | 0% | - |
-| Uday | 0 | 0 | 0 | 0 | 12 | 0 | 0% | U-01 |
+| Uday | 0 | 0 | 1 | 0 | 11 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
 ## Task board
@@ -22,7 +22,7 @@
 | R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | todo | 0/3 | - |
 | S-01 | Freeze contracts v1 | Shared | S0 (19-20 Nov) | in-progress | 0/3 | - |
 | U-01 | Boomi environment and service verification | Uday | S0 (19-20 Nov) | todo | 0/3 | - |
-| U-02 | Backend scaffold | Uday | S0 (19-21 Nov) | todo | 0/3 | - |
+| U-02 | Backend scaffold | Uday | S0 (19-21 Nov) | review | 3/3 | - |
 | U-03 | Core data model + seed loader | Uday | S0 (21-23 Nov) | todo | 0/4 | - |
 | N-04 | Deterministic impact + risk scoring engine | Nikhil | S1 (25-30 Nov) | todo | 0/4 | - |
 | R-02 | Read APIs for the UI (Django `apps/portal`) | Roop | S1 (26-30 Nov) | todo | 0/3 | - |
@@ -78,19 +78,24 @@
 - **Blockers:** S-01 must add `daily_demand` to CONTRACTS s5 and confirm CONTRACTS names win over LLD 16.1 (Uday's U-03 depends on it).
 
 ### Uday
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start U-01 (Boomi env check) and U-02 (backend scaffold) today - everyone depends on U-03 models by 23 Nov.
+- **Last updated:** 2026-11-19 (U-02 scaffold built, in review)
+- **Current task:** U-02
+- **Branch:** `uday/U-02-backend-scaffold`
+- **Where I left off:** Backend scaffold done and committed; pytest + ruff green. Docker compose not run yet (Docker Desktop was off).
+- **Next step:** Run `docker compose up --build backend db`, tick the box, merge U-02. Then U-03 (needs S-01 contracts frozen) and U-01 (manual Boomi checks).
 - **Blockers:** none
 
 ## Recent tracked commits
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 9f884ef | nikhil | N-03 | review | chore(tasks): N-03 handoff - N-01/N-02 auto-merged, N-03 ready |
+| 2026-11-19 | 8dcf1b8 | uday | U-02 | review | merge: U-02 Backend scaffold (auto-merge) |
+| 2026-11-19 | 4d2b535 | roop | R-01 | in-progress | fix(frontend): align API types and mocks with agent schemas |
 | 2026-11-19 | 63cdd3f | nikhil | N-02 | review | merge: N-02 Synthetic demo dataset (auto-merge) |
 | 2026-11-19 | 659d556 | roop | S-02 | in-progress | ci(checks): auto-discover every top-level tests/ suite |
+| 2026-11-19 | 53a38f3 | uday | U-02 | review | chore(tasks): U-02 verified with docker compose on Postgres 16 |
+| 2026-11-19 | 8567b46 | uday | U-02 | review | feat(backend): Django 5 + DRF scaffold with app shells, health, compose |
 | 2026-11-19 | 2aed25a | nikhil | N-03 | review | chore(tasks): handoff N-03 - in review, compose pending on Uday |
 | 2026-11-19 | 462be3e | nikhil | N-03 | review | feat(mock-erp): FastAPI mock ERP with idempotent PATCH and chaos |
 | 2026-11-19 | 64a246f | roop | S-02 | in-progress | ci(automation): auto-merge ready task branches and auto-sync everyone |
@@ -104,8 +109,3 @@
 | 2026-11-19 | fa0542d | roop | R-01 | in-progress | feat(frontend): login, AuthProvider, protected routes, user badge |
 | 2026-11-19 | 4333e31 | nikhil | N-01 | review | chore(tasks): handoff N-01 - in review, awaiting S-01 ratification |
 | 2026-11-19 | 55dd014 | nikhil | N-01 | review | feat(ai): agent I/O JSON schemas, fixtures and schema tests |
-| 2026-11-19 | 6815d00 | roop | R-01 | in-progress | merge: R-01 --ui sub-branch into task branch |
-| 2026-11-19 | f0ebce3 | roop | R-01 | in-progress | merge: R-01 --api sub-branch into task branch |
-| 2026-11-19 | cd80aef | roop | R-01 | in-progress | feat(frontend): typed API client, JWT refresh, MSW mocks |
-| 2026-11-19 | faed257 | roop | R-01 | in-progress | feat(frontend): design-system UI kit |
-| 2026-11-19 | 1ee2c50 | roop | R-01 | in-progress | merge: R-01 --scaffold sub-branch into task branch |
