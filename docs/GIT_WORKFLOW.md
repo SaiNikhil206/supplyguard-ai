@@ -35,19 +35,25 @@ Member: uday
 ```
 Types: feat, fix, test, docs, refactor, chore, ci. Scope = app or folder (`integrations`, `frontend`, `boomi`, `tasks`).
 
-## Pull requests
+## Pull requests and merging (Claude merges)
 - Base: `collaboration`. Title: `<TASK-ID>: <title>`. Template in `.github/pull_request_template.md`.
-- Needs CI green + 1 approval (another member, or paste the `reviewer` subagent verdict if teammates are offline > 12 h).
-- Squash merge is NOT used - keep commits so trailers stay in history. Use "Create a merge commit" or "Rebase and merge".
-- After merge, delete the task branch.
+- Every member is a repo admin; the team agreed that **Claude verifies and merges PRs itself** - no waiting for a human approval.
+- Merge gate: rebased on latest `collaboration`, conflicts resolved, tests green (CI once `ci.yml` exists), `reviewer` subagent verdict APPROVE in the PR, task status `review` or `done`.
+- `/done <ID>` merges the current task and continues with the next one. `/merge-prs` verifies and merges every ready PR/branch for the whole team (run it any time, e.g. start of day).
+- Merge method: "Create a merge commit" (`gh pr merge --merge --delete-branch`). Squash is NOT used - keep commits so trailers stay in history.
+- After merge, the task branch and its `--<sub>` branches are deleted.
 
 ## Conflicts
-`/sync` rebases your branch on `collaboration`. If a conflict is in another member's folder, keep their version and tell them. If it's in `docs/CONTRACTS.md`, stop and agree on it together.
+`/sync` rebases your branch on `collaboration`. Rules (Claude applies them automatically):
+- your own folders -> resolve, keeping both intents;
+- another member's folders -> take theirs, unless both sides only added lines (keep both), and note it in the Handoff Blockers line for them;
+- `docs/CONTRACTS.md` -> keep both if they do not contradict + changelog line; if they contradict, stop and ask;
+- `PROGRESS.md` -> regenerate.
 
 ## Milestones (S-02)
 At the end of each sprint that sprint's S-02 driver (rotating, see `tasks/SHARED.md`) merges `collaboration` -> `main` via PR and tags `m1`..`m6`. Final: `v1.0` on 31 Dec.
 
 ## Recommended GitHub settings (any repo admin, once)
 - Default branch: `collaboration`.
-- Protect `main` and `collaboration`: require PR, require CI (`ci.yml`) to pass, no force push.
+- Protect `main` and `collaboration`: require PR, 0 required approvals (Claude merges), require CI (`ci.yml`) once it exists, no force push, no deletion. If a rule still blocks a merge, admins merge with `gh pr merge --admin`.
 - Allow "Rebase and merge" and "Create a merge commit".

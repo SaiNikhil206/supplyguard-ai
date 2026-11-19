@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://supplyguard.ai/schemas/risk_analysis.schema.json",
+  "title": "Supplier Risk Analyst output",
+  "description": "CONTRACTS section 6. Every key is required; empty arrays are allowed for facts/estimates/assumptions/missing_data, but the keys must be present so the agent has to state them explicitly. evidence must have at least one entry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "risk_case_id",
+    "risk_level",
+    "risk_score",
+    "summary",
+    "affected_entities",
+    "evidence",
+    "facts",
+    "estimates",
+    "assumptions",
+    "missing_data",
+    "confidence"
+  ],
+  "properties": {
+    "risk_case_id": { "$ref": "common.schema.json#/$defs/riskCaseId" },
+    "risk_level": { "$ref": "common.schema.json#/$defs/severity" },
+    "risk_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "summary": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+    "affected_entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "id"],
+        "properties": {
+          "type": { "enum": ["PO", "SUPPLIER", "ITEM", "SHIPMENT", "LOCATION"] },
+          "id": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "evidence": { "$ref": "common.schema.json#/$defs/evidenceList" },
+    "facts": { "$ref": "common.schema.json#/$defs/stringList" },
+    "estimates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statement", "basis"],
+        "properties": {
+          "statement": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+          "basis": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "assumptions": { "$ref": "common.schema.json#/$defs/stringList" },
+    "missing_data": { "$ref": "common.schema.json#/$defs/stringList" },
+    "confidence": { "enum": ["LOW", "MEDIUM", "HIGH"] }
+  }
+}
