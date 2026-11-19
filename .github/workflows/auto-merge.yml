@@ -1,0 +1,63 @@
+name: auto-merge
+
+# Every push to a task branch (roop/R-01-..., nikhil/N-02-..., uday/U-03-...) is checked here.
+# If the task is `review` or `done` in its task file, the branch merges cleanly into
+# `collaboration` and all test suites pass, it is merged and pushed automatically.
+# After a merge, the new `collaboration` is merged into every other open task branch.
+# Sub-branches (`...--sub`) are skipped; they merge into their task branch first.
+
+on:
+  push:
+    branches: ["roop/**", "nikhil/**", "uday/**"]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Task branch to merge, e.g. roop/R-01-frontend-scaffold"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collaboration-writer
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: ${{ !contains(github.ref_name, '--') }}
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: supplyguard
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      CI: "true"
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/supplyguard
+      BRANCH: ${{ inputs.branch || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: collaboration
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Git identity
+        run: |
+          git config user.name "auto-merge-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Merge task branch into collaboration
+        id: merge
+        run: python scripts/gitflow.py automerge "$BRANCH" --install
+      - name: Sync collaboration into every open task branch
+        if: steps.merge.outputs.merged == 'true'
+        run: python scripts/gitflow.py sync-branches

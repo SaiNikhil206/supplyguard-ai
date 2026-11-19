@@ -18,6 +18,8 @@
 3. Type **`/resume <your-name>`** - Claude picks up your pending/ongoing task from where you (or anyone) left off and works through it with subagents.
 4. Before you stop: **`/handoff`** - saves where you left off and pushes.
 
+Automatic: Claude Code pulls the latest `collaboration` into your branch when it starts; a pushed task marked `review`/`done` is merged into `collaboration` by GitHub Actions when tests pass, and the new `collaboration` is pushed into every open task branch. See [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md#automation-runs-by-itself).
+
 Check anyone's progress: `/status nikhil` in Claude Code, or `python scripts/progress.py nikhil` in a terminal.
 
 ## Documents
