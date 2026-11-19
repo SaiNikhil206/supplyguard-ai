@@ -98,6 +98,10 @@ describe('Field', () => {
 });
 
 describe('formatMoney', () => {
+  it('renders Not available for null/undefined', () => {
+    expect(formatMoney(null)).toBe('Not available');
+    expect(formatMoney(undefined)).toBe('Not available');
+  });
   it('formats INR with Indian grouping', () => {
     expect(formatMoney({ amount: '420000.00', currency: 'INR' })).toBe('₹4,20,000.00');
   });

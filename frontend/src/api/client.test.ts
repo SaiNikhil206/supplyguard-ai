@@ -126,6 +126,16 @@ describe('401 refresh', () => {
     expect(c.n).toBe(1);
   });
 
+  it('two concurrent requests with a rejected refresh emit logout once', async () => {
+    setTokens({ access: expired(), refresh: 'garbage' });
+    let fired = 0;
+    const off = onLogout(() => fired++);
+    const results = await Promise.allSettled([getMe(), apiFetch('/suppliers')]);
+    off();
+    expect(results.every((r) => r.status === 'rejected')).toBe(true);
+    expect(fired).toBe(1);
+  });
+
   it('refresh failure clears tokens and emits logout', async () => {
     setTokens({ access: expired(), refresh: 'garbage' });
     let fired = 0;

@@ -4,9 +4,14 @@ import { ApiError } from '@/api/client';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 
+/** Retry once, and never on 4xx ApiErrors. */
+export function shouldRetry(count: number, err: unknown): boolean {
+  return !(err instanceof ApiError && err.status >= 400 && err.status < 500) && count < 1;
+}
+
 export function createQueryClient(): QueryClient {
   return new QueryClient({
-    defaultOptions: { queries: { retry: (count, err) => !(err instanceof ApiError && err.status >= 400 && err.status < 500) && count < 1, staleTime: 30_000, refetchOnWindowFocus: false } },
+    defaultOptions: { queries: { retry: shouldRetry, staleTime: 30_000, refetchOnWindowFocus: false } },
   });
 }
 

@@ -41,8 +41,11 @@ describe('app shell (authenticated)', () => {
     const toggle = await screen.findByRole('button', { name: 'Toggle menu' });
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
     expect(document.getElementById('main')).toBeInTheDocument();
+    const aside = screen.getByLabelText('Sidebar') as HTMLElement & { inert: boolean };
+    expect(aside.inert).toBe(true);
     await userEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(aside.inert).toBe(false);
     await userEvent.keyboard('{Escape}');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
