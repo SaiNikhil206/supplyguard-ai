@@ -26,9 +26,10 @@ There is no team lead; shared tasks have a named driver (`tasks/SHARED.md`).
 **Start:** the SessionStart hook already ran `python scripts/gitflow.py local-sync` (auto-pull: updates `collaboration`, pulls your task branch, merges the latest `collaboration` into it; skipped if you have uncommitted changes). Then `python scripts/progress.py <member>` -> read that member's task file (Handoff block first) -> pick the `in-progress` task, else the first `todo` task whose Depends are all `done` -> create/checkout its branch from `collaboration`.
 **During:** follow section 4 (advisor + subagents). Commit small, often, with the trailers in section 5.
 **Keep going:** when a task is done, `/done` merges it into `collaboration` and Claude immediately continues with the member's next ready task in the same session (tell the user "Next: <ID> <title>" in one line, no need to ask). Repeat until nothing is ready, the user says stop, or the context is getting long.
+**Hands-free (autopilot):** `/loop /autopilot <member>` - Claude checks every few minutes with `python scripts/progress.py <member> --ready`; as soon as a task's dependencies are merged it starts that task, finishes it, merges, and goes on to the next. While waiting it only prints what it waits on (task, owner, status). Steps only a human can do (Boomi platform clicks, a call, credentials) are prepared, explained to the member, and the task is set `blocked` with `needs <member>: ...` until done. Runs while that member's Claude Code is open.
 **End (never skip, even if the work is unfinished):** run `/handoff` - it updates the task file Handoff block + Status + checkboxes, appends to `progress/SESSION_LOG.md`, regenerates `PROGRESS.md`, commits and pushes. Unpushed work does not exist for the rest of the team.
 
-Slash commands in `.claude/commands/`: `/resume <member>`, `/status [member|all]`, `/handoff`, `/done <task-id>`, `/sync`, `/merge-prs`.
+Slash commands in `.claude/commands/`: `/resume <member>`, `/status [member|all]`, `/handoff`, `/done <task-id>`, `/sync`, `/merge-prs`, `/autopilot <member>` (use with `/loop`).
 
 ## 4. Advisor + nested subagents (how to do the work)
 The main session is the **advisor** and runs on **Opus 5.5** (`/model opus`). The advisor plans, decides, reviews and integrates; it delegates bulk work to subagents defined in `.claude/agents/` with the right model and effort:
@@ -83,4 +84,5 @@ Rules: break the task into subtasks of <= 1-2 files each; run independent subtas
 - Task status lives ONLY in `tasks/<MEMBER>.md` (`- **Status:** ...` line) - keep the format exactly.
 - `PROGRESS.md` is generated: `python scripts/progress.py all --write`. Never hand-edit it.
 - `progress/SESSION_LOG.md` is append-only, one entry per session.
+- A dependency counts as satisfied when it is `done` or `review` (review tasks are already merged into `collaboration` and only wait for a final sign-off).
 - Asking "what has Nikhil done / what's pending?" -> run `python scripts/progress.py nikhil` and answer from its output plus the Handoff block.
