@@ -19,7 +19,7 @@
 ---
 
 ### U-01: Boomi environment and service verification
-- **Status:** todo
+- **Status:** blocked
 - **Sprint:** S0 (19-20 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `uday/U-01-boomi-env`
 - **Model hint:** haiku / low (checklist + docs); the Boomi UI clicks are manual
@@ -29,7 +29,7 @@
   - [ ] Roop and Nikhil have Boomi platform access
   - [ ] Fallback decision recorded for every missing service
 - **Done in:** -
-- **Notes:** -
+- **Notes:** needs uday: log in to platform.boomi.com and fill every TODO in `docs/BOOMI_ENV.md` (account ID, environment + runtime, enabled yes/no for the 6 services, add Roop + Nikhil as users, fallback per missing service), then tell Claude "U-01 done". Checklist prepared by Claude (haiku-level docs, advisor opus).
 
 ### U-02: Backend scaffold
 - **Status:** review
