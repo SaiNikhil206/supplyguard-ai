@@ -220,8 +220,16 @@ def claim_support(text: str, evidence: list[dict], inp: dict, year: int, is_esti
     unbacked = named - backed_ids
     if unbacked:
         problems.append(f"no evidence for {sorted(unbacked)}")
+    po_item = {a["po_id"]: a["item_id"] for a in inp["impact"]["affected_pos"]}
+
+    def ids_of(e: dict) -> set[str]:  # a per-PO impact row also belongs to that PO's item
+        ids = _ev_ids(e)
+        if e["source"] == "IMPACT" and e["entity"] in po_item:
+            ids.add(po_item[e["entity"]])
+        return ids
+
     if named:
-        relevant = [e for e in evidence if _ev_ids(e) & named or e["source"] == "EVENT" or e["entity"] == "IMPACT"]
+        relevant = [e for e in evidence if ids_of(e) & named or e["source"] == "EVENT" or e["entity"] == "IMPACT"]
     else:
         relevant = list(evidence)
     nums, dates = set(), set()
@@ -232,6 +240,8 @@ def claim_support(text: str, evidence: list[dict], inp: dict, year: int, is_esti
             continue
         if isinstance(v, str) and ISO_DATE_RE.fullmatch(v):
             dates.add(v[:10])
+            if "T" in v:  # a cited timestamp also supports its clock time ("10:15")
+                nums |= {_dec(p) for p in re.findall(r"\d+", v[11:16])}
         elif _dec(v) is not None:
             nums.add(_dec(v))
             by_field[e["field"]].append(_dec(v))

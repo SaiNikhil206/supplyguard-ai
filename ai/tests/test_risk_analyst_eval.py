@@ -319,3 +319,10 @@ def test_run1_v110_demo_real_failures_are_caught():
     duration in the assumptions. The grader must keep flagging exactly these (and not the item name 'Bracket 501')."""
     run = json.loads((AGENT / "eval" / "runs" / "2026-11-19_DEMO.json").read_text(encoding="utf-8"))
     assert failed(grade(run, build_agent_input("demo"))) == {"summary_values_in_input", "assumptions_qualitative"}
+
+
+def test_run2_v120_demo_passes_every_check():
+    """Real Agentstudio run on prompt v1.2.0: acceptance 1 (schema) and 2 (claims backed by evidence) met."""
+    run = json.loads((AGENT / "eval" / "runs" / "2026-11-19_DEMO_v1.2.0.json").read_text(encoding="utf-8"))
+    result = grade(run, build_agent_input("demo"))
+    assert passed(result), {k: v for k, v in result.items() if not v[0]}
