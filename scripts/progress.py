@@ -70,11 +70,15 @@ class Task:
 
 
 def parse_file(owner: str, path: Path) -> tuple[list[Task], str]:
+    return parse_text(owner, path.read_text(encoding="utf-8"))
+
+
+def parse_text(owner: str, text: str) -> tuple[list[Task], str]:
     tasks: list[Task] = []
     handoff_lines: list[str] = []
     in_handoff = False
     cur: Task | None = None
-    for raw in path.read_text(encoding="utf-8").splitlines():
+    for raw in text.splitlines():
         line = raw.rstrip()
         if line.startswith("## "):
             in_handoff = line.strip().lower() == "## handoff"

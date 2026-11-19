@@ -25,7 +25,7 @@ End-of-session handoff. Extra note from the user: $ARGUMENTS
    Status: <status>
    Member: <member>
    ```
-   then `git push -u origin <branch>`.
+   then `git pull --no-rebase origin <branch>` (only if it exists on origin - the sync bot may have added a merge) and `git push -u origin <branch>`. If the task is `review`/`done`, the auto-merge Action merges it into `collaboration` on this push.
 7. If the task is in `review`/`done` and no PR exists, open one to `collaboration` (`gh pr create --base collaboration`); if `gh` is not logged in, print the compare URL instead.
 8. Print a 5-line summary: task, status, tests, pushed branch, next step.
 Never leave work uncommitted or unpushed at the end of this command.

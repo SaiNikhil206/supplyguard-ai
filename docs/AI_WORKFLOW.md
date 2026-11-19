@@ -23,10 +23,13 @@ Other commands:
 |---|---|
 | `/status nikhil` / `/status all` | done / in progress / pending / overdue / next task, from task files + git trailers |
 | `/handoff` | save where you left off (task file + session log + PROGRESS.md), commit, push |
-| `/done U-06` | verify acceptance, mark done, push, open PR to `collaboration` |
-| `/sync` | rebase your task branch on latest `collaboration`, resolve conflicts, run tests |
+| `/done U-06` | verify acceptance, mark done, merge into `collaboration`, then continue with your next task |
+| `/sync` | merge the latest `collaboration` into your task branch, resolve conflicts, run tests |
+| `/merge-prs` | verify, fix conflicts and merge every ready PR / task branch of the team into `collaboration` |
 
 Without Claude: `python scripts/progress.py uday` prints the same status.
+
+Automatic (no command needed): when Claude Code starts it pulls your branch and the latest `collaboration` for you; when you push a task that is `review`/`done`, GitHub Actions merges it into `collaboration` if tests pass, then pushes the new `collaboration` into everybody's task branches. Details: `docs/GIT_WORKFLOW.md` -> Automation.
 
 ## 3. Advisor pattern
 ```
@@ -68,4 +71,4 @@ For a big task (e.g. R-04 + R-05 screens, or N-05 + N-06 agents) the advisor can
 - The advisor merges sub-branches into the task branch, runs tests, then reviewer, then PR to `collaboration`.
 
 ## 6. What "done" means for Claude
-A task is `done` only when: acceptance boxes ticked with evidence, tests pass (output seen, not assumed), reviewer found no blocking issue, task file + PROGRESS.md updated, pushed, PR open/merged into `collaboration`. If any of this is missing, status is `review` or `in-progress` - never claim `done`.
+A task is `done` only when: acceptance boxes ticked with evidence, tests pass (output seen, not assumed), reviewer found no blocking issue, task file + PROGRESS.md updated, merged into `collaboration` (Claude merges it itself). Then Claude moves straight on to the next ready task. If any of this is missing, status is `review` or `in-progress` - never claim `done`.
