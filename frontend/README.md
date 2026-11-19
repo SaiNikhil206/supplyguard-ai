@@ -28,3 +28,8 @@ Layout: src/app providers, src/theme light/dark, src/layout shell + nav, src/pag
 | `viewer` | VIEWER |
 
 - Full case detail: `RC-000045` (factory outage at `SUP-1008`). Mock access tokens live 15 min, refresh 7 days.
+
+## UI kit
+
+`src/components/ui/` is the design-system kit (import from `@/components/ui`). Token classes only (no hex), keyboard/ARIA friendly.
+Button (variant, size, loading), Card/CardHeader/CardTitle/CardBody, Badge (tone), SeverityBadge, StatusBadge (RiskCase states), KpiTile (delta, hint, loading), Spinner, Skeleton, EmptyState, ErrorState (correlationId, onRetry), Input/Select/Field, Table/THead/TBody/TR/TH/TD/TableEmptyRow, Money + formatMoney, EvidenceTag (FACT/ESTIMATE/ASSUMPTION/MISSING_DATA, label + glyph + border style).
