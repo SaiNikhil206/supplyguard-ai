@@ -58,7 +58,7 @@ Types: feat, fix, test, docs, refactor, chore, ci. Scope = app or folder (`integ
 | Auto-pull (local) | `.claude/settings.json` SessionStart hook -> `scripts/gitflow.py local-sync` | every Claude Code start/resume | updates local `collaboration`, pulls your task branch, merges latest `collaboration` into it; skipped when you have uncommitted changes |
 | Progress board | `.github/workflows/progress.yml` | push to `collaboration`/`main` touching `tasks/**` | regenerates `PROGRESS.md` |
 | Checks | `scripts/run_checks.py` | auto-merge, and locally any time | runs every suite that exists: ai, mock-erp, backend (Postgres via `DATABASE_URL`), frontend lint/typecheck/test/build (backend also ruff) |
-| CI | `.github/workflows/ci.yml` | task-branch pushes (`roop/**`, `nikhil/**`, `uday/**`), PRs to `collaboration`/`main`, pushes to `collaboration`/`main`, nightly, manual | same checks as `run_checks.py` plus Postgres for the backend; `ci-ok` ("CI OK") is the aggregate check |
+| CI | `.github/workflows/ci.yml` | task-branch pushes (`roop/**`, `nikhil/**`, `uday/**`), PRs to `collaboration`/`main`, pushes to `collaboration`/`main`, nightly, manual | same checks as `run_checks.py` (backend on Postgres 16, like the auto-merge gate); new top-level test folders must also be added to the CI matrix; `ci-ok` ("CI OK") is the aggregate check |
 
 Pushes made with the `GITHUB_TOKEN` (bot merges) do not trigger CI, so `collaboration` is verified by the nightly/manual CI run, while the auto-merge gate runs `run_checks.py`.
 

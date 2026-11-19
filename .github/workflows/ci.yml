@@ -14,7 +14,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  # Cancel superseded runs on PRs and task branches; never on collaboration/main.
+  # Cancel superseded runs on PRs and task branches; never cancels a *running* collaboration/main run
+  # (GitHub still drops an older pending run in the same group).
   cancel-in-progress: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/collaboration' && github.ref != 'refs/heads/main') }}
 
 jobs:
@@ -95,6 +96,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Keep in sync with scripts/run_checks.py, which auto-detects every top-level <folder>/tests.
+        # A new Python suite must be added here too.
         suite: [ai, data, mock-erp]
     steps:
       - uses: actions/checkout@v4

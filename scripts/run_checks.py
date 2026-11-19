@@ -59,10 +59,12 @@ def backend(install: bool) -> bool | None:
     if install and not pip_install(folder / "requirements.txt", folder / "requirements-dev.txt"):
         return False
     ok = True
-    if importlib.util.find_spec("ruff") is None and shutil.which("ruff") is None:
-        print("ruff not installed - backend lint skipped")
-    else:
+    if importlib.util.find_spec("ruff") is not None:
         ok = run([PY, "-m", "ruff", "check", "."], folder)
+    elif shutil.which("ruff"):
+        ok = run([shutil.which("ruff"), "check", "."], folder)
+    else:
+        print("ruff not installed - backend lint skipped")
     return run([PY, "-m", "pytest", "-q"], folder) and ok
 
 
