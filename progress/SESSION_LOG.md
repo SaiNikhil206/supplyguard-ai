@@ -43,6 +43,15 @@ Template:
 - Blockers: S-01 ratification; U-03 needs the field table
 - Models used: advisor opus; reviewer (opus, general-purpose agent)
 
+## 2026-11-19 - nikhil - N-03
+- Branch: nikhil/N-03-mock-erp (stacked on nikhil/N-02-seed-data)
+- Did: FastAPI mock ERP: CONTRACTS s5 reads (+ GET PO by id, shipments), PATCH with reschedule / reassign / split rules and required Idempotency-Key (replay, KEY_REUSED / IN_FLIGHT / RESET_DURING_REQUEST conflicts), chaos timeout (async hang then apply) and 500, reset, bounded request log with write_applied, optional API key, test endpoints switch, CONTRACTS error body. Dockerfile (non-root, healthcheck) built and smoke-tested. Reviewer pass: fixed hung-PATCH-after-reset bug, tenant required on PATCH, exact log filter, date rule, PO id collisions, catch-all error body.
+- Tests: `cd mock-erp && python -m pytest tests -q` -> 46 passed (3 runs)
+- Status now: review
+- Next: compose snippet + U-10 notes to Uday; S-01 proposals; PRs N-01 -> N-02 -> N-03
+- Blockers: docker-compose.yml (Uday); S-01 ratification
+- Models used: advisor opus; reviewer (opus, general-purpose agent)
+
 ## 2026-11-19 - nikhil - N-01
 - Branch: nikhil/N-01-agent-schemas
 - Did: Agent I/O JSON Schemas (risk_analysis, recovery_plan, agent_input, common) in Draft 2020-12; schema_registry.py with validator_for() and bundled_schema() for the N-09 Claude fallback; fixture generator, 5 valid + 27 invalid fixtures each failing on one expected keyword; README with evidence-addressing rule for N-07. Reviewer pass: fixed nullable-estimate rule, evidence addressing, per-option-type change fields, bundling, uuid correlation ids.
