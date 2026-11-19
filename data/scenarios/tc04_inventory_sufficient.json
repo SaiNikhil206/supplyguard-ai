@@ -1,0 +1,40 @@
+{
+  "scenario": "tc04_inventory_sufficient",
+  "test_case": "TC-04",
+  "description": "ITM-530 stock covers ~47 days, longer than the 3-day outage: no shortage.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000904",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1030",
+    "event_type": "FACTORY_OUTAGE",
+    "severity": "HIGH",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 72,
+    "description": "Power outage at plant",
+    "source_system": "supplier-portal",
+    "correlation_id": "8d35aee7-123a-4e2d-a975-bf5012cb5449"
+  },
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1013",
+      "PO-1014"
+    ],
+    "affected_po_ids": [
+      "PO-1013",
+      "PO-1014"
+    ],
+    "exposure": {
+      "amount": "1468775.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-530"
+    ],
+    "qualified_alternate_supplier_ids": [
+      "SUP-2005"
+    ],
+    "shortage_expected": false
+  }
+}

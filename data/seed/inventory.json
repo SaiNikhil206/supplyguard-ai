@@ -1,0 +1,1872 @@
+[
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-501",
+    "item_name": "Bracket 501",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 800,
+    "reserved": 100,
+    "safety_stock": 200,
+    "daily_demand": 150
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-501",
+    "item_name": "Bracket 501",
+    "location_id": "DC-PUNE",
+    "on_hand": 1100,
+    "reserved": 200,
+    "safety_stock": 300,
+    "daily_demand": 600
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-502",
+    "item_name": "Housing 502",
+    "location_id": "DC-PUNE",
+    "on_hand": 2000,
+    "reserved": 300,
+    "safety_stock": 400,
+    "daily_demand": 100
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-503",
+    "item_name": "Coupling 503",
+    "location_id": "DC-DELHI",
+    "on_hand": 576,
+    "reserved": 13,
+    "safety_stock": 320,
+    "daily_demand": 64
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-504",
+    "item_name": "Valve 504",
+    "location_id": "DC-DELHI",
+    "on_hand": 4212,
+    "reserved": 199,
+    "safety_stock": 468,
+    "daily_demand": 468
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-504",
+    "item_name": "Valve 504",
+    "location_id": "DC-PUNE",
+    "on_hand": 4290,
+    "reserved": 896,
+    "safety_stock": 990,
+    "daily_demand": 330
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-505",
+    "item_name": "Sensor 505",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 864,
+    "reserved": 133,
+    "safety_stock": 24,
+    "daily_demand": 24
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-506",
+    "item_name": "Coupling 506",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1065,
+    "reserved": 137,
+    "safety_stock": 71,
+    "daily_demand": 71
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-506",
+    "item_name": "Coupling 506",
+    "location_id": "DC-DELHI",
+    "on_hand": 12803,
+    "reserved": 2307,
+    "safety_stock": 1239,
+    "daily_demand": 413
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-507",
+    "item_name": "Gasket 507",
+    "location_id": "DC-DELHI",
+    "on_hand": 9083,
+    "reserved": 588,
+    "safety_stock": 586,
+    "daily_demand": 293
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-508",
+    "item_name": "Sensor 508",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1127,
+    "reserved": 100,
+    "safety_stock": 805,
+    "daily_demand": 161
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-508",
+    "item_name": "Sensor 508",
+    "location_id": "DC-DELHI",
+    "on_hand": 1521,
+    "reserved": 132,
+    "safety_stock": 845,
+    "daily_demand": 169
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-508",
+    "item_name": "Sensor 508",
+    "location_id": "DC-PUNE",
+    "on_hand": 5382,
+    "reserved": 237,
+    "safety_stock": 1035,
+    "daily_demand": 207
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-509",
+    "item_name": "Bracket 509",
+    "location_id": "DC-DELHI",
+    "on_hand": 15504,
+    "reserved": 1643,
+    "safety_stock": 1224,
+    "daily_demand": 408
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-509",
+    "item_name": "Bracket 509",
+    "location_id": "DC-PUNE",
+    "on_hand": 780,
+    "reserved": 62,
+    "safety_stock": 260,
+    "daily_demand": 52
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-510",
+    "item_name": "Spring 510",
+    "location_id": "DC-PUNE",
+    "on_hand": 11811,
+    "reserved": 2093,
+    "safety_stock": 381,
+    "daily_demand": 381
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-511",
+    "item_name": "Coupling 511",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 3507,
+    "reserved": 652,
+    "safety_stock": 835,
+    "daily_demand": 167
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-512",
+    "item_name": "Bracket 512",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1141,
+    "reserved": 225,
+    "safety_stock": 489,
+    "daily_demand": 163
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-512",
+    "item_name": "Bracket 512",
+    "location_id": "DC-DELHI",
+    "on_hand": 9312,
+    "reserved": 781,
+    "safety_stock": 1164,
+    "daily_demand": 388
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-513",
+    "item_name": "Bearing 513",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 6771,
+    "reserved": 1126,
+    "safety_stock": 183,
+    "daily_demand": 183
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-513",
+    "item_name": "Bearing 513",
+    "location_id": "DC-PUNE",
+    "on_hand": 5382,
+    "reserved": 398,
+    "safety_stock": 1242,
+    "daily_demand": 414
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-514",
+    "item_name": "Gasket 514",
+    "location_id": "DC-DELHI",
+    "on_hand": 3629,
+    "reserved": 795,
+    "safety_stock": 573,
+    "daily_demand": 191
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-514",
+    "item_name": "Gasket 514",
+    "location_id": "DC-PUNE",
+    "on_hand": 2457,
+    "reserved": 266,
+    "safety_stock": 702,
+    "daily_demand": 351
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-515",
+    "item_name": "Flange 515",
+    "location_id": "DC-PUNE",
+    "on_hand": 250,
+    "reserved": 50,
+    "safety_stock": 50,
+    "daily_demand": 250
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-516",
+    "item_name": "PCB 516",
+    "location_id": "DC-DELHI",
+    "on_hand": 3700,
+    "reserved": 907,
+    "safety_stock": 200,
+    "daily_demand": 100
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-517",
+    "item_name": "Bracket 517",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 14630,
+    "reserved": 154,
+    "safety_stock": 1254,
+    "daily_demand": 418
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-517",
+    "item_name": "Bracket 517",
+    "location_id": "DC-DELHI",
+    "on_hand": 11544,
+    "reserved": 1615,
+    "safety_stock": 1443,
+    "daily_demand": 481
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-518",
+    "item_name": "Valve 518",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 3570,
+    "reserved": 146,
+    "safety_stock": 1071,
+    "daily_demand": 357
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-519",
+    "item_name": "Bearing 519",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 17316,
+    "reserved": 2399,
+    "safety_stock": 1924,
+    "daily_demand": 481
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-519",
+    "item_name": "Bearing 519",
+    "location_id": "DC-DELHI",
+    "on_hand": 2940,
+    "reserved": 157,
+    "safety_stock": 420,
+    "daily_demand": 420
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-519",
+    "item_name": "Bearing 519",
+    "location_id": "DC-PUNE",
+    "on_hand": 2772,
+    "reserved": 599,
+    "safety_stock": 1584,
+    "daily_demand": 396
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-520",
+    "item_name": "Bushing 520",
+    "location_id": "DC-DELHI",
+    "on_hand": 400,
+    "reserved": 100,
+    "safety_stock": 100,
+    "daily_demand": 150
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-521",
+    "item_name": "Gasket 521",
+    "location_id": "DC-DELHI",
+    "on_hand": 400,
+    "reserved": 100,
+    "safety_stock": 100,
+    "daily_demand": 150
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-522",
+    "item_name": "Bracket 522",
+    "location_id": "DC-DELHI",
+    "on_hand": 400,
+    "reserved": 100,
+    "safety_stock": 100,
+    "daily_demand": 150
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-523",
+    "item_name": "Flange 523",
+    "location_id": "DC-DELHI",
+    "on_hand": 400,
+    "reserved": 100,
+    "safety_stock": 100,
+    "daily_demand": 150
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-524",
+    "item_name": "Housing 524",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 4920,
+    "reserved": 326,
+    "safety_stock": 1640,
+    "daily_demand": 328
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-525",
+    "item_name": "Gasket 525",
+    "location_id": "DC-DELHI",
+    "on_hand": 10800,
+    "reserved": 494,
+    "safety_stock": 432,
+    "daily_demand": 432
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-525",
+    "item_name": "Gasket 525",
+    "location_id": "DC-PUNE",
+    "on_hand": 12122,
+    "reserved": 2153,
+    "safety_stock": 836,
+    "daily_demand": 418
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-526",
+    "item_name": "Valve 526",
+    "location_id": "DC-PUNE",
+    "on_hand": 18278,
+    "reserved": 2788,
+    "safety_stock": 1976,
+    "daily_demand": 494
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-527",
+    "item_name": "Rotor 527",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 7922,
+    "reserved": 1510,
+    "safety_stock": 466,
+    "daily_demand": 466
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-528",
+    "item_name": "Gear 528",
+    "location_id": "DC-PUNE",
+    "on_hand": 15732,
+    "reserved": 2784,
+    "safety_stock": 1748,
+    "daily_demand": 437
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-529",
+    "item_name": "Flange 529",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1376,
+    "reserved": 110,
+    "safety_stock": 1032,
+    "daily_demand": 344
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-529",
+    "item_name": "Flange 529",
+    "location_id": "DC-DELHI",
+    "on_hand": 5538,
+    "reserved": 279,
+    "safety_stock": 852,
+    "daily_demand": 426
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-529",
+    "item_name": "Flange 529",
+    "location_id": "DC-PUNE",
+    "on_hand": 3604,
+    "reserved": 901,
+    "safety_stock": 1060,
+    "daily_demand": 212
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-530",
+    "item_name": "Rotor 530",
+    "location_id": "DC-PUNE",
+    "on_hand": 20000,
+    "reserved": 1000,
+    "safety_stock": 2000,
+    "daily_demand": 400
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-531",
+    "item_name": "Valve 531",
+    "location_id": "DC-PUNE",
+    "on_hand": 489,
+    "reserved": 3,
+    "safety_stock": 326,
+    "daily_demand": 163
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-532",
+    "item_name": "Sensor 532",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 6280,
+    "reserved": 824,
+    "safety_stock": 1256,
+    "daily_demand": 314
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-532",
+    "item_name": "Sensor 532",
+    "location_id": "DC-PUNE",
+    "on_hand": 7500,
+    "reserved": 1607,
+    "safety_stock": 500,
+    "daily_demand": 500
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-533",
+    "item_name": "Coupling 533",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2388,
+    "reserved": 305,
+    "safety_stock": 995,
+    "daily_demand": 199
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-533",
+    "item_name": "Coupling 533",
+    "location_id": "DC-PUNE",
+    "on_hand": 428,
+    "reserved": 41,
+    "safety_stock": 1070,
+    "daily_demand": 214
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-534",
+    "item_name": "Seal 534",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 5168,
+    "reserved": 409,
+    "safety_stock": 152,
+    "daily_demand": 152
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-534",
+    "item_name": "Seal 534",
+    "location_id": "DC-DELHI",
+    "on_hand": 7917,
+    "reserved": 1176,
+    "safety_stock": 546,
+    "daily_demand": 273
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-535",
+    "item_name": "Gasket 535",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 441,
+    "reserved": 67,
+    "safety_stock": 147,
+    "daily_demand": 147
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-535",
+    "item_name": "Gasket 535",
+    "location_id": "DC-PUNE",
+    "on_hand": 5112,
+    "reserved": 1215,
+    "safety_stock": 284,
+    "daily_demand": 284
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-536",
+    "item_name": "Gear 536",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2912,
+    "reserved": 30,
+    "safety_stock": 364,
+    "daily_demand": 91
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-536",
+    "item_name": "Gear 536",
+    "location_id": "DC-DELHI",
+    "on_hand": 5680,
+    "reserved": 1213,
+    "safety_stock": 1420,
+    "daily_demand": 284
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-537",
+    "item_name": "Bearing 537",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 8178,
+    "reserved": 1967,
+    "safety_stock": 846,
+    "daily_demand": 282
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-538",
+    "item_name": "Shaft 538",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 7924,
+    "reserved": 1107,
+    "safety_stock": 1132,
+    "daily_demand": 283
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-538",
+    "item_name": "Shaft 538",
+    "location_id": "DC-DELHI",
+    "on_hand": 1898,
+    "reserved": 76,
+    "safety_stock": 730,
+    "daily_demand": 146
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-539",
+    "item_name": "Shaft 539",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1272,
+    "reserved": 213,
+    "safety_stock": 265,
+    "daily_demand": 53
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-539",
+    "item_name": "Shaft 539",
+    "location_id": "DC-DELHI",
+    "on_hand": 6358,
+    "reserved": 1329,
+    "safety_stock": 1870,
+    "daily_demand": 374
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-540",
+    "item_name": "Bearing 540",
+    "location_id": "DC-PUNE",
+    "on_hand": 150,
+    "reserved": 100,
+    "safety_stock": 0,
+    "daily_demand": 100
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-541",
+    "item_name": "Rotor 541",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 3922,
+    "reserved": 673,
+    "safety_stock": 318,
+    "daily_demand": 106
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-541",
+    "item_name": "Rotor 541",
+    "location_id": "DC-PUNE",
+    "on_hand": 6045,
+    "reserved": 878,
+    "safety_stock": 930,
+    "daily_demand": 465
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-542",
+    "item_name": "Spring 542",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2946,
+    "reserved": 117,
+    "safety_stock": 2455,
+    "daily_demand": 491
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-542",
+    "item_name": "Spring 542",
+    "location_id": "DC-DELHI",
+    "on_hand": 2958,
+    "reserved": 370,
+    "safety_stock": 493,
+    "daily_demand": 493
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-542",
+    "item_name": "Spring 542",
+    "location_id": "DC-PUNE",
+    "on_hand": 9765,
+    "reserved": 658,
+    "safety_stock": 465,
+    "daily_demand": 465
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-543",
+    "item_name": "Gear 543",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 5928,
+    "reserved": 179,
+    "safety_stock": 456,
+    "daily_demand": 228
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-543",
+    "item_name": "Gear 543",
+    "location_id": "DC-PUNE",
+    "on_hand": 4860,
+    "reserved": 880,
+    "safety_stock": 540,
+    "daily_demand": 135
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-544",
+    "item_name": "Valve 544",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 10311,
+    "reserved": 2238,
+    "safety_stock": 2455,
+    "daily_demand": 491
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-544",
+    "item_name": "Valve 544",
+    "location_id": "DC-DELHI",
+    "on_hand": 11410,
+    "reserved": 1507,
+    "safety_stock": 1630,
+    "daily_demand": 326
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-544",
+    "item_name": "Valve 544",
+    "location_id": "DC-PUNE",
+    "on_hand": 2688,
+    "reserved": 508,
+    "safety_stock": 512,
+    "daily_demand": 128
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-545",
+    "item_name": "Rotor 545",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 8588,
+    "reserved": 1568,
+    "safety_stock": 1356,
+    "daily_demand": 452
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-545",
+    "item_name": "Rotor 545",
+    "location_id": "DC-PUNE",
+    "on_hand": 6102,
+    "reserved": 1042,
+    "safety_stock": 678,
+    "daily_demand": 339
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-546",
+    "item_name": "Spring 546",
+    "location_id": "DC-PUNE",
+    "on_hand": 9030,
+    "reserved": 1414,
+    "safety_stock": 2150,
+    "daily_demand": 430
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-547",
+    "item_name": "Bearing 547",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 6450,
+    "reserved": 1571,
+    "safety_stock": 1290,
+    "daily_demand": 430
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-547",
+    "item_name": "Bearing 547",
+    "location_id": "DC-DELHI",
+    "on_hand": 14560,
+    "reserved": 3248,
+    "safety_stock": 1820,
+    "daily_demand": 364
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-548",
+    "item_name": "Valve 548",
+    "location_id": "DC-DELHI",
+    "on_hand": 12852,
+    "reserved": 1552,
+    "safety_stock": 714,
+    "daily_demand": 357
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-548",
+    "item_name": "Valve 548",
+    "location_id": "DC-PUNE",
+    "on_hand": 2822,
+    "reserved": 692,
+    "safety_stock": 332,
+    "daily_demand": 166
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-549",
+    "item_name": "Bearing 549",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 8610,
+    "reserved": 1320,
+    "safety_stock": 246,
+    "daily_demand": 246
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-549",
+    "item_name": "Bearing 549",
+    "location_id": "DC-DELHI",
+    "on_hand": 4389,
+    "reserved": 882,
+    "safety_stock": 133,
+    "daily_demand": 133
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-549",
+    "item_name": "Bearing 549",
+    "location_id": "DC-PUNE",
+    "on_hand": 11136,
+    "reserved": 1616,
+    "safety_stock": 1152,
+    "daily_demand": 384
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-550",
+    "item_name": "Flange 550",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 7084,
+    "reserved": 1303,
+    "safety_stock": 322,
+    "daily_demand": 322
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-550",
+    "item_name": "Flange 550",
+    "location_id": "DC-DELHI",
+    "on_hand": 4598,
+    "reserved": 28,
+    "safety_stock": 1254,
+    "daily_demand": 418
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-550",
+    "item_name": "Flange 550",
+    "location_id": "DC-PUNE",
+    "on_hand": 5497,
+    "reserved": 258,
+    "safety_stock": 239,
+    "daily_demand": 239
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-551",
+    "item_name": "Bracket 551",
+    "location_id": "DC-PUNE",
+    "on_hand": 8190,
+    "reserved": 550,
+    "safety_stock": 630,
+    "daily_demand": 210
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-552",
+    "item_name": "Gear 552",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 4100,
+    "reserved": 485,
+    "safety_stock": 820,
+    "daily_demand": 410
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-552",
+    "item_name": "Gear 552",
+    "location_id": "DC-DELHI",
+    "on_hand": 1320,
+    "reserved": 316,
+    "safety_stock": 330,
+    "daily_demand": 110
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-552",
+    "item_name": "Gear 552",
+    "location_id": "DC-PUNE",
+    "on_hand": 7215,
+    "reserved": 1501,
+    "safety_stock": 585,
+    "daily_demand": 195
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-553",
+    "item_name": "Housing 553",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2775,
+    "reserved": 528,
+    "safety_stock": 370,
+    "daily_demand": 185
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-553",
+    "item_name": "Housing 553",
+    "location_id": "DC-DELHI",
+    "on_hand": 18126,
+    "reserved": 1649,
+    "safety_stock": 1908,
+    "daily_demand": 477
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-553",
+    "item_name": "Housing 553",
+    "location_id": "DC-PUNE",
+    "on_hand": 8814,
+    "reserved": 1408,
+    "safety_stock": 904,
+    "daily_demand": 226
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-554",
+    "item_name": "PCB 554",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 6512,
+    "reserved": 246,
+    "safety_stock": 1221,
+    "daily_demand": 407
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-554",
+    "item_name": "PCB 554",
+    "location_id": "DC-DELHI",
+    "on_hand": 11320,
+    "reserved": 2106,
+    "safety_stock": 566,
+    "daily_demand": 283
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-554",
+    "item_name": "PCB 554",
+    "location_id": "DC-PUNE",
+    "on_hand": 6948,
+    "reserved": 810,
+    "safety_stock": 579,
+    "daily_demand": 193
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-555",
+    "item_name": "Housing 555",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 14413,
+    "reserved": 2811,
+    "safety_stock": 1491,
+    "daily_demand": 497
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-555",
+    "item_name": "Housing 555",
+    "location_id": "DC-DELHI",
+    "on_hand": 7320,
+    "reserved": 1608,
+    "safety_stock": 244,
+    "daily_demand": 244
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-555",
+    "item_name": "Housing 555",
+    "location_id": "DC-PUNE",
+    "on_hand": 6273,
+    "reserved": 891,
+    "safety_stock": 1476,
+    "daily_demand": 369
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-556",
+    "item_name": "Seal 556",
+    "location_id": "DC-DELHI",
+    "on_hand": 3806,
+    "reserved": 239,
+    "safety_stock": 346,
+    "daily_demand": 173
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-556",
+    "item_name": "Seal 556",
+    "location_id": "DC-PUNE",
+    "on_hand": 3835,
+    "reserved": 726,
+    "safety_stock": 885,
+    "daily_demand": 295
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-557",
+    "item_name": "PCB 557",
+    "location_id": "DC-DELHI",
+    "on_hand": 4620,
+    "reserved": 60,
+    "safety_stock": 154,
+    "daily_demand": 154
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-557",
+    "item_name": "PCB 557",
+    "location_id": "DC-PUNE",
+    "on_hand": 3024,
+    "reserved": 704,
+    "safety_stock": 378,
+    "daily_demand": 189
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-558",
+    "item_name": "Shaft 558",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 7632,
+    "reserved": 534,
+    "safety_stock": 2120,
+    "daily_demand": 424
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-559",
+    "item_name": "PCB 559",
+    "location_id": "DC-DELHI",
+    "on_hand": 3936,
+    "reserved": 844,
+    "safety_stock": 984,
+    "daily_demand": 246
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-560",
+    "item_name": "Shaft 560",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 10101,
+    "reserved": 2242,
+    "safety_stock": 1443,
+    "daily_demand": 481
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-560",
+    "item_name": "Shaft 560",
+    "location_id": "DC-DELHI",
+    "on_hand": 2592,
+    "reserved": 175,
+    "safety_stock": 72,
+    "daily_demand": 72
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-701",
+    "item_name": "Bearing 701",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2142,
+    "reserved": 173,
+    "safety_stock": 765,
+    "daily_demand": 153
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-701",
+    "item_name": "Bearing 701",
+    "location_id": "DC-PUNE",
+    "on_hand": 1780,
+    "reserved": 133,
+    "safety_stock": 445,
+    "daily_demand": 89
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-702",
+    "item_name": "Flange 702",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 7242,
+    "reserved": 148,
+    "safety_stock": 2130,
+    "daily_demand": 426
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-702",
+    "item_name": "Flange 702",
+    "location_id": "DC-DELHI",
+    "on_hand": 2380,
+    "reserved": 356,
+    "safety_stock": 1190,
+    "daily_demand": 238
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-702",
+    "item_name": "Flange 702",
+    "location_id": "DC-PUNE",
+    "on_hand": 3528,
+    "reserved": 106,
+    "safety_stock": 294,
+    "daily_demand": 147
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-703",
+    "item_name": "Bushing 703",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 930,
+    "reserved": 80,
+    "safety_stock": 1395,
+    "daily_demand": 465
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-703",
+    "item_name": "Bushing 703",
+    "location_id": "DC-DELHI",
+    "on_hand": 6214,
+    "reserved": 906,
+    "safety_stock": 478,
+    "daily_demand": 239
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-703",
+    "item_name": "Bushing 703",
+    "location_id": "DC-PUNE",
+    "on_hand": 1935,
+    "reserved": 244,
+    "safety_stock": 1548,
+    "daily_demand": 387
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-704",
+    "item_name": "Coupling 704",
+    "location_id": "DC-DELHI",
+    "on_hand": 4379,
+    "reserved": 829,
+    "safety_stock": 604,
+    "daily_demand": 151
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-705",
+    "item_name": "Sensor 705",
+    "location_id": "DC-PUNE",
+    "on_hand": 3408,
+    "reserved": 386,
+    "safety_stock": 284,
+    "daily_demand": 284
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-706",
+    "item_name": "Seal 706",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2496,
+    "reserved": 168,
+    "safety_stock": 156,
+    "daily_demand": 156
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-706",
+    "item_name": "Seal 706",
+    "location_id": "DC-DELHI",
+    "on_hand": 7436,
+    "reserved": 571,
+    "safety_stock": 1144,
+    "daily_demand": 286
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-706",
+    "item_name": "Seal 706",
+    "location_id": "DC-PUNE",
+    "on_hand": 3136,
+    "reserved": 536,
+    "safety_stock": 490,
+    "daily_demand": 98
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-707",
+    "item_name": "Gasket 707",
+    "location_id": "DC-PUNE",
+    "on_hand": 9504,
+    "reserved": 1323,
+    "safety_stock": 792,
+    "daily_demand": 264
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-708",
+    "item_name": "Seal 708",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2630,
+    "reserved": 596,
+    "safety_stock": 263,
+    "daily_demand": 263
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-708",
+    "item_name": "Seal 708",
+    "location_id": "DC-DELHI",
+    "on_hand": 12070,
+    "reserved": 1823,
+    "safety_stock": 1065,
+    "daily_demand": 355
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-709",
+    "item_name": "Valve 709",
+    "location_id": "DC-DELHI",
+    "on_hand": 8844,
+    "reserved": 548,
+    "safety_stock": 1206,
+    "daily_demand": 402
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-710",
+    "item_name": "Rotor 710",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 9360,
+    "reserved": 1514,
+    "safety_stock": 1872,
+    "daily_demand": 468
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-710",
+    "item_name": "Rotor 710",
+    "location_id": "DC-DELHI",
+    "on_hand": 936,
+    "reserved": 116,
+    "safety_stock": 72,
+    "daily_demand": 36
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-710",
+    "item_name": "Rotor 710",
+    "location_id": "DC-PUNE",
+    "on_hand": 1235,
+    "reserved": 53,
+    "safety_stock": 988,
+    "daily_demand": 247
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-711",
+    "item_name": "Gasket 711",
+    "location_id": "DC-DELHI",
+    "on_hand": 5640,
+    "reserved": 878,
+    "safety_stock": 705,
+    "daily_demand": 141
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-712",
+    "item_name": "Seal 712",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 5151,
+    "reserved": 447,
+    "safety_stock": 1212,
+    "daily_demand": 303
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-712",
+    "item_name": "Seal 712",
+    "location_id": "DC-DELHI",
+    "on_hand": 5180,
+    "reserved": 736,
+    "safety_stock": 148,
+    "daily_demand": 148
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-713",
+    "item_name": "Gasket 713",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1666,
+    "reserved": 77,
+    "safety_stock": 49,
+    "daily_demand": 49
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-713",
+    "item_name": "Gasket 713",
+    "location_id": "DC-DELHI",
+    "on_hand": 13984,
+    "reserved": 3342,
+    "safety_stock": 736,
+    "daily_demand": 368
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-714",
+    "item_name": "Bracket 714",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 252,
+    "reserved": 17,
+    "safety_stock": 108,
+    "daily_demand": 36
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-714",
+    "item_name": "Bracket 714",
+    "location_id": "DC-DELHI",
+    "on_hand": 1480,
+    "reserved": 365,
+    "safety_stock": 148,
+    "daily_demand": 74
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-714",
+    "item_name": "Bracket 714",
+    "location_id": "DC-PUNE",
+    "on_hand": 69,
+    "reserved": 6,
+    "safety_stock": 92,
+    "daily_demand": 23
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-715",
+    "item_name": "Sensor 715",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 7833,
+    "reserved": 955,
+    "safety_stock": 1865,
+    "daily_demand": 373
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-716",
+    "item_name": "Sensor 716",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 1645,
+    "reserved": 262,
+    "safety_stock": 705,
+    "daily_demand": 235
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-716",
+    "item_name": "Sensor 716",
+    "location_id": "DC-DELHI",
+    "on_hand": 1737,
+    "reserved": 123,
+    "safety_stock": 965,
+    "daily_demand": 193
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-717",
+    "item_name": "Flange 717",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2964,
+    "reserved": 566,
+    "safety_stock": 456,
+    "daily_demand": 114
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-717",
+    "item_name": "Flange 717",
+    "location_id": "DC-DELHI",
+    "on_hand": 13050,
+    "reserved": 3046,
+    "safety_stock": 1800,
+    "daily_demand": 450
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-717",
+    "item_name": "Flange 717",
+    "location_id": "DC-PUNE",
+    "on_hand": 6574,
+    "reserved": 573,
+    "safety_stock": 519,
+    "daily_demand": 173
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-718",
+    "item_name": "Flange 718",
+    "location_id": "DC-DELHI",
+    "on_hand": 588,
+    "reserved": 135,
+    "safety_stock": 882,
+    "daily_demand": 294
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-719",
+    "item_name": "Spring 719",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 12960,
+    "reserved": 1647,
+    "safety_stock": 1440,
+    "daily_demand": 360
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-719",
+    "item_name": "Spring 719",
+    "location_id": "DC-DELHI",
+    "on_hand": 4719,
+    "reserved": 155,
+    "safety_stock": 2145,
+    "daily_demand": 429
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-719",
+    "item_name": "Spring 719",
+    "location_id": "DC-PUNE",
+    "on_hand": 910,
+    "reserved": 22,
+    "safety_stock": 35,
+    "daily_demand": 35
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-720",
+    "item_name": "Housing 720",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 5148,
+    "reserved": 389,
+    "safety_stock": 2340,
+    "daily_demand": 468
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-720",
+    "item_name": "Housing 720",
+    "location_id": "DC-DELHI",
+    "on_hand": 1836,
+    "reserved": 102,
+    "safety_stock": 204,
+    "daily_demand": 204
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-721",
+    "item_name": "Bearing 721",
+    "location_id": "DC-DELHI",
+    "on_hand": 8910,
+    "reserved": 1804,
+    "safety_stock": 1350,
+    "daily_demand": 270
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-722",
+    "item_name": "Gear 722",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 5984,
+    "reserved": 58,
+    "safety_stock": 1088,
+    "daily_demand": 272
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-722",
+    "item_name": "Gear 722",
+    "location_id": "DC-PUNE",
+    "on_hand": 7375,
+    "reserved": 484,
+    "safety_stock": 1475,
+    "daily_demand": 295
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-723",
+    "item_name": "PCB 723",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 12964,
+    "reserved": 1854,
+    "safety_stock": 926,
+    "daily_demand": 463
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-723",
+    "item_name": "PCB 723",
+    "location_id": "DC-DELHI",
+    "on_hand": 15708,
+    "reserved": 2154,
+    "safety_stock": 476,
+    "daily_demand": 476
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-723",
+    "item_name": "PCB 723",
+    "location_id": "DC-PUNE",
+    "on_hand": 2322,
+    "reserved": 571,
+    "safety_stock": 430,
+    "daily_demand": 86
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-724",
+    "item_name": "Housing 724",
+    "location_id": "DC-DELHI",
+    "on_hand": 4455,
+    "reserved": 224,
+    "safety_stock": 891,
+    "daily_demand": 297
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-724",
+    "item_name": "Housing 724",
+    "location_id": "DC-PUNE",
+    "on_hand": 9048,
+    "reserved": 722,
+    "safety_stock": 1248,
+    "daily_demand": 312
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-725",
+    "item_name": "Bearing 725",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 4830,
+    "reserved": 42,
+    "safety_stock": 920,
+    "daily_demand": 230
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-725",
+    "item_name": "Bearing 725",
+    "location_id": "DC-DELHI",
+    "on_hand": 930,
+    "reserved": 169,
+    "safety_stock": 62,
+    "daily_demand": 31
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-725",
+    "item_name": "Bearing 725",
+    "location_id": "DC-PUNE",
+    "on_hand": 6720,
+    "reserved": 113,
+    "safety_stock": 576,
+    "daily_demand": 192
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-726",
+    "item_name": "Shaft 726",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2412,
+    "reserved": 317,
+    "safety_stock": 2010,
+    "daily_demand": 402
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-726",
+    "item_name": "Shaft 726",
+    "location_id": "DC-DELHI",
+    "on_hand": 12992,
+    "reserved": 839,
+    "safety_stock": 1624,
+    "daily_demand": 406
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-726",
+    "item_name": "Shaft 726",
+    "location_id": "DC-PUNE",
+    "on_hand": 1963,
+    "reserved": 136,
+    "safety_stock": 755,
+    "daily_demand": 151
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-727",
+    "item_name": "Valve 727",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 14065,
+    "reserved": 1482,
+    "safety_stock": 1455,
+    "daily_demand": 485
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-727",
+    "item_name": "Valve 727",
+    "location_id": "DC-PUNE",
+    "on_hand": 5603,
+    "reserved": 419,
+    "safety_stock": 862,
+    "daily_demand": 431
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-728",
+    "item_name": "Gear 728",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 4740,
+    "reserved": 916,
+    "safety_stock": 632,
+    "daily_demand": 158
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-728",
+    "item_name": "Gear 728",
+    "location_id": "DC-DELHI",
+    "on_hand": 5696,
+    "reserved": 812,
+    "safety_stock": 712,
+    "daily_demand": 356
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-729",
+    "item_name": "Gear 729",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 10527,
+    "reserved": 578,
+    "safety_stock": 1276,
+    "daily_demand": 319
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-729",
+    "item_name": "Gear 729",
+    "location_id": "DC-DELHI",
+    "on_hand": 5282,
+    "reserved": 991,
+    "safety_stock": 834,
+    "daily_demand": 278
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-729",
+    "item_name": "Gear 729",
+    "location_id": "DC-PUNE",
+    "on_hand": 11529,
+    "reserved": 281,
+    "safety_stock": 1281,
+    "daily_demand": 427
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-730",
+    "item_name": "Bearing 730",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 636,
+    "reserved": 138,
+    "safety_stock": 1272,
+    "daily_demand": 318
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-730",
+    "item_name": "Bearing 730",
+    "location_id": "DC-PUNE",
+    "on_hand": 5943,
+    "reserved": 907,
+    "safety_stock": 849,
+    "daily_demand": 283
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-731",
+    "item_name": "Spring 731",
+    "location_id": "DC-DELHI",
+    "on_hand": 2190,
+    "reserved": 294,
+    "safety_stock": 73,
+    "daily_demand": 73
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-732",
+    "item_name": "Shaft 732",
+    "location_id": "DC-DELHI",
+    "on_hand": 972,
+    "reserved": 151,
+    "safety_stock": 81,
+    "daily_demand": 27
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-733",
+    "item_name": "PCB 733",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 402,
+    "reserved": 49,
+    "safety_stock": 268,
+    "daily_demand": 67
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-733",
+    "item_name": "PCB 733",
+    "location_id": "DC-DELHI",
+    "on_hand": 925,
+    "reserved": 78,
+    "safety_stock": 740,
+    "daily_demand": 185
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-733",
+    "item_name": "PCB 733",
+    "location_id": "DC-PUNE",
+    "on_hand": 504,
+    "reserved": 35,
+    "safety_stock": 21,
+    "daily_demand": 21
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-734",
+    "item_name": "Gasket 734",
+    "location_id": "DC-DELHI",
+    "on_hand": 7350,
+    "reserved": 1731,
+    "safety_stock": 1225,
+    "daily_demand": 245
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-735",
+    "item_name": "Valve 735",
+    "location_id": "DC-DELHI",
+    "on_hand": 7020,
+    "reserved": 573,
+    "safety_stock": 936,
+    "daily_demand": 234
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-735",
+    "item_name": "Valve 735",
+    "location_id": "DC-PUNE",
+    "on_hand": 1221,
+    "reserved": 113,
+    "safety_stock": 165,
+    "daily_demand": 33
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-736",
+    "item_name": "Rotor 736",
+    "location_id": "DC-PUNE",
+    "on_hand": 1552,
+    "reserved": 194,
+    "safety_stock": 388,
+    "daily_demand": 194
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-737",
+    "item_name": "Gear 737",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2144,
+    "reserved": 210,
+    "safety_stock": 201,
+    "daily_demand": 67
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-737",
+    "item_name": "Gear 737",
+    "location_id": "DC-DELHI",
+    "on_hand": 2028,
+    "reserved": 244,
+    "safety_stock": 338,
+    "daily_demand": 338
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-737",
+    "item_name": "Gear 737",
+    "location_id": "DC-PUNE",
+    "on_hand": 2853,
+    "reserved": 201,
+    "safety_stock": 1268,
+    "daily_demand": 317
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-738",
+    "item_name": "Gear 738",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 5694,
+    "reserved": 574,
+    "safety_stock": 438,
+    "daily_demand": 438
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-738",
+    "item_name": "Gear 738",
+    "location_id": "DC-DELHI",
+    "on_hand": 284,
+    "reserved": 55,
+    "safety_stock": 355,
+    "daily_demand": 71
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-738",
+    "item_name": "Gear 738",
+    "location_id": "DC-PUNE",
+    "on_hand": 528,
+    "reserved": 58,
+    "safety_stock": 528,
+    "daily_demand": 176
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-739",
+    "item_name": "Gasket 739",
+    "location_id": "DC-CHENNAI",
+    "on_hand": 2704,
+    "reserved": 67,
+    "safety_stock": 1352,
+    "daily_demand": 338
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-739",
+    "item_name": "Gasket 739",
+    "location_id": "DC-PUNE",
+    "on_hand": 3562,
+    "reserved": 609,
+    "safety_stock": 137,
+    "daily_demand": 137
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-740",
+    "item_name": "Spring 740",
+    "location_id": "DC-DELHI",
+    "on_hand": 1610,
+    "reserved": 62,
+    "safety_stock": 460,
+    "daily_demand": 115
+  }
+]

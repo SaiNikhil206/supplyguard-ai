@@ -1,0 +1,30 @@
+{
+  "scenario": "tenant_isolation",
+  "test_case": "AC-08",
+  "description": "ACME credential sends an event naming a GLOBEX supplier: rejected, nothing created.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000910",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-3005",
+    "event_type": "FACTORY_OUTAGE",
+    "severity": "HIGH",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 48,
+    "description": "Cross-tenant probe",
+    "source_system": "supplier-portal",
+    "correlation_id": "2d9a85ba-2689-497a-ace2-4c07db55fe7c"
+  },
+  "expected": {
+    "supplier_found": false,
+    "evaluated_po_ids": [],
+    "affected_po_ids": [],
+    "exposure": {
+      "amount": "0.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [],
+    "qualified_alternate_supplier_ids": [],
+    "risk_case_expected": false
+  }
+}

@@ -1,0 +1,1214 @@
+[
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-501",
+    "supplier_id": "SUP-2001",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "84.00",
+      "currency": "INR"
+    },
+    "capacity": 5000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-501",
+    "supplier_id": "SUP-2002",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "79.50",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-503",
+    "supplier_id": "SUP-2008",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "500.95",
+      "currency": "INR"
+    },
+    "capacity": 8574
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-504",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "36.84",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-505",
+    "supplier_id": "SUP-2003",
+    "qualified": true,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "426.29",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-506",
+    "supplier_id": "SUP-2003",
+    "qualified": false,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "331.86",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-506",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "307.62",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-507",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "63.72",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-508",
+    "supplier_id": "SUP-2008",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "480.15",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-508",
+    "supplier_id": "SUP-2010",
+    "qualified": false,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "410.66",
+      "currency": "INR"
+    },
+    "capacity": 9342
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-509",
+    "supplier_id": "SUP-2006",
+    "qualified": true,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "568.83",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-510",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "160.93",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-510",
+    "supplier_id": "SUP-2008",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "156.32",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-511",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "250.04",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-511",
+    "supplier_id": "SUP-2010",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "228.68",
+      "currency": "INR"
+    },
+    "capacity": 962
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-512",
+    "supplier_id": "SUP-2010",
+    "qualified": true,
+    "lead_time_days": 14,
+    "unit_price": {
+      "amount": "500.43",
+      "currency": "INR"
+    },
+    "capacity": 2635
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-513",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "437.35",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-514",
+    "supplier_id": "SUP-2004",
+    "qualified": false,
+    "lead_time_days": 11,
+    "unit_price": {
+      "amount": "269.75",
+      "currency": "INR"
+    },
+    "capacity": 7686
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-514",
+    "supplier_id": "SUP-2008",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "248.55",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-515",
+    "supplier_id": "SUP-2003",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "411.16",
+      "currency": "INR"
+    },
+    "capacity": 2000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-518",
+    "supplier_id": "SUP-2003",
+    "qualified": false,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "197.86",
+      "currency": "INR"
+    },
+    "capacity": 8541
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-518",
+    "supplier_id": "SUP-2008",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "196.68",
+      "currency": "INR"
+    },
+    "capacity": 7471
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-519",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "58.61",
+      "currency": "INR"
+    },
+    "capacity": 7526
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-520",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "142.37",
+      "currency": "INR"
+    },
+    "capacity": 4000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-521",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "301.35",
+      "currency": "INR"
+    },
+    "capacity": 4000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-522",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "523.03",
+      "currency": "INR"
+    },
+    "capacity": 4000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-523",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "62.47",
+      "currency": "INR"
+    },
+    "capacity": 4000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-524",
+    "supplier_id": "SUP-2006",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "372.13",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-526",
+    "supplier_id": "SUP-2006",
+    "qualified": false,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "429.33",
+      "currency": "INR"
+    },
+    "capacity": 9767
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-526",
+    "supplier_id": "SUP-2010",
+    "qualified": false,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "452.33",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-527",
+    "supplier_id": "SUP-2010",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "187.00",
+      "currency": "INR"
+    },
+    "capacity": 7458
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-528",
+    "supplier_id": "SUP-2003",
+    "qualified": false,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "307.11",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-529",
+    "supplier_id": "SUP-2006",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "385.10",
+      "currency": "INR"
+    },
+    "capacity": 8724
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-530",
+    "supplier_id": "SUP-2005",
+    "qualified": true,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "436.44",
+      "currency": "INR"
+    },
+    "capacity": 6000
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-533",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "469.92",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-534",
+    "supplier_id": "SUP-2006",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "166.87",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-534",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "158.93",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-535",
+    "supplier_id": "SUP-2010",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "34.67",
+      "currency": "INR"
+    },
+    "capacity": 4589
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-536",
+    "supplier_id": "SUP-2003",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "96.05",
+      "currency": "INR"
+    },
+    "capacity": 5934
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-537",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "153.25",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-537",
+    "supplier_id": "SUP-2010",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "146.73",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-538",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "472.29",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-539",
+    "supplier_id": "SUP-2009",
+    "qualified": false,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "53.52",
+      "currency": "INR"
+    },
+    "capacity": 9637
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-542",
+    "supplier_id": "SUP-2006",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "239.50",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-543",
+    "supplier_id": "SUP-2005",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "406.81",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-545",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "155.13",
+      "currency": "INR"
+    },
+    "capacity": 6847
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-546",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "409.53",
+      "currency": "INR"
+    },
+    "capacity": 2809
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-547",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "336.61",
+      "currency": "INR"
+    },
+    "capacity": 1864
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-547",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "357.69",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-548",
+    "supplier_id": "SUP-2008",
+    "qualified": true,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "298.97",
+      "currency": "INR"
+    },
+    "capacity": 2339
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-549",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "135.45",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-550",
+    "supplier_id": "SUP-2004",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "328.91",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-551",
+    "supplier_id": "SUP-2006",
+    "qualified": false,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "246.50",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-554",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "380.05",
+      "currency": "INR"
+    },
+    "capacity": 8881
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-555",
+    "supplier_id": "SUP-2003",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "258.01",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-556",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "65.41",
+      "currency": "INR"
+    },
+    "capacity": 6778
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-558",
+    "supplier_id": "SUP-2003",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "569.28",
+      "currency": "INR"
+    },
+    "capacity": 1199
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-558",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "487.70",
+      "currency": "INR"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-559",
+    "supplier_id": "SUP-2009",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "412.88",
+      "currency": "INR"
+    },
+    "capacity": 2966
+  },
+  {
+    "tenant_id": "TEN-ACME",
+    "item_id": "ITM-560",
+    "supplier_id": "SUP-2007",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "206.23",
+      "currency": "INR"
+    },
+    "capacity": 9075
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-701",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "390.06",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-701",
+    "supplier_id": "SUP-3040",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "320.99",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-702",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "558.97",
+      "currency": "USD"
+    },
+    "capacity": 8795
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-703",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "580.22",
+      "currency": "USD"
+    },
+    "capacity": 6852
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-704",
+    "supplier_id": "SUP-3033",
+    "qualified": true,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "355.83",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-704",
+    "supplier_id": "SUP-3037",
+    "qualified": false,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "401.77",
+      "currency": "USD"
+    },
+    "capacity": 3050
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-705",
+    "supplier_id": "SUP-3035",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "451.30",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-706",
+    "supplier_id": "SUP-3033",
+    "qualified": true,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "250.87",
+      "currency": "USD"
+    },
+    "capacity": 4983
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-706",
+    "supplier_id": "SUP-3035",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "234.27",
+      "currency": "USD"
+    },
+    "capacity": 2816
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-708",
+    "supplier_id": "SUP-3040",
+    "qualified": true,
+    "lead_time_days": 11,
+    "unit_price": {
+      "amount": "437.50",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-709",
+    "supplier_id": "SUP-3036",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "188.97",
+      "currency": "USD"
+    },
+    "capacity": 5087
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-710",
+    "supplier_id": "SUP-3040",
+    "qualified": true,
+    "lead_time_days": 9,
+    "unit_price": {
+      "amount": "333.60",
+      "currency": "USD"
+    },
+    "capacity": 7528
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-711",
+    "supplier_id": "SUP-3038",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "431.28",
+      "currency": "USD"
+    },
+    "capacity": 7893
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-712",
+    "supplier_id": "SUP-3031",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "438.15",
+      "currency": "USD"
+    },
+    "capacity": 1902
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-715",
+    "supplier_id": "SUP-3033",
+    "qualified": true,
+    "lead_time_days": 3,
+    "unit_price": {
+      "amount": "195.98",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-716",
+    "supplier_id": "SUP-3035",
+    "qualified": true,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "424.97",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-716",
+    "supplier_id": "SUP-3039",
+    "qualified": true,
+    "lead_time_days": 13,
+    "unit_price": {
+      "amount": "481.47",
+      "currency": "USD"
+    },
+    "capacity": 2254
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-718",
+    "supplier_id": "SUP-3033",
+    "qualified": false,
+    "lead_time_days": 11,
+    "unit_price": {
+      "amount": "58.79",
+      "currency": "USD"
+    },
+    "capacity": 5114
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-719",
+    "supplier_id": "SUP-3037",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "68.64",
+      "currency": "USD"
+    },
+    "capacity": 1321
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-720",
+    "supplier_id": "SUP-3035",
+    "qualified": true,
+    "lead_time_days": 6,
+    "unit_price": {
+      "amount": "476.56",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-721",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 8,
+    "unit_price": {
+      "amount": "122.01",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-721",
+    "supplier_id": "SUP-3040",
+    "qualified": true,
+    "lead_time_days": 2,
+    "unit_price": {
+      "amount": "118.91",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-722",
+    "supplier_id": "SUP-3034",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "337.28",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-724",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 11,
+    "unit_price": {
+      "amount": "363.01",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-724",
+    "supplier_id": "SUP-3034",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "366.98",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-725",
+    "supplier_id": "SUP-3034",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "289.63",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-726",
+    "supplier_id": "SUP-3038",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "24.89",
+      "currency": "USD"
+    },
+    "capacity": 7362
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-728",
+    "supplier_id": "SUP-3031",
+    "qualified": true,
+    "lead_time_days": 11,
+    "unit_price": {
+      "amount": "319.41",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-729",
+    "supplier_id": "SUP-3038",
+    "qualified": false,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "384.75",
+      "currency": "USD"
+    },
+    "capacity": 5557
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-730",
+    "supplier_id": "SUP-3035",
+    "qualified": true,
+    "lead_time_days": 11,
+    "unit_price": {
+      "amount": "410.59",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-731",
+    "supplier_id": "SUP-3036",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "141.91",
+      "currency": "USD"
+    },
+    "capacity": 8941
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-732",
+    "supplier_id": "SUP-3034",
+    "qualified": true,
+    "lead_time_days": 7,
+    "unit_price": {
+      "amount": "303.98",
+      "currency": "USD"
+    },
+    "capacity": 7995
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-732",
+    "supplier_id": "SUP-3039",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "267.06",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-733",
+    "supplier_id": "SUP-3032",
+    "qualified": false,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "433.25",
+      "currency": "USD"
+    },
+    "capacity": 4274
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-734",
+    "supplier_id": "SUP-3035",
+    "qualified": true,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "106.20",
+      "currency": "USD"
+    },
+    "capacity": 7931
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-735",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "314.85",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-736",
+    "supplier_id": "SUP-3039",
+    "qualified": true,
+    "lead_time_days": 10,
+    "unit_price": {
+      "amount": "66.16",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-737",
+    "supplier_id": "SUP-3031",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "131.51",
+      "currency": "USD"
+    },
+    "capacity": 2843
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-737",
+    "supplier_id": "SUP-3033",
+    "qualified": true,
+    "lead_time_days": 4,
+    "unit_price": {
+      "amount": "163.14",
+      "currency": "USD"
+    },
+    "capacity": 8299
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-739",
+    "supplier_id": "SUP-3032",
+    "qualified": true,
+    "lead_time_days": 12,
+    "unit_price": {
+      "amount": "607.63",
+      "currency": "USD"
+    },
+    "capacity": null
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "item_id": "ITM-739",
+    "supplier_id": "SUP-3040",
+    "qualified": false,
+    "lead_time_days": 5,
+    "unit_price": {
+      "amount": "589.70",
+      "currency": "USD"
+    },
+    "capacity": null
+  }
+]

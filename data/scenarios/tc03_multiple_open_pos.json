@@ -1,0 +1,50 @@
+{
+  "scenario": "tc03_multiple_open_pos",
+  "test_case": "TC-03",
+  "description": "SUP-1020 has 6 open POs; all evaluated, 5 affected.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000903",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1020",
+    "event_type": "FACTORY_OUTAGE",
+    "severity": "CRITICAL",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 72,
+    "description": "Furnace failure, casting line down",
+    "source_system": "supplier-portal",
+    "correlation_id": "de5c904d-eaca-4a67-8683-be9fc508a90c"
+  },
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1007",
+      "PO-1008",
+      "PO-1009",
+      "PO-1010",
+      "PO-1011",
+      "PO-1012"
+    ],
+    "affected_po_ids": [
+      "PO-1007",
+      "PO-1008",
+      "PO-1009",
+      "PO-1010",
+      "PO-1011"
+    ],
+    "exposure": {
+      "amount": "537649.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-520",
+      "ITM-521",
+      "ITM-522",
+      "ITM-523"
+    ],
+    "qualified_alternate_supplier_ids": [
+      "SUP-2004"
+    ],
+    "risk_case_expected": true
+  }
+}

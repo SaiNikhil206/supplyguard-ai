@@ -1,0 +1,48 @@
+{
+  "scenario": "tc08_erp_timeout",
+  "test_case": "TC-08",
+  "description": "Approve while mock ERP PATCH times out: execution failed/pending, retry is idempotent.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000908",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1008",
+    "event_type": "FACTORY_OUTAGE",
+    "severity": "HIGH",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 48,
+    "description": "Line 2 fire, production halted",
+    "source_system": "supplier-portal",
+    "correlation_id": "5628fbc3-acc1-4c36-a7aa-16c8cbe295f8"
+  },
+  "decision": {
+    "decision": "APPROVE",
+    "comments": "Approve"
+  },
+  "chaos_mode": "timeout",
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1001",
+      "PO-1002",
+      "PO-1003"
+    ],
+    "affected_po_ids": [
+      "PO-1001",
+      "PO-1002"
+    ],
+    "exposure": {
+      "amount": "491400.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-501"
+    ],
+    "qualified_alternate_supplier_ids": [
+      "SUP-2001",
+      "SUP-2002"
+    ],
+    "erp_write_expected": false,
+    "execution_status_expected": "EXECUTION_FAILED"
+  }
+}
