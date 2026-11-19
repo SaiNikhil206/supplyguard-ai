@@ -33,3 +33,12 @@ Template:
 - Next: Roop R-01; Nikhil N-01 then N-02; Uday U-01 + U-02
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 - roop - SETUP (merge policy)
+- Branch: roop/S-06-merge-policy (separate worktree; another session is working on R-01 in the main checkout)
+- Did: Team policy: every member is a repo admin, Claude verifies and merges PRs into `collaboration` itself (rebase, conflict rules, tests green, reviewer APPROVE). `/done` now merges and continues with the next ready task automatically; new `/merge-prs` merges every ready PR/branch for the team. Conflict rules written into CLAUDE.md and GIT_WORKFLOW.md.
+- Tests: n/a (docs only)
+- Status now: policy live on `collaboration`
+- Next: run `/merge-prs` when N-01 / R-01 are ready
+- Blockers: none
+- Models used: advisor opus
