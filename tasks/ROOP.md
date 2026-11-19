@@ -56,7 +56,7 @@
 - **Notes:** -
 
 ### R-04: Risk Command Center + case detail
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S2-S3 (4-10 Dec) | **Est:** 2.5d | **Depends:** R-02, U-06
 - **Branch:** `roop/R-04-risk-center`
 - **Model hint:** sonnet / medium
@@ -65,7 +65,7 @@
   - [ ] New case appears within 5 s of the simulate click
   - [ ] Estimates and missing data visibly labelled (AC-03)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-05: AI Recommendations + Approval Center
 - **Status:** todo
