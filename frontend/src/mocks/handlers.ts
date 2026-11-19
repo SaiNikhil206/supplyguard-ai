@@ -1,5 +1,6 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
 import type { ErrorCode, Paginated } from '@/api/types';
+import { auditHandlers } from './admin/audit';
 import {
   dashboardSummary,
   meFor,
@@ -219,4 +220,5 @@ export const handlers: HttpHandler[] = [
       );
     }),
   ),
+  ...auditHandlers,
 ];
