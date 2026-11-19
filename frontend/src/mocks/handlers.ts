@@ -12,6 +12,7 @@ import {
   users,
   type MockUser,
 } from './fixtures';
+import { adminSettingsHandlers } from './admin/settings';
 
 export const ACCESS_TTL_SECONDS = 15 * 60;
 export const REFRESH_TTL_SECONDS = 7 * 24 * 3600;
@@ -121,6 +122,7 @@ function protectedRoute(
 const API = '*/api/v1';
 
 export const handlers: HttpHandler[] = [
+  ...adminSettingsHandlers,
   http.post(`${API}/auth/token`, async ({ request }) => {
     const body = (await request.json().catch(() => ({}))) as { username?: string; password?: string };
     if (!body.username || !body.password) {
