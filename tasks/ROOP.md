@@ -28,7 +28,7 @@
   - [x] `npm run build` and `npm test` green (10 files / 76 tests; `python scripts/run_checks.py` frontend PASS)
   - [x] Login + protected routes work against MSW mocks (`frontend/src/auth/__tests__/auth.test.tsx`)
   - [x] Setting `VITE_API_MOCK=false` points the same code at the real backend (`src/main.tsx` skips MSW worker; `src/api/config.test.ts`; `loginNoMock.test.tsx`; Vite proxy `/api` -> :8000)
-- **Done in:** -
+- **Done in:** cfaec62
 - **Notes:** Built via nested branches `--scaffold` (subagent), `--api` + `--ui` (visible sessions), `--auth`, `--review-fixes`, `--schema-fixes` (subagents). Opus review x2: CHANGES REQUIRED -> all MAJORs fixed -> APPROVE WITH NITS. Stack: React 18.3, Vite 8, Vitest 5, TS 5.9 (TS 7 avoided: no JS API for openapi-typescript), Node >=22.22.2 (`.nvmrc`); auto-merge.yml now on Node 22.22.2. Types hand-written from CONTRACTS + `ai/schemas` (ajv test validates mock analysis/plan); swap to openapi-typescript after U-02. Deferred: cross-tab refresh-token rotation + short refresh lifetime (Uday, backend), refresh token in localStorage (hackathon trade-off, README), `/settings` ADMIN gating (R-08). Mock users in `frontend/README.md`.
 
 ### R-02: Read APIs for the UI (Django `apps/portal`)
