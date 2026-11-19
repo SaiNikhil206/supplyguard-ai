@@ -95,3 +95,12 @@ Template:
 - Next: R-09 once U-02 lands; R-02 after U-03/U-04
 - Blockers: Uday U-02/U-03/U-04; backend asks in ROOP.md Handoff (refresh lifetime/rotation, /me shape)
 - Models used: advisor opus; implementer sonnet x5, reviewer opus x2, 2 visible sonnet sessions
+
+## 2026-11-19 - nikhil - N-05 (Boomi-free part)
+- Branch: nikhil/N-05-risk-analyst
+- Did: Supplier Risk Analyst prompt v1.1.0 + agent.json + tools.json (4 ERP lookups -> U-07 processes); 5 adversarial cases; reference answers (demo, TC-05); ai/eval/build_agent_input.py (schema-valid inputs from seed + scenarios, provisional impact until N-04) and ai/eval/grade.py (evidence resolution, claim-to-evidence link, dates, numeric support, shortage per PO, flags, case patterns). Reviewer (opus) found grader bypasses (dates, uncited claims, assumptions, UUID digits) and false failures - all fixed with regression tests.
+- Tests: `python -m pytest ai/tests -q` -> 133 passed
+- Status now: in-progress (acceptance needs real agent runs)
+- Next: U-01 -> create agent (Agentstudio or Claude fallback), grade demo + ADV-01..05
+- Blockers: U-01 not pushed; N-04 waits on U-03
+- Models used: advisor opus; reviewer (opus, general-purpose agent)

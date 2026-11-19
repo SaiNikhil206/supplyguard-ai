@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 0 | 0 | 11 | 0 | 8% | - |
-| Nikhil | 0 | 0 | 3 | 0 | 11 | 0 | 0% | - |
+| Nikhil | 0 | 1 | 3 | 0 | 10 | 0 | 0% | N-05 |
 | Uday | 0 | 0 | 1 | 0 | 11 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
@@ -32,7 +32,7 @@
 | U-06 | Event intake + Boomi client (Django `apps/integrations`) | Uday | S1 (26-30 Nov) | todo | 0/5 | - |
 | U-07 | Boomi ERP read processes + canonical profiles | Uday | S1 (25-30 Nov) | todo | 0/3 | - |
 | U-12 | Local + hosted deployment | Uday | S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | todo | 0/3 | - |
-| N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | todo | 0/3 | - |
+| N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | in-progress | 0/3 | - |
 | N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | todo | 0/3 | - |
 | N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | todo | 0/3 | - |
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
@@ -70,12 +70,12 @@
 - **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (N-03 implemented, in review)
-- **Current task:** N-03 (N-01, N-02 also in review)
-- **Branch:** `nikhil/N-03-mock-erp`
-- **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
-- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
-- **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
+- **Last updated:** 2026-11-19 (N-05 Boomi-free part done)
+- **Current task:** N-05 (in-progress; N-01..N-03 auto-merged, in review)
+- **Branch:** `nikhil/N-05-risk-analyst`
+- **Where I left off:** Risk Analyst prompt v1.1.0, agent.json, tools.json in `boomi/agents/risk_analyst/`; 5 adversarial cases + reference answers; `ai/eval/build_agent_input.py` (provisional impact until N-04) and `ai/eval/grade.py`; 133 ai tests green. Reviewer (opus) findings fixed (grader bypasses, false failures, prompt contract). No real agent run yet.
+- **Next step:** When U-01 is pushed: create the agent in Agentstudio (README steps) or, if not enabled, run the same prompt via the Claude fallback; grade demo + ADV-01..05 runs into `eval/runs/`, log in `boomi/TEST_LOG.md`, then set N-05 to review.
+- **Blockers:** U-01 not on GitHub yet (no `docs/BOOMI_ENV.md`): Agentstudio availability + Nikhil's Boomi access unknown. N-04 waits on U-03.
 
 ### Uday
 - **Last updated:** 2026-11-19 (U-02 scaffold built, in review)
@@ -89,12 +89,13 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 4b45577 | roop | R-09 | in-progress | chore(tasks): start R-09 CI pipeline |
 | 2026-11-19 | a464f4a | roop | R-01 | done | merge: R-01 Frontend scaffold + design system (auto-merge) |
 | 2026-11-19 | ffdc766 | roop | R-01 | done | chore(tasks): handoff R-01 - done |
 | 2026-11-19 | cfaec62 | roop | R-01 | done | chore(tasks): R-01 done - frontend scaffold, auth, mocks, UI kit |
 | 2026-11-19 | 96a74fc | roop | R-01 | in-progress | ci(automation): run auto-merge checks on Node 22.22.2 |
-| 2026-11-19 | 89e9f67 | nikhil | N-03 | review | merge: N-03 Mock ERP service (auto-merge) |
 | 2026-11-19 | 9f884ef | nikhil | N-03 | review | chore(tasks): N-03 handoff - N-01/N-02 auto-merged, N-03 ready |
+| 2026-11-19 | 89e9f67 | nikhil | N-03 | review | merge: N-03 Mock ERP service (auto-merge) |
 | 2026-11-19 | dcc2320 | roop | R-01 | in-progress | merge: R-01 --schema-fixes sub-branch into task branch |
 | 2026-11-19 | 8dcf1b8 | uday | U-02 | review | merge: U-02 Backend scaffold (auto-merge) |
 | 2026-11-19 | 4d2b535 | roop | R-01 | in-progress | fix(frontend): align API types and mocks with agent schemas |
@@ -108,4 +109,3 @@
 | 2026-11-19 | c0cf42b | roop | R-01 | in-progress | merge: R-01 --review-fixes sub-branch into task branch |
 | 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |
 | 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
-| 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |

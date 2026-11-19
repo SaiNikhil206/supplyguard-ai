@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (N-03 implemented, in review)
-- **Current task:** N-03 (N-01, N-02 also in review)
-- **Branch:** `nikhil/N-03-mock-erp`
-- **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
-- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
-- **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
+- **Last updated:** 2026-11-19 (N-05 Boomi-free part done)
+- **Current task:** N-05 (in-progress; N-01..N-03 auto-merged, in review)
+- **Branch:** `nikhil/N-05-risk-analyst`
+- **Where I left off:** Risk Analyst prompt v1.1.0, agent.json, tools.json in `boomi/agents/risk_analyst/`; 5 adversarial cases + reference answers; `ai/eval/build_agent_input.py` (provisional impact until N-04) and `ai/eval/grade.py`; 133 ai tests green. Reviewer (opus) findings fixed (grader bypasses, false failures, prompt contract). No real agent run yet.
+- **Next step:** When U-01 is pushed: create the agent in Agentstudio (README steps) or, if not enabled, run the same prompt via the Claude fallback; grade demo + ADV-01..05 runs into `eval/runs/`, log in `boomi/TEST_LOG.md`, then set N-05 to review.
+- **Blockers:** U-01 not on GitHub yet (no `docs/BOOMI_ENV.md`): Agentstudio availability + Nikhil's Boomi access unknown. N-04 waits on U-03.
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
@@ -72,7 +72,7 @@
 - **Notes:** -
 
 ### N-05: Supplier Risk Analyst agent (Agentstudio)
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S2 (1-4 Dec) | **Est:** 2d | **Depends:** N-01, U-01
 - **Branch:** `nikhil/N-05-risk-analyst`
 - **Model hint:** opus / high (prompt + guardrails); use the boomi-agentstudio skill if installed
@@ -82,7 +82,7 @@
   - [ ] Every claim has an `evidence` entry pointing to snapshot data
   - [ ] 5 adversarial prompts (asking it to guess capacity etc.) -> it reports missing data instead
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Done offline: prompt/config/tools/guardrails, 5 adversarial cases, input builder, grader (see `boomi/agents/risk_analyst/README.md`). Left: create in Agentstudio (needs U-01) and grade real runs for all 3 acceptance boxes. Impact in eval inputs is provisional until N-04.
 
 ### N-06: Recovery Planning agent (Agentstudio)
 - **Status:** todo
