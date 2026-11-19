@@ -3,8 +3,13 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup",
+        "matcher": "startup|resume",
         "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/gitflow.py local-sync --quiet",
+            "timeout": 60
+          },
           {
             "type": "command",
             "command": "python scripts/progress.py --brief",

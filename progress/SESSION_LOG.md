@@ -59,3 +59,12 @@ Template:
 - Next: Nikhil fixes reviewer follow-ups before S-01 call
 - Blockers: none
 - Models used: advisor opus; reviewer opus
+
+## 2026-11-19 - roop - SETUP (auto-merge + auto-pull)
+- Branch: roop/S-02-automerge (separate worktree)
+- Did: Added `scripts/gitflow.py` (automerge / sync-branches / local-sync) and `scripts/run_checks.py`; GitHub Actions `auto-merge.yml` (merge `review`/`done` task branches into collaboration when clean + green, delete `done` branches, then sync) and `branch-sync.yml` (merge collaboration into every open task branch); SessionStart hook auto-pulls locally. Team switched from rebase to merge (no force pushes). Docs + commands updated.
+- Tests: simulated GitHub with a bare repo: in-progress branch skipped, review branch merged with SESSION_LOG conflict auto-resolved, re-run skipped as already merged, sync pushed collaboration into 2 branches, local-sync pulled bot merge, dirty tree skipped, real conflict reported (rc=2); ai checks 82 passed.
+- Status now: automation live on collaboration
+- Next: R-01 merges automatically once its /done marks it `review`/`done` and pushes
+- Blockers: none
+- Models used: advisor opus
