@@ -1,0 +1,2141 @@
+[
+  {
+    "supplier_id": "SUP-1001",
+    "tenant_id": "TEN-ACME",
+    "name": "Summit Bearings Pvt Ltd",
+    "tax_id": "27WMQYJ5776F1Z8",
+    "category": "Raw Material",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 88.2,
+    "quality_score": 3.7,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1001.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-21",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1002",
+    "tenant_id": "TEN-ACME",
+    "name": "Orion Forgings Pvt Ltd",
+    "tax_id": "27JAXBW7350F1Z9",
+    "category": "Raw Material",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 94.1,
+    "quality_score": 3.4,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1002.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-25",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-03-01",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-04-23",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1003",
+    "tenant_id": "TEN-ACME",
+    "name": "Meridian Electronics Pvt Ltd",
+    "tax_id": "27QBHGN7394E1Z9",
+    "category": "Raw Material",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 81.6,
+    "quality_score": 3.5,
+    "capacity_per_week": 10627,
+    "contact_email": "orders@sup-1003.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-18",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 6
+      },
+      {
+        "date": "2026-10-05",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 1
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1004",
+    "tenant_id": "TEN-ACME",
+    "name": "Shakti Polymers Pvt Ltd",
+    "tax_id": "27XRVHK6633C1Z7",
+    "category": "Electrical",
+    "city": "Ahmedabad",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.3,
+    "quality_score": 4.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1004.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-07-21",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1005",
+    "tenant_id": "TEN-ACME",
+    "name": "Pioneer Forgings Pvt Ltd",
+    "tax_id": "27LHRAL3999H1Z7",
+    "category": "Chemical",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 98.8,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1005.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-23",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1006",
+    "tenant_id": "TEN-ACME",
+    "name": "Vardhan Electronics Pvt Ltd",
+    "tax_id": "27XGFFJ5344F1Z7",
+    "category": "Packaging",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 80.9,
+    "quality_score": 3.9,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1006.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1007",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Components Pvt Ltd",
+    "tax_id": "27HCFTH9690H1Z6",
+    "category": "Chemical",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 82.2,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1007.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-30",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1008",
+    "tenant_id": "TEN-ACME",
+    "name": "Shakti Components Pvt Ltd",
+    "tax_id": "27TPUSP8629C1Z2",
+    "category": "Packaging",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 83.1,
+    "quality_score": 4.9,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1008.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1009",
+    "tenant_id": "TEN-ACME",
+    "name": "Summit Chemicals Pvt Ltd",
+    "tax_id": "27XXMAE7216A1Z8",
+    "category": "Mechanical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.4,
+    "quality_score": 4.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1009.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1010",
+    "tenant_id": "TEN-ACME",
+    "name": "Zenith Textiles Pvt Ltd",
+    "tax_id": "27SALPT7732E1Z3",
+    "category": "Raw Material",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.3,
+    "quality_score": 4.5,
+    "capacity_per_week": 7104,
+    "contact_email": "orders@sup-1010.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-10-08",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1011",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Forgings Pvt Ltd",
+    "tax_id": "27XAFBM4154B1Z8",
+    "category": "Mechanical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.5,
+    "quality_score": 3.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1011.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1012",
+    "tenant_id": "TEN-ACME",
+    "name": "Zenith Precision Pvt Ltd",
+    "tax_id": "27RUZCD5512G1Z1",
+    "category": "Mechanical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.0,
+    "quality_score": 3.6,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1012.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1013",
+    "tenant_id": "TEN-ACME",
+    "name": "Shakti Forgings Pvt Ltd",
+    "tax_id": "27GFCKB9054B1Z8",
+    "category": "Raw Material",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 95.4,
+    "quality_score": 4.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1013.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-28",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1014",
+    "tenant_id": "TEN-ACME",
+    "name": "Shakti Packaging Pvt Ltd",
+    "tax_id": "27SLVHP9355H1Z7",
+    "category": "Packaging",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.0,
+    "quality_score": 3.3,
+    "capacity_per_week": 6330,
+    "contact_email": "orders@sup-1014.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-20",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1015",
+    "tenant_id": "TEN-ACME",
+    "name": "Kaveri Polymers Pvt Ltd",
+    "tax_id": "27DYRRV8579B1Z9",
+    "category": "Raw Material",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.4,
+    "quality_score": 5.0,
+    "capacity_per_week": 8000,
+    "contact_email": "orders@sup-1015.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-11-11",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 1
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1016",
+    "tenant_id": "TEN-ACME",
+    "name": "Sapphire Metals Pvt Ltd",
+    "tax_id": "27DMPCE2598F1Z2",
+    "category": "Raw Material",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 88.0,
+    "quality_score": 4.8,
+    "capacity_per_week": 13501,
+    "contact_email": "orders@sup-1016.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-04-05",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 6
+      },
+      {
+        "date": "2026-11-12",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1017",
+    "tenant_id": "TEN-ACME",
+    "name": "Indus Castings Pvt Ltd",
+    "tax_id": "27XFLYM8146D1Z9",
+    "category": "Electrical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 94.0,
+    "quality_score": 4.5,
+    "capacity_per_week": 8566,
+    "contact_email": "orders@sup-1017.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-04-16",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1018",
+    "tenant_id": "TEN-ACME",
+    "name": "Sterling Fasteners Pvt Ltd",
+    "tax_id": "27UCMPR4988C1Z9",
+    "category": "Raw Material",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 98.8,
+    "quality_score": 3.5,
+    "capacity_per_week": 14670,
+    "contact_email": "orders@sup-1018.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1019",
+    "tenant_id": "TEN-ACME",
+    "name": "Zenith Components Pvt Ltd",
+    "tax_id": "27UYKHJ6358A1Z8",
+    "category": "Packaging",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 82.2,
+    "quality_score": 3.8,
+    "capacity_per_week": 18367,
+    "contact_email": "orders@sup-1019.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1020",
+    "tenant_id": "TEN-ACME",
+    "name": "Trident Castings Pvt Ltd",
+    "tax_id": "27YXYJF4657B1Z3",
+    "category": "Packaging",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 87.9,
+    "quality_score": 3.6,
+    "capacity_per_week": 12000,
+    "contact_email": "orders@sup-1020.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-15",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 6
+      },
+      {
+        "date": "2026-06-12",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-09-27",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1021",
+    "tenant_id": "TEN-ACME",
+    "name": "Trident Fasteners Pvt Ltd",
+    "tax_id": "27LCNJA3400H1Z2",
+    "category": "Raw Material",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.8,
+    "quality_score": 5.0,
+    "capacity_per_week": 19356,
+    "contact_email": "orders@sup-1021.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1022",
+    "tenant_id": "TEN-ACME",
+    "name": "Trident Polymers Pvt Ltd",
+    "tax_id": "27WMXEM6640B1Z3",
+    "category": "Electrical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 97.2,
+    "quality_score": 3.3,
+    "capacity_per_week": 16460,
+    "contact_email": "orders@sup-1022.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1023",
+    "tenant_id": "TEN-ACME",
+    "name": "Vardhan Castings Pvt Ltd",
+    "tax_id": "27EDTZF8625G1Z8",
+    "category": "Electrical",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 82.4,
+    "quality_score": 4.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1023.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1024",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Chemicals Pvt Ltd",
+    "tax_id": "27UAHND3423E1Z5",
+    "category": "Mechanical",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 98.1,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1024.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-21",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-08-16",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-08-18",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1025",
+    "tenant_id": "TEN-ACME",
+    "name": "Nova Fasteners Pvt Ltd",
+    "tax_id": "27RJACA8349D1Z1",
+    "category": "Electrical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 95.6,
+    "quality_score": 4.0,
+    "capacity_per_week": 18826,
+    "contact_email": "orders@sup-1025.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-05-25",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1026",
+    "tenant_id": "TEN-ACME",
+    "name": "Shakti Textiles Pvt Ltd",
+    "tax_id": "27AQAHH4638F1Z7",
+    "category": "Mechanical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 94.2,
+    "quality_score": 3.3,
+    "capacity_per_week": 16649,
+    "contact_email": "orders@sup-1026.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-29",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-03-21",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-09-22",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1027",
+    "tenant_id": "TEN-ACME",
+    "name": "Harbor Polymers Pvt Ltd",
+    "tax_id": "27PXDLC9725B1Z5",
+    "category": "Electrical",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 98.8,
+    "quality_score": 4.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1027.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-04",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1028",
+    "tenant_id": "TEN-ACME",
+    "name": "Atlas Castings Pvt Ltd",
+    "tax_id": "27ULLCK2397C1Z3",
+    "category": "Packaging",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 80.2,
+    "quality_score": 4.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1028.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-18",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-03-15",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1029",
+    "tenant_id": "TEN-ACME",
+    "name": "Orion Packaging Pvt Ltd",
+    "tax_id": "27ARKCU6622B1Z5",
+    "category": "Electrical",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 95.8,
+    "quality_score": 4.0,
+    "capacity_per_week": 15677,
+    "contact_email": "orders@sup-1029.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-08-31",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 6
+      },
+      {
+        "date": "2026-09-07",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-11-10",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 5
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1030",
+    "tenant_id": "TEN-ACME",
+    "name": "Lotus Packaging Pvt Ltd",
+    "tax_id": "27TBHNP7841D1Z5",
+    "category": "Raw Material",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 90.1,
+    "quality_score": 4.9,
+    "capacity_per_week": 15000,
+    "contact_email": "orders@sup-1030.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-04-26",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1031",
+    "tenant_id": "TEN-ACME",
+    "name": "Atlas Electronics Pvt Ltd",
+    "tax_id": "27XUHFF2626F1Z7",
+    "category": "Chemical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 82.1,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1031.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1032",
+    "tenant_id": "TEN-ACME",
+    "name": "Kaveri Forgings Pvt Ltd",
+    "tax_id": "27ZVYWM2205C1Z6",
+    "category": "Mechanical",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 81.3,
+    "quality_score": 4.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1032.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1033",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Polymers Pvt Ltd",
+    "tax_id": "27MTNZG6740F1Z9",
+    "category": "Electrical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 94.8,
+    "quality_score": 4.6,
+    "capacity_per_week": 16694,
+    "contact_email": "orders@sup-1033.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-04-09",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 5
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1034",
+    "tenant_id": "TEN-ACME",
+    "name": "Sapphire Fasteners Pvt Ltd",
+    "tax_id": "27NBESC1937F1Z2",
+    "category": "Mechanical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.1,
+    "quality_score": 5.0,
+    "capacity_per_week": 10275,
+    "contact_email": "orders@sup-1034.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-07-31",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1035",
+    "tenant_id": "TEN-ACME",
+    "name": "Vertex Fasteners Pvt Ltd",
+    "tax_id": "27EUNKC1325H1Z1",
+    "category": "Mechanical",
+    "city": "Ahmedabad",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 84.0,
+    "quality_score": 3.9,
+    "capacity_per_week": 17385,
+    "contact_email": "orders@sup-1035.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1036",
+    "tenant_id": "TEN-ACME",
+    "name": "Sterling Metals Pvt Ltd",
+    "tax_id": "27YXVQB2132G1Z7",
+    "category": "Raw Material",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 94.2,
+    "quality_score": 4.1,
+    "capacity_per_week": 2398,
+    "contact_email": "orders@sup-1036.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1037",
+    "tenant_id": "TEN-ACME",
+    "name": "Vardhan Precision Pvt Ltd",
+    "tax_id": "27XZJHY9923C1Z3",
+    "category": "Chemical",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 89.3,
+    "quality_score": 3.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1037.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1038",
+    "tenant_id": "TEN-ACME",
+    "name": "Sterling Castings Pvt Ltd",
+    "tax_id": "27BBBME3460F1Z2",
+    "category": "Electrical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 84.4,
+    "quality_score": 4.7,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1038.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-03-20",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-04-15",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-06-20",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1039",
+    "tenant_id": "TEN-ACME",
+    "name": "Orion Fasteners Pvt Ltd",
+    "tax_id": "27WBBMB6132A1Z6",
+    "category": "Packaging",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 93.4,
+    "quality_score": 4.4,
+    "capacity_per_week": 1391,
+    "contact_email": "orders@sup-1039.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1040",
+    "tenant_id": "TEN-ACME",
+    "name": "Zenith Electronics Pvt Ltd",
+    "tax_id": "27FNQWK8255A1Z1",
+    "category": "Raw Material",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.6,
+    "quality_score": 4.9,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1040.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-03-21",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 7
+      },
+      {
+        "date": "2026-05-11",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 2
+      },
+      {
+        "date": "2026-09-20",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1041",
+    "tenant_id": "TEN-ACME",
+    "name": "Lotus Textiles Pvt Ltd",
+    "tax_id": "27QGWCN6071G1Z9",
+    "category": "Chemical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.1,
+    "quality_score": 5.0,
+    "capacity_per_week": 4343,
+    "contact_email": "orders@sup-1041.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1042",
+    "tenant_id": "TEN-ACME",
+    "name": "Kaveri Electronics Pvt Ltd",
+    "tax_id": "27QDYDL9117F1Z5",
+    "category": "Raw Material",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 89.5,
+    "quality_score": 4.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1042.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-03-09",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 5
+      },
+      {
+        "date": "2026-05-17",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1043",
+    "tenant_id": "TEN-ACME",
+    "name": "Vertex Electronics Pvt Ltd",
+    "tax_id": "27NFFDZ3287A1Z7",
+    "category": "Electrical",
+    "city": "Ahmedabad",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 81.5,
+    "quality_score": 3.4,
+    "capacity_per_week": 17478,
+    "contact_email": "orders@sup-1043.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-08-24",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 5
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1044",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Textiles Pvt Ltd",
+    "tax_id": "27NNHLE3731E1Z7",
+    "category": "Electrical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 85.2,
+    "quality_score": 5.0,
+    "capacity_per_week": 19675,
+    "contact_email": "orders@sup-1044.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1045",
+    "tenant_id": "TEN-ACME",
+    "name": "Vertex Metals Pvt Ltd",
+    "tax_id": "27WGADT2939F1Z1",
+    "category": "Chemical",
+    "city": "Ahmedabad",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 94.4,
+    "quality_score": 4.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1045.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1046",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Forgings Private Limited",
+    "tax_id": "27XAFBM4154B1Z8",
+    "category": "Mechanical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.5,
+    "quality_score": 3.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1046.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1047",
+    "tenant_id": "TEN-ACME",
+    "name": "ZENITH PRECISION PVT LTD",
+    "tax_id": "27RUZCD5512G1Z1",
+    "category": "Mechanical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.0,
+    "quality_score": 3.6,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1047.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1048",
+    "tenant_id": "TEN-ACME",
+    "name": "Shakti  Forgings Pvt Ltd.",
+    "tax_id": "27GFCKB9054B1Z8",
+    "category": "Raw Material",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 95.4,
+    "quality_score": 4.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-1048.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-1049",
+    "tenant_id": "TEN-ACME",
+    "name": "Meridian Bearings Pvt Ltd",
+    "tax_id": "27XTYVG3818B1Z4",
+    "category": "Raw Material",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 83.3,
+    "quality_score": 4.4,
+    "capacity_per_week": 9059,
+    "contact_email": "orders@sup-1049.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-21",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 7
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-1050",
+    "tenant_id": "TEN-ACME",
+    "name": "Lotus Fasteners Pvt Ltd",
+    "tax_id": "27YSEGK1399E1Z8",
+    "category": "Mechanical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 88.4,
+    "quality_score": 4.6,
+    "capacity_per_week": 11472,
+    "contact_email": "orders@sup-1050.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-2001",
+    "tenant_id": "TEN-ACME",
+    "name": "Apex Precision Pvt Ltd",
+    "tax_id": "27MHEPN8386F1Z4",
+    "category": "Chemical",
+    "city": "Ahmedabad",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 82.9,
+    "quality_score": 3.3,
+    "capacity_per_week": 5000,
+    "contact_email": "orders@sup-2001.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-2002",
+    "tenant_id": "TEN-ACME",
+    "name": "Orion Metals Pvt Ltd",
+    "tax_id": "27YPPXR9699E1Z6",
+    "category": "Chemical",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 79.1,
+    "quality_score": 4.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-2002.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-2003",
+    "tenant_id": "TEN-ACME",
+    "name": "Meridian Forgings Pvt Ltd",
+    "tax_id": "27SRAZV2015A1Z7",
+    "category": "Electrical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.5,
+    "quality_score": 4.5,
+    "capacity_per_week": 16825,
+    "contact_email": "orders@sup-2003.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-2004",
+    "tenant_id": "TEN-ACME",
+    "name": "Nova Components Pvt Ltd",
+    "tax_id": "27CGZAH7214D1Z5",
+    "category": "Packaging",
+    "city": "Chennai",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 91.9,
+    "quality_score": 4.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-2004.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-07",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 5
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-2005",
+    "tenant_id": "TEN-ACME",
+    "name": "Orion Textiles Pvt Ltd",
+    "tax_id": "27EYSHN1788D1Z5",
+    "category": "Chemical",
+    "city": "Coimbatore",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.2,
+    "quality_score": 3.3,
+    "capacity_per_week": 14885,
+    "contact_email": "orders@sup-2005.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-2006",
+    "tenant_id": "TEN-ACME",
+    "name": "Bharat Textiles Pvt Ltd",
+    "tax_id": "27RGYGT7485B1Z2",
+    "category": "Electrical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 80.3,
+    "quality_score": 3.6,
+    "capacity_per_week": 2430,
+    "contact_email": "orders@sup-2006.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-2007",
+    "tenant_id": "TEN-ACME",
+    "name": "Indus Electronics Pvt Ltd",
+    "tax_id": "27EPEQG5252G1Z1",
+    "category": "Packaging",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 87.9,
+    "quality_score": 4.4,
+    "capacity_per_week": 8198,
+    "contact_email": "orders@sup-2007.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-10",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      },
+      {
+        "date": "2026-10-26",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-2008",
+    "tenant_id": "TEN-ACME",
+    "name": "Indus Components Pvt Ltd",
+    "tax_id": "27URVTU9419E1Z2",
+    "category": "Mechanical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.8,
+    "quality_score": 4.5,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-2008.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-09-27",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-2009",
+    "tenant_id": "TEN-ACME",
+    "name": "Pioneer Bearings Pvt Ltd",
+    "tax_id": "27BXLTX7670C1Z2",
+    "category": "Raw Material",
+    "city": "Ludhiana",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.0,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-2009.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-07",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 5
+      },
+      {
+        "date": "2026-01-23",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      },
+      {
+        "date": "2026-08-27",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 7
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-2010",
+    "tenant_id": "TEN-ACME",
+    "name": "Nova Polymers Pvt Ltd",
+    "tax_id": "27JJBCV1830B1Z3",
+    "category": "Chemical",
+    "city": "Pune",
+    "country": "IN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.6,
+    "quality_score": 4.6,
+    "capacity_per_week": 16121,
+    "contact_email": "orders@sup-2010.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-10-29",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3001",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Vertex Textiles Inc",
+    "tax_id": "41-3745162",
+    "category": "Packaging",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.9,
+    "quality_score": 4.9,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3001.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-18",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 2
+      },
+      {
+        "date": "2026-05-21",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3002",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Meridian Fasteners Inc",
+    "tax_id": "38-6001167",
+    "category": "Chemical",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.7,
+    "quality_score": 5.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3002.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3003",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Harbor Electronics Inc",
+    "tax_id": "91-6826031",
+    "category": "Raw Material",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 81.2,
+    "quality_score": 4.8,
+    "capacity_per_week": 4442,
+    "contact_email": "orders@sup-3003.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3004",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Orion Chemicals Inc",
+    "tax_id": "44-1790651",
+    "category": "Electrical",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.2,
+    "quality_score": 4.1,
+    "capacity_per_week": 13582,
+    "contact_email": "orders@sup-3004.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-04-02",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-06-08",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3005",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Atlas Components Inc",
+    "tax_id": "29-9544301",
+    "category": "Raw Material",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 97.8,
+    "quality_score": 4.8,
+    "capacity_per_week": 2586,
+    "contact_email": "orders@sup-3005.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-04",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 2
+      },
+      {
+        "date": "2026-06-19",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3006",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Indus Bearings Inc",
+    "tax_id": "48-1423388",
+    "category": "Raw Material",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.9,
+    "quality_score": 3.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3006.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3007",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Indus Forgings Inc",
+    "tax_id": "44-3932392",
+    "category": "Raw Material",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 88.9,
+    "quality_score": 4.3,
+    "capacity_per_week": 12605,
+    "contact_email": "orders@sup-3007.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-07-22",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 7
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3008",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Crest Fasteners Inc",
+    "tax_id": "32-1805881",
+    "category": "Raw Material",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 78.2,
+    "quality_score": 5.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3008.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3009",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Sapphire Components Inc",
+    "tax_id": "20-7718151",
+    "category": "Mechanical",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.8,
+    "quality_score": 4.6,
+    "capacity_per_week": 14315,
+    "contact_email": "orders@sup-3009.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-03-02",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 7
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3010",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Kaveri Castings Inc",
+    "tax_id": "62-6686349",
+    "category": "Raw Material",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 86.6,
+    "quality_score": 3.4,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3010.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-01-06",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 6
+      },
+      {
+        "date": "2026-03-14",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-09-19",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3011",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Sapphire Packaging Inc",
+    "tax_id": "67-9312549",
+    "category": "Chemical",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 79.1,
+    "quality_score": 4.6,
+    "capacity_per_week": 18084,
+    "contact_email": "orders@sup-3011.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-05-15",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 5
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3012",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Sapphire Precision Inc",
+    "tax_id": "85-1396684",
+    "category": "Packaging",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 81.4,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3012.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3013",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Harbor Components Inc",
+    "tax_id": "76-6570897",
+    "category": "Raw Material",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 81.1,
+    "quality_score": 3.6,
+    "capacity_per_week": 3168,
+    "contact_email": "orders@sup-3013.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3014",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Shakti Precision Inc",
+    "tax_id": "43-9102546",
+    "category": "Electrical",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 93.9,
+    "quality_score": 4.8,
+    "capacity_per_week": 4533,
+    "contact_email": "orders@sup-3014.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3015",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Summit Textiles Inc",
+    "tax_id": "60-3345288",
+    "category": "Mechanical",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 95.2,
+    "quality_score": 3.9,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3015.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-01-02",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 1
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3016",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Orion Polymers Inc",
+    "tax_id": "12-6626882",
+    "category": "Chemical",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 82.6,
+    "quality_score": 4.1,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3016.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-19",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-09-15",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3017",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Harbor Fasteners Inc",
+    "tax_id": "20-6149390",
+    "category": "Electrical",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 92.8,
+    "quality_score": 4.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3017.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-01-30",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-02-06",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-08-30",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3018",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Orion Precision Inc",
+    "tax_id": "16-8662453",
+    "category": "Raw Material",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 93.6,
+    "quality_score": 3.6,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3018.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-11",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-06-17",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 6
+      },
+      {
+        "date": "2026-10-14",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 1
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3019",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Shakti Metals Inc",
+    "tax_id": "13-1808327",
+    "category": "Electrical",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 97.8,
+    "quality_score": 4.9,
+    "capacity_per_week": 18423,
+    "contact_email": "orders@sup-3019.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-05-05",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 7
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3020",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Summit Precision Inc",
+    "tax_id": "96-7741549",
+    "category": "Packaging",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 86.4,
+    "quality_score": 3.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3020.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-01-14",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-02-21",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      },
+      {
+        "date": "2026-06-14",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3021",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Kaveri Textiles Inc",
+    "tax_id": "72-6429459",
+    "category": "Packaging",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 92.5,
+    "quality_score": 4.1,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3021.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3022",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Kaveri Components Inc",
+    "tax_id": "86-9761235",
+    "category": "Chemical",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 80.4,
+    "quality_score": 3.6,
+    "capacity_per_week": 18713,
+    "contact_email": "orders@sup-3022.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-07-08",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-10-13",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 1
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3023",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Meridian Components Inc",
+    "tax_id": "97-8934745",
+    "category": "Mechanical",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 98.3,
+    "quality_score": 3.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3023.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3024",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Crest Electronics Inc",
+    "tax_id": "62-5028131",
+    "category": "Raw Material",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.1,
+    "quality_score": 4.0,
+    "capacity_per_week": 2818,
+    "contact_email": "orders@sup-3024.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3025",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Pioneer Textiles Inc",
+    "tax_id": "67-7178388",
+    "category": "Mechanical",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 90.4,
+    "quality_score": 4.1,
+    "capacity_per_week": 1549,
+    "contact_email": "orders@sup-3025.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3026",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Bharat Packaging Inc",
+    "tax_id": "56-1729921",
+    "category": "Raw Material",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 89.8,
+    "quality_score": 3.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3026.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-30",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-01-27",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 5
+      },
+      {
+        "date": "2026-02-27",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 4
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3027",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Sterling Electronics Inc",
+    "tax_id": "14-3514843",
+    "category": "Mechanical",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 96.5,
+    "quality_score": 3.3,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3027.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3028",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Vardhan Forgings Inc",
+    "tax_id": "39-3012189",
+    "category": "Mechanical",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 78.6,
+    "quality_score": 3.2,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3028.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3029",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Vertex Packaging Inc",
+    "tax_id": "36-9500747",
+    "category": "Mechanical",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.5,
+    "quality_score": 4.2,
+    "capacity_per_week": 12116,
+    "contact_email": "orders@sup-3029.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3030",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Nova Metals Inc",
+    "tax_id": "42-9710605",
+    "category": "Mechanical",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 86.1,
+    "quality_score": 3.4,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3030.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3031",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Orion Castings Inc",
+    "tax_id": "83-3108683",
+    "category": "Electrical",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "LOW",
+    "on_time_delivery_pct": 97.8,
+    "quality_score": 3.8,
+    "capacity_per_week": 14958,
+    "contact_email": "orders@sup-3031.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3032",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Bharat Polymers Inc",
+    "tax_id": "71-9301437",
+    "category": "Electrical",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 79.1,
+    "quality_score": 4.8,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3032.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3033",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Zenith Chemicals Inc",
+    "tax_id": "76-9142337",
+    "category": "Chemical",
+    "city": "Columbus",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 94.6,
+    "quality_score": 3.4,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3033.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-05-15",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 2
+      },
+      {
+        "date": "2026-07-17",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 3
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3034",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Vardhan Fasteners Inc",
+    "tax_id": "32-6629827",
+    "category": "Chemical",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 87.3,
+    "quality_score": 4.9,
+    "capacity_per_week": 1910,
+    "contact_email": "orders@sup-3034.example.com",
+    "disruption_history": []
+  },
+  {
+    "supplier_id": "SUP-3035",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Lotus Chemicals Inc",
+    "tax_id": "41-2076716",
+    "category": "Raw Material",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 92.6,
+    "quality_score": 4.0,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3035.example.com",
+    "disruption_history": [
+      {
+        "date": "2025-12-14",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3036",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Vardhan Components Inc",
+    "tax_id": "38-6930778",
+    "category": "Electrical",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 82.3,
+    "quality_score": 3.6,
+    "capacity_per_week": null,
+    "contact_email": "orders@sup-3036.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-11-02",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3037",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Indus Chemicals Inc",
+    "tax_id": "46-6329149",
+    "category": "Chemical",
+    "city": "Austin",
+    "country": "US",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 80.8,
+    "quality_score": 4.5,
+    "capacity_per_week": 6004,
+    "contact_email": "orders@sup-3037.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-21",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 7
+      },
+      {
+        "date": "2026-05-29",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-06-07",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 7
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3038",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Atlas Metals Inc",
+    "tax_id": "81-1093620",
+    "category": "Electrical",
+    "city": "Shenzhen",
+    "country": "CN",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 96.5,
+    "quality_score": 3.5,
+    "capacity_per_week": 15067,
+    "contact_email": "orders@sup-3038.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-01-29",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 1
+      },
+      {
+        "date": "2026-04-01",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 5
+      },
+      {
+        "date": "2026-05-15",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 2
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3039",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Trident Precision Inc",
+    "tax_id": "35-7521906",
+    "category": "Chemical",
+    "city": "Stuttgart",
+    "country": "DE",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "on_time_delivery_pct": 90.8,
+    "quality_score": 3.3,
+    "capacity_per_week": 11012,
+    "contact_email": "orders@sup-3039.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-06-05",
+        "event_type": "SHIPMENT_DELAY",
+        "delay_days": 6
+      }
+    ]
+  },
+  {
+    "supplier_id": "SUP-3040",
+    "tenant_id": "TEN-GLOBEX",
+    "name": "Summit Castings Inc",
+    "tax_id": "53-9536117",
+    "category": "Raw Material",
+    "city": "Monterrey",
+    "country": "MX",
+    "status": "ACTIVE",
+    "risk_level": "HIGH",
+    "on_time_delivery_pct": 80.4,
+    "quality_score": 4.1,
+    "capacity_per_week": 17249,
+    "contact_email": "orders@sup-3040.example.com",
+    "disruption_history": [
+      {
+        "date": "2026-02-10",
+        "event_type": "QUALITY_HOLD",
+        "delay_days": 7
+      },
+      {
+        "date": "2026-09-26",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 4
+      },
+      {
+        "date": "2026-10-16",
+        "event_type": "CAPACITY_REDUCTION",
+        "delay_days": 4
+      }
+    ]
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "as_of": "2026-12-02",
+  "seed": 20261119,
+  "generator": "data/generate_seed.py",
+  "counts": {
+    "tenants": 2,
+    "suppliers": 100,
+    "purchase_orders": 500,
+    "inventory": 187,
+    "alternate_suppliers": 101,
+    "shipments": 20
+  },
+  "duplicate_suppliers": {
+    "SUP-1046": "SUP-1011",
+    "SUP-1047": "SUP-1012",
+    "SUP-1048": "SUP-1013"
+  }
+}

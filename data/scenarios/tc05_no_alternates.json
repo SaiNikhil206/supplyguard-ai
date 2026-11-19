@@ -1,0 +1,42 @@
+{
+  "scenario": "tc05_no_alternates",
+  "test_case": "TC-05",
+  "description": "ITM-540 has no alternate supplier, no stock at other locations and SUP-1040 capacity is unknown: the agent must state that no validated alternative can be recommended.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000905",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1040",
+    "event_type": "FACTORY_OUTAGE",
+    "severity": "HIGH",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 96,
+    "description": "Clean-room contamination, production halted",
+    "source_system": "supplier-portal",
+    "correlation_id": "e1fcf7fc-fd8c-4d63-a9a0-c60f73464b01"
+  },
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1015"
+    ],
+    "affected_po_ids": [
+      "PO-1015"
+    ],
+    "exposure": {
+      "amount": "474384.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-540"
+    ],
+    "qualified_alternate_supplier_ids": [],
+    "shortage_expected": true,
+    "no_validated_alternative_expected": true,
+    "unsupported_option_types": [
+      "ALTERNATE_SUPPLIER",
+      "INVENTORY_TRANSFER",
+      "SPLIT_ORDER"
+    ]
+  }
+}

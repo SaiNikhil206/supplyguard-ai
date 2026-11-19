@@ -1,0 +1,39 @@
+{
+  "scenario": "tc01_valid_event",
+  "test_case": "TC-01",
+  "description": "Valid event is accepted, correlated to SUP-1015 and a risk case is created.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000901",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1015",
+    "event_type": "QUALITY_HOLD",
+    "severity": "MEDIUM",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 24,
+    "description": "Batch failed incoming QC, shipments on hold",
+    "source_system": "supplier-portal",
+    "correlation_id": "75017629-ad31-467b-953a-b83cb41685b9"
+  },
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1005"
+    ],
+    "affected_po_ids": [
+      "PO-1005"
+    ],
+    "exposure": {
+      "amount": "310312.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-515"
+    ],
+    "qualified_alternate_supplier_ids": [
+      "SUP-2003"
+    ],
+    "risk_case_expected": true,
+    "shortage_expected": true
+  }
+}

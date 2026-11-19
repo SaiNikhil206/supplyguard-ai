@@ -1,0 +1,39 @@
+{
+  "scenario": "tc09_duplicate_event",
+  "test_case": "TC-09",
+  "description": "Same event sent twice: one risk case, no repeated execution.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000909",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1015",
+    "event_type": "QUALITY_HOLD",
+    "severity": "MEDIUM",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 24,
+    "description": "Duplicate delivery of the same feed message",
+    "source_system": "supplier-portal",
+    "correlation_id": "30ea54a9-5467-4dc8-9b66-de56a55b2332"
+  },
+  "send_times": 2,
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1005"
+    ],
+    "affected_po_ids": [
+      "PO-1005"
+    ],
+    "exposure": {
+      "amount": "310312.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-515"
+    ],
+    "qualified_alternate_supplier_ids": [
+      "SUP-2003"
+    ],
+    "risk_cases_created": 1
+  }
+}

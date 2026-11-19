@@ -1,0 +1,44 @@
+[
+  {
+    "tenant_id": "TEN-ACME",
+    "tenant_name": "Acme Manufacturing Pvt Ltd",
+    "currency": "INR",
+    "status": "ACTIVE",
+    "created_at": "2026-11-01T00:00:00Z",
+    "locations": [
+      "DC-PUNE",
+      "DC-CHENNAI",
+      "DC-DELHI"
+    ],
+    "settings": {
+      "risk_thresholds": {
+        "medium": 40,
+        "high": 65,
+        "critical": 85
+      },
+      "max_cost_increase_pct": 15,
+      "require_qualified_alternates": true
+    }
+  },
+  {
+    "tenant_id": "TEN-GLOBEX",
+    "tenant_name": "Globex Industrial Inc",
+    "currency": "USD",
+    "status": "ACTIVE",
+    "created_at": "2026-11-01T00:00:00Z",
+    "locations": [
+      "DC-PUNE",
+      "DC-CHENNAI",
+      "DC-DELHI"
+    ],
+    "settings": {
+      "risk_thresholds": {
+        "medium": 40,
+        "high": 65,
+        "critical": 85
+      },
+      "max_cost_increase_pct": 15,
+      "require_qualified_alternates": true
+    }
+  }
+]
