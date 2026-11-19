@@ -19,7 +19,7 @@
 ---
 
 ### R-01: Frontend scaffold + design system
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S0-S1 (19-25 Nov) | **Est:** 2d | **Depends:** -
 - **Branch:** `roop/R-01-frontend-scaffold`
 - **Model hint:** sonnet / medium
@@ -29,7 +29,7 @@
   - [ ] Login + protected routes work against MSW mocks
   - [ ] Setting `VITE_API_MOCK=false` points the same code at the real backend
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Subtasks: (1) scaffold Vite/TS/Tailwind/Router/Query/Recharts/Vitest + tokens + app shell w/ 9 routes [implementer sonnet, branch --scaffold]; (2a) typed API client + token refresh + MSW handlers/fixtures + env switch [implementer sonnet, --api]; (2b) design-system UI kit (Button, Card, Badge, KpiTile, states) [implementer sonnet, --ui]; (3) AuthProvider + Login + ProtectedRoute + tenant/user badge [implementer sonnet, --auth]; (4) tests/build [test-runner haiku]; (5) review [reviewer opus].
 
 ### R-02: Read APIs for the UI (Django `apps/portal`)
 - **Status:** todo
