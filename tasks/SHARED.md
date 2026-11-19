@@ -26,7 +26,7 @@ There is no team lead. Each shared task has one **driver** who is accountable fo
   - [ ] Nikhil approved sections 3, 5, 6, 7
   - [ ] Uday approved sections 1, 2, 4, 8
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Decide on the call: PO `expected_date` (header, used by section 5 PATCH and LLD) vs line `due_date` (seed snapshot) - section 6 evidence example uses `expected_date`. Also ratify Nikhil's schema tightenings listed in `ai/README.md` 'Proposed for S-01'.
 
 ### S-02: Sprint-end integration demos
 - **Status:** todo
