@@ -3,6 +3,7 @@ import { AppShell } from '@/layout/AppShell';
 import ExecutiveOverview from '@/pages/ExecutiveOverview';
 import SupplierIntelligence from '@/pages/SupplierIntelligence';
 import RiskCommandCenter from '@/pages/RiskCommandCenter';
+import RiskCaseDetail from '@/pages/RiskCaseDetail';
 import AiRecommendations from '@/pages/AiRecommendations';
 import ApprovalCenter from '@/pages/ApprovalCenter';
 import WhatIfSimulator from '@/pages/WhatIfSimulator';
@@ -26,6 +27,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <ExecutiveOverview /> },
       { path: 'suppliers', element: <SupplierIntelligence /> },
       { path: 'risk', element: <RiskCommandCenter /> },
+      { path: 'risk/:id', element: <RiskCaseDetail /> },
       { path: 'recommendations', element: <AiRecommendations /> },
       { path: 'approvals', element: <ApprovalCenter /> },
       { path: 'what-if', element: <WhatIfSimulator /> },
