@@ -31,7 +31,14 @@ export const routes: RouteObject[] = [
       { path: 'what-if', element: <WhatIfSimulator /> },
       { path: 'integrations', element: <IntegrationCenter /> },
       { path: 'audit', element: <AuditCenter /> },
-      { path: 'settings', element: <TenantSettings /> },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRoute roles={['ADMIN']}>
+            <TenantSettings />
+          </ProtectedRoute>
+        ),
+      },
       { path: '*', element: <NotFound /> },
     ],
   },

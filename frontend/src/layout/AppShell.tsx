@@ -16,7 +16,7 @@ const roleLabel = (r: string) =>
 export function AppShell() {
   const [open, setOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { me, signOut } = useAuth();
+  const { me, signOut, hasRole } = useAuth();
   const asideRef = useRef<HTMLElement>(null);
 
   // Below md a closed sidebar is off-screen: make it inert so links leave the tab order.
@@ -59,7 +59,7 @@ export function AppShell() {
           <span className="text-primary">▣</span> SupplyGuard AI
         </div>
         <nav aria-label="Main" className="flex flex-col gap-1 p-3">
-          {navItems.map((item) => (
+          {navItems.filter((item) => !item.roles || hasRole(...item.roles)).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
