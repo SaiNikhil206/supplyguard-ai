@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 0 | 0 | 0 | 0 | 12 | 0 | 0% | R-01 |
-| Nikhil | 0 | 0 | 2 | 0 | 12 | 0 | 0% | - |
+| Nikhil | 0 | 0 | 3 | 0 | 11 | 0 | 0% | - |
 | Uday | 0 | 0 | 1 | 0 | 11 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
@@ -18,7 +18,7 @@
 | S-02 | Sprint-end integration demos | Shared | every sprint (23 Nov, 30 Nov, 7 Dec, 14 Dec, 20 Dec, 26 Dec) | todo | 0/6 | - |
 | N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-20 Nov) | review | 2/3 | - |
 | N-02 | Synthetic demo dataset | Nikhil | S0 (20-22 Nov) | review | 2/3 | - |
-| N-03 | Mock ERP service | Nikhil | S0-S1 (22-25 Nov) | todo | 0/4 | - |
+| N-03 | Mock ERP service | Nikhil | S0-S1 (22-25 Nov) | review | 3/4 | - |
 | R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | todo | 0/3 | - |
 | S-01 | Freeze contracts v1 | Shared | S0 (19-20 Nov) | in-progress | 0/3 | - |
 | U-01 | Boomi environment and service verification | Uday | S0 (19-20 Nov) | todo | 0/3 | - |
@@ -70,12 +70,12 @@
 - **Blockers:** none
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (N-02 implemented, in review)
-- **Current task:** N-02 (N-01 also in review)
-- **Branch:** `nikhil/N-02-seed-data`
-- **Where I left off:** `data/generate_seed.py` writes 6 seed files + manifest and 11 scenario files (demo, TC-01..TC-09, tenant isolation) with `expected` blocks; 33 tests in `data/tests/`. Reviewer (opus) findings fixed except the CONTRACTS ones.
-- **Next step:** At the S-01 call raise both "Proposed for S-01" lists (`ai/README.md` on the N-01 branch, `data/README.md` here); tell Uday about the field-name table in `data/README.md` for U-03; open PRs for N-01 and N-02; then start N-03 (mock ERP).
-- **Blockers:** S-01 must add `daily_demand` to CONTRACTS s5 and confirm CONTRACTS names win over LLD 16.1 (Uday's U-03 depends on it).
+- **Last updated:** 2026-11-19 (N-03 implemented, in review)
+- **Current task:** N-03 (N-01, N-02 also in review)
+- **Branch:** `nikhil/N-03-mock-erp`
+- **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
+- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
+- **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
 
 ### Uday
 - **Last updated:** 2026-11-19 (U-02 scaffold built, in review)
@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 89e9f67 | nikhil | N-03 | review | merge: N-03 Mock ERP service (auto-merge) |
 | 2026-11-19 | 9f884ef | nikhil | N-03 | review | chore(tasks): N-03 handoff - N-01/N-02 auto-merged, N-03 ready |
 | 2026-11-19 | 8dcf1b8 | uday | U-02 | review | merge: U-02 Backend scaffold (auto-merge) |
 | 2026-11-19 | 4d2b535 | roop | R-01 | in-progress | fix(frontend): align API types and mocks with agent schemas |
@@ -108,4 +109,3 @@
 | 2026-11-19 | 2819fee | roop | R-01 | in-progress | merge: R-01 --auth sub-branch into task branch |
 | 2026-11-19 | fa0542d | roop | R-01 | in-progress | feat(frontend): login, AuthProvider, protected routes, user badge |
 | 2026-11-19 | 4333e31 | nikhil | N-01 | review | chore(tasks): handoff N-01 - in review, awaiting S-01 ratification |
-| 2026-11-19 | 55dd014 | nikhil | N-01 | review | feat(ai): agent I/O JSON schemas, fixtures and schema tests |
