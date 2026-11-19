@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 1 | 0 | 0 | 0 | 11 | 0 | 8% | R-09 |
+| Roop | 1 | 0 | 1 | 0 | 10 | 0 | 8% | - |
 | Nikhil | 0 | 0 | 3 | 0 | 11 | 0 | 0% | - |
 | Uday | 1 | 0 | 0 | 0 | 11 | 0 | 8% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
@@ -26,7 +26,7 @@
 | U-03 | Core data model + seed loader | Uday | S0 (21-23 Nov) | todo | 0/4 | - |
 | N-04 | Deterministic impact + risk scoring engine | Nikhil | S1 (25-30 Nov) | todo | 0/4 | - |
 | R-02 | Read APIs for the UI (Django `apps/portal`) | Roop | S1 (26-30 Nov) | todo | 0/3 | - |
-| R-09 | CI pipeline | Roop | S1 (24-26 Nov) | todo | 0/1 | - |
+| R-09 | CI pipeline | Roop | S1 (24-26 Nov) | review | 0/1 | - |
 | U-04 | Auth, tenant isolation, RBAC, users + settings APIs | Uday | S1 (24-27 Nov) | todo | 0/3 | - |
 | U-05 | Audit service + correlation-id middleware | Uday | S1 (24-26 Nov) | todo | 0/2 | - |
 | U-06 | Event intake + Boomi client (Django `apps/integrations`) | Uday | S1 (26-30 Nov) | todo | 0/5 | - |
@@ -62,12 +62,12 @@
 ## Where each member left off
 
 ### Roop
-- **Last updated:** 2026-11-19 (R-01 done)
-- **Current task:** - (R-01 done; auto-merge Action merges `roop/R-01-frontend-scaffold` into `collaboration`)
-- **Branch:** `roop/R-01-frontend-scaffold` (deleted by auto-merge once merged)
-- **Where I left off:** `frontend/` complete: shell + 9 placeholder screens, login/JWT refresh, MSW mocks (`src/mocks/`), typed API (`src/api/`), UI kit (`src/components/ui/`). 76 tests green.
-- **Next step:** Nothing ready yet. R-09 (CI) starts when Uday's U-02 lands; R-02 after U-03/U-04; R-07 after N-11. Meanwhile can draft R-03 screen layouts against MSW mocks.
-- **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
+- **Last updated:** 2026-11-19 (R-09 in review)
+- **Current task:** R-09 CI pipeline - `review` (auto-merge merges it into collaboration)
+- **Branch:** `roop/R-09-ci`
+- **Where I left off:** `.github/workflows/ci.yml` + ESLint + lint/ruff in `scripts/run_checks.py` done and reviewed. First GitHub run not observed (repo private, `gh` not logged in).
+- **Next step:** Check Actions -> CI is green on `roop/R-09-ci`, then run CI manually on `collaboration`; agree with Nikhil + Uday to change R-09 acceptance to "`ci-ok` required on `main` only", set that protection, mark R-09 done.
+- **Blockers:** Team decision on required checks (SHARED). Uday: pin ruff in `backend/requirements-dev.txt`; run `ruff format backend` so CI can add format-check; keep simplejwt refresh lifetime short + rotation off; `/me` shape provisional. Team: drop `[skip ci]` from bot commits (`scripts/gitflow.py`, `progress.yml`) or dispatch CI before milestone PRs.
 
 ### Nikhil
 - **Last updated:** 2026-11-19 (autopilot: N-01 reviewer follow-ups fixed; autopilot stopped on request)
