@@ -3,7 +3,12 @@ import type { InventoryGapPoint } from '@/api/whatif';
 
 export function InventoryGapChart({ data }: { data: InventoryGapPoint[] }) {
   const firstShort = data.find((p) => p.on_hand < p.required);
-  const worst = data.reduce((m, p) => Math.max(m, p.required - p.on_hand), 0);
+  const worstPoint = data.reduce<InventoryGapPoint | undefined>(
+    (m, p) => (!m || p.required - p.on_hand > m.required - m.on_hand ? p : m),
+    undefined,
+  );
+  const worst = worstPoint ? Math.max(0, worstPoint.required - worstPoint.on_hand) : 0;
+  const range = data.length ? `${data[0].date} to ${data[data.length - 1].date}` : 'no data';
   const summary = firstShort
     ? `Inventory falls below requirement on ${firstShort.date}; the largest shortfall is ${worst} units.`
     : 'On-hand inventory stays at or above the requirement for the whole period.';
@@ -15,7 +20,30 @@ export function InventoryGapChart({ data }: { data: InventoryGapPoint[] }) {
   }));
   return (
     <div>
-      <p className="sr-only">{summary}</p>
+      <div className="sr-only">
+        <p>{summary}</p>
+        <p>
+          Largest shortfall: {worst} units on {worstPoint?.date ?? 'n/a'}. Range: {range}.
+        </p>
+        <table aria-label="Inventory gap data">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">On hand</th>
+              <th scope="col">Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((p) => (
+              <tr key={p.date}>
+                <td>{p.date}</td>
+                <td>{p.on_hand}</td>
+                <td>{p.required}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div aria-hidden="true" className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={rows} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>

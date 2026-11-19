@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
@@ -42,23 +42,24 @@ describe('What-if Simulator', () => {
     expect(screen.getByText('No simulation yet')).toBeInTheDocument();
     await clickPreset();
     expect(await screen.findByText('Estimated exposure')).toBeInTheDocument();
-    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('table')).toHaveLength(2);
     expect(screen.getByText('Best option')).toBeInTheDocument();
     expect(screen.getByText(/Computed in \d+ ms/)).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Supplier' })).toHaveValue('SUP-1001');
     expect(screen.getByRole('slider')).toHaveValue('7');
-    expect(screen.getByText(/Inventory (falls below|stays)/)).toHaveClass('sr-only');
+    expect(screen.getByText(/Inventory falls below requirement on \d{4}-\d{2}-\d{2}/).closest('.sr-only')).not.toBeNull();
+    const gapTable = screen.getByRole('table', { name: /inventory gap data/i });
+    expect(within(gapTable).getAllByRole('row').length).toBeGreaterThan(2);
+    expect(screen.getByText(/Largest shortfall: \d+ units on \d{4}-\d{2}-\d{2}\. Range: \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/)).toBeInTheDocument();
   });
 
   it('shows pending state then results in under 3 seconds', async () => {
     await openPage();
     await screen.findByRole('option', { name: /Bharat Steelworks/ });
-    const start = performance.now();
     await userEvent.click(screen.getByRole('button', { name: 'Supplier A out 7 days' }));
     expect(screen.getByTestId('whatif-skeleton')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Run simulation/ })).toBeDisabled();
-    await screen.findByText(/Computed in/, undefined, { timeout: 3000 });
-    expect(performance.now() - start).toBeLessThan(3000);
+    await waitFor(() => expect(screen.getByText(/Computed in/)).toBeInTheDocument(), { timeout: 3000 });
   });
 
   it('disables running for a viewer and explains why', async () => {
