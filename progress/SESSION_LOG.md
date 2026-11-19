@@ -140,3 +140,12 @@ Template:
 - Next: confirm CI green on GitHub; team agrees required check = `ci-ok` on main only; then done
 - Blockers: team decision on required checks; Uday ruff pin + format; bot [skip ci]
 - Models used: advisor opus; implementer sonnet x3, reviewer opus x2
+
+## 2026-11-19 - roop - SETUP (model routing enforced)
+- Branch: roop/S-02-model-routing (separate worktree)
+- Did: Advisor = Opus at medium effort (project default `model: opus`, `effortLevel: medium`); PreToolUse hook `scripts/hooks/advisor_guard.py` blocks the main session from editing code so it must delegate; `implementer`/`boomi-builder` run with `isolation: worktree` in nested branches `<task-branch>--<sub>` cut from HEAD (`worktree.baseRef: head` - before this, subagent worktrees were cut from the default branch); new `reviewer-lite` (Sonnet) is the default review, Opus `reviewer` only for sensitive areas; commands get explicit effort (handoff/status haiku low, sync sonnet low, resume/done/merge-prs opus medium); mandatory plan table.
+- Tests: guard hook: main-session code edit blocked (exit 2), subagent allowed, task/docs allowed, Windows paths handled; settings.json valid
+- Status now: live for new sessions on collaboration
+- Next: members restart Claude Code to pick up the settings
+- Blockers: none
+- Models used: advisor opus; claude-code-guide (docs check)
