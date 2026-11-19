@@ -70,12 +70,12 @@
 - **Blockers:** Team decision on required checks (SHARED). Uday: pin ruff in `backend/requirements-dev.txt`; run `ruff format backend` so CI can add format-check; keep simplejwt refresh lifetime short + rotation off; `/me` shape provisional. Team: drop `[skip ci]` from bot commits (`scripts/gitflow.py`, `progress.yml`) or dispatch CI before milestone PRs.
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (N-03 implemented, in review)
-- **Current task:** N-03 (N-01, N-02 also in review)
-- **Branch:** `nikhil/N-03-mock-erp`
-- **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
-- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
-- **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
+- **Last updated:** 2026-11-19 (autopilot: N-01 reviewer follow-ups fixed; autopilot stopped on request)
+- **Current task:** N-01 follow-ups (N-01, N-02, N-03 in review)
+- **Branch:** `nikhil/N-01-agent-schemas`
+- **Where I left off:** N-01 reviewer follow-ups 1-5 done in `ai/` (snapshot PO header `expected_date`, full S-01 proposal list + tenant rule in `ai/README.md`, `recovery_plan__all_option_types` + 4 new invalid fixtures, fixture inventory = `data/seed/`, `bundled_schema` docstring); second reviewer APPROVE, `ai/tests` 93 passed. N-03 compose snippet / open items still to send to Uday.
+- **Next step:** Raise the `ai/README.md` and `data/README.md` "Proposed for S-01" lists in the S-01 contracts call; send Uday the mock-erp compose snippet. N-04 starts when U-03 lands, N-05 when U-01 lands (restart `/loop /autopilot nikhil` to pick them up automatically).
+- **Blockers:** N-04 waits on U-03 (uday, todo); N-05 waits on U-01 (uday, todo); S-01 ratification for N-01/N-02/N-03 contract additions; N-03 compose box needs Uday's docker-compose.yml.
 
 ### Uday
 - **Last updated:** 2026-11-19 (U-02 done and merged, review follow-ups applied)
@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | ba05765 | roop | R-09 | review | chore(tasks): handoff R-09 - in review |
 | 2026-11-19 | 0d95fec | roop | R-09 | in-progress | ci: address R-09 re-review nits |
 | 2026-11-19 | fba72b3 | nikhil | N-01 | review | merge: N-01 Agent I/O JSON schemas + fixtures (auto-merge) |
 | 2026-11-19 | 7665fdc | roop | R-09 | in-progress | merge: R-09 --gate sub-branch into task branch |
@@ -108,4 +109,3 @@
 | 2026-11-19 | a9aafea | roop | R-09 | in-progress | merge: R-09 --lint sub-branch into task branch |
 | 2026-11-19 | a09cbdd | roop | R-09 | in-progress | build(frontend): add ESLint flat config and lint script |
 | 2026-11-19 | 0823f4a | uday | U-01 | blocked | docs(boomi): U-01 Boomi environment checklist, waiting on platform checks |
-| 2026-11-19 | f9813db | roop | R-09 | in-progress | ci: add CI workflow for backend, frontend and python suites |
