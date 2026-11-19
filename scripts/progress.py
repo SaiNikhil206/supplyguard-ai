@@ -9,6 +9,8 @@ Usage:
     python scripts/progress.py nikhil          # one member: done / in progress / pending / next / handoff
     python scripts/progress.py all --write     # regenerate PROGRESS.md
     python scripts/progress.py --brief         # one line per member (used by the SessionStart hook)
+    python scripts/progress.py roop --ready    # autopilot check: exit 0 + READY line if a task can start,
+                                               # exit 3 + what it is waiting on (task, owner, status) if not
 """
 from __future__ import annotations
 
@@ -160,8 +162,18 @@ def git_commits(limit: int = 300) -> list[dict[str, str]]:
     return rows
 
 
+# A dependency is satisfied when it is `done`, or `review`: review tasks are already merged into
+# `collaboration` by auto-merge and only wait for a final sign-off (e.g. the S-01 contracts call),
+# so the code a dependent task needs is there.
+SATISFIED = {"done", "review"}
+
+
+def dep_ok(d: str, tasks: dict[str, Task]) -> bool:
+    return d not in tasks or tasks[d].status in SATISFIED
+
+
 def ready(t: Task, tasks: dict[str, Task]) -> bool:
-    return all(tasks.get(d) is None or tasks[d].status == "done" for d in t.depends)
+    return all(dep_ok(d, tasks) for d in t.depends)
 
 
 def next_task(owner: str, tasks: dict[str, Task]) -> Task | None:
@@ -175,6 +187,26 @@ def next_task(owner: str, tasks: dict[str, Task]) -> Task | None:
     return None
 
 
+def ready_report(owner: str, tasks: dict[str, Task]) -> tuple[str, int]:
+    nxt = next_task(owner, tasks)
+    if nxt:
+        state = "continue" if nxt.status == "in-progress" else "start"
+        return f"READY ({state}): {nxt.id} {nxt.title} (branch {nxt.branch})", 0
+    mine = [t for t in tasks.values() if t.owner == owner]
+    # only the next few pending tasks matter - show what each is waiting on
+    upcoming = [t for t in mine if t.status == "todo"][:3]
+    lines = [f"WAITING: no task of {owner} can start yet"]
+    for t in upcoming:
+        waits = [f"{d} ({tasks[d].owner}, {tasks[d].status})" for d in t.depends if not dep_ok(d, tasks)]
+        lines.append(f"  {t.id} {t.title} waits on: {', '.join(waits)}")
+    for t in mine:
+        if t.status in ("review", "blocked"):
+            lines.append(f"  own task {t.id} is {t.status}")
+    if not any(t.status != "done" for t in mine):
+        lines = [f"ALL DONE: every task of {owner} is done"]
+    return "\n".join(lines), 3
+
+
 def pct(ts: list[Task]) -> int:
     return round(100 * sum(t.status == "done" for t in ts) / len(ts)) if ts else 0
 
@@ -184,7 +216,7 @@ def fmt_task(t: Task, today: dt.date, tasks: dict[str, Task]) -> str:
     if t.overdue(today):
         flags.append("OVERDUE")
     if t.status == "todo" and not ready(t, tasks):
-        waiting = [d for d in t.depends if d in tasks and tasks[d].status != "done"]
+        waiting = [d for d in t.depends if not dep_ok(d, tasks)]
         flags.append("waiting on " + ", ".join(waiting))
     extra = f" ({'; '.join(flags)})" if flags else ""
     boxes = f" [{t.boxes_done}/{t.boxes_total}]" if t.boxes_total else ""
@@ -267,6 +299,7 @@ def main() -> int:
     ap.add_argument("--write", action="store_true", help="regenerate PROGRESS.md")
     ap.add_argument("--brief", action="store_true", help="one line per member")
     ap.add_argument("--today", help="override date (YYYY-MM-DD) for testing")
+    ap.add_argument("--ready", action="store_true", help="autopilot check for one member (exit 0 ready, 3 waiting)")
     args = ap.parse_args()
 
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
@@ -274,6 +307,14 @@ def main() -> int:
     if not tasks:
         print("No tasks found in tasks/*.md")
         return 1
+    if args.ready:
+        who = args.member.lower()
+        if who not in MEMBERS or who == "all":
+            print("--ready needs a member: roop | nikhil | uday | shared")
+            return 2
+        text, code = ready_report(who, tasks)
+        print(text)
+        return code
     commits = git_commits()
 
     if args.brief:

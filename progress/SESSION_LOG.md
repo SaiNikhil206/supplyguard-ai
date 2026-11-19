@@ -95,3 +95,12 @@ Template:
 - Next: R-09 once U-02 lands; R-02 after U-03/U-04
 - Blockers: Uday U-02/U-03/U-04; backend asks in ROOP.md Handoff (refresh lifetime/rotation, /me shape)
 - Models used: advisor opus; implementer sonnet x5, reviewer opus x2, 2 visible sonnet sessions
+
+## 2026-11-19 - roop - SETUP (autopilot)
+- Branch: roop/S-02-autopilot (separate worktree)
+- Did: `progress.py <member> --ready` (exit 0 + READY line, or exit 3 + what the next tasks wait on); new `/autopilot <member>` command for `/loop` hands-free mode (pull, check, work ready task, mark human-only steps `blocked: needs <member>`, wait 5-30 min); dependencies in `review` now count as satisfied (already merged). Docs updated.
+- Tests: --ready checked for all members: roop READY R-09, nikhil WAITING on U-03/U-01, uday READY U-01
+- Status now: autopilot available
+- Next: each member starts `/loop /autopilot <name>`
+- Blockers: none
+- Models used: advisor opus
