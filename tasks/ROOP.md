@@ -114,7 +114,7 @@
 - **Notes:** -
 
 ### R-09: CI pipeline
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S1 (24-26 Nov) | **Est:** 0.5d | **Depends:** R-01, U-02
 - **Branch:** `roop/R-09-ci`
 - **Model hint:** haiku / low
@@ -122,7 +122,7 @@
 - **Acceptance:**
   - [ ] CI green on `collaboration`; added as required check on both protected branches
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early: U-02 in review, code already in collaboration. Subtasks: (1) ESLint flat config + `npm run lint` in frontend [implementer sonnet, branch --lint, worktree]; (2) `.github/workflows/ci.yml` backend ruff+pytest on Postgres 16 service, frontend lint/typecheck/test/build on Node 22.22.2, ai/data/mock-erp pytest [implementer sonnet, branch --workflow]; (3) YAML validation + local run of every CI command [test-runner haiku]; (4) review [reviewer opus]; (5) required-check branch protection = repo settings, decide with team (conflicts with auto-merge bot direct pushes).
 
 ### R-10: UX polish + demo mode
 - **Status:** todo
