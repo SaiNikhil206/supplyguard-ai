@@ -1,6 +1,8 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
 import type { ErrorCode, Paginated } from '@/api/types';
+import { SCENARIOS } from '@/features/risk/inbox/scenarios';
 import {
+  addSimulatedCase,
   dashboardSummary,
   meFor,
   riskCaseDetail,
@@ -209,9 +211,12 @@ export const handlers: HttpHandler[] = [
           scenario: ['This field is required.'],
         });
       }
+      // Unknown names fall back to the first scenario (the real backend decides its own list).
+      const scenario = SCENARIOS.find((s) => s.name === body.scenario) ?? SCENARIOS[0];
+      const { eventId } = addSimulatedCase(scenario);
       return HttpResponse.json(
         {
-          event_id: `EVT-${String(Date.now()).slice(-6)}`,
+          event_id: eventId,
           correlation_id: request.headers.get('X-Correlation-ID') ?? crypto.randomUUID(),
           status: 'RECEIVED',
         },
