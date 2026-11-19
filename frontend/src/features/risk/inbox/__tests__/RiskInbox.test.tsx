@@ -9,7 +9,7 @@ import { server } from '@/mocks/server';
 import { addSimulatedCase } from '@/mocks/fixtures';
 import { loginAs } from '@/test/loginAs';
 import { renderWithProviders } from '@/test/renderWithProviders';
-import { SCENARIOS } from '../scenarios';
+import { SCENARIOS } from '@/mocks/scenarios';
 
 /** Shows the signed-in role so tests can wait until /me has loaded. */
 function RoleProbe() {

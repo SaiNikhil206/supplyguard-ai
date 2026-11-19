@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSimulateDisruption } from '@/api/queries';
 import { ApiError } from '@/api/client';
 import { Button } from '@/components/ui';
-import { SCENARIOS } from './scenarios';
+import { SCENARIOS } from '@/mocks/scenarios';
 
 /** Admin-only trigger: pick a scenario, POST it, show pending / error / event id. */
 export function SimulateDisruption() {
