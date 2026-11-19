@@ -5,8 +5,8 @@
     python scripts/run_checks.py --install  # CI: install each suite's dependencies first
 
 Suites are detected by files, so new parts of the project join automatically:
-    ai/tests/               -> pytest (deps: ai/requirements.txt)
-    mock-erp/tests/         -> pytest (deps: mock-erp/requirements.txt)
+    <folder>/tests/         -> pytest for every top-level folder with tests (ai, data, mock-erp, ...);
+                               deps from <folder>/requirements*.txt; mock-erp runs from its own folder
     backend/manage.py       -> pytest in backend/ (deps: backend/requirements*.txt; DB from DATABASE_URL)
     frontend/package.json   -> npm ci/install, typecheck (if script), test, build
 Exit code is non-zero if any suite fails.
@@ -23,6 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable
+SERVICE_DIRS = {"mock-erp"}
 
 
 def run(cmd: list[str], cwd: Path) -> bool:
@@ -82,12 +83,18 @@ def main() -> int:
     ap.add_argument("--install", action="store_true")
     args = ap.parse_args()
     os.environ.setdefault("CI", "true")
-    results = {
-        "ai": python_suite(ROOT / "ai", ROOT / "ai" / "tests", ROOT, args.install),
-        "mock-erp": python_suite(ROOT / "mock-erp", ROOT / "mock-erp" / "tests", ROOT / "mock-erp", args.install),
-        "backend": backend(args.install),
-        "frontend": frontend(args.install),
-    }
+    results: dict[str, bool | None] = {}
+    if args.install:
+        run([PY, "-m", "pip", "install", "-q", "pytest"], ROOT)
+    # Any top-level folder with a tests/ dir is a Python suite (ai, data, mock-erp, ...).
+    # Services run from their own folder; libraries run from the repo root.
+    for d in sorted(p for p in ROOT.iterdir() if p.is_dir() and (p / "tests").is_dir()):
+        if d.name in {"backend", "frontend", "tests"}:  # handled below / e2e needs a running stack
+            continue
+        cwd = d if d.name in SERVICE_DIRS else ROOT
+        results[d.name] = python_suite(d, d / "tests", cwd, args.install)
+    results["backend"] = backend(args.install)
+    results["frontend"] = frontend(args.install)
     print("\nCheck results:")
     for name, ok in results.items():
         print(f"  {name:<9} {'skipped (not present)' if ok is None else 'PASS' if ok else 'FAIL'}")
