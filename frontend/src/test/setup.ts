@@ -1,9 +1,16 @@
 import '@testing-library/jest-dom/vitest';
-import { afterEach } from 'vitest';
+import { afterAll, afterEach, beforeAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { server } from '@/mocks/server';
+import { clearTokens } from '@/api/tokens';
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterAll(() => server.close());
 
 afterEach(() => {
   cleanup();
+  server.resetHandlers();
+  clearTokens();
   document.documentElement.classList.remove('dark');
   try {
     localStorage.clear();
