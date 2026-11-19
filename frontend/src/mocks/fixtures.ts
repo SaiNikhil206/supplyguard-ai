@@ -140,6 +140,13 @@ export const riskCaseList: RiskCaseListItem[] = [
   rc(40, 'CLOSED', 'MEDIUM', 11, 'SHIPMENT_DELAY', 'Cable shipment from Monterrey delayed 3 days', 47, 2, '310000.00', '2026-11-20T14:20:00Z'),
 ];
 
+/** 14 consecutive days ending 2026-11-30 (fixed anchor, Date arithmetic). */
+function trendDate(i: number): string {
+  const d = new Date(Date.UTC(2026, 10, 30));
+  d.setUTCDate(d.getUTCDate() - (13 - i));
+  return d.toISOString().slice(0, 10);
+}
+
 export const dashboardSummary: DashboardSummary = {
   suppliers: suppliers.length,
   open_pos: suppliers.reduce((a, s) => a + s.open_po_count, 0),
@@ -148,11 +155,11 @@ export const dashboardSummary: DashboardSummary = {
   open_cases: riskCaseList.filter((c) => !['RECOVERED', 'CLOSED', 'REJECTED'].includes(c.status)).length,
   recovered_value: inr('2100000.00'),
   exposure_trend: Array.from({ length: 14 }, (_, i) => ({
-    date: `2026-11-${String(19 + i > 30 ? 19 + i - 30 : 19 + i).padStart(2, '0')}`,
+    date: trendDate(i),
     value: 2_000_000 + ((i * 337_000) % 2_800_000),
   })),
   cases_trend: Array.from({ length: 14 }, (_, i) => ({
-    date: `2026-11-${String(19 + i > 30 ? 19 + i - 30 : 19 + i).padStart(2, '0')}`,
+    date: trendDate(i),
     value: 1 + ((i * 3) % 6),
   })),
 };
@@ -180,7 +187,7 @@ export const riskCaseDetail45: RiskCaseDetail = {
   ],
   analysis: {
     risk_case_id: 'RC-000045',
-    severity: 'HIGH',
+    risk_level: 'HIGH',
     risk_score: 92,
     summary:
       'A fire at Pune Forge & Motors Line 2 halts production for about 48 hours. Three open POs worth INR 1,250,000 are exposed; PO-1001 is most urgent with only 2 days of stock cover.',
@@ -248,6 +255,7 @@ export const riskCaseDetail45: RiskCaseDetail = {
       data_gaps: [],
     },
   ],
+  no_viable_option_reason: null,
   approvals: [],
   executions: [],
   timeline: [
