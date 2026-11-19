@@ -50,7 +50,9 @@ jobs:
           python-version: "3.12"
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Keep in sync with frontend/.nvmrc (frontend engines: node >=22.22.2).
+          # Not node-version-file: this job checks out collaboration, which may not have frontend/ yet.
+          node-version: "22.22.2"
       - name: Git identity
         run: |
           git config user.name "auto-merge-bot"

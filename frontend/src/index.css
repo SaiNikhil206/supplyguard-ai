@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens: space-separated RGB so Tailwind alpha modifiers work. */
+:root {
+  --bg: 244 246 250;
+  --surface: 255 255 255;
+  --surface-2: 241 244 249;
+  --border: 224 229 238;
+  --text: 17 24 39;
+  --text-muted: 100 112 133;
+  --primary: 37 99 235;
+  --primary-fg: 255 255 255;
+  --success: 22 163 74;
+  --warning: 217 119 6;
+  --danger: 220 38 38;
+  --info: 2 132 199;
+  --sev-low: 22 163 74;
+  --sev-medium: 202 138 4;
+  --sev-high: 234 88 12;
+  --sev-critical: 220 38 38;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: 11 15 25;
+  --surface: 20 26 40;
+  --surface-2: 28 36 54;
+  --border: 42 52 74;
+  --text: 232 236 245;
+  --text-muted: 148 160 184;
+  --primary: 96 150 255;
+  --primary-fg: 8 14 30;
+  --success: 52 211 120;
+  --warning: 251 170 50;
+  --danger: 248 113 113;
+  --info: 56 189 248;
+  --sev-low: 52 211 120;
+  --sev-medium: 250 204 21;
+  --sev-high: 251 146 60;
+  --sev-critical: 248 113 113;
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-bg font-sans text-text antialiased;
+}
