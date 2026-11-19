@@ -1,0 +1,83 @@
+{
+  "risk_case_id": "RC-000045",
+  "risk_level": "SEVERE",
+  "risk_score": 92,
+  "summary": "SUP-1008 factory outage (48 h) delays 2 open POs for ITM-501 due inside the outage window; DC-PUNE stock covers about 1.5 days, so a shortage is likely.",
+  "affected_entities": [
+    {
+      "type": "SUPPLIER",
+      "id": "SUP-1008"
+    },
+    {
+      "type": "PO",
+      "id": "PO-1001"
+    },
+    {
+      "type": "PO",
+      "id": "PO-1002"
+    },
+    {
+      "type": "ITEM",
+      "id": "ITM-501"
+    }
+  ],
+  "evidence": [
+    {
+      "source": "ERP",
+      "entity": "PO-1001",
+      "field": "due_date",
+      "value": "2026-12-03",
+      "item_id": "ITM-501"
+    },
+    {
+      "source": "ERP",
+      "entity": "PO-1001",
+      "field": "qty",
+      "value": 4000,
+      "item_id": "ITM-501"
+    },
+    {
+      "source": "ERP",
+      "entity": "PO-1002",
+      "field": "due_date",
+      "value": "2026-12-04",
+      "item_id": "ITM-501"
+    },
+    {
+      "source": "ERP",
+      "entity": "ITM-501",
+      "field": "on_hand",
+      "value": 1200,
+      "location_id": "DC-PUNE"
+    },
+    {
+      "source": "IMPACT",
+      "entity": "IMPACT",
+      "field": "risk_score",
+      "value": 92
+    },
+    {
+      "source": "EVENT",
+      "entity": "EVT-000123",
+      "field": "expected_duration_hours",
+      "value": 48
+    }
+  ],
+  "facts": [
+    "PO-1001 (4000 units ITM-501) is due 2026-12-03, inside the outage window.",
+    "On-hand ITM-501 at DC-PUNE is 1200 units."
+  ],
+  "estimates": [
+    {
+      "statement": "Delivery of PO-1001 slips by about 2 days.",
+      "basis": "Outage duration of 48 h from the event; supplier gave no restart date."
+    }
+  ],
+  "assumptions": [
+    "Outage duration reported in the event is accurate."
+  ],
+  "missing_data": [
+    "SUP-1008 remaining production capacity not provided"
+  ],
+  "confidence": "MEDIUM"
+}

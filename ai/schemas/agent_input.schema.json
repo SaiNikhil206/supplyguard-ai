@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://supplyguard.ai/schemas/agent_input.schema.json",
+  "title": "Agent input context",
+  "description": "What Boomi (N-08/N-09) or the Django fallback sends to either agent. Derived from LLD 16.5; proposed for CONTRACTS section 6 in S-01. Top level is strict; ERP records list only the keys we rely on and allow extra columns until N-02/N-03 finalise the seed shape. RECOVERY_PLANNER input must also carry the validated risk_analysis.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["agent", "risk_case_id", "tenant_id", "correlation_id", "event", "snapshot", "impact", "data_quality_flags"],
+  "properties": {
+    "agent": { "enum": ["RISK_ANALYST", "RECOVERY_PLANNER"] },
+    "risk_case_id": { "$ref": "common.schema.json#/$defs/riskCaseId" },
+    "tenant_id": { "$ref": "common.schema.json#/$defs/tenantId" },
+    "correlation_id": { "$ref": "common.schema.json#/$defs/uuid" },
+    "event": { "$ref": "#/$defs/event" },
+    "snapshot": { "$ref": "#/$defs/snapshot" },
+    "impact": { "$ref": "#/$defs/impact" },
+    "data_quality_flags": {
+      "description": "Known gaps in the snapshot, e.g. 'supplier capacity not provided'. Agents must echo these into missing_data / data_gaps.",
+      "$ref": "common.schema.json#/$defs/stringList"
+    },
+    "constraints": {
+      "description": "Tenant business rules for the Recovery Planner (optional).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_cost_increase_pct": { "type": "number", "minimum": 0 },
+        "require_qualified_alternates": { "type": "boolean" },
+        "priority_items": { "$ref": "common.schema.json#/$defs/stringList" }
+      }
+    },
+    "risk_analysis": { "$ref": "risk_analysis.schema.json" }
+  },
+  "if": { "properties": { "agent": { "const": "RECOVERY_PLANNER" } } },
+  "then": { "required": ["risk_analysis"] },
+  "else": { "not": { "required": ["risk_analysis"] } },
+  "$defs": {
+    "event": {
+      "description": "Canonical disruption event, CONTRACTS section 3.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_id", "tenant_id", "supplier_id", "event_type", "severity", "event_time", "expected_duration_hours", "description", "source_system", "correlation_id"],
+      "properties": {
+        "event_id": { "type": "string", "pattern": "^EVT-[0-9]+$" },
+        "tenant_id": { "$ref": "common.schema.json#/$defs/tenantId" },
+        "supplier_id": { "$ref": "common.schema.json#/$defs/supplierId" },
+        "event_type": { "$ref": "common.schema.json#/$defs/eventType" },
+        "severity": { "$ref": "common.schema.json#/$defs/severity" },
+        "event_time": { "$ref": "common.schema.json#/$defs/isoDateTime" },
+        "expected_duration_hours": { "type": "number", "minimum": 0 },
+        "description": { "type": "string" },
+        "source_system": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "correlation_id": { "$ref": "common.schema.json#/$defs/uuid" },
+        "shipment_id": { "type": "string" },
+        "po_id": { "$ref": "common.schema.json#/$defs/poId" }
+      }
+    },
+    "snapshot": {
+      "description": "ERP data as read by Boomi (CONTRACTS section 5) at the time of the case. This is the 'source of truth' the evidence entries must point into.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["captured_at", "supplier", "purchase_orders", "inventory", "alternate_suppliers"],
+      "properties": {
+        "captured_at": { "$ref": "common.schema.json#/$defs/isoDateTime" },
+        "supplier": {
+          "type": "object",
+          "required": ["supplier_id", "name"],
+          "properties": {
+            "supplier_id": { "$ref": "common.schema.json#/$defs/supplierId" },
+            "name": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+          }
+        },
+        "supplier_history": {
+          "type": "array",
+          "items": { "type": "object" }
+        },
+        "purchase_orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["po_id", "supplier_id", "status", "lines"],
+            "properties": {
+              "po_id": { "$ref": "common.schema.json#/$defs/poId" },
+              "supplier_id": { "$ref": "common.schema.json#/$defs/supplierId" },
+              "status": { "type": "string" },
+              "lines": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["item_id", "qty", "due_date", "unit_price"],
+                  "properties": {
+                    "item_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+                    "qty": { "type": "integer", "minimum": 0 },
+                    "due_date": { "$ref": "common.schema.json#/$defs/isoDate" },
+                    "unit_price": { "$ref": "common.schema.json#/$defs/snapshotMoney" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "inventory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["item_id", "location_id", "on_hand", "reserved", "safety_stock"],
+            "properties": {
+              "item_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "location_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "on_hand": { "type": "integer", "minimum": 0 },
+              "reserved": { "type": "integer", "minimum": 0 },
+              "safety_stock": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "alternate_suppliers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["supplier_id", "item_id", "lead_time_days", "unit_price", "capacity"],
+            "properties": {
+              "supplier_id": { "$ref": "common.schema.json#/$defs/supplierId" },
+              "item_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "lead_time_days": { "type": "integer", "minimum": 0 },
+              "unit_price": { "$ref": "common.schema.json#/$defs/snapshotMoney" },
+              "capacity": {
+                "description": "null = unknown; the agent must then report it as missing data, never guess.",
+                "type": ["integer", "null"],
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "impact": {
+      "description": "Deterministic output of the N-04 impact engine.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["risk_score", "affected_pos", "total_exposure"],
+      "properties": {
+        "risk_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "total_exposure": { "$ref": "common.schema.json#/$defs/money" },
+        "affected_pos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["po_id", "item_id", "affected_qty", "estimated_delay_days", "exposure_amount", "inventory_coverage_days", "shortage"],
+            "properties": {
+              "po_id": { "$ref": "common.schema.json#/$defs/poId" },
+              "item_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+              "affected_qty": { "type": "integer", "minimum": 0 },
+              "estimated_delay_days": { "type": "number", "minimum": 0 },
+              "exposure_amount": { "$ref": "common.schema.json#/$defs/money" },
+              "inventory_coverage_days": { "type": ["number", "null"], "minimum": 0 },
+              "shortage": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -15,7 +15,7 @@ Member:
 <!-- paste the summary line(s): e.g. "pytest: 42 passed" -->
 
 ## Reviewer verdict
-<!-- APPROVE / CHANGES REQUIRED - from a teammate or the `reviewer` subagent -->
+<!-- APPROVE / CHANGES REQUIRED - from the `reviewer` subagent (Claude merges on APPROVE + green tests) -->
 
 ## Checklist
 - [ ] Rebased on latest `collaboration`

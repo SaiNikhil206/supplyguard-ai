@@ -1,0 +1,34 @@
+name: branch-sync
+
+# When anybody pushes to `collaboration` directly (e.g. Claude's /done or /merge-prs),
+# merge the new `collaboration` into every open task branch so all members stay current.
+# (Pushes made by the auto-merge workflow do not trigger this; it syncs by itself.)
+
+on:
+  push:
+    branches: [collaboration]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collaboration-writer
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: collaboration
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Git identity
+        run: |
+          git config user.name "branch-sync-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: python scripts/gitflow.py sync-branches

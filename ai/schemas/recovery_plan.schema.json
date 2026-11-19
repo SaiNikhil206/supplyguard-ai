@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://supplyguard.ai/schemas/recovery_plan.schema.json",
+  "title": "Recovery Planning Agent output",
+  "description": "CONTRACTS section 6. Either options is non-empty and no_viable_option_reason is null, or options is [] and no_viable_option_reason is a non-empty string (TC-05). Rank uniqueness and fact checks against the snapshot are done by the N-07 validator, not here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["risk_case_id", "options", "no_viable_option_reason"],
+  "properties": {
+    "risk_case_id": { "$ref": "common.schema.json#/$defs/riskCaseId" },
+    "options": { "type": "array", "items": { "$ref": "#/$defs/option" } },
+    "no_viable_option_reason": {
+      "anyOf": [{ "type": "null" }, { "$ref": "common.schema.json#/$defs/nonEmptyString" }]
+    }
+  },
+  "if": { "required": ["options"], "properties": { "options": { "type": "array", "maxItems": 0 } } },
+  "then": { "properties": { "no_viable_option_reason": { "$ref": "common.schema.json#/$defs/nonEmptyString" } } },
+  "else": { "properties": { "no_viable_option_reason": { "type": "null" } } },
+  "$defs": {
+    "change": {
+      "description": "Fields the approved action would change (CONTRACTS section 5 PATCH: expected_date / supplier_id / split qty). Location fields are for INVENTORY_TRANSFER. Which fields are required depends on option_type (see option.allOf).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "supplier_id": { "$ref": "common.schema.json#/$defs/supplierId" },
+        "expected_date": { "$ref": "common.schema.json#/$defs/isoDate" },
+        "qty": { "type": "integer", "minimum": 1 },
+        "item_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "from_location_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" },
+        "to_location_id": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank",
+        "option_type",
+        "proposed_action",
+        "action_steps",
+        "estimated_lead_time_days",
+        "estimated_cost_delta",
+        "trade_offs",
+        "evidence",
+        "assumptions",
+        "data_gaps"
+      ],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1 },
+        "option_type": { "$ref": "common.schema.json#/$defs/optionType" },
+        "proposed_action": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["po_id", "change"],
+          "properties": {
+            "po_id": { "$ref": "common.schema.json#/$defs/poId" },
+            "change": { "$ref": "#/$defs/change" }
+          }
+        },
+        "action_steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "common.schema.json#/$defs/nonEmptyString" }
+        },
+        "estimated_lead_time_days": {
+          "description": "null only when the data does not support an estimate; data_gaps must then say why (LLD 16.5 'where supported').",
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "estimated_cost_delta": {
+          "description": "null only when the data does not support an estimate; data_gaps must then say why.",
+          "anyOf": [{ "type": "null" }, { "$ref": "common.schema.json#/$defs/money" }]
+        },
+        "trade_offs": { "$ref": "common.schema.json#/$defs/stringList" },
+        "evidence": { "$ref": "common.schema.json#/$defs/evidenceList" },
+        "assumptions": { "$ref": "common.schema.json#/$defs/stringList" },
+        "data_gaps": { "$ref": "common.schema.json#/$defs/stringList" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              { "required": ["estimated_lead_time_days"], "properties": { "estimated_lead_time_days": { "type": "null" } } },
+              { "required": ["estimated_cost_delta"], "properties": { "estimated_cost_delta": { "type": "null" } } }
+            ]
+          },
+          "then": { "properties": { "data_gaps": { "minItems": 1 } } }
+        },
+        {
+          "if": { "required": ["option_type"], "properties": { "option_type": { "const": "ALTERNATE_SUPPLIER" } } },
+          "then": { "properties": { "proposed_action": { "properties": { "change": { "required": ["supplier_id"] } } } } }
+        },
+        {
+          "if": { "required": ["option_type"], "properties": { "option_type": { "const": "SPLIT_ORDER" } } },
+          "then": { "properties": { "proposed_action": { "properties": { "change": { "required": ["supplier_id", "qty"] } } } } }
+        },
+        {
+          "if": { "required": ["option_type"], "properties": { "option_type": { "const": "REVISED_SCHEDULE" } } },
+          "then": { "properties": { "proposed_action": { "properties": { "change": { "required": ["expected_date"] } } } } }
+        },
+        {
+          "if": { "required": ["option_type"], "properties": { "option_type": { "const": "INVENTORY_TRANSFER" } } },
+          "then": { "properties": { "proposed_action": { "properties": { "change": { "required": ["item_id", "from_location_id", "to_location_id", "qty"] } } } } }
+        }
+      ]
+    }
+  }
+}
