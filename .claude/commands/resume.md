@@ -1,0 +1,20 @@
+---
+description: Continue a team member's pending/ongoing work from where they left off (e.g. /resume roop)
+argument-hint: <roop|nikhil|uday> [task-id]
+model: opus
+---
+Resume work for team member: **$ARGUMENTS**
+
+You are the ADVISOR (Opus 5.5). Follow CLAUDE.md exactly.
+
+1. **Identify member + task.** First word of the arguments is the member (roop/nikhil/uday). If missing, use `git config user.name`; if still unclear, ask. An optional second word is a task ID to force.
+2. **Sync.** `git fetch --all --prune`, `git checkout collaboration`, `git pull --ff-only`. If there are uncommitted changes, stop and ask what to do with them.
+3. **Load state.** Run `python scripts/progress.py <member>`. Read `tasks/<MEMBER>.md` (Handoff block first), the chosen task block, the CONTRACTS sections it touches, and the last 3 entries of `progress/SESSION_LOG.md` for that member.
+4. **Pick the task.** Forced ID > the `in-progress` task > first `todo` task whose Depends are all `done`. If nothing is ready, report what blocks the member and suggest the most useful unblocking work (often a dependency owned by someone else - say who), then stop.
+5. **Branch.** If the task branch exists (local or `origin/`), check it out and `git rebase collaboration`; otherwise create it from `collaboration` with the name in the task block. Set the task `Status: in-progress` if it was `todo`.
+6. **Plan.** Write a short subtask list (3-8 items) into the task's `Notes:` line, each tagged with the subagent + model that will do it (see CLAUDE.md section 4 and the task's Model hint).
+7. **Execute.** Delegate: `investigator` for lookups, `implementer` / `boomi-builder` for building (parallel when independent; `isolation: worktree` if they share an app), `test-runner` to verify. Keep the advisor context lean. Commit after each meaningful subtask with the trailers from CLAUDE.md section 5 (`Status: in-progress`, a `Left:` line in the body) and push the branch.
+8. **Review.** When the acceptance criteria look met, run `reviewer` on the branch. Fix blockers. If everything is met, run the `/done <task-id>` procedure; otherwise keep `in-progress`.
+9. **Always finish with the `/handoff` procedure** (update Handoff block, session log, PROGRESS.md, commit, push) - even if you stop early, hit a blocker, or the user interrupts.
+
+Report at the end: task, what was completed, tests result, what is left, next step.
