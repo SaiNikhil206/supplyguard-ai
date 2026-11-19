@@ -68,8 +68,8 @@ function Stages({ events }: { events: import('@/api/admin/audit').AuditEvent[] }
         </li>
       ))}
       {other.length > 0 && (
-        <li>
-          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">Other</h3>
+        <li data-testid="trace-other">
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted">Other events</h3>
           <ul className="space-y-2 border-l-2 border-border pl-4">
             {other.map((e) => (
               <li key={e.id} className="text-sm">
