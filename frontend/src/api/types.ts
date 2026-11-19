@@ -196,7 +196,7 @@ export interface EvidenceRef {
 /** CONTRACTS section 6: Risk Analysis Agent output. */
 export interface RiskAnalysis {
   risk_case_id: string;
-  severity: Severity;
+  risk_level: Severity;
   risk_score: number;
   summary: string;
   affected_entities: { type: string; id: string }[];
@@ -267,6 +267,8 @@ export interface RiskCaseDetail extends RiskCaseListItem {
   affected_pos: AffectedPO[];
   analysis: RiskAnalysis | null;
   recommendations: Recommendation[];
+  /** CONTRACTS section 6 recovery_plan: set when options is empty. */
+  no_viable_option_reason?: string | null;
   approvals: Approval[];
   executions: Execution[];
   timeline: TimelineEntry[];

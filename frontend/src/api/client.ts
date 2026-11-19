@@ -126,17 +126,32 @@ function refreshAccess(): Promise<void> {
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  let res = await rawFetch(path, init, true);
+  // One correlation id per logical call, reused on the post-refresh retry.
+  const headers = new Headers(init?.headers);
+  if (!headers.has('X-Correlation-ID')) headers.set('X-Correlation-ID', newCorrelationId());
+  const req: RequestInit = { ...init, headers };
+
+  const usedToken = getAccessToken();
+  let res = await rawFetch(path, req, true);
 
   if (res.status === 401) {
-    try {
-      await refreshAccess();
-    } catch {
-      clearTokens();
-      emitLogout();
-      throw await toApiError(res);
+    const current = getAccessToken();
+    // If another request already refreshed, just retry with the new token.
+    if (!current || current === usedToken) {
+      try {
+        await refreshAccess();
+      } catch (e) {
+        // Only an explicit rejection of the refresh token ends the session;
+        // network/5xx errors keep tokens so a later retry can succeed.
+        if (e instanceof ApiError && (e.status === 400 || e.status === 401)) {
+          clearTokens();
+          emitLogout();
+          throw await toApiError(res);
+        }
+        throw e;
+      }
     }
-    res = await rawFetch(path, init, true);
+    res = await rawFetch(path, req, true);
   }
 
   if (!res.ok) throw await toApiError(res);

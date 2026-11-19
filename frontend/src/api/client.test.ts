@@ -147,4 +147,62 @@ describe('401 refresh', () => {
     off();
     expect(fired).toBe(1);
   });
+
+  it('refresh network/5xx error keeps tokens, no logout, rethrows ApiError', async () => {
+    const t = await login('admin', 'demo123');
+    const exp = expired();
+    setTokens({ access: exp, refresh: t.refresh });
+    server.use(
+      http.post('*/auth/refresh', () =>
+        HttpResponse.json({ error: { code: 'DOWNSTREAM_ERROR', message: 'down' } }, { status: 503 }),
+      ),
+    );
+    let fired = 0;
+    const off = onLogout(() => fired++);
+    const err = await failure(getMe());
+    off();
+    expect(err).toBeInstanceOf(ApiError);
+    expect(err.status).toBe(503);
+    expect(fired).toBe(0);
+    expect(getAccessToken()).toBe(exp);
+    expect(getRefreshToken()).toBe(t.refresh);
+  });
+
+  it('reuses the same X-Correlation-ID on the post-refresh retry', async () => {
+    const t = await login('admin', 'demo123');
+    setTokens({ access: expired(), refresh: t.refresh });
+    const ids: (string | null)[] = [];
+    server.events.on('request:start', ({ request }) => {
+      if (request.url.endsWith('/me')) ids.push(request.headers.get('X-Correlation-ID'));
+    });
+    await getMe();
+    server.events.removeAllListeners();
+    expect(ids).toHaveLength(2);
+    expect(ids[0]).toBeTruthy();
+    expect(ids[1]).toBe(ids[0]);
+  });
+
+  it('retries without refreshing when another request already refreshed', async () => {
+    const t = await login('admin', 'demo123');
+    const stale = expired();
+    setTokens({ access: stale, refresh: t.refresh });
+    const fresh = makeToken(admin, 'access', 600);
+    let calls = 0;
+    server.use(
+      http.get('*/suppliers', ({ request }) => {
+        calls++;
+        if (calls === 1) {
+          setTokens({ access: fresh, refresh: t.refresh }); // simulate concurrent refresh
+          return HttpResponse.json({ error: { code: 'UNAUTHENTICATED', message: 'x' } }, { status: 401 });
+        }
+        expect(request.headers.get('Authorization')).toBe(`Bearer ${fresh}`);
+        return HttpResponse.json({ count: 0, results: [] });
+      }),
+    );
+    const c = countRefreshes();
+    await apiFetch('/suppliers');
+    server.events.removeAllListeners();
+    expect(c.n).toBe(0);
+    expect(calls).toBe(2);
+  });
 });

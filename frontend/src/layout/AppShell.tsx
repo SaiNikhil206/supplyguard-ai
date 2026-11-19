@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import clsx from 'clsx';
 import { navItems } from './nav';
@@ -17,10 +17,38 @@ export function AppShell() {
   const [open, setOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { me, signOut } = useAuth();
+  const asideRef = useRef<HTMLElement>(null);
+
+  // Below md a closed sidebar is off-screen: make it inert so links leave the tab order.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const apply = () => {
+      if (asideRef.current) (asideRef.current as HTMLElement & { inert: boolean }).inert = !open && !mq.matches;
+    };
+    apply();
+    mq.addEventListener?.('change', apply);
+    return () => mq.removeEventListener?.('change', apply);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
 
   return (
     <div className="flex min-h-screen bg-bg text-text">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-fg"
+      >
+        Skip to main content
+      </a>
       <aside
+        ref={asideRef}
         aria-label="Sidebar"
         className={clsx(
           'fixed inset-y-0 left-0 z-30 w-64 transform border-r border-border bg-surface transition-transform md:static md:translate-x-0',
@@ -71,7 +99,6 @@ export function AppShell() {
             <button
               type="button"
               onClick={toggleTheme}
-              aria-label="Toggle theme"
               className="rounded-md border border-border px-3 py-1 text-sm hover:bg-surface-2"
             >
               {theme === 'dark' ? '☀ Light' : '☾ Dark'}
@@ -86,7 +113,7 @@ export function AppShell() {
             </button>
           </div>
         </header>
-        <main className="flex-1 p-6">
+        <main id="main" tabIndex={-1} className="flex-1 p-6 focus:outline-none">
           <Outlet />
         </main>
       </div>

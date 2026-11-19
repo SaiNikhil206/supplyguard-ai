@@ -2,12 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { parseApiMock } from '@/config';
 
 describe('parseApiMock', () => {
-  it('defaults to mock on', () => {
-    expect(parseApiMock(undefined)).toBe(true);
-    expect(parseApiMock('true')).toBe(true);
-    expect(parseApiMock('')).toBe(true);
+  it('unset falls back to the default (DEV)', () => {
+    expect(parseApiMock(undefined, true)).toBe(true);
+    expect(parseApiMock(undefined, false)).toBe(false);
+    expect(parseApiMock('', false)).toBe(false);
   });
-  it('only the string "false" hits the real backend', () => {
-    expect(parseApiMock('false')).toBe(false);
+  it('explicit true/false wins over the default', () => {
+    expect(parseApiMock('true', false)).toBe(true);
+    expect(parseApiMock('false', true)).toBe(false);
   });
 });

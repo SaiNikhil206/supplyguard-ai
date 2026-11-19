@@ -28,12 +28,23 @@ describe('app shell (authenticated)', () => {
 
   it('toggles dark class on <html>', async () => {
     renderWithProviders({ path: '/' });
-    const btn = await screen.findByRole('button', { name: 'Toggle theme' });
+    const btn = await screen.findByRole('button', { name: /Dark|Light/ });
     expect(document.documentElement).not.toHaveClass('dark');
     await userEvent.click(btn);
     expect(document.documentElement).toHaveClass('dark');
     await userEvent.click(btn);
     expect(document.documentElement).not.toHaveClass('dark');
+  });
+
+  it('Escape closes the mobile menu and a skip link targets main', async () => {
+    renderWithProviders({ path: '/' });
+    const toggle = await screen.findByRole('button', { name: 'Toggle menu' });
+    expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
+    expect(document.getElementById('main')).toBeInTheDocument();
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.keyboard('{Escape}');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('shows NotFound for unknown path', async () => {
