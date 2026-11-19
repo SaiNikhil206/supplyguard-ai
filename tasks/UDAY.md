@@ -9,11 +9,11 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start U-01 (Boomi env check) and U-02 (backend scaffold) today - everyone depends on U-03 models by 23 Nov.
+- **Last updated:** 2026-11-19 (U-02 scaffold built, in review)
+- **Current task:** U-02
+- **Branch:** `uday/U-02-backend-scaffold`
+- **Where I left off:** Backend scaffold done and committed; pytest + ruff green. Docker compose not run yet (Docker Desktop was off).
+- **Next step:** Run `docker compose up --build backend db`, tick the box, merge U-02. Then U-03 (needs S-01 contracts frozen) and U-01 (manual Boomi checks).
 - **Blockers:** none
 
 ---
@@ -32,17 +32,17 @@
 - **Notes:** -
 
 ### U-02: Backend scaffold
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S0 (19-21 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `uday/U-02-backend-scaffold`
 - **Model hint:** sonnet / medium
 - **Deliverables:** `backend/` Django 5 + DRF + drf-spectacular + simplejwt + psycopg; settings from env (`django-environ`); app shells `backend/apps/{tenants,accounts,core,audit,integrations,intelligence,workflow,portal}` so Roop and Nikhil can start without touching settings; `/api/health`; pytest + pytest-django; ruff; Dockerfile; Postgres 16 in root `docker-compose.yml`; `.env.example`.
 - **Acceptance:**
   - [ ] `docker compose up backend db` serves `/api/health` and `/api/schema/`
-  - [ ] `pytest` green with one smoke test
-  - [ ] All app shells registered in settings
+  - [x] `pytest` green with one smoke test
+  - [x] All app shells registered in settings
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Docker box NOT yet ticked: Docker Desktop was not running when built, so only `docker compose config` was validated. The same server was checked locally (migrate + runserver: `/api/health` -> `{"status":"ok","db":"ok"}`, `/api/schema/` -> 200) and pytest (3 tests) + ruff are green. Run `docker compose up --build backend db` once and tick the box. Tests default to in-memory SQLite (`D:DATABASE_URL` in pyproject); set `DATABASE_URL` to Postgres in CI. AUTH_USER_MODEL is still Django's default - U-03 introduces the custom User (`accounts.User`); recreate the `pgdata` volume after that lands. Health endpoint is `/api/health` (no trailing slash, no tenant data).
 
 ### U-03: Core data model + seed loader
 - **Status:** todo
