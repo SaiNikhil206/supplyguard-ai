@@ -9,40 +9,39 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start N-01 today (agent schemas - your input to the S-01 contracts freeze), then N-02 dataset.
-- **Blockers:** none
-
+- **Last updated:** 2026-11-19 (N-02 implemented, in review)
+- **Current task:** N-02 (N-01 also in review)
+- **Branch:** `nikhil/N-02-seed-data`
+- **Where I left off:** `data/generate_seed.py` writes 6 seed files + manifest and 11 scenario files (demo, TC-01..TC-09, tenant isolation) with `expected` blocks; 33 tests in `data/tests/`. Reviewer (opus) findings fixed except the CONTRACTS ones.
+- **Next step:** At the S-01 call raise both "Proposed for S-01" lists (`ai/README.md` on the N-01 branch, `data/README.md` here); tell Uday about the field-name table in `data/README.md` for U-03; open PRs for N-01 and N-02; then start N-03 (mock ERP).
+- **Blockers:** S-01 must add `daily_demand` to CONTRACTS s5 and confirm CONTRACTS names win over LLD 16.1 (Uday's U-03 depends on it).
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S0 (19-20 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `nikhil/N-01-agent-schemas`
 - **Model hint:** opus / high (schema design is a contract)
 - **Deliverables:** `ai/schemas/risk_analysis.schema.json`, `ai/schemas/recovery_plan.schema.json`, `ai/schemas/agent_input.schema.json`; valid + invalid fixtures in `ai/fixtures/`; schema test.
 - **Acceptance:**
   - [ ] Schemas match CONTRACTS section 6 exactly
-  - [ ] Required `missing_data` / `assumptions` / `evidence` fields enforced
-  - [ ] Invalid fixtures fail validation in tests
+  - [x] Required `missing_data` / `assumptions` / `evidence` fields enforced
+  - [x] Invalid fixtures fail validation in tests
 - **Done in:** -
-- **Notes:** -
+- **Notes:** CONTRACTS section 6 examples validate and keys match (test parses CONTRACTS.md). Additions beyond the contract are listed in `ai/README.md` 'Proposed for S-01' - first box ticks once S-01 ratifies them. Fact-checking evidence against the snapshot is N-07.
 
 ### N-02: Synthetic demo dataset
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S0 (20-22 Nov) | **Est:** 1d | **Depends:** S-01
 - **Branch:** `nikhil/N-02-seed-data`
 - **Model hint:** sonnet / medium (generator script), haiku / low to sanity-check
 - **Deliverables:** `data/generate_seed.py` (deterministic, seeded RNG) -> `data/seed/{tenants,suppliers,purchase_orders,inventory,alternate_suppliers,shipments}.json`; 2 tenants (TEN-ACME, TEN-GLOBEX), 100 suppliers, 500 POs, 3 locations, 20 active shipments, 3 deliberate duplicate suppliers (for N-12); `data/scenarios/*.json` canonical events for TC-01..TC-09 and the demo (SUP-1008 factory outage, 48 h).
 - **Acceptance:**
-  - [ ] Demo scenario numbers documented in `data/README.md` (affected POs, exposure, 2 alternates)
-  - [ ] TC-04 scenario has enough inventory to cover the delay; TC-05 scenario has no alternates
+  - [x] Demo scenario numbers documented in `data/README.md` (affected POs, exposure, 2 alternates)
+  - [x] TC-04 scenario has enough inventory to cover the delay; TC-05 scenario has no alternates
   - [ ] Uday's seed loader (U-03) and the mock ERP (N-03) load the same files
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Third box ticks when U-03 `load_seed` and N-03 both load `data/seed/` (field table in `data/README.md`). Started before S-01 was frozen; CONTRACTS asks listed under 'Proposed for S-01' in `data/README.md`. Seed has 187 inventory rows, 101 alternates.
 
 ### N-03: Mock ERP service
 - **Status:** todo

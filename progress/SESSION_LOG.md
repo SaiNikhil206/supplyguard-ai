@@ -33,3 +33,12 @@ Template:
 - Next: Roop R-01; Nikhil N-01 then N-02; Uday U-01 + U-02
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 - nikhil - N-02
+- Branch: nikhil/N-02-seed-data
+- Did: Deterministic generator `data/generate_seed.py` (seeded, `--as-of` re-anchoring with `--out` guard): 2 tenants, 100 suppliers (3 deliberate duplicates, otherwise unique names), 500 POs, 187 inventory rows over 3 DCs, 101 alternates, 20 in-transit shipments; 11 scenario files with expected affected POs / exposure / alternates. Demo: SUP-1008 48 h -> PO-1001 + PO-1002, INR 491,400.00, alternates SUP-2001/2002. README with impact rule, field-name table for U-03/N-03, S-01 proposals. Reviewer pass: fixed TC-05 (no split-order data, precise expectation), name collisions, TC-01 boundary, README/test drift checks.
+- Tests: `python -m pytest data/tests -q` -> 33 passed
+- Status now: review
+- Next: S-01 proposals (daily_demand, CONTRACTS-over-LLD names, s6 example qty); PRs for N-01/N-02; start N-03
+- Blockers: S-01 ratification; U-03 needs the field table
+- Models used: advisor opus; reviewer (opus, general-purpose agent)
