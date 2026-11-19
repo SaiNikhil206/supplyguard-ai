@@ -45,7 +45,7 @@
 - **Notes:** -
 
 ### R-03: Executive Overview + Supplier Intelligence screens
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S2 (1-5 Dec) | **Est:** 2d | **Depends:** R-01, R-02
 - **Branch:** `roop/R-03-overview-suppliers`
 - **Model hint:** sonnet / medium
@@ -53,7 +53,7 @@
 - **Acceptance:**
   - [ ] Real seed data shown; loading / empty / error states handled
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04); "real seed data" acceptance ticks only after R-02. Plan: overview screen | implementer | sonnet/medium | `roop/R-03-overview-suppliers--overview`; supplier list | implementer | sonnet/medium | `roop/R-03-overview-suppliers--supplier-list`; supplier detail + route | implementer | sonnet/medium | `roop/R-03-overview-suppliers--supplier-detail`; tests+build | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-04: Risk Command Center + case detail
 - **Status:** todo
