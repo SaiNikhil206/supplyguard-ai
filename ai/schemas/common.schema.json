@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://supplyguard.ai/schemas/common.schema.json",
+  "title": "SupplyGuard shared definitions",
+  "description": "Building blocks reused by the agent schemas. Follows CONTRACTS section 1 conventions.",
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "riskCaseId": { "type": "string", "pattern": "^RC-[0-9]+$" },
+    "tenantId": { "type": "string", "pattern": "^TEN-[A-Z0-9]+$" },
+    "supplierId": { "type": "string", "pattern": "^SUP-[0-9]+$" },
+    "poId": { "type": "string", "pattern": "^PO-[0-9]+$" },
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    },
+    "isoDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "isoDateTime": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"
+    },
+    "money": {
+      "description": "Agent output money (CONTRACTS section 1): decimal string with exactly 2 places, ISO-4217 currency. Negative allowed for deltas.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "string", "pattern": "^-?[0-9]+\\.[0-9]{2}$" },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
+    "snapshotMoney": {
+      "description": "Money as read from the ERP: decimal string with 0-4 places (more lenient than agent output).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "string", "pattern": "^-?[0-9]+(\\.[0-9]{1,4})?$" },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+      }
+    },
+    "evidence": {
+      "description": "Pointer to ONE value in the agent input, resolvable by N-07. source: ERP = snapshot, EVENT = event, IMPACT = impact engine. entity = record id (SUP-/PO-/EVT- id, or item_id for inventory). field = the snapshot field name as-is (due_date, unit_price, on_hand, capacity...). item_id narrows to a PO line; location_id narrows to an inventory row. Money is cited by its amount string. value null = the source record has no value (cite it as missing data).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "entity", "field", "value"],
+      "properties": {
+        "source": { "enum": ["ERP", "EVENT", "IMPACT"] },
+        "entity": { "$ref": "#/$defs/nonEmptyString" },
+        "field": { "$ref": "#/$defs/nonEmptyString" },
+        "value": { "type": ["string", "number", "boolean", "null"] },
+        "item_id": { "$ref": "#/$defs/nonEmptyString" },
+        "location_id": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "evidenceList": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "stringList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmptyString" }
+    },
+    "severity": { "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+    "eventType": {
+      "enum": ["FACTORY_OUTAGE", "SHIPMENT_DELAY", "QUALITY_HOLD", "CAPACITY_REDUCTION", "LOGISTICS_DISRUPTION"]
+    },
+    "optionType": {
+      "enum": ["ALTERNATE_SUPPLIER", "INVENTORY_TRANSFER", "REVISED_SCHEDULE", "SPLIT_ORDER"]
+    }
+  }
+}
