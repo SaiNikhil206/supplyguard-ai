@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+import { AuthProvider } from '@/auth/AuthProvider';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 
 export function createQueryClient(): QueryClient {
@@ -14,7 +15,9 @@ const queryClient = createQueryClient();
 export function Providers({ children, client = queryClient }: { children: ReactNode; client?: QueryClient }) {
   return (
     <QueryClientProvider client={client}>
-      <ThemeProvider>{children}</ThemeProvider>
+      <ThemeProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
