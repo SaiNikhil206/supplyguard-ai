@@ -89,8 +89,10 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | fa79ece | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - offline part done, waiting on U-01 |
+| 2026-11-19 | f8604c7 | nikhil | N-05 | in-progress | feat(ai): Risk Analyst agent definition, eval inputs and grader |
+| 2026-11-19 | febba11 | roop | S-02 | in-progress | chore(workflow): remove autopilot |
 | 2026-11-19 | 47ac1ba | roop | R-09 | in-progress | ci: run CI on task branches + nightly, ci-ok aggregate, lint/ruff in auto-merge gate |
-| 2026-11-19 | a0d1b93 | nikhil | N-01 | review | fix(ai): N-01 reviewer follow-ups - PO header date, S-01 proposal list, option-type fixtures |
 | 2026-11-19 | 0aaf825 | uday | U-12 | in-progress | chore(tasks): handoff U-12 - in-progress, compose up not yet verified |
 | 2026-11-19 | fe30fdc | uday | U-12 | in-progress | fix(deploy): safe tunnel defaults, Render free-plan migrate, proxy settings |
 | 2026-11-19 | 6fd83da | uday | U-01 | blocked | docs(boomi): fill U-01 environment facts from read-only platform check |
@@ -107,5 +109,3 @@
 | 2026-11-19 | 824203d | roop | S-02 | in-progress | feat(workflow): autopilot - start each task as soon as its dependencies merge |
 | 2026-11-19 | 4b45577 | roop | R-09 | in-progress | chore(tasks): start R-09 CI pipeline |
 | 2026-11-19 | 4005eb2 | uday | U-02 | done | fix(backend): apply U-02 review notes (error body, accounts.User, compose hardening) |
-| 2026-11-19 | a464f4a | roop | R-01 | done | merge: R-01 Frontend scaffold + design system (auto-merge) |
-| 2026-11-19 | ffdc766 | roop | R-01 | done | chore(tasks): handoff R-01 - done |
