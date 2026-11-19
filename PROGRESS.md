@@ -85,3 +85,8 @@
 - **Next step:** Start U-01 (backend scaffold) today - Roop and Nikhil depend on U-02 models by 23 Nov.
 - **Blockers:** none
 
+## Recent tracked commits
+
+| Date | Commit | Member | Task | Status | Subject |
+|---|---|---|---|---|---|
+| 2026-11-19 | 75e0679 | roop | S-01 | in-progress | chore(setup): team task split, Claude workflow and progress tracking |

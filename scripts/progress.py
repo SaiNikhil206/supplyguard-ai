@@ -126,8 +126,15 @@ def load() -> tuple[dict[str, Task], dict[str, str]]:
     return all_tasks, handoffs
 
 
+def _trailer(body: str, key: str) -> str:
+    # Parsed from the whole body (not git's trailer parser) so a blank line before
+    # Co-Authored-By or similar does not hide our Task/Status/Member lines.
+    vals = re.findall(rf"^{key}:\s*(.+?)\s*$", body, flags=re.MULTILINE | re.IGNORECASE)
+    return ",".join(vals)
+
+
 def git_commits(limit: int = 300) -> list[dict[str, str]]:
-    fmt = "%h%x1f%ad%x1f%an%x1f%s%x1f%(trailers:key=Task,valueonly,separator=%x2C)%x1f%(trailers:key=Status,valueonly)%x1f%(trailers:key=Member,valueonly)%x1e"
+    fmt = "%h%x1f%ad%x1f%an%x1f%s%x1f%B%x1e"
     try:
         out = subprocess.run(
             ["git", "log", "--all", f"-n{limit}", "--date=short", f"--format={fmt}"],
@@ -137,11 +144,15 @@ def git_commits(limit: int = 300) -> list[dict[str, str]]:
         return []
     rows = []
     for rec in out.split("\x1e"):
-        parts = [p.strip() for p in rec.strip().split("\x1f")]
-        if len(parts) < 7 or not parts[4]:
+        parts = rec.strip().split("\x1f")
+        if len(parts) < 5:
             continue
-        rows.append(dict(hash=parts[0], date=parts[1], author=parts[2], subject=parts[3],
-                         task=parts[4], status=parts[5], member=parts[6].lower()))
+        task = _trailer(parts[4], "Task")
+        if not task:
+            continue
+        rows.append(dict(hash=parts[0].strip(), date=parts[1], author=parts[2], subject=parts[3],
+                         task=task, status=_trailer(parts[4], "Status"),
+                         member=_trailer(parts[4], "Member").lower()))
     return rows
 
 
