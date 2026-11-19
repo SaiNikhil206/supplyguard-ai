@@ -1,10 +1,5 @@
-import type { RiskLevel, SupplierFilters, SupplierStatus } from '@/api/types';
-
-export const STATUS_OPTIONS: { value: SupplierStatus; label: string }[] = [
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'ON_HOLD', label: 'On hold' },
-  { value: 'INACTIVE', label: 'Inactive' },
-];
+import type { RiskLevel, SupplierFilters } from '@/api/types';
+import { STATUS_OPTIONS } from '../status';
 
 export const RISK_OPTIONS: { value: RiskLevel; label: string }[] = [
   { value: 'LOW', label: 'Low' },
