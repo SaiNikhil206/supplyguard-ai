@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (N-02 implemented, in review)
-- **Current task:** N-02 (N-01 also in review)
-- **Branch:** `nikhil/N-02-seed-data`
-- **Where I left off:** `data/generate_seed.py` writes 6 seed files + manifest and 11 scenario files (demo, TC-01..TC-09, tenant isolation) with `expected` blocks; 33 tests in `data/tests/`. Reviewer (opus) findings fixed except the CONTRACTS ones.
-- **Next step:** At the S-01 call raise both "Proposed for S-01" lists (`ai/README.md` on the N-01 branch, `data/README.md` here); tell Uday about the field-name table in `data/README.md` for U-03; open PRs for N-01 and N-02; then start N-03 (mock ERP).
-- **Blockers:** S-01 must add `daily_demand` to CONTRACTS s5 and confirm CONTRACTS names win over LLD 16.1 (Uday's U-03 depends on it).
+- **Last updated:** 2026-11-19 (N-03 implemented, in review)
+- **Current task:** N-03 (N-01, N-02 also in review)
+- **Branch:** `nikhil/N-03-mock-erp` (stacked on `nikhil/N-02-seed-data` - merge N-02 first)
+- **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
+- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals; open PRs N-01, N-02, then N-03. Next own task N-04 waits on U-03.
+- **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
@@ -44,18 +44,18 @@
 - **Notes:** Third box ticks when U-03 `load_seed` and N-03 both load `data/seed/` (field table in `data/README.md`). Started before S-01 was frozen; CONTRACTS asks listed under 'Proposed for S-01' in `data/README.md`. Seed has 187 inventory rows, 101 alternates.
 
 ### N-03: Mock ERP service
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S0-S1 (22-25 Nov) | **Est:** 2d | **Depends:** S-01, N-02
 - **Branch:** `nikhil/N-03-mock-erp`
 - **Model hint:** sonnet / medium
 - **Deliverables:** `mock-erp/` FastAPI app (Python 3.12) implementing CONTRACTS section 5, loads `data/seed/*.json`, in-memory store with reset endpoint, request log (for TC-06 assertions), `Idempotency-Key` enforcement on PATCH, chaos endpoint, Dockerfile, pytest.
 - **Acceptance:**
-  - [ ] All endpoints in CONTRACTS section 5 respond with seed data
-  - [ ] Same `Idempotency-Key` twice -> second call returns first result, no double update
-  - [ ] `_chaos timeout` makes PATCH hang > 30 s; `off` restores
+  - [x] All endpoints in CONTRACTS section 5 respond with seed data
+  - [x] Same `Idempotency-Key` twice -> second call returns first result, no double update
+  - [x] `_chaos timeout` makes PATCH hang > 30 s; `off` restores
   - [ ] Runs via `docker compose up mock-erp`
 - **Done in:** -
-- **Notes:** Uday's U-07 (Boomi ERP reads) needs this by 25 Nov.
+- **Notes:** Uday's U-07 (Boomi ERP reads) needs this by 25 Nov. Compose box ticks once Uday adds the service (snippet in `mock-erp/README.md`); image already builds/runs via `docker build -f mock-erp/Dockerfile .`. Extensions beyond CONTRACTS s5 (GET PO by id, shipments, X-Tenant-ID, PATCH body, INTERNAL_ERROR) listed for S-01.
 
 ### N-04: Deterministic impact + risk scoring engine
 - **Status:** todo
