@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 0 | 0 | 0 | 0 | 12 | 0 | 0% | R-01 |
-| Nikhil | 0 | 0 | 0 | 0 | 14 | 0 | 0% | N-01 |
+| Nikhil | 0 | 0 | 1 | 0 | 13 | 0 | 0% | - |
 | Uday | 0 | 0 | 0 | 0 | 12 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
@@ -16,7 +16,7 @@
 | ID | Task | Owner | Sprint | Status | Checks | Done in |
 |---|---|---|---|---|---|---|
 | S-02 | Sprint-end integration demos | Shared | every sprint (23 Nov, 30 Nov, 7 Dec, 14 Dec, 20 Dec, 26 Dec) | todo | 0/6 | - |
-| N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-20 Nov) | todo | 0/3 | - |
+| N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-20 Nov) | review | 2/3 | - |
 | N-02 | Synthetic demo dataset | Nikhil | S0 (20-22 Nov) | todo | 0/3 | - |
 | N-03 | Mock ERP service | Nikhil | S0-S1 (22-25 Nov) | todo | 0/4 | - |
 | R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | todo | 0/3 | - |
@@ -70,12 +70,12 @@
 - **Blockers:** none
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start N-01 today (agent schemas - your input to the S-01 contracts freeze), then N-02 dataset.
-- **Blockers:** none
+- **Last updated:** 2026-11-19 (N-01 implemented, in review)
+- **Current task:** N-01
+- **Branch:** `nikhil/N-01-agent-schemas`
+- **Where I left off:** 4 schemas in `ai/schemas/`, `ai/schema_registry.py` (validator_for + bundled_schema), 27 invalid + 5 valid fixtures (from `ai/fixtures/generate_fixtures.py`), 82 tests passing. Reviewer (opus) findings fixed.
+- **Next step:** Take the "Proposed for S-01" list in `ai/README.md` to the S-01 contracts call so Uday adds it to CONTRACTS section 6; then open the PR to `collaboration` and start N-02.
+- **Blockers:** S-01 must ratify the schema additions (agent_input, evidence addressing, nullable estimates) before N-01 can be `done`.
 
 ### Uday
 - **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
@@ -89,6 +89,9 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 1ee2c50 | roop | R-01 | in-progress | merge: R-01 --scaffold sub-branch into task branch |
+| 2026-11-19 | e88c783 | roop | R-01 | in-progress | feat(frontend): Vite React TS scaffold, tokens, app shell, 9 routes |
+| 2026-11-19 | f717b25 | roop | R-01 | in-progress | chore(tasks): start R-01 frontend scaffold |
 | 2026-11-19 | e2906ed | roop | S-01 | in-progress | chore(tasks): re-assign tasks by role, remove team lead |
 | 2026-11-19 | 35d9259 | roop | S-01 | in-progress | fix(scripts): read Task/Status/Member trailers from full commit body |
 | 2026-11-19 | 75e0679 | roop | S-01 | in-progress | chore(setup): team task split, Claude workflow and progress tracking |

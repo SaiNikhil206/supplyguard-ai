@@ -9,27 +9,26 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start N-01 today (agent schemas - your input to the S-01 contracts freeze), then N-02 dataset.
-- **Blockers:** none
-
+- **Last updated:** 2026-11-19 (N-01 implemented, in review)
+- **Current task:** N-01
+- **Branch:** `nikhil/N-01-agent-schemas`
+- **Where I left off:** 4 schemas in `ai/schemas/`, `ai/schema_registry.py` (validator_for + bundled_schema), 27 invalid + 5 valid fixtures (from `ai/fixtures/generate_fixtures.py`), 82 tests passing. Reviewer (opus) findings fixed.
+- **Next step:** Take the "Proposed for S-01" list in `ai/README.md` to the S-01 contracts call so Uday adds it to CONTRACTS section 6; then open the PR to `collaboration` and start N-02.
+- **Blockers:** S-01 must ratify the schema additions (agent_input, evidence addressing, nullable estimates) before N-01 can be `done`.
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S0 (19-20 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `nikhil/N-01-agent-schemas`
 - **Model hint:** opus / high (schema design is a contract)
 - **Deliverables:** `ai/schemas/risk_analysis.schema.json`, `ai/schemas/recovery_plan.schema.json`, `ai/schemas/agent_input.schema.json`; valid + invalid fixtures in `ai/fixtures/`; schema test.
 - **Acceptance:**
   - [ ] Schemas match CONTRACTS section 6 exactly
-  - [ ] Required `missing_data` / `assumptions` / `evidence` fields enforced
-  - [ ] Invalid fixtures fail validation in tests
+  - [x] Required `missing_data` / `assumptions` / `evidence` fields enforced
+  - [x] Invalid fixtures fail validation in tests
 - **Done in:** -
-- **Notes:** -
+- **Notes:** CONTRACTS section 6 examples validate and keys match (test parses CONTRACTS.md). Additions beyond the contract are listed in `ai/README.md` 'Proposed for S-01' - first box ticks once S-01 ratifies them. Fact-checking evidence against the snapshot is N-07.
 
 ### N-02: Synthetic demo dataset
 - **Status:** todo

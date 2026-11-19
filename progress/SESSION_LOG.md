@@ -33,3 +33,12 @@ Template:
 - Next: Roop R-01; Nikhil N-01 then N-02; Uday U-01 + U-02
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 - nikhil - N-01
+- Branch: nikhil/N-01-agent-schemas
+- Did: Agent I/O JSON Schemas (risk_analysis, recovery_plan, agent_input, common) in Draft 2020-12; schema_registry.py with validator_for() and bundled_schema() for the N-09 Claude fallback; fixture generator, 5 valid + 27 invalid fixtures each failing on one expected keyword; README with evidence-addressing rule for N-07. Reviewer pass: fixed nullable-estimate rule, evidence addressing, per-option-type change fields, bundling, uuid correlation ids.
+- Tests: `python -m pytest ai/tests -q` -> 82 passed
+- Status now: review
+- Next: raise the "Proposed for S-01" list at the contracts call; PR to collaboration; start N-02
+- Blockers: S-01 ratification of schema additions
+- Models used: advisor opus; reviewer (opus, general-purpose agent - project subagents not loaded this session)
