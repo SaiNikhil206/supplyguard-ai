@@ -122,3 +122,12 @@ Template:
 - Next: S-01 contracts call; U-01 Boomi check by a human
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 15:00 - roop - R-09
+- Branch: roop/R-09-ci @ 0d95fec
+- Did: Added `.github/workflows/ci.yml` (backend ruff+pytest on Postgres 16, frontend lint/typecheck/test/build, ai/data/mock-erp suites, `ci-ok` aggregate; task-branch pushes, PRs, nightly, manual). ESLint 9 in frontend. Auto-merge gate now runs lint + ruff. Started early while U-02 in review.
+- Tests: run_checks.py ai/data/mock-erp/backend/frontend PASS locally; frontend 76 tests, lint 0 warnings. GitHub run not observed (private repo, no gh auth).
+- Status now: review
+- Next: confirm CI green on GitHub; team agrees required check = `ci-ok` on main only; then done
+- Blockers: team decision on required checks; Uday ruff pin + format; bot [skip ci]
+- Models used: advisor opus; implementer sonnet x3, reviewer opus x2
