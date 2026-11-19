@@ -1,5 +1,6 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
 import type { ErrorCode, Paginated } from '@/api/types';
+import { approvalHandlers } from './approvals';
 import {
   dashboardSummary,
   meFor,
@@ -119,6 +120,7 @@ function protectedRoute(
 const API = '*/api/v1';
 
 export const handlers: HttpHandler[] = [
+  ...approvalHandlers, // stateful R-05 overrides of /risk-cases* + decision/retry; must stay first
   http.post(`${API}/auth/token`, async ({ request }) => {
     const body = (await request.json().catch(() => ({}))) as { username?: string; password?: string };
     if (!body.username || !body.password) {

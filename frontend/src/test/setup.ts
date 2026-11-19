@@ -3,6 +3,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { server } from '@/mocks/server';
 import { clearTokens } from '@/api/tokens';
+import { resetApprovalsMock } from '@/mocks/approvals';
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());
@@ -10,6 +11,7 @@ afterAll(() => server.close());
 afterEach(() => {
   cleanup();
   server.resetHandlers();
+  resetApprovalsMock();
   clearTokens();
   document.documentElement.classList.remove('dark');
   try {
