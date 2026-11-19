@@ -68,7 +68,7 @@
 - **Notes:** -
 
 ### R-05: AI Recommendations + Approval Center
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S3 (8-12 Dec) | **Est:** 2d | **Depends:** R-04, N-10
 - **Branch:** `roop/R-05-approvals`
 - **Model hint:** sonnet / medium
@@ -77,7 +77,7 @@
   - [ ] Buttons hidden/disabled for roles that cannot decide
   - [ ] UNSUPPORTED options shown but not approvable
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (N-10 not done). Pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
 
 ### R-06: Boomi Flow approval workflow
 - **Status:** todo
