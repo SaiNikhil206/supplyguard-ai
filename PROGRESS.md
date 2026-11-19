@@ -89,6 +89,15 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 422a05c | roop | S-02 | in-progress | docs(workflow): Claude merges PRs itself and continues to the next task |
+| 2026-11-19 | 2819fee | roop | R-01 | in-progress | merge: R-01 --auth sub-branch into task branch |
+| 2026-11-19 | fa0542d | roop | R-01 | in-progress | feat(frontend): login, AuthProvider, protected routes, user badge |
+| 2026-11-19 | 4333e31 | nikhil | N-01 | review | chore(tasks): handoff N-01 - in review, awaiting S-01 ratification |
+| 2026-11-19 | 55dd014 | nikhil | N-01 | review | feat(ai): agent I/O JSON schemas, fixtures and schema tests |
+| 2026-11-19 | 6815d00 | roop | R-01 | in-progress | merge: R-01 --ui sub-branch into task branch |
+| 2026-11-19 | f0ebce3 | roop | R-01 | in-progress | merge: R-01 --api sub-branch into task branch |
+| 2026-11-19 | cd80aef | roop | R-01 | in-progress | feat(frontend): typed API client, JWT refresh, MSW mocks |
+| 2026-11-19 | faed257 | roop | R-01 | in-progress | feat(frontend): design-system UI kit |
 | 2026-11-19 | 1ee2c50 | roop | R-01 | in-progress | merge: R-01 --scaffold sub-branch into task branch |
 | 2026-11-19 | e88c783 | roop | R-01 | in-progress | feat(frontend): Vite React TS scaffold, tokens, app shell, 9 routes |
 | 2026-11-19 | f717b25 | roop | R-01 | in-progress | chore(tasks): start R-01 frontend scaffold |
