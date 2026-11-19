@@ -31,7 +31,7 @@ describe('Risk case detail /risk/:id', () => {
     expect(within(event).getByText('supplier-portal')).toBeInTheDocument();
     expect(within(event).getByText('EVT-000123')).toBeInTheDocument();
 
-    const table = screen.getByRole('table');
+    const table = screen.getByRole('table', { name: /Affected purchase orders/ });
     for (const po of ['PO-1001', 'PO-1002', 'PO-1003']) expect(within(table).getByText(po)).toBeInTheDocument();
     expect(within(table).getByText('BLDC Motor 24V')).toBeInTheDocument();
     expect(screen.getByTestId('total-exposure')).toHaveTextContent('₹12,50,000.00');
@@ -63,8 +63,11 @@ describe('Risk case detail /risk/:id', () => {
   it('shows the analysis slot summary and recommendation link', async () => {
     renderWithProviders({ path: '/risk/RC-000045' });
     const slot = await screen.findByTestId('analysis-slot');
-    expect(slot).toHaveTextContent('fire at Pune Forge');
     expect(screen.getByRole('heading', { name: 'AI risk analysis' })).toBeInTheDocument();
+    expect(within(slot).getByText(/fire at Pune Forge/)).toBeInTheDocument();
+    for (const label of ['Facts', 'Estimates', 'Missing data']) {
+      expect(within(slot).getAllByText(label).length).toBeGreaterThan(0);
+    }
     expect(screen.getByText('4 recovery options proposed')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Review in AI Recommendations/ })).toHaveAttribute(
       'href',
@@ -72,12 +75,12 @@ describe('Risk case detail /risk/:id', () => {
     );
   });
 
-  it('shows "Analysis pending" when analysis is null', async () => {
+  it('shows the in-progress panel when analysis is null', async () => {
     const pending = { ...riskCaseDetail45, analysis: null, status: 'ANALYZING' as const, affected_pos: [] };
     server.use(http.get(URL, () => HttpResponse.json(pending)));
     renderWithProviders({ path: '/risk/RC-000045' });
     const slot = await screen.findByTestId('analysis-slot');
-    expect(slot).toHaveTextContent('Analysis pending');
+    expect(slot).toHaveTextContent('AI analysis in progress');
     expect(within(slot).getByRole('status', { name: 'Analysis in progress' })).toBeInTheDocument();
     expect(screen.getByText('No affected purchase orders')).toBeInTheDocument();
   });
