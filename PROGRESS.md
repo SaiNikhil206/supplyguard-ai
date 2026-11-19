@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 63cdd3f | nikhil | N-02 | review | merge: N-02 Synthetic demo dataset (auto-merge) |
+| 2026-11-19 | 659d556 | roop | S-02 | in-progress | ci(checks): auto-discover every top-level tests/ suite |
 | 2026-11-19 | 2aed25a | nikhil | N-03 | review | chore(tasks): handoff N-03 - in review, compose pending on Uday |
 | 2026-11-19 | 462be3e | nikhil | N-03 | review | feat(mock-erp): FastAPI mock ERP with idempotent PATCH and chaos |
 | 2026-11-19 | 64a246f | roop | S-02 | in-progress | ci(automation): auto-merge ready task branches and auto-sync everyone |
@@ -107,5 +109,3 @@
 | 2026-11-19 | cd80aef | roop | R-01 | in-progress | feat(frontend): typed API client, JWT refresh, MSW mocks |
 | 2026-11-19 | faed257 | roop | R-01 | in-progress | feat(frontend): design-system UI kit |
 | 2026-11-19 | 1ee2c50 | roop | R-01 | in-progress | merge: R-01 --scaffold sub-branch into task branch |
-| 2026-11-19 | e88c783 | roop | R-01 | in-progress | feat(frontend): Vite React TS scaffold, tokens, app shell, 9 routes |
-| 2026-11-19 | f717b25 | roop | R-01 | in-progress | chore(tasks): start R-01 frontend scaffold |
