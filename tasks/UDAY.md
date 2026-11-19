@@ -38,11 +38,11 @@
 - **Model hint:** sonnet / medium
 - **Deliverables:** `backend/` Django 5 + DRF + drf-spectacular + simplejwt + psycopg; settings from env (`django-environ`); app shells `backend/apps/{tenants,accounts,core,audit,integrations,intelligence,workflow,portal}` so Roop and Nikhil can start without touching settings; `/api/health`; pytest + pytest-django; ruff; Dockerfile; Postgres 16 in root `docker-compose.yml`; `.env.example`.
 - **Acceptance:**
-  - [ ] `docker compose up backend db` serves `/api/health` and `/api/schema/`
+  - [x] `docker compose up backend db` serves `/api/health` and `/api/schema/`
   - [x] `pytest` green with one smoke test
   - [x] All app shells registered in settings
 - **Done in:** -
-- **Notes:** Docker box NOT yet ticked: Docker Desktop was not running when built, so only `docker compose config` was validated. The same server was checked locally (migrate + runserver: `/api/health` -> `{"status":"ok","db":"ok"}`, `/api/schema/` -> 200) and pytest (3 tests) + ruff are green. Run `docker compose up --build backend db` once and tick the box. Tests default to in-memory SQLite (`D:DATABASE_URL` in pyproject); set `DATABASE_URL` to Postgres in CI. AUTH_USER_MODEL is still Django's default - U-03 introduces the custom User (`accounts.User`); recreate the `pgdata` volume after that lands. Health endpoint is `/api/health` (no trailing slash, no tenant data).
+- **Notes:** Verified with Docker (Postgres 16): `/api/health` -> `{"status":"ok","db":"ok"}`, `/api/schema/` -> 200; pytest (3 tests) + ruff green. If host port 8000 is taken, run `BACKEND_PORT=8001 docker compose up --build backend db`. Tests default to in-memory SQLite (`D:DATABASE_URL` in pyproject); set `DATABASE_URL` to Postgres in CI. AUTH_USER_MODEL is still Django's default - U-03 introduces the custom User (`accounts.User`); recreate the `pgdata` volume after that lands. Health endpoint is `/api/health` (no trailing slash, no tenant data).
 
 ### U-03: Core data model + seed loader
 - **Status:** todo
