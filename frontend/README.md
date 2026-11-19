@@ -14,3 +14,17 @@ API types are generated from the backend OpenAPI schema (`/api/schema/`).
     npm run build          # tsc -b && vite build
 
 Layout: src/app providers, src/theme light/dark, src/layout shell + nav, src/pages the 9 screens, src/router.tsx routes, src/test helpers. Design tokens are CSS variables in src/index.css, mapped in tailwind.config.js (bg-surface, text-muted, bg-sev-critical).
+
+## API layer and mocks
+
+- `src/api/`: typed client (`client.ts`: JWT bearer, single-flight 401 refresh, `ApiError`), `tokens.ts`, `endpoints.ts`, `queries.ts` (TanStack hooks + `queryKeys`), `types.ts` (hand-written from CONTRACTS; replaced by openapi-typescript output after U-02).
+- `src/mocks/`: MSW handlers + fixtures for tenant `TEN-ACME`. Browser worker starts in `main.tsx` when `VITE_API_MOCK` is not `false`; Vitest uses the node server (`src/test/setup.ts`).
+- Mock login users (password `demo123` for all):
+
+| username | role |
+|---|---|
+| `admin` | ADMIN |
+| `manager` | PROCUREMENT_MANAGER |
+| `viewer` | VIEWER |
+
+- Full case detail: `RC-000045` (factory outage at `SUP-1008`). Mock access tokens live 15 min, refresh 7 days.
