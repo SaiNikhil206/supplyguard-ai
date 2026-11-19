@@ -83,4 +83,5 @@ Rules: break the task into subtasks of <= 1-2 files each; run independent subtas
 - Task status lives ONLY in `tasks/<MEMBER>.md` (`- **Status:** ...` line) - keep the format exactly.
 - `PROGRESS.md` is generated: `python scripts/progress.py all --write`. Never hand-edit it.
 - `progress/SESSION_LOG.md` is append-only, one entry per session.
+- A dependency counts as satisfied when it is `done` or `review` (review tasks are already merged into `collaboration` and only wait for a final sign-off).
 - Asking "what has Nikhil done / what's pending?" -> run `python scripts/progress.py nikhil` and answer from its output plus the Handoff block.
