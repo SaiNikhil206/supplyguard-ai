@@ -1,0 +1,18 @@
+# SupplyGuard AI - Slide Deck Outline (DRAFT v0.1)
+
+12 slides, ~4 min if presented alone; in the live slot only slides 1-3 come before the demo and 9-12 after it. All figures are illustrative synthetic data or `[measured: ...]` placeholders - no invented metrics.
+
+| # | Title | Key message | Visual | Speaker note |
+|---|---|---|---|---|
+| 1 | SupplyGuard AI | Supplier continuity and recovery, built on Boomi. | Logo, tagline "Predict -> Understand -> Recover -> Verify", team names | "We're Roop, Nikhil and Uday. Seven minutes from a factory fire to a fixed purchase order." |
+| 2 | The problem | Disruptions are found late, analysed by hand, and fixed by email with no trail. | Timeline: event -> days of spreadsheets -> late PO; `[source: industry stat to cite, or drop]` | Don't quote a statistic we can't cite. Use the story: "find out when the PO is already late." |
+| 3 | What exists today | Marketplace has prediction, EDI visibility and data sync - nobody closes the loop to recovery. | 4-row table from PRODUCT_STRATEGY (SAP agent, B2B360, Coupa sync, OSI EDI) with "gap" column | "We're not another connector or chatbot." |
+| 4 | Our solution | Detect -> find affected POs -> explain with evidence -> recommend -> human approves -> ERP updated -> audited. | Horizontal 7-step loop with icons; screenshot strip of SaaS screens | Map each step to a demo scene number. |
+| 5 | Architecture | Multi-tenant SaaS (React, Django, PostgreSQL) + Boomi as the integration and AI backbone. | Diagram: Supplier portal -> API Mgmt -> Event Streams -> Integration <-> mock ERP; Agentstudio agents; Flow; Django + Postgres; React | Point out the correlation ID flowing end to end. |
+| 6 | Boomi services, each with a job | Six services, each visible in the demo. | Coverage table (service / role / demo scene), Data Hub marked optional | "Six is not better than five - each one earns its place." |
+| 7 | AI governance - facts vs estimates | AI output is structured JSON; every claim is FACT, ESTIMATE, ASSUMPTION or MISSING_DATA. | Screenshot of analysis panel with evidence tags; JSON snippet | "Missing data is stated, never invented." |
+| 8 | AI governance - validation, approval, audit | Validator rejects invented IDs/quantities/prices; no ERP write without recorded approval; full audit trail. | Flow: agent output -> validator -> stored -> approval -> idempotent write -> audit; state machine strip | "The agent can recommend; it can never execute." |
+| 9 | Security and tenancy | Tenant from JWT or API key, never from the request; RBAC (Admin, Procurement Manager, Ops, Viewer); keys and rate limits in API Management. | Role table; lock icons | Keep short; details in Q&A. |
+| 10 | Impact | Faster detection to recovery, decisions with evidence, audit-ready. | 3 tiles: detection-to-case `[measured: ...]`, case-to-approved recommendation `[measured: ...]`, ERP write verified `[measured: ...]` | Numbers are from our demo runs on synthetic data - say so. |
+| 11 | Boomi Marketplace accelerator | Free starter accelerator -> paid SaaS -> enterprise customization. | Package contents list (processes, event processing, both agents, approval workflow, API defs, config templates, sample data, guides, video) | "Submission candidate - partner approval is a separate gate." |
+| 12 | Team and next steps | Three builders; what's next after the hackathon. | Photos/roles: Roop (React SaaS, Flow, Marketplace), Nikhil (AI agents, impact engine, mock ERP), Uday (Django platform, Boomi processes, API Mgmt, deploy); roadmap: more ERP connectors, httpOnly-cookie auth, partner program | End with the closing line from the demo script. |

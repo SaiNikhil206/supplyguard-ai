@@ -136,7 +136,7 @@
 - **Notes:** -
 
 ### R-11: Demo script, deck, video storyboard
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S6 (27-31 Dec) | **Est:** 2d | **Depends:** S-03
 - **Branch:** `roop/R-11-demo-script`
 - **Model hint:** opus / high for the story, haiku / low for formatting
@@ -145,7 +145,7 @@
   - [ ] Two timed rehearsals under 8 min
   - [ ] Every Boomi service has a visible moment
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Drafts done (script, deck outline, shot list, Q&A); needs S-03 dry run + 2 timed rehearsals. Piece: script | session | opus/medium | roop/R-11-demo-script--script.
 
 ### R-12: Marketplace accelerator package
 - **Status:** todo
