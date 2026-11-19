@@ -7,7 +7,7 @@ API types are hand-written from `docs/CONTRACTS.md` until U-02 lands, then gener
 ## Develop
 
     cd frontend
-    cp .env.example .env   # VITE_API_MOCK=true uses MSW mock data (unset: on in dev, off in prod build)
+    cp .env.example .env   # VITE_API_MOCK is commented out: unset = MSW mocks on in dev, off in prod build
     npm install            # needs Node >= 22.22.2 (see .nvmrc; engine-strict)
     npm run dev            # http://localhost:5173, /api proxied to localhost:8000
     npm test               # Vitest + Testing Library

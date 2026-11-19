@@ -186,11 +186,28 @@ export interface AffectedPO {
   stock_cover_days: number;
 }
 
+export type EvidenceSource = 'ERP' | 'EVENT' | 'IMPACT';
+
+/** ai/schemas/common.schema.json `evidence`. value null = source record has no value. */
 export interface EvidenceRef {
-  source: string;
+  source: EvidenceSource;
   entity: string;
   field: string;
-  value: string;
+  value: string | number | boolean | null;
+  item_id?: string;
+  location_id?: string;
+}
+
+export type AffectedEntityType = 'PO' | 'SUPPLIER' | 'ITEM' | 'SHIPMENT' | 'LOCATION';
+
+/** recovery_plan.schema.json `change`; required keys depend on option_type. */
+export interface ProposedChange {
+  supplier_id?: string;
+  expected_date?: string; // YYYY-MM-DD
+  qty?: number;
+  item_id?: string;
+  from_location_id?: string;
+  to_location_id?: string;
 }
 
 /** CONTRACTS section 6: Risk Analysis Agent output. */
@@ -199,7 +216,7 @@ export interface RiskAnalysis {
   risk_level: Severity;
   risk_score: number;
   summary: string;
-  affected_entities: { type: string; id: string }[];
+  affected_entities: { type: AffectedEntityType; id: string }[];
   evidence: EvidenceRef[];
   facts: string[];
   estimates: { statement: string; basis: string }[];
@@ -219,10 +236,11 @@ export interface Recommendation {
   id: string;
   rank: number;
   option_type: OptionType;
-  proposed_action: { po_id: string; change: Record<string, unknown> };
+  proposed_action: { po_id: string; change: ProposedChange };
   action_steps: string[];
-  estimated_lead_time_days: number;
-  estimated_cost_delta: Money;
+  /** null only when data does not support an estimate; data_gaps then says why. */
+  estimated_lead_time_days: number | null;
+  estimated_cost_delta: Money | null;
   trade_offs: string[];
   evidence: EvidenceRef[];
   assumptions: string[];
@@ -267,8 +285,8 @@ export interface RiskCaseDetail extends RiskCaseListItem {
   affected_pos: AffectedPO[];
   analysis: RiskAnalysis | null;
   recommendations: Recommendation[];
-  /** CONTRACTS section 6 recovery_plan: set when options is empty. */
-  no_viable_option_reason?: string | null;
+  /** recovery_plan: non-empty string when recommendations is empty, else null. */
+  no_viable_option_reason: string | null;
   approvals: Approval[];
   executions: Execution[];
   timeline: TimelineEntry[];

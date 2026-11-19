@@ -108,16 +108,26 @@ let refreshInFlight: Promise<void> | null = null;
 function refreshAccess(): Promise<void> {
   if (!refreshInFlight) {
     refreshInFlight = (async () => {
-      const refresh = getRefreshToken();
-      if (!refresh) throw new ApiError({ code: 'UNAUTHENTICATED', message: 'No refresh token', status: 401 });
-      const res = await rawFetch(
-        '/auth/refresh',
-        { method: 'POST', body: JSON.stringify({ refresh }) },
-        false,
-      );
-      if (!res.ok) throw await toApiError(res);
-      const data = (await res.json()) as { access: string; refresh?: string };
-      setTokens({ access: data.access, refresh: data.refresh });
+      try {
+        const refresh = getRefreshToken();
+        if (!refresh) throw new ApiError({ code: 'UNAUTHENTICATED', message: 'No refresh token', status: 401 });
+        const res = await rawFetch(
+          '/auth/refresh',
+          { method: 'POST', body: JSON.stringify({ refresh }) },
+          false,
+        );
+        if (!res.ok) throw await toApiError(res);
+        const data = (await res.json()) as { access: string; refresh?: string };
+        setTokens({ access: data.access, refresh: data.refresh });
+      } catch (e) {
+        // Only an explicit rejection of the refresh token ends the session (emitted once here,
+        // not once per waiting request); network/5xx errors keep tokens so a later retry can succeed.
+        if (e instanceof ApiError && (e.status === 400 || e.status === 401)) {
+          clearTokens();
+          emitLogout();
+        }
+        throw e;
+      }
     })().finally(() => {
       refreshInFlight = null;
     });
@@ -141,11 +151,8 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
       try {
         await refreshAccess();
       } catch (e) {
-        // Only an explicit rejection of the refresh token ends the session;
-        // network/5xx errors keep tokens so a later retry can succeed.
+        // Logout was already emitted inside the shared refresh.
         if (e instanceof ApiError && (e.status === 400 || e.status === 401)) {
-          clearTokens();
-          emitLogout();
           throw await toApiError(res);
         }
         throw e;
