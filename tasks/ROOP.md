@@ -80,7 +80,7 @@
 - **Notes:** -
 
 ### R-06: Boomi Flow approval workflow
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S3 (9-14 Dec) | **Est:** 2.5d | **Depends:** N-07, N-10, U-01
 - **Branch:** `roop/R-06-flow-approval`
 - **Model hint:** sonnet / medium via `boomi-builder` (Claude explains Flow as "a low-code screen + form builder with a state diagram")
@@ -89,7 +89,7 @@
   - [ ] Approve in Flow -> execution starts; Reject -> no execution
   - [ ] Decision visible in the SaaS Approval Center and audit within 5 s
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Spec-first while N-07/N-10/U-01 are pending: boomi/flow/ README, approval-flow-spec, test-plan done; build in Flow once env + decision API exist. Piece: flow-spec | session | sonnet/medium | roop/R-06-flow-approval--flow-spec.
 
 ### R-07: What-if Simulator UI
 - **Status:** todo
