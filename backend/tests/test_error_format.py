@@ -72,3 +72,37 @@ def test_correlation_id_is_echoed_when_valid():
 def test_bad_correlation_id_is_replaced():
     response = call(make_view(exceptions.NotFound()), HTTP_X_CORRELATION_ID="not-a-uuid")
     assert error_of(response)["correlation_id"] != "not-a-uuid"
+
+
+def test_request_correlation_id_beats_header():
+    """U-05 middleware sets request.correlation_id; the handler must reuse it."""
+    mw_id, header_id = str(uuid.uuid4()), str(uuid.uuid4())
+    http_request = APIRequestFactory().get("/x", HTTP_X_CORRELATION_ID=header_id)
+    http_request.correlation_id = mw_id
+
+    class View(APIView):
+        permission_classes = [AllowAny]
+
+        def get(self, request):
+            raise exceptions.NotFound()
+
+    response = View.as_view()(http_request)
+    assert error_of(response)["correlation_id"] == mw_id
+
+
+def test_list_validation_error_details_are_wrapped():
+    response = call(make_view(exceptions.ValidationError(["bad", "worse"])))
+    assert response.status_code == 400
+    assert error_of(response)["details"] == {"errors": ["bad", "worse"]}
+
+
+def test_dict_detail_api_exception_keeps_message_and_empty_details():
+    class Teapot(exceptions.APIException):
+        status_code = 409
+        default_detail = "Short and stout."
+
+    response = call(make_view(Teapot({"reason": "x"})))
+    error = error_of(response)
+    assert error["code"] == "CONFLICT"
+    assert error["details"] == {}
+    assert error["message"]

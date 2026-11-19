@@ -1,5 +1,6 @@
 import importlib
 
+import environ
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
@@ -19,6 +20,9 @@ def test_no_missing_migrations():
 
 @pytest.fixture
 def reload_settings(monkeypatch):
+    # settings.py re-reads <repo>/.env on every reload (read_env uses setdefault), which would
+    # re-add SECRET_KEY after we delete it. Make these tests independent of a developer's .env.
+    monkeypatch.setattr(environ.Env, "read_env", classmethod(lambda cls, *a, **k: None))
     yield lambda: importlib.reload(settings_module)
     monkeypatch.undo()
     importlib.reload(settings_module)  # restore the test configuration
