@@ -1,0 +1,43 @@
+{
+  "scenario": "demo",
+  "test_case": "DEMO",
+  "description": "Live demo: SUP-1008 factory outage for 48 h hits 2 open ITM-501 POs; 2 qualified alternates.",
+  "as_of": "2026-12-02",
+  "event": {
+    "event_id": "EVT-000123",
+    "tenant_id": "TEN-ACME",
+    "supplier_id": "SUP-1008",
+    "event_type": "FACTORY_OUTAGE",
+    "severity": "HIGH",
+    "event_time": "2026-12-02T10:15:00Z",
+    "expected_duration_hours": 48,
+    "description": "Line 2 fire, production halted",
+    "source_system": "supplier-portal",
+    "correlation_id": "2d68e761-19b2-4481-ae35-95fae61044b3"
+  },
+  "expected": {
+    "supplier_found": true,
+    "evaluated_po_ids": [
+      "PO-1001",
+      "PO-1002",
+      "PO-1003"
+    ],
+    "affected_po_ids": [
+      "PO-1001",
+      "PO-1002"
+    ],
+    "exposure": {
+      "amount": "491400.00",
+      "currency": "INR"
+    },
+    "affected_item_ids": [
+      "ITM-501"
+    ],
+    "qualified_alternate_supplier_ids": [
+      "SUP-2001",
+      "SUP-2002"
+    ],
+    "shortage_expected": true,
+    "viable_option_expected": true
+  }
+}

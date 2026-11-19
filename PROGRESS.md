@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 0 | 0 | 0 | 0 | 12 | 0 | 0% | R-01 |
-| Nikhil | 0 | 0 | 1 | 0 | 13 | 0 | 0% | - |
+| Nikhil | 0 | 0 | 2 | 0 | 12 | 0 | 0% | - |
 | Uday | 0 | 0 | 0 | 0 | 12 | 0 | 0% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
@@ -17,7 +17,7 @@
 |---|---|---|---|---|---|---|
 | S-02 | Sprint-end integration demos | Shared | every sprint (23 Nov, 30 Nov, 7 Dec, 14 Dec, 20 Dec, 26 Dec) | todo | 0/6 | - |
 | N-01 | Agent I/O JSON schemas + fixtures | Nikhil | S0 (19-20 Nov) | review | 2/3 | - |
-| N-02 | Synthetic demo dataset | Nikhil | S0 (20-22 Nov) | todo | 0/3 | - |
+| N-02 | Synthetic demo dataset | Nikhil | S0 (20-22 Nov) | review | 2/3 | - |
 | N-03 | Mock ERP service | Nikhil | S0-S1 (22-25 Nov) | todo | 0/4 | - |
 | R-01 | Frontend scaffold + design system | Roop | S0-S1 (19-25 Nov) | todo | 0/3 | - |
 | S-01 | Freeze contracts v1 | Shared | S0 (19-20 Nov) | in-progress | 0/3 | - |
@@ -70,12 +70,12 @@
 - **Blockers:** none
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (N-01 implemented, in review)
-- **Current task:** N-01
-- **Branch:** `nikhil/N-01-agent-schemas`
-- **Where I left off:** 4 schemas in `ai/schemas/`, `ai/schema_registry.py` (validator_for + bundled_schema), 27 invalid + 5 valid fixtures (from `ai/fixtures/generate_fixtures.py`), 82 tests passing. Reviewer (opus) findings fixed.
-- **Next step:** Take the "Proposed for S-01" list in `ai/README.md` to the S-01 contracts call so Uday adds it to CONTRACTS section 6; then open the PR to `collaboration` and start N-02.
-- **Blockers:** S-01 must ratify the schema additions (agent_input, evidence addressing, nullable estimates) before N-01 can be `done`.
+- **Last updated:** 2026-11-19 (N-02 implemented, in review)
+- **Current task:** N-02 (N-01 also in review)
+- **Branch:** `nikhil/N-02-seed-data`
+- **Where I left off:** `data/generate_seed.py` writes 6 seed files + manifest and 11 scenario files (demo, TC-01..TC-09, tenant isolation) with `expected` blocks; 33 tests in `data/tests/`. Reviewer (opus) findings fixed except the CONTRACTS ones.
+- **Next step:** At the S-01 call raise both "Proposed for S-01" lists (`ai/README.md` on the N-01 branch, `data/README.md` here); tell Uday about the field-name table in `data/README.md` for U-03; open PRs for N-01 and N-02; then start N-03 (mock ERP).
+- **Blockers:** S-01 must add `daily_demand` to CONTRACTS s5 and confirm CONTRACTS names win over LLD 16.1 (Uday's U-03 depends on it).
 
 ### Uday
 - **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
@@ -92,6 +92,7 @@
 | 2026-11-19 | 2aed25a | nikhil | N-03 | review | chore(tasks): handoff N-03 - in review, compose pending on Uday |
 | 2026-11-19 | 462be3e | nikhil | N-03 | review | feat(mock-erp): FastAPI mock ERP with idempotent PATCH and chaos |
 | 2026-11-19 | 64a246f | roop | S-02 | in-progress | ci(automation): auto-merge ready task branches and auto-sync everyone |
+| 2026-11-19 | c0cf42b | roop | R-01 | in-progress | merge: R-01 --review-fixes sub-branch into task branch |
 | 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |
 | 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
 | 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |
@@ -108,4 +109,3 @@
 | 2026-11-19 | 1ee2c50 | roop | R-01 | in-progress | merge: R-01 --scaffold sub-branch into task branch |
 | 2026-11-19 | e88c783 | roop | R-01 | in-progress | feat(frontend): Vite React TS scaffold, tokens, app shell, 9 routes |
 | 2026-11-19 | f717b25 | roop | R-01 | in-progress | chore(tasks): start R-01 frontend scaffold |
-| 2026-11-19 | e2906ed | roop | S-01 | in-progress | chore(tasks): re-assign tasks by role, remove team lead |
