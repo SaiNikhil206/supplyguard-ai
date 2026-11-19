@@ -11,9 +11,9 @@
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
 - **Last updated:** 2026-11-19 (N-03 implemented, in review)
 - **Current task:** N-03 (N-01, N-02 also in review)
-- **Branch:** `nikhil/N-03-mock-erp` (stacked on `nikhil/N-02-seed-data` - merge N-02 first)
+- **Branch:** `nikhil/N-03-mock-erp`
 - **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
-- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals; open PRs N-01, N-02, then N-03. Next own task N-04 waits on U-03.
+- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
 - **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
 ---
 

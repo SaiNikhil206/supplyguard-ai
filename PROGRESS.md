@@ -72,9 +72,9 @@
 ### Nikhil
 - **Last updated:** 2026-11-19 (N-03 implemented, in review)
 - **Current task:** N-03 (N-01, N-02 also in review)
-- **Branch:** `nikhil/N-03-mock-erp` (stacked on `nikhil/N-02-seed-data` - merge N-02 first)
+- **Branch:** `nikhil/N-03-mock-erp`
 - **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
-- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals; open PRs N-01, N-02, then N-03. Next own task N-04 waits on U-03.
+- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
 - **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
 
 ### Uday
@@ -89,8 +89,16 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 63cdd3f | nikhil | N-02 | review | merge: N-02 Synthetic demo dataset (auto-merge) |
+| 2026-11-19 | 659d556 | roop | S-02 | in-progress | ci(checks): auto-discover every top-level tests/ suite |
+| 2026-11-19 | 2aed25a | nikhil | N-03 | review | chore(tasks): handoff N-03 - in review, compose pending on Uday |
+| 2026-11-19 | 462be3e | nikhil | N-03 | review | feat(mock-erp): FastAPI mock ERP with idempotent PATCH and chaos |
+| 2026-11-19 | 64a246f | roop | S-02 | in-progress | ci(automation): auto-merge ready task branches and auto-sync everyone |
+| 2026-11-19 | c0cf42b | roop | R-01 | in-progress | merge: R-01 --review-fixes sub-branch into task branch |
+| 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |
 | 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
 | 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |
+| 2026-11-19 | 4d5b9cd | nikhil | N-01 | review | merge: N-01 agent I/O JSON schemas + fixtures into collaboration |
 | 2026-11-19 | 422a05c | roop | S-02 | in-progress | docs(workflow): Claude merges PRs itself and continues to the next task |
 | 2026-11-19 | 2819fee | roop | R-01 | in-progress | merge: R-01 --auth sub-branch into task branch |
 | 2026-11-19 | fa0542d | roop | R-01 | in-progress | feat(frontend): login, AuthProvider, protected routes, user badge |
@@ -101,8 +109,3 @@
 | 2026-11-19 | cd80aef | roop | R-01 | in-progress | feat(frontend): typed API client, JWT refresh, MSW mocks |
 | 2026-11-19 | faed257 | roop | R-01 | in-progress | feat(frontend): design-system UI kit |
 | 2026-11-19 | 1ee2c50 | roop | R-01 | in-progress | merge: R-01 --scaffold sub-branch into task branch |
-| 2026-11-19 | e88c783 | roop | R-01 | in-progress | feat(frontend): Vite React TS scaffold, tokens, app shell, 9 routes |
-| 2026-11-19 | f717b25 | roop | R-01 | in-progress | chore(tasks): start R-01 frontend scaffold |
-| 2026-11-19 | e2906ed | roop | S-01 | in-progress | chore(tasks): re-assign tasks by role, remove team lead |
-| 2026-11-19 | 35d9259 | roop | S-01 | in-progress | fix(scripts): read Task/Status/Member trailers from full commit body |
-| 2026-11-19 | 75e0679 | roop | S-01 | in-progress | chore(setup): team task split, Claude workflow and progress tracking |
