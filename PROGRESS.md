@@ -70,12 +70,12 @@
 - **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ### Nikhil
-- **Last updated:** 2026-11-19 (N-03 implemented, in review)
-- **Current task:** N-03 (N-01, N-02 also in review)
-- **Branch:** `nikhil/N-03-mock-erp`
-- **Where I left off:** FastAPI mock ERP in `mock-erp/app/` (store.py rules, main.py routes), 46 tests, Docker image builds and runs (non-root, healthcheck). Reviewer (opus) findings fixed. Not yet run via `docker compose` - the compose file is Uday's.
-- **Next step:** Send Uday the compose snippet + "Open items" in `mock-erp/README.md` (needed for U-07 by 25 Nov and U-10: same execution_id as Idempotency-Key on retry, X-Tenant-ID on PATCH, don't PATCH INVENTORY_TRANSFER); raise S-01 proposals. N-01 and N-02 are auto-merged into collaboration; N-03 auto-merges on this push. Next own task N-04 waits on U-03.
-- **Blockers:** acceptance "Runs via docker compose up mock-erp" needs Uday's docker-compose.yml; S-01 ratification for N-01/N-02/N-03 contract additions.
+- **Last updated:** 2026-11-19 (autopilot: N-01 reviewer follow-ups fixed; autopilot stopped on request)
+- **Current task:** N-01 follow-ups (N-01, N-02, N-03 in review)
+- **Branch:** `nikhil/N-01-agent-schemas`
+- **Where I left off:** N-01 reviewer follow-ups 1-5 done in `ai/` (snapshot PO header `expected_date`, full S-01 proposal list + tenant rule in `ai/README.md`, `recovery_plan__all_option_types` + 4 new invalid fixtures, fixture inventory = `data/seed/`, `bundled_schema` docstring); second reviewer APPROVE, `ai/tests` 93 passed. N-03 compose snippet / open items still to send to Uday.
+- **Next step:** Raise the `ai/README.md` and `data/README.md` "Proposed for S-01" lists in the S-01 contracts call; send Uday the mock-erp compose snippet. N-04 starts when U-03 lands, N-05 when U-01 lands (restart `/loop /autopilot nikhil` to pick them up automatically).
+- **Blockers:** N-04 waits on U-03 (uday, todo); N-05 waits on U-01 (uday, todo); S-01 ratification for N-01/N-02/N-03 contract additions; N-03 compose box needs Uday's docker-compose.yml.
 
 ### Uday
 - **Last updated:** 2026-11-19 (U-02 scaffold built, in review)
@@ -89,23 +89,23 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 0aaf825 | uday | U-12 | in-progress | chore(tasks): handoff U-12 - in-progress, compose up not yet verified |
+| 2026-11-19 | fe30fdc | uday | U-12 | in-progress | fix(deploy): safe tunnel defaults, Render free-plan migrate, proxy settings |
+| 2026-11-19 | 6fd83da | uday | U-01 | blocked | docs(boomi): fill U-01 environment facts from read-only platform check |
+| 2026-11-19 | 7c5973a | uday | S-01 | blocked | chore(tasks): S-01 blocked on the v1 freeze call |
+| 2026-11-19 | 0380d2c | uday | U-12 | in-progress | feat(deploy): full local stack, tunnel guide and Render blueprint |
+| 2026-11-19 | 410f634 | uday | S-01 | blocked | docs(contracts): S-01 decision sheet for the v1 freeze call |
+| 2026-11-19 | 5384b03 | uday | U-02 | done | merge: U-02 Backend scaffold (auto-merge) |
+| 2026-11-19 | 77ad3a9 | roop | R-09 | in-progress | merge: R-09 --workflow sub-branch into task branch |
+| 2026-11-19 | a9aafea | roop | R-09 | in-progress | merge: R-09 --lint sub-branch into task branch |
+| 2026-11-19 | a09cbdd | roop | R-09 | in-progress | build(frontend): add ESLint flat config and lint script |
+| 2026-11-19 | 0823f4a | uday | U-01 | blocked | docs(boomi): U-01 Boomi environment checklist, waiting on platform checks |
+| 2026-11-19 | f9813db | roop | R-09 | in-progress | ci: add CI workflow for backend, frontend and python suites |
+| 2026-11-19 | 56f0c5f | uday | U-02 | done | fix(backend): isolate settings tests from .env, non-root image can write /app |
 | 2026-11-19 | 824203d | roop | S-02 | in-progress | feat(workflow): autopilot - start each task as soon as its dependencies merge |
 | 2026-11-19 | 4b45577 | roop | R-09 | in-progress | chore(tasks): start R-09 CI pipeline |
+| 2026-11-19 | 4005eb2 | uday | U-02 | done | fix(backend): apply U-02 review notes (error body, accounts.User, compose hardening) |
 | 2026-11-19 | a464f4a | roop | R-01 | done | merge: R-01 Frontend scaffold + design system (auto-merge) |
 | 2026-11-19 | ffdc766 | roop | R-01 | done | chore(tasks): handoff R-01 - done |
 | 2026-11-19 | cfaec62 | roop | R-01 | done | chore(tasks): R-01 done - frontend scaffold, auth, mocks, UI kit |
 | 2026-11-19 | 96a74fc | roop | R-01 | in-progress | ci(automation): run auto-merge checks on Node 22.22.2 |
-| 2026-11-19 | 89e9f67 | nikhil | N-03 | review | merge: N-03 Mock ERP service (auto-merge) |
-| 2026-11-19 | 9f884ef | nikhil | N-03 | review | chore(tasks): N-03 handoff - N-01/N-02 auto-merged, N-03 ready |
-| 2026-11-19 | dcc2320 | roop | R-01 | in-progress | merge: R-01 --schema-fixes sub-branch into task branch |
-| 2026-11-19 | 8dcf1b8 | uday | U-02 | review | merge: U-02 Backend scaffold (auto-merge) |
-| 2026-11-19 | 4d2b535 | roop | R-01 | in-progress | fix(frontend): align API types and mocks with agent schemas |
-| 2026-11-19 | 63cdd3f | nikhil | N-02 | review | merge: N-02 Synthetic demo dataset (auto-merge) |
-| 2026-11-19 | 659d556 | roop | S-02 | in-progress | ci(checks): auto-discover every top-level tests/ suite |
-| 2026-11-19 | 53a38f3 | uday | U-02 | review | chore(tasks): U-02 verified with docker compose on Postgres 16 |
-| 2026-11-19 | 8567b46 | uday | U-02 | review | feat(backend): Django 5 + DRF scaffold with app shells, health, compose |
-| 2026-11-19 | 2aed25a | nikhil | N-03 | review | chore(tasks): handoff N-03 - in review, compose pending on Uday |
-| 2026-11-19 | 462be3e | nikhil | N-03 | review | feat(mock-erp): FastAPI mock ERP with idempotent PATCH and chaos |
-| 2026-11-19 | 64a246f | roop | S-02 | in-progress | ci(automation): auto-merge ready task branches and auto-sync everyone |
-| 2026-11-19 | c0cf42b | roop | R-01 | in-progress | merge: R-01 --review-fixes sub-branch into task branch |
-| 2026-11-19 | cd167d2 | roop | R-01 | in-progress | fix(frontend): address R-01 review findings |

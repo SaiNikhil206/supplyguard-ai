@@ -104,3 +104,12 @@ Template:
 - Next: each member starts `/loop /autopilot <name>`
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 - nikhil - N-01 (autopilot, run by Roop's machine)
+- Branch: nikhil/N-01-agent-schemas
+- Did: Autopilot round: nothing ready (N-04 waits on U-03, N-05 on U-01). Used the wait to fix N-01 reviewer follow-ups in `ai/`: optional PO header `expected_date` in the agent_input snapshot (proposed for CONTRACTS s5), complete S-01 tightening list and tenant rule in `ai/README.md`, valid fixture with every option_type + invalid SPLIT_ORDER/INVENTORY_TRANSFER/REVISED_SCHEDULE/PO-date cases, fixture inventory aligned to `data/seed/`, `bundled_schema` docstring, option-type coverage test.
+- Tests: run_checks.py exit 0 - ai 93, data 33, mock-erp 46, backend 3, frontend 76 passed
+- Status now: review (unchanged)
+- Next: S-01 call ratifies the proposals; N-04 after U-03, N-05 after U-01
+- Blockers: Uday U-01/U-03; S-01
+- Models used: advisor opus; reviewer opus x1
