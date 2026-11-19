@@ -89,6 +89,9 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-19 | 28b1512 | nikhil | N-02 | review | chore(tasks): handoff N-02 - in review, awaiting S-01 ratification |
+| 2026-11-19 | 4e3e1fd | nikhil | N-02 | review | feat(data): deterministic synthetic seed dataset and test scenarios |
+| 2026-11-19 | 4d5b9cd | nikhil | N-01 | review | merge: N-01 agent I/O JSON schemas + fixtures into collaboration |
 | 2026-11-19 | 422a05c | roop | S-02 | in-progress | docs(workflow): Claude merges PRs itself and continues to the next task |
 | 2026-11-19 | 2819fee | roop | R-01 | in-progress | merge: R-01 --auth sub-branch into task branch |
 | 2026-11-19 | fa0542d | roop | R-01 | in-progress | feat(frontend): login, AuthProvider, protected routes, user badge |
