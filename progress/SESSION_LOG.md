@@ -104,3 +104,12 @@ Template:
 - Next: U-01 (manual Boomi checks), S-01 (freeze contracts) which unblocks U-03
 - Blockers: **Everyone who ran the first U-02 scaffold must run `docker compose down -v` once** (AUTH_USER_MODEL changed to accounts.User; old Postgres volume gives InconsistentMigrationHistory). Roop: API errors now use the CONTRACTS s1 body. Open for S-01: no 500/429 code in CONTRACTS (429/405 map to VALIDATION_ERROR for now).
 - Models used: advisor sonnet; reviewer opus x2
+
+## 2026-11-19 - roop - SETUP (autopilot)
+- Branch: roop/S-02-autopilot (separate worktree)
+- Did: `progress.py <member> --ready` (exit 0 + READY line, or exit 3 + what the next tasks wait on); new `/autopilot <member>` command for `/loop` hands-free mode (pull, check, work ready task, mark human-only steps `blocked: needs <member>`, wait 5-30 min); dependencies in `review` now count as satisfied (already merged). Docs updated.
+- Tests: --ready checked for all members: roop READY R-09, nikhil WAITING on U-03/U-01, uday READY U-01
+- Status now: autopilot available
+- Next: each member starts `/loop /autopilot <name>`
+- Blockers: none
+- Models used: advisor opus
