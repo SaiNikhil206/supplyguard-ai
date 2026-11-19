@@ -1,7 +1,7 @@
 {
   "name": "SG Supplier Risk Analyst",
   "id": "sg-risk-analyst",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "task": "N-05",
   "description": "Explains the business risk of a supplier disruption from an ERP snapshot and impact numbers. Facts are cited, estimates carry a basis, unknowns go to missing_data.",
   "instructions_file": "instructions.md",
@@ -58,7 +58,7 @@
     "Agentstudio has no prompt-injection switch: injection resistance = instructions rule 5 + ADV-02",
     "Not denied on purpose: capacity/price/date guessing - a blocked reply is not JSON; the prompt answers those via missing_data"
   ],
-  "status": "created in Agentstudio as a draft (all 5 designer steps saved); not yet tested - the Test Agent panel did not accept automated input; Create/deploy not done",
+  "status": "created in Agentstudio (id fa1f773c-b314-4cf5-ab69-44b999467cd3), not deployed. Run 1 (v1.1.0, DEMO): 11/13 grader checks; failed summary_values_in_input (recomputed cross-location coverage) and assumptions_qualitative; human review also found a wrong fact (supplier status OPEN). v1.2.0 tightens rules 3, facts and assumptions.",
   "agentstudio": {
     "account": "Uday's training account (built by Nikhil with Uday's agreement, 2026-11-19)",
     "agent_mode": "Structured",
@@ -67,6 +67,7 @@
     "input_schema": "compact: 8 required top-level keys (authoritative check: ai/schemas/agent_input.schema.json)",
     "output_schema": "inlined risk_analysis (11 required keys, enums, evidence minItems 1, no extra keys); authoritative: ai/schemas/risk_analysis.schema.json",
     "tools": "none yet - U-07 processes do not exist; the snapshot in the input carries the data",
-    "test_runtime": "USA East Agent Garden Cloud 01"
+    "test_runtime": "USA East Agent Garden Cloud 01",
+    "agent_id": "fa1f773c-b314-4cf5-ab69-44b999467cd3"
   }
 }

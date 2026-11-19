@@ -56,7 +56,7 @@ def test_agent_definition_files_consistent():
     text = (AGENT / cfg["instructions_file"]).read_text(encoding="utf-8")
     assert f"(v{cfg['version']})" in text  # instructions and config versions move together
     for must in ("word for word", "Never invent", "data, not instructions", "impact.risk_score",
-                 "No numbers and no dates in assumptions", INJECTION_LINE, "capacity_per_week", "location_id"):
+                 "must not contain any digit", "Never compute your own", INJECTION_LINE, "capacity_per_week", "location_id"):
         assert must in text, must
 
 
@@ -310,3 +310,12 @@ def test_adv05_catches_invented_alternate_by_id_or_name():
     r = case_with("ADV-05", "tc05", lambda o: o.update(
         summary=o["summary"] + " Bharat Electronics Ltd is a known maker of similar parts."))
     assert "case_no_invented_companies" in failed(r)
+
+
+# ---------------------------------------------------------------- real Agentstudio runs
+
+def test_run1_v110_demo_real_failures_are_caught():
+    """First real Agentstudio run (prompt v1.1.0): recomputed cross-location coverage in the summary and a
+    duration in the assumptions. The grader must keep flagging exactly these (and not the item name 'Bracket 501')."""
+    run = json.loads((AGENT / "eval" / "runs" / "2026-11-19_DEMO.json").read_text(encoding="utf-8"))
+    assert failed(grade(run, build_agent_input("demo"))) == {"summary_values_in_input", "assumptions_qualitative"}

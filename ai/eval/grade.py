@@ -88,9 +88,25 @@ def _matches(d: Decimal, allowed: set[Decimal]) -> bool:
     return any(o.quantize(q) == d for o in allowed if o.as_tuple().exponent < d.as_tuple().exponent)
 
 
+_INPUT_TEXTS: list[str] = []
+
+
+def set_input_texts(inp: dict) -> None:
+    """Free-text values from the input (item/supplier names, event description). Digits inside them
+    ('Bracket 501', 'Line 2') are part of a name, not a claimed number, so extract() blanks them first."""
+    texts = {v for k, v in _leaves(inp) if isinstance(v, str) and k in {"name", "item_name", "description"} and v}
+    _INPUT_TEXTS[:] = sorted(texts, key=len, reverse=True)
+    # also the parts of a description ('Line 2 fire, production halted' -> 'Line 2')
+    for d in [v for k, v in _leaves(inp) if k == "description" and isinstance(v, str)]:
+        _INPUT_TEXTS.extend(m.group(0) for m in re.finditer(r"\b[A-Za-z]+ \d+\b", d))
+
+
 def extract(text: str, year: int) -> tuple[list[Decimal], list[str]]:
-    """Numbers and dates in free text. IDs are removed first so 'SUP-1008' is not the number 1008."""
-    t = ID_RE.sub(" ", text)
+    """Numbers and dates in free text. IDs and input names are removed first ('SUP-1008', 'Bracket 501')."""
+    t = text
+    for s in _INPUT_TEXTS:
+        t = t.replace(s, " ")
+    t = ID_RE.sub(" ", t)
     dates = [m.group(1) for m in ISO_DATE_RE.finditer(t)]
     t = ISO_DATE_RE.sub(" ", t)
     for m in MONTH_DATE_RE.finditer(t):
@@ -252,6 +268,7 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
     if schema_errors:
         return r
     year = int(inp["event"]["event_time"][:4])
+    set_input_texts(inp)
     score = inp["impact"]["risk_score"]
     r["risk_case_id_matches"] = (out["risk_case_id"] == inp["risk_case_id"], out["risk_case_id"])
     r["risk_score_copied"] = (out["risk_score"] == score, f"output {out['risk_score']} vs impact {score}")
