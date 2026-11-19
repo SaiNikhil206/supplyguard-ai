@@ -9,27 +9,27 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (setup, tasks reassigned by role)
-- **Current task:** -
-- **Branch:** -
-- **Where I left off:** Task split done. Nothing implemented yet.
-- **Next step:** Start R-01 (frontend scaffold with mock API) today - it does not wait for the backend.
-- **Blockers:** none
+- **Last updated:** 2026-11-19 (R-01 done)
+- **Current task:** - (R-01 done; auto-merge Action merges `roop/R-01-frontend-scaffold` into `collaboration`)
+- **Branch:** `roop/R-01-frontend-scaffold` (deleted by auto-merge once merged)
+- **Where I left off:** `frontend/` complete: shell + 9 placeholder screens, login/JWT refresh, MSW mocks (`src/mocks/`), typed API (`src/api/`), UI kit (`src/components/ui/`). 76 tests green.
+- **Next step:** Nothing ready yet. R-09 (CI) starts when Uday's U-02 lands; R-02 after U-03/U-04; R-07 after N-11. Meanwhile can draft R-03 screen layouts against MSW mocks.
+- **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ---
 
 ### R-01: Frontend scaffold + design system
-- **Status:** in-progress
+- **Status:** done
 - **Sprint:** S0-S1 (19-25 Nov) | **Est:** 2d | **Depends:** -
 - **Branch:** `roop/R-01-frontend-scaffold`
 - **Model hint:** sonnet / medium
 - **Deliverables:** `frontend/` Vite + React 18 + TypeScript + Tailwind + React Router + TanStack Query + Recharts; app shell (sidebar with the 9 screens, tenant/user badge, light/dark tokens); login page + token refresh; API client typed from `docs/CONTRACTS.md` section 4 (switch to types generated from `/api/schema/` with openapi-typescript once U-02 is live); MSW mock handlers so screens work before the backend exists (`VITE_API_MOCK=true`); Vitest + Testing Library.
 - **Acceptance:**
-  - [ ] `npm run build` and `npm test` green
-  - [ ] Login + protected routes work against MSW mocks
-  - [ ] Setting `VITE_API_MOCK=false` points the same code at the real backend
+  - [x] `npm run build` and `npm test` green (10 files / 76 tests; `python scripts/run_checks.py` frontend PASS)
+  - [x] Login + protected routes work against MSW mocks (`frontend/src/auth/__tests__/auth.test.tsx`)
+  - [x] Setting `VITE_API_MOCK=false` points the same code at the real backend (`src/main.tsx` skips MSW worker; `src/api/config.test.ts`; `loginNoMock.test.tsx`; Vite proxy `/api` -> :8000)
 - **Done in:** -
-- **Notes:** Subtasks: (1) scaffold Vite/TS/Tailwind/Router/Query/Recharts/Vitest + tokens + app shell w/ 9 routes [implementer sonnet, branch --scaffold]; (2a) typed API client + token refresh + MSW handlers/fixtures + env switch [implementer sonnet, --api]; (2b) design-system UI kit (Button, Card, Badge, KpiTile, states) [implementer sonnet, --ui]; (3) AuthProvider + Login + ProtectedRoute + tenant/user badge [implementer sonnet, --auth]; (4) tests/build [test-runner haiku]; (5) review [reviewer opus].
+- **Notes:** Built via nested branches `--scaffold` (subagent), `--api` + `--ui` (visible sessions), `--auth`, `--review-fixes`, `--schema-fixes` (subagents). Opus review x2: CHANGES REQUIRED -> all MAJORs fixed -> APPROVE WITH NITS. Stack: React 18.3, Vite 8, Vitest 5, TS 5.9 (TS 7 avoided: no JS API for openapi-typescript), Node >=22.22.2 (`.nvmrc`); auto-merge.yml now on Node 22.22.2. Types hand-written from CONTRACTS + `ai/schemas` (ajv test validates mock analysis/plan); swap to openapi-typescript after U-02. Deferred: cross-tab refresh-token rotation + short refresh lifetime (Uday, backend), refresh token in localStorage (hackathon trade-off, README), `/settings` ADMIN gating (R-08). Mock users in `frontend/README.md`.
 
 ### R-02: Read APIs for the UI (Django `apps/portal`)
 - **Status:** todo
