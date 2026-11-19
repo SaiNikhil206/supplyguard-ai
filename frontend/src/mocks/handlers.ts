@@ -1,4 +1,5 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
+import { integrationHandlers } from './admin/integrations';
 import type { ErrorCode, Paginated } from '@/api/types';
 import {
   dashboardSummary,
@@ -219,4 +220,5 @@ export const handlers: HttpHandler[] = [
       );
     }),
   ),
+  ...integrationHandlers,
 ];
