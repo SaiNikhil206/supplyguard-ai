@@ -4,12 +4,12 @@ Owner: **Nikhil**. Versioned definition of the Agentstudio agent "SG Recovery Pl
 
 | File | What |
 |---|---|
-| `instructions.md` | the prompt v1.1.0 (paste into Agentstudio; fallback system prompt) |
-| `agentstudio_task_instructions.txt` | exact plain-text copy of `instructions.md` (below the `---` line) for the Agentstudio task field (< 40000 chars) |
+| `instructions.md` | the prompt v1.2.0 (paste into Agentstudio; fallback system prompt) |
+| `agentstudio_task_instructions.txt` | plain-text copy of `instructions.md` (below the `---` line, some prose shortened to stay under 13500 chars) for the Agentstudio task field (< 40000 chars) |
 | `agent.json` | name, version, model, schemas, guardrails and how each is checked |
 | `eval/adversarial_cases.json` | the 4 adversarial prompts RP-ADV-01..04 |
 | `eval/reference/demo.json`, `tc05.json` | hand-built correct answers (both validate against `recovery_plan.schema.json`; every evidence entry resolves) |
-| `eval/runs/` | (later) real agent outputs, one file per run, graded |
+| `eval/runs/` | real agent outputs, one file per run, graded (see `eval/runs/README.md`) |
 
 Input = `ai/schemas/agent_input.schema.json` with `agent: RECOVERY_PLANNER`, built by
 `build_agent_input(<scenario>, "RECOVERY_PLANNER", risk_analysis=<N-05 reference for that scenario>)`:
@@ -18,7 +18,7 @@ Output = `ai/schemas/recovery_plan.schema.json`.
 
 > `impact` numbers are provisional until N-04 (see `ai/eval/build_agent_input.py`). The plan depends on `affected_qty`, `estimated_delay_days` and `shortage`; if N-04 changes them, regenerate the references.
 
-Status: **designed, not created in Agentstudio**. No tools (the snapshot carries the data).
+Status: **built, testing** in Agentstudio (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on). v1.1.0 runs: decisions correct in all six cases, wording failures fixed by prompt v1.2.0 (re-run pending). No tools (the snapshot carries the data).
 
 ## How the agent decides (summary of `instructions.md`)
 1. **Target PO** = one PO from `impact.affected_pos`: shortage first, then `constraints.priority_items`, then earliest line `due_date`, then lowest `po_id`. All options act on it; other affected POs are named in every option's `trade_offs`.
@@ -139,7 +139,7 @@ All generic checks (including `options_complete` and `ranking_order`) also run f
 - reference outputs vs each case: demo reference passes RP-ADV-02 and RP-ADV-04 case checks; it fails RP-ADV-03 only on `case_data_gaps` (the reference was not asked to assume anything).
 
 ## Create it in Agentstudio (advisor, browser)
-Same recipe as the Risk Analyst (`../risk_analyst/README.md`): new agent "SG Recovery Planner", Structured mode, account default model (Claude Sonnet 4.5), one task "Plan supplier-disruption recovery" holding `agentstudio_task_instructions.txt`, compact input schema (10 required keys), inlined output schema per `agent.json`, guardrails per `agent.json`. Record the agent id in `agent.json` and `boomi/TEST_LOG.md`. Run DEMO, TC05, RP-ADV-01..04 by pasting `python -m ai.eval.grade_recovery --payload <ID>`; save replies to `eval/runs/<date>_<ID>_v1.1.0.json`; grade each.
+Same recipe as the Risk Analyst (`../risk_analyst/README.md`): new agent "SG Recovery Planner", Structured mode, account default model (Claude Sonnet 4.5), one task "Plan supplier-disruption recovery" holding `agentstudio_task_instructions.txt`, compact input schema (10 required keys), inlined output schema per `agent.json`, guardrails per `agent.json`. Record the agent id in `agent.json` and `boomi/TEST_LOG.md`. Run DEMO, TC05, RP-ADV-01..04 by pasting `python -m ai.eval.grade_recovery --payload <ID>`; save replies to `eval/runs/<date>_RP-<ID>_<prompt version>.json`; grade each.
 
 ## Open items / contract gaps (not changed here)
 - **One PO per plan.** `recovery_plan` options each carry one `po_id` and ranks are alternatives, so a multi-PO case (demo: PO-1001 and PO-1002) is planned for the most urgent PO only; the others are named in `trade_offs`. Covering every PO needs N-09 to call the planner once per affected PO (with a `target_po` hint in the input) or an S-01 schema change.

@@ -1,7 +1,7 @@
 {
   "name": "SG Recovery Planner",
   "id": "sg-recovery-planner",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "task": "N-06",
   "description": "Proposes ranked recovery options (ALTERNATE_SUPPLIER, INVENTORY_TRANSFER, REVISED_SCHEDULE, SPLIT_ORDER) for the most urgent affected PO, using only the ERP snapshot, impact numbers and tenant constraints. No supported option -> options [] + no_viable_option_reason.",
   "instructions_file": "instructions.md",
@@ -9,7 +9,7 @@
   "output_schema": "ai/schemas/recovery_plan.schema.json",
   "output_format": "json_only",
   "llm": {
-    "agentstudio": "Agentstudio default Claude Sonnet 4.5 (Boomi-managed); Extended Thinking OFF; File Upload OFF",
+    "agentstudio": "Agentstudio default Claude Sonnet 4.5 (Boomi-managed); Extended Thinking ON; File Upload OFF",
     "fallback_model": "claude-sonnet-5-5",
     "temperature": 0,
     "max_output_tokens": 6000
@@ -68,7 +68,7 @@
     "Agentstudio has no prompt-injection switch: injection resistance = instructions rule 6 + RP-ADV-04",
     "Not denied on purpose: requests to guess capacity/lead time or override quantities - a blocked reply is not JSON; the prompt answers those via data_gaps (rule 7)"
   ],
-  "status": "designed, not created in Agentstudio",
+  "status": "built, testing",
   "agentstudio": {
     "account": "Uday's training account (same as SG Supplier Risk Analyst)",
     "agent_mode": "Structured",
@@ -78,6 +78,6 @@
     "output_schema": "inlined recovery_plan (3 top-level keys, option with 10 required keys, change object, money, evidence minItems 1, no extra keys); Agentstudio may not accept if/then - grader + N-07 enforce those rules; authoritative: ai/schemas/recovery_plan.schema.json",
     "tools": "none - the snapshot in the input carries the data",
     "test_runtime": "USA East Agent Garden Cloud 01",
-    "agent_id": null
+    "agent_id": "b5f2f51a-0b4e-41e6-998d-e04031f2a9d0"
   }
 }
