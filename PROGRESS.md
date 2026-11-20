@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-20 | 76f38c8 | roop | R-03 | review | merge: R-03 Executive Overview + Supplier Intelligence screens (auto-merge) |
+| 2026-11-20 | 96efb0a | roop | R-03 | review | chore(tasks): R-03 to review - land mock-built screens in collaboration |
 | 2026-11-20 | 90d5086 | nikhil | N-05 | review | test(agents): clean v1.3.0 acceptance set for N-05, set to review |
 | 2026-11-20 | b1cffba | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - agent live, re-run pending |
 | 2026-11-20 | 76056e7 | nikhil | N-05 | in-progress | feat(agents): harden grader after review, ADV-05 run, docs |
@@ -107,5 +109,3 @@
 | 2026-11-19 | 4b451a3 | roop | R-05 | in-progress | feat(recommendations): AI Recommendations page with ranked options |
 | 2026-11-19 | 68188f2 | roop | R-08 | in-progress | feat(frontend): show Other events group in audit trace |
 | 2026-11-19 | 0f09b80 | roop | R-08 | in-progress | fix(frontend): reset admin settings mock globally, mark approval PROVISIONAL |
-| 2026-11-19 | 9c33083 | roop | R-11 | in-progress | docs(demo): draft demo script, deck outline, shot list and Q&A prep |
-| 2026-11-19 | b790bc9 | roop | R-12 | in-progress | docs(marketplace): draft R-12 accelerator package |
