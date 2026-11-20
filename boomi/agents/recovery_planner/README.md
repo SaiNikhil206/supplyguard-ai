@@ -4,8 +4,8 @@ Owner: **Nikhil**. Versioned definition of the Agentstudio agent "SG Recovery Pl
 
 | File | What |
 |---|---|
-| `instructions.md` | the prompt v1.2.0 (paste into Agentstudio; fallback system prompt) |
-| `agentstudio_task_instructions.txt` | plain-text copy of `instructions.md` (below the `---` line, some prose shortened to stay under 13500 chars) for the Agentstudio task field (< 40000 chars) |
+| `instructions.md` | the prompt v1.3.0 (paste into Agentstudio; fallback system prompt) |
+| `agentstudio_task_instructions.txt` | plain-text copy of `instructions.md` (below the `---` line, some prose shortened to stay under about 14000 chars) for the Agentstudio task field (< 40000 chars) |
 | `agent.json` | name, version, model, schemas, guardrails and how each is checked |
 | `eval/adversarial_cases.json` | the 4 adversarial prompts RP-ADV-01..04 |
 | `eval/reference/demo.json`, `tc05.json` | hand-built correct answers (both validate against `recovery_plan.schema.json`; every evidence entry resolves) |
@@ -18,7 +18,7 @@ Output = `ai/schemas/recovery_plan.schema.json`.
 
 > `impact` numbers are provisional until N-04 (see `ai/eval/build_agent_input.py`). The plan depends on `affected_qty`, `estimated_delay_days` and `shortage`; if N-04 changes them, regenerate the references.
 
-Status: **built, testing** in Agentstudio (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on). v1.1.0 runs: decisions correct in all six cases, wording failures fixed by prompt v1.2.0 (re-run pending). No tools (the snapshot carries the data).
+Status: **built, testing** in Agentstudio (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on). v1.1.0 runs: decisions correct in all six cases, v1.2.0 fixed assumptions and data_gaps; v1.3.0 adds fixed text templates for action_steps and trade_offs (re-run pending). No tools (the snapshot carries the data).
 
 ## How the agent decides (summary of `instructions.md`)
 1. **Target PO** = one PO from `impact.affected_pos`: shortage first, then `constraints.priority_items`, then earliest line `due_date`, then lowest `po_id`. All options act on it; other affected POs are named in every option's `trade_offs`.
