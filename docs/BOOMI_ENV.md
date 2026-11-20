@@ -6,7 +6,7 @@ This file is the single source of truth for "what Boomi do we actually have". Ev
 
 **Headline (read this first):**
 1. **Flow is NOT available** in this account -> R-06 / the Flow approval screens need the CONTRACTS section 8 fallback (see section 5). **OPEN: confirm.**
-2. **Only Uday has a Boomi login.** Roop and Nikhil cannot open the account yet. **OPEN: Uday invites them.**
+2. **Each member works in their own Boomi training account.** This file describes **Uday's** account only. Roop and Nikhil do not need an invite; they record their own account in section 9. Consequence: Boomi components are not shared automatically between accounts (section 9).
 3. The only runtime is a **local runtime on Uday's own PC (`ESI-PC28`)**, attached to the only environment, which belongs to the BIMBA project. It can reach `localhost` on that PC, so no tunnel is needed for Uday's own S1 testing.
 4. **Account expiry is not shown anywhere readable** (Account Information and Licensing pages). It is a `Training-` account. **OPEN: confirm it outlives 31 Dec 2026.**
 5. Integration, Event Streams, Agentstudio, API Management and Data Hub are **accessible**, but nothing was created or run in them yet (see section 3).
@@ -60,15 +60,15 @@ Other tiles on Home (not used by SupplyGuard): Data Integration, Connect, Metahu
 
 ## 4. Team access
 
-| Member | Boomi user | Role in Boomi | Can build + test processes? |
+| Member | Boomi account | Role | Can build + test processes? |
 |---|---|---|---|
-| Uday | Yes (the only user) | Account administrator | Yes |
-| Roop | **No account** | - | No (needs Integration; Flow is unavailable anyway) |
-| Nikhil | **No account** | - | No (needs Agentstudio + Integration) |
+| Uday | This account (`trainingvisinigiriudaykir-VL9DS4`), the only user in it | Administrator | Yes |
+| Roop | **His own training account** (per Uday; not checked by Claude) | his own | Per Roop - fill section 9 |
+| Nikhil | **His own training account** (per Uday; not checked by Claude) | his own | Per Nikhil - fill section 9 |
 
-User Management lists exactly one user. **OPEN: Uday invites Roop and Nikhil** (Settings > User Management) and each confirms login. Claude does not add users. Check the training licence allows extra users first.
+No invitations to Uday's account are needed. The criterion is read as "each member has Boomi platform access" and is ticked on Uday's word. Roop and Nikhil should each confirm which services their account has (section 9).
 
-- [ ] Roop and Nikhil have Boomi platform access
+- [x] Roop and Nikhil have Boomi platform access (own accounts, per Uday - services in their accounts not yet recorded)
 
 ## 5. Fallback decisions (CONTRACTS section 8)
 
@@ -78,7 +78,7 @@ Contracts (event shape, API, schemas) do not change - only where a step runs.
 |---|---|---|---|
 | Event Streams | Yes (access) | None needed. Re-check when U-08 creates the first topic. | U-08, N-08 |
 | Agentstudio / Agent Garden | Yes (access) | None needed. Re-check when N-05 creates the first agent. | N-05, N-06 |
-| **Flow** | **No** | **PROPOSED (needs Uday + Roop to confirm):** approval only in the SaaS Approval Center; Django triggers the Boomi execution process after the decision. Drop the Boomi Flow screens from R-06/R-12 scope. | R-06, U-10, Roop's Flow work (`boomi/flow/`) |
+| **Flow** | **No, in Uday's account.** Unknown in Roop's own account. | **OPEN - Roop checks `flow.boomi.com` in his own account first.** If his account has Flow, no fallback is needed: he builds R-06 there. If no account has Flow, use the fallback: approval only in the SaaS Approval Center, Django triggers the Boomi execution process after the decision, and the Boomi Flow screens leave R-06/R-12 scope. | R-06, U-10, Roop's Flow work (`boomi/flow/`) |
 | API Management | Yes (access) | None needed. Re-check when U-09 creates the first API. | U-09, U-06 |
 | Data Hub | Yes (access) | n/a (optional) | - |
 
@@ -106,3 +106,20 @@ If the Flow fallback is confirmed, tell Roop and Nikhil (their tasks change). No
 - **Component Locking is OFF and Branching is OFF:** two people editing the same Boomi process can overwrite each other. Agree one editor per process (follows the folder ownership in CLAUDE.md) and keep the `boomi/` exports in git as the backup.
 - **Shared account:** keep SupplyGuard components in their own folder (e.g. `SupplyGuard`) away from the BIMBA folders, and prefix names `SG_`.
 - **Uday's PC is the runtime:** if `ESI-PC28` is off or asleep, every Boomi test run fails. Keep it awake during demos and sprint-end checks.
+
+## 9. Other team accounts (Roop, Nikhil)
+
+Each member builds in their own training account, so these facts are per account. Roop and Nikhil: copy the table, fill it in from your own account, and commit it here (names/IDs/yes-no only, no secrets).
+
+| Item | Roop | Nikhil |
+|---|---|---|
+| Account ID | TODO | TODO |
+| Account expiry (must be after 31 Dec 2026) | TODO | TODO |
+| Runtime (type, host, online?) | TODO | TODO |
+| Integration / Event Streams / Agentstudio / Flow / API Management / Data Hub available? | TODO (**Flow is the one that matters**) | TODO (**Agentstudio is the one that matters**) |
+
+**Consequence of separate accounts - OPEN, decide before U-07/N-08:** Boomi processes cannot call processes in another account, and Event Streams topics, API Management gateways and runtimes are per account. The design in the task files assumes one shared account in places:
+- **N-08** (Nikhil's correlation process) "reads via Uday's ERP processes" `SG_Get_*` (U-07), and **N-05/N-06** agents use those processes as tools.
+- **U-08** topics and the U-09 gateway live in Uday's account.
+
+Options: (a) Nikhil imports Uday's `boomi/processes/` exports into his account and runs them on his runtime against the mock ERP (needs the mock ERP reachable from his runtime); (b) the accounts talk over HTTPS only (Uday's API Management endpoints, Django API) and each side keeps its own process set; (c) one member builds the whole Boomi chain in one account. Exports under `boomi/` in git are the hand-off format in every option.

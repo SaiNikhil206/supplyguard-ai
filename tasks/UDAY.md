@@ -26,10 +26,10 @@
 - **Deliverables:** `docs/BOOMI_ENV.md` - account ID, environments, runtime (cloud atom / local atom), which of Integration, Event Streams, Agentstudio, Flow, API Management, Data Hub are enabled, team member access, chosen fallbacks (CONTRACTS section 8).
 - **Acceptance:**
   - [x] All 6 services checked and recorded as enabled / not enabled
-  - [ ] Roop and Nikhil have Boomi platform access
+  - [x] Roop and Nikhil have Boomi platform access
   - [ ] Fallback decision recorded for every missing service
 - **Done in:** -
-- **Notes:** `docs/BOOMI_ENV.md` filled in read-only on 2026-11-19 (nothing created/changed in Boomi). Findings: Flow NOT available (flow.boomi.com: no tenants); Integration, Event Streams, Agentstudio, API Management, Data Hub are access-verified only (not build-verified); only Uday has a Boomi login; only runtime is the local runtime on Uday's PC ESI-PC28, attached to the BIMBA-OPCUA-Test environment. Still needs Uday: (1) invite Roop + Nikhil in Settings > User Management, (2) confirm Flow fallback (proposed: approval in SaaS Approval Center only, affects R-06/R-12), (3) confirm account expiry is after 31 Dec 2026 (not shown in the UI), (4) choose reuse BIMBA environment vs new SG-Dev + second runtime. Then tick the two open boxes and set Status review. Checklist drafted by Roop's Claude session.
+- **Notes:** UPDATE 2026-11-20: Roop and Nikhil use their own Boomi training accounts (per Uday), so no invites; box ticked on that basis. Flow fallback now waits on Roop checking Flow in his own account; separate accounts also mean processes are not shared automatically (BOOMI_ENV.md section 9, decide before U-07/N-08). Original notes: `docs/BOOMI_ENV.md` filled in read-only on 2026-11-19 (nothing created/changed in Boomi). Findings: Flow NOT available (flow.boomi.com: no tenants); Integration, Event Streams, Agentstudio, API Management, Data Hub are access-verified only (not build-verified); only Uday has a Boomi login; only runtime is the local runtime on Uday's PC ESI-PC28, attached to the BIMBA-OPCUA-Test environment. Still needs Uday: (1) invite Roop + Nikhil in Settings > User Management, (2) confirm Flow fallback (proposed: approval in SaaS Approval Center only, affects R-06/R-12), (3) confirm account expiry is after 31 Dec 2026 (not shown in the UI), (4) choose reuse BIMBA environment vs new SG-Dev + second runtime. Then tick the two open boxes and set Status review. Checklist drafted by Roop's Claude session.
 
 ### U-02: Backend scaffold
 - **Status:** done
