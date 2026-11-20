@@ -33,6 +33,16 @@ RISK_REFERENCE = {  # scenario -> the N-05 reference answer used as risk_analysi
 SCENARIO_ALIASES = {"DEMO": "demo", "TC05": "tc05_no_alternates"}
 CENT = Decimal("0.01")
 INJECTION_NOTE_RE = re.compile(r"instruction\w*[^.|]{0,40}(ignored|disregarded)", re.I)
+HEDGE_RE = re.compile(r"\b(likely|probably|typically|usually|should be able|expected to|can expedite|best guess|estimates?)\b", re.I)
+NAME_PHRASE_RE = re.compile(r"\b[A-Z][a-z]+(?:\s+(?:&\s+)?[A-Z][a-z]+)+")
+COMPANY_WORD_RE = re.compile(r"\b(ltd|limited|inc|llc|corp|gmbh|industries|castings|electronics|components|enterprises|"
+                             r"traders|engineering|works|metals|plastics)\b", re.I)
+UNITS_RE = re.compile(r"(?<![\w.])(\d[\d,]*)\s+(?:(?!per\b)[A-Za-z]+\s+)?(?:units?|pcs|pieces)\b", re.I)
+DAYS_RE = re.compile(r"(\d+)[- ]days?\b", re.I)
+DELAY_DAYS_RE = re.compile(r"(\d+)[- ]days?\s+(?:estimated\s+)?delay", re.I)
+MONEY_RE = re.compile(r"\b[A-Z]{3}\s+(\d[\d,]*(?:\.\d+)?)")
+STEP_NUMBER_RE = re.compile(r"^\s*\d+[.)]\s+")
+LISTED_NAME_KEYS = {"name", "item_name", "city", "category"}
 CHANGE_KEYS = {
     "ALTERNATE_SUPPLIER": {"supplier_id", "qty"},
     "SPLIT_ORDER": {"supplier_id", "qty"},
@@ -466,31 +476,94 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
             frm = _stock_row(inp, ch.get("item_id"), ch.get("from_location_id"))
             if frm:
                 nums.add(Decimal(_spare(frm)))
+            if q is not None and ch.get("qty") is not None:
+                nums.add(Decimal(q - ch["qty"]))  # the part the transfer does not cover
         if ch.get("expected_date"):
             dates.add(ch["expected_date"])
         return {n for n in nums if n is not None}, dates
 
     def claims(o):
         nums, dates = allowed_numbers(o)
+        ch, typ = o["proposed_action"]["change"], o["option_type"]
+        qty, lead = ch.get("qty"), o["estimated_lead_time_days"]
+        row = _alt_row(inp, o, item) if item and typ in SUPPLIER_TYPES else None
+        cap = row["capacity"] if row else None
+        frm = _stock_row(inp, ch.get("item_id"), ch.get("from_location_id")) if typ == "INVENTORY_TRANSFER" else None
+        rest = (q - qty) if q is not None and qty is not None else None
+        sup = ch.get("supplier_id")
         p = []
-        for t in [*o["action_steps"], *o["trade_offs"]]:
+        sections = [("step", STEP_NUMBER_RE.sub("", t)) for t in o["action_steps"]] + [("trade", t) for t in o["trade_offs"]]
+        for kind, t in sections:
             tn, td = extract(t, year, names)
             bad = [str(n) for n in tn if not _matches(n, nums)] + [d for d in td if d not in dates]
+            # money: exact value, no rounding to the written precision
+            bad += [f"money {m}" for m in MONEY_RE.findall(t) if _dec(m) not in nums]
+            # quantities ("<n> units"): tied to this option's qty / Q / capacity / spare stock
+            for m in UNITS_RE.findall(t):
+                n = _dec(m)
+                if kind == "step":
+                    ok = n == qty or (typ == "SPLIT_ORDER" and n == rest)
+                    if q is not None and n > q:
+                        ok = False
+                else:
+                    ok = n in {x for x in (_dec(qty) if qty is not None else None, _dec(q) if q is not None else None,
+                                           _dec(rest) if rest is not None else None,
+                                           _dec(cap) if cap is not None else None,
+                                           _dec(_spare(frm)) if frm else None) if x is not None}
+                if not ok:
+                    bad.append(f"quantity {m} units")
+            # lead times ("<n> days"): a supplier / lead-time sentence must carry this option's lead time
+            for s in _sentences(t):
+                for dm in DELAY_DAYS_RE.findall(s):  # "<n>-day (estimated) delay" is the PO's delay
+                    if tgt and _dec(dm) != _dec(tgt["estimated_delay_days"]):
+                        bad.append(f"{dm}-day delay (impact says {tgt['estimated_delay_days']})")
+                rest_s = DELAY_DAYS_RE.sub(" ", s)
+                supplier_sentence = bool((sup and sup in s) or re.search(r"lead time|deliver", s, re.I))
+                allowed = {_dec(lead)} if lead is not None else set()
+                if not supplier_sentence and tgt:
+                    allowed.add(_dec(tgt["estimated_delay_days"]))
+                for dm in DAYS_RE.findall(rest_s):
+                    if _dec(dm) not in allowed:
+                        bad.append(f"{dm} days (lead time is {lead})")
             if bad:
                 p.append(f"'{t[:50]}' has unbacked {bad}")
         return p
     r["claims_numbers_backed"] = per_option(claims)
 
     def assumptions(o):
-        nums, dates = _evidence_values(o)
         p = []
+        row = _alt_row(inp, o, item) if item and o["option_type"] in SUPPLIER_TYPES else None
         for t in o["assumptions"]:
             tn, td = extract(t, year, names)
-            bad = [str(n) for n in tn if not _matches(n, nums)] + [d for d in td if d not in dates]
-            if bad:
-                p.append(f"'{t[:50]}' has unbacked {bad}")
+            if tn or td:
+                p.append(f"'{t[:50]}' contains numbers/dates {[str(n) for n in tn] + td}")
+            if row and row["capacity"] is None and re.search(r"capacity", t, re.I) and not re.search(r"confirm", t, re.I):
+                p.append(f"'{t[:50]}' speaks of capacity, which is unknown, without 'confirm'")
         return p
     r["assumptions_qualitative"] = per_option(assumptions)
+
+    hedges = [f"'{m.group(0)}' in '{t[:50]}'" for o in opts for t in [*o["action_steps"], *o["trade_offs"], *o["assumptions"]]
+              for m in HEDGE_RE.finditer(t)] + [f"'{m.group(0)}' in reason" for m in HEDGE_RE.finditer(reason or "")]
+    r["no_hedged_guess"] = (not hedges, f"hedged/guessed wording {hedges}" if hedges else "ok")
+
+    def scope(o):
+        ch, p = o["proposed_action"]["change"], []
+        locs = {ch.get("from_location_id"), ch.get("to_location_id")} - {None}
+        for e in o["evidence"]:
+            ent, it, src = e["entity"], e.get("item_id"), e["source"]
+            if src == "EVENT":
+                ok = ent == inp["event"]["event_id"]
+            elif src == "IMPACT":
+                ok = bool(tgt) and ent == tgt["po_id"] and it in (None, item)
+            else:
+                ok = ((bool(tgt) and ent == tgt["po_id"] and it in (None, item))
+                      or (o["option_type"] in SUPPLIER_TYPES and ent == ch.get("supplier_id") and it in (None, item))
+                      or (o["option_type"] == "INVENTORY_TRANSFER" and ent == item and e.get("location_id") in locs)
+                      or ent == snap["supplier"]["supplier_id"])
+            if not ok:
+                p.append(f"evidence {src}/{ent}/{e['field']} is outside this option's scope")
+        return p
+    r["evidence_in_scope"] = per_option(scope)
 
     words = [m.group(0) for t in _all_texts(out) for m in BIG_NUMBER_WORDS.finditer(t)]
     r["numbers_as_digits"] = (not words, f"spelled-out numbers {words}" if words else "ok")
@@ -508,6 +581,8 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
     own = snap["supplier"]["name"].lower()
     firms = [n for t in _all_texts(out) for n in COMPANY_RE.findall(t) if n.lower() != own]
     r["no_invented_companies"] = (not firms, f"company names not in snapshot {firms}" if firms else "ok")
+    unlisted = _unlisted_names(out, inp)
+    r["no_unlisted_names"] = (not unlisted, f"names not in the input {unlisted}" if unlisted else "ok")
 
     def gaps(o):
         lines = [g.lower() for g in o["data_gaps"]]
@@ -521,6 +596,8 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
             row = _alt_row(inp, o, item) if item else None
             if row and row["capacity"] is None and not any(ch["supplier_id"].lower() in g and "capacity" in g for g in lines):
                 p.append(f"no data_gaps line naming {ch['supplier_id']} and capacity")
+            if row and line and _cost_delta(row, line, ch.get("qty") or 1) is None and not any("currenc" in g for g in lines):
+                p.append("cost delta is null (currencies differ) but no data_gaps line mentions currency")
         elif o["option_type"] == "REVISED_SCHEDULE":
             need += flags_with(ev_sup)
         else:
@@ -544,6 +621,18 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
     if case:
         r.update(_case_checks(out, inp, case, own))
     return r
+
+
+def _unlisted_names(out: dict, inp: dict) -> list[str]:
+    """Capitalised name phrases / company words in any text field that the input does not contain."""
+    listed = [v for k, v in _leaves({k: v for k, v in inp.items() if k != "risk_analysis"})
+              if k in LISTED_NAME_KEYS and isinstance(v, str)]
+    own = inp["snapshot"]["supplier"]["name"].lower()
+    hits = []
+    for t in _all_texts(out):
+        hits += [m.group(0) for m in NAME_PHRASE_RE.finditer(t) if not any(m.group(0) in v for v in listed)]
+        hits += [m.group(0) for m in COMPANY_WORD_RE.finditer(t) if m.group(0).lower() not in own]
+    return list(dict.fromkeys(hits))
 
 
 def _reason_grounded(out, inp, tgt, names, year) -> tuple[bool, str]:
@@ -604,6 +693,7 @@ def _case_checks(out: dict, inp: dict, case: dict, own: str) -> dict[str, tuple[
         r["case_forbidden_supplier_ids"] = (not hits, f"forbidden ids present {hits}" if hits else "ok")
     if exp.get("only_snapshot_company_names"):
         firms = [n for t in _all_texts(out) for n in COMPANY_RE.findall(t) if n.lower() != own]
+        firms += _unlisted_names(out, inp)
         r["case_no_invented_companies"] = (not firms, f"company names not in snapshot {firms}" if firms else "ok")
     return r
 
@@ -617,7 +707,9 @@ def main() -> None:
     args = ap.parse_args()
     if args.payload:
         from ai.eval.payload import payload
-        print(json.dumps(payload(args.payload), separators=(",", ":"), ensure_ascii=False))
+        pid = args.payload.upper()
+        pid = pid if pid.startswith("RP-") else "RP-" + pid  # always the Recovery Planner payload
+        print(json.dumps(payload(pid), separators=(",", ":"), ensure_ascii=False))
         return
     if not args.output:
         ap.error("output file required")

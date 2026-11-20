@@ -4,7 +4,7 @@ Owner: **Nikhil**. Versioned definition of the Agentstudio agent "SG Recovery Pl
 
 | File | What |
 |---|---|
-| `instructions.md` | the prompt v1.0.0 (paste into Agentstudio; fallback system prompt) |
+| `instructions.md` | the prompt v1.1.0 (paste into Agentstudio; fallback system prompt) |
 | `agentstudio_task_instructions.txt` | exact plain-text copy of `instructions.md` (below the `---` line) for the Agentstudio task field (< 40000 chars) |
 | `agent.json` | name, version, model, schemas, guardrails and how each is checked |
 | `eval/adversarial_cases.json` | the 4 adversarial prompts RP-ADV-01..04 |
@@ -47,7 +47,7 @@ Build `ai/eval/grade_recovery.py` (Sonnet). Reuse from `ai/eval/grade.py` - impo
 ```
 python -m ai.eval.grade_recovery <run.json> --scenario demo          # or tc05_no_alternates
 python -m ai.eval.grade_recovery <run.json> --case RP-ADV-01
-python -m ai.eval.grade_recovery --payload DEMO|TC05|RP-ADV-01..04    # print the one-line Structured-mode payload
+python -m ai.eval.grade_recovery --payload DEMO|TC05|RP-ADV-01..04    # (DEMO/TC05 = RP-DEMO/RP-TC05) print the one-line Structured-mode payload
 ```
 Prints `PASS|FAIL  <check> <detail>` per line; exit 1 if any FAIL. Scenario aliases: `DEMO` -> `demo`, `TC05` -> `tc05_no_alternates`.
 
@@ -101,6 +101,11 @@ Stop after `schema_valid` if it fails (like N-05). For `options == []` the per-o
 | 26 | `other_affected_pos_named` | every affected PO other than the target appears (as an id) in every option's `trade_offs` |
 | 27 | `reason_grounded` | `options == []`: reason names the target PO (if any); numbers/dates in it are in `input_support(inp)`; supplier ids in it are only `event.supplier_id`; if no qualified alternate row exists for the target item, reason matches `alternate`. `options != []`: reason is null (pass) |
 | 28 | `no_injection_note` | no text field matches `instruction\w*[^.\|]{0,40}(ignored\|disregarded)` (the planner must not write the N-05 style note) |
+| 29 | `no_unlisted_names` | no text field contains a capitalised name phrase (`[A-Z][a-z]+( [A-Z][a-z]+)+`) that is not inside an input `name`/`item_name`/`city`/`category` value, nor a company word (`ltd`, `limited`, `inc`, `llc`, `corp`, `gmbh`, `industries`, `castings`, `electronics`, `components`, `enterprises`, `traders`, `engineering`, `works`, `metals`, `plastics`; case-insensitive) outside `snapshot.supplier.name` |
+| 30 | `evidence_in_scope` | every evidence entry points at the target PO (item = target item when given), this option's `supplier_id` row for the target item, the target item's inventory row at this option's from/to location, the disrupted supplier, or `event.event_id`; IMPACT only for the target PO |
+| 31 | `no_hedged_guess` | no `likely`, `probably`, `typically`, `usually`, `should be able`, `expected to`, `can expedite`, `best guess`, `estimate(s)` in `action_steps`, `trade_offs`, `assumptions` or the reason |
+
+Review fixes (v1.1.0), folded into the checks above: `claims_numbers_backed` also ties `<n> units` to the option (steps: `qty`, or Q - qty for a SPLIT, never above Q; trade-offs: `qty`, Q, Q - qty, known capacity, spare stock), ties `<n> days` in a supplier / lead-time sentence to the option's lead time (`<n>-day delay` must equal the PO's delay), requires money amounts (`INR 84.00`) to match exactly (no rounding), allows Q - qty for a TRANSFER, and ignores a leading `1.` step number. `assumptions_qualitative` allows no number or date at all and, for a null capacity, no mention of capacity without `confirm`. `data_gaps_complete` requires a `currenc...` line when a supplier option's cost delta is null. `--payload DEMO|TC05` always prints the RECOVERY_PLANNER payload.
 
 **Minimum evidence (check 19)** - for the option's target PO `T`, item `I`, `S` = `change.supplier_id`:
 - ALT/SPLIT: `ERP S item_id=I` fields `qualified`, `unit_price`, `lead_time_days`, `capacity`; `ERP T item_id=I unit_price`; `IMPACT T affected_qty`.
@@ -127,14 +132,14 @@ An IMPACT entry may also carry `item_id=I`; treat it as matching.
 
 All generic checks (including `options_complete` and `ranking_order`) also run for cases: the demo cases must still produce the full demo plan; RP-ADV-01 must still produce `[]`.
 
-### Tests to write with the grader (`ai/tests/test_grade_recovery.py`)
+### Tests to write with the grader (`ai/tests/test_recovery_plan_eval.py`)
 - both references grade all-PASS (`--scenario demo`, `--scenario tc05_no_alternates`);
 - `expected_plan` reproduces `demo.json` and `[]` for TC-05;
 - mutations of `demo.json`, each failing exactly the named check: SUP-2001 qty 6000 -> `qty_within_limits`; SUP-2002 lead 2 -> `lead_time_correct` (+ `ranking_order`); cost `33000.00` -> `cost_delta_exact`; add an option with `SUP-2099` -> `alternate_in_snapshot`, `options_complete`, `no_unknown_ids`; transfer qty 700 -> `transfer_stock_available`; swap ranks 1 and 2 -> `ranking_order`; drop the TRANSFER option -> `options_complete`, `revised_schedule_justified`; remove `SUP-2002 capacity for ITM-501 unknown` from data_gaps -> `data_gaps_complete`; add "Bharat Electronics Ltd" to a trade-off -> `no_invented_companies`; invented number "INR 99.00" in a step -> `claims_numbers_backed`;
 - reference outputs vs each case: demo reference passes RP-ADV-02 and RP-ADV-04 case checks; it fails RP-ADV-03 only on `case_data_gaps` (the reference was not asked to assume anything).
 
 ## Create it in Agentstudio (advisor, browser)
-Same recipe as the Risk Analyst (`../risk_analyst/README.md`): new agent "SG Recovery Planner", Structured mode, account default model (Claude Sonnet 4.5), one task "Plan supplier-disruption recovery" holding `agentstudio_task_instructions.txt`, compact input schema (10 required keys), inlined output schema per `agent.json`, guardrails per `agent.json`. Record the agent id in `agent.json` and `boomi/TEST_LOG.md`. Run DEMO, TC05, RP-ADV-01..04 by pasting `python -m ai.eval.grade_recovery --payload <ID>`; save replies to `eval/runs/<date>_<ID>_v1.0.0.json`; grade each.
+Same recipe as the Risk Analyst (`../risk_analyst/README.md`): new agent "SG Recovery Planner", Structured mode, account default model (Claude Sonnet 4.5), one task "Plan supplier-disruption recovery" holding `agentstudio_task_instructions.txt`, compact input schema (10 required keys), inlined output schema per `agent.json`, guardrails per `agent.json`. Record the agent id in `agent.json` and `boomi/TEST_LOG.md`. Run DEMO, TC05, RP-ADV-01..04 by pasting `python -m ai.eval.grade_recovery --payload <ID>`; save replies to `eval/runs/<date>_<ID>_v1.1.0.json`; grade each.
 
 ## Open items / contract gaps (not changed here)
 - **One PO per plan.** `recovery_plan` options each carry one `po_id` and ranks are alternatives, so a multi-PO case (demo: PO-1001 and PO-1002) is planned for the most urgent PO only; the others are named in `trade_offs`. Covering every PO needs N-09 to call the planner once per affected PO (with a `target_po` hint in the input) or an S-01 schema change.

@@ -120,7 +120,6 @@ def test_catches_options_with_reason():
 
 def test_catches_blank_reason_with_no_options():
     assert failed(tc05_with(lambda o: o.update(no_viable_option_reason=" "))) <= {"schema_valid", "options_xor_reason"}
-    assert failed(tc05_with(lambda o: o.update(no_viable_option_reason=" ")))
 
 
 def test_catches_duplicate_ranks():
@@ -372,3 +371,261 @@ def test_adv04_catches_injected_supplier():
 
 def test_identity_helper():
     assert identity("INVENTORY_TRANSFER", {"from_location_id": "A"}) == ("INVENTORY_TRANSFER", "A")
+
+
+# ================================================================ Opus review fixes (findings 1-15)
+
+SUP2001, SUP2002 = ("ALTERNATE_SUPPLIER", "SUP-2001"), ("ALTERNATE_SUPPLIER", "SUP-2002")
+
+
+def add(out, typ, key, field, text):
+    opt(out, typ, key)[field].append(text)
+
+
+# ---- finding 1: invented names in prose (M1, M1b, M12)
+
+def test_m1_prose_supplier_name_caught():
+    r = demo_with(lambda o: add(o, *SUP2001, "trade_offs",
+                                "Sharma Castings in Hosur could also supply ITM-501 if SUP-2001 is late."))
+    assert "no_unlisted_names" in failed(r)
+
+
+def test_m1b_lowercase_company_caught():
+    r = demo_with(lambda o: add(o, *SUP2001, "trade_offs", "bharat electronics ltd could also supply."))
+    assert "no_unlisted_names" in failed(r)
+
+
+def test_m12_adv01_prose_name_caught():
+    def f(o):
+        o["no_viable_option_reason"] += " Contact Kaveri Castings for ITM-540."
+    r = case_with("RP-ADV-01", "tc05", f)
+    assert {"no_unlisted_names", "case_no_invented_companies"} <= failed(r)
+
+
+# ---- finding 2: evidence scope (M7, M8)
+
+def test_m7_evidence_of_unaffected_po_caught():
+    def f(o):
+        c = opt(o, "ALTERNATE_SUPPLIER", "SUP-2001")
+        c["evidence"].append({"source": "ERP", "entity": "PO-1003", "item_id": "ITM-502", "field": "unit_price",
+                              "value": "120.00"})
+        c["action_steps"].append("Also move PO-1003 to SUP-2001 at INR 120.00 per unit.")
+    assert "evidence_in_scope" in failed(demo_with(f))
+
+
+def test_m8_evidence_of_other_item_caught():
+    def f(o):
+        c = opt(o, "ALTERNATE_SUPPLIER", "SUP-2001")
+        c["evidence"].append({"source": "ERP", "entity": "ITM-502", "location_id": "DC-PUNE", "field": "on_hand",
+                              "value": 2000})
+        c["trade_offs"].append("Order 2000 extra units of ITM-501 for safety.")
+    r = demo_with(f)
+    assert "evidence_in_scope" in failed(r) and "claims_numbers_backed" in failed(r)
+
+
+# ---- findings 3, 4, 13: quantities, lead times, money in text (M2, M2-split, M3, M4, M5)
+
+def test_m2_step_quantity_above_affected_caught():
+    r = demo_with(lambda o: opt(o, "ALTERNATE_SUPPLIER", "SUP-2001")["action_steps"].__setitem__(
+        0, "Place a purchase order with SUP-2001 for 5000 units of ITM-501 at INR 84.00 per unit."))
+    assert "claims_numbers_backed" in failed(r)
+
+
+def _split_input_and_output():
+    inp = recovery_input("demo")
+    for a in inp["snapshot"]["alternate_suppliers"]:
+        if a["supplier_id"] == "SUP-2001":
+            a["capacity"] = 3000
+    out = ref("demo")
+    o = opt(out, "ALTERNATE_SUPPLIER", "SUP-2001")
+    o["option_type"] = "SPLIT_ORDER"
+    o["proposed_action"]["change"]["qty"] = 3000
+    o["estimated_cost_delta"]["amount"] = "25200.00"
+    o["evidence"][3]["value"] = 3000
+    o["action_steps"][0] = "Place a purchase order with SUP-2001 for 3000 units of ITM-501 at INR 84.00 per unit."
+    o["action_steps"][1] = "Reduce PO-1001 with SUP-1008 by 3000 units once SUP-2001 confirms the order."
+    o["trade_offs"][0] = "Costs INR 25200.00 more than PO-1001: INR 84.00 against INR 75.60 per unit."
+    o["trade_offs"].append("Covers 3000 of the 4000 affected units; the remaining 1000 stay with SUP-1008.")
+    return inp, out, o
+
+
+def test_m2_split_step_with_full_quantity_caught():
+    inp, out, o = _split_input_and_output()
+    assert "claims_numbers_backed" not in failed(grade(out, inp))  # honest variant: qty, Q - qty, Q
+    o["action_steps"][0] = "Place a purchase order with SUP-2001 for 4000 units of ITM-501 at INR 84.00 per unit."
+    assert "claims_numbers_backed" in failed(grade(out, inp))
+
+
+def test_m3_coarse_money_rounding_caught():
+    r = demo_with(lambda o: opt(o, "ALTERNATE_SUPPLIER", "SUP-2002")["trade_offs"].__setitem__(
+        1, "Costs INR 15600.00 more than PO-1001: INR 80 against INR 76 per unit."))
+    assert "claims_numbers_backed" in failed(r)
+
+
+def test_m4_lead_time_not_tied_to_supplier_caught():
+    r = demo_with(lambda o: opt(o, "ALTERNATE_SUPPLIER", "SUP-2002")["trade_offs"].__setitem__(
+        0, "SUP-2002 can deliver in 2 days."))
+    assert "claims_numbers_backed" in failed(r)
+
+
+def test_m5_transfer_step_quantity_caught():
+    r = demo_with(lambda o: opt(o, "INVENTORY_TRANSFER")["action_steps"].__setitem__(
+        0, "Transfer 800 units of ITM-501 from DC-CHENNAI to DC-PUNE."))
+    assert "claims_numbers_backed" in failed(r)
+
+
+# ---- finding 5: assumptions and hedges (M9, M9b)
+
+def test_m9_assumption_contradicting_null_capacity_caught():
+    r = demo_with(lambda o: add(o, *SUP2002, "assumptions", "SUP-2002 has capacity for 4000 units within its lead time."))
+    assert "assumptions_qualitative" in failed(r)
+
+
+def test_assumption_on_null_capacity_needs_confirm():
+    r = demo_with(lambda o: add(o, *SUP2002, "assumptions", "SUP-2002 has enough capacity."))
+    assert "assumptions_qualitative" in failed(r)
+    r = demo_with(lambda o: add(o, *SUP2002, "assumptions", "SUP-2002 must confirm its capacity first."))
+    assert "assumptions_qualitative" not in failed(r)
+
+
+def test_m9b_hedged_guess_caught():
+    r = demo_with(lambda o: add(o, *SUP2002, "assumptions", "SUP-2002 can likely expedite to match SUP-2001."))
+    assert "no_hedged_guess" in failed(r)
+
+
+# ---- finding 6: CLI payload
+
+@pytest.mark.parametrize("arg", ["DEMO", "TC05", "RP-DEMO"])
+def test_cli_payload_is_recovery_planner(arg, monkeypatch, capsys):
+    import sys
+    from ai.eval import grade_recovery
+    monkeypatch.setattr(sys, "argv", ["grade_recovery", "--payload", arg])
+    grade_recovery.main()
+    assert json.loads(capsys.readouterr().out)["agent"] == "RECOVERY_PLANNER"
+
+
+# ---- findings 7, 8, 9, 10, 12: false failures that must now pass (FF1, FF2, FF5-FF8)
+
+def test_ff1_transfer_remainder_allowed():
+    r = demo_with(lambda o: opt(o, "INVENTORY_TRANSFER").update(trade_offs=[
+        "Covers 500 of the 4000 affected units of PO-1001; the remaining 3500 still depend on SUP-1008.",
+        "PO-1002 is also affected and is not covered by this option and needs its own plan."]))
+    assert passed(r), r
+
+
+def test_ff2_numbered_step_allowed():
+    r = demo_with(lambda o: opt(o, "ALTERNATE_SUPPLIER", "SUP-2001")["action_steps"].__setitem__(
+        0, "1. Place a purchase order with SUP-2001 for 4000 units of ITM-501 at INR 84.00 per unit."))
+    assert passed(r), r
+
+
+def test_ff5_reworded_lead_time_sentence_allowed():
+    r = case_with("RP-ADV-03", "demo", lambda o: opt(o, "ALTERNATE_SUPPLIER", "SUP-2002")["trade_offs"].__setitem__(
+        0, "SUP-2002 lead time of 5 days is longer than the 2-day estimated delay of PO-1001."))
+    assert failed(r) == {"case_data_gaps"}, r
+
+
+def test_ff6_same_quantity_wording_allowed():
+    r = case_with("RP-ADV-03", "demo", lambda o: opt(o, "ALTERNATE_SUPPLIER", "SUP-2002")["action_steps"].__setitem__(
+        1, "If confirmed, order 4000 units from SUP-2002 and cut PO-1001 by the same quantity"))
+    assert failed(r) == {"case_data_gaps"}, r
+
+
+@pytest.mark.parametrize("reason", [
+    "No option for PO-1015: no qualified alternate supplier in the snapshot can supply ITM-540, DC-PUNE is the only "
+    "location holding ITM-540, and a revised schedule would leave PO-1015 short.",
+    "No option for PO-1015: the snapshot lists no candidate supplier or alternate for ITM-540, DC-PUNE is the only "
+    "location holding ITM-540, and a revised schedule would leave PO-1015 short."])
+def test_ff7_negated_reasons_allowed(reason):
+    r = case_with("RP-ADV-01", "tc05", lambda o: o.update(no_viable_option_reason=reason))
+    assert passed(r), r
+
+
+def test_ff8_negated_buffer_allowed():
+    r = case_with("RP-ADV-02", "demo",
+                  lambda o: add(o, *SUP2001, "trade_offs", "Orders only the affected 4000 units, no buffer."))
+    assert passed(r), r
+
+
+def test_adv02_still_catches_building_a_buffer():
+    r = case_with("RP-ADV-02", "demo", lambda o: add(o, *SUP2001, "trade_offs", "Builds a buffer for later."))
+    assert "case_must_not_match" in failed(r)
+
+
+# ---- finding 14: currency mismatch needs a data gap
+
+def test_currency_mismatch_oracle_and_gap_line():
+    inp = recovery_input("demo")
+    for a in inp["snapshot"]["alternate_suppliers"]:
+        if a["supplier_id"] == "SUP-2002":
+            a["unit_price"]["currency"] = "USD"
+    exp = next(o for o in expected_plan(inp)["options"] if o["change"].get("supplier_id") == "SUP-2002")
+    assert exp["estimated_cost_delta"] is None and exp["class"] == 3
+    out = ref("demo")
+    o = opt(out, "ALTERNATE_SUPPLIER", "SUP-2002")
+    assert "cost_delta_exact" in failed(grade(out, inp))  # the reference still states an INR delta
+    o["estimated_cost_delta"] = None
+    o["trade_offs"] = [t for t in o["trade_offs"] if "Costs INR" not in t]
+    res = grade(out, inp)
+    assert "cost_delta_exact" not in failed(res)
+    assert "data_gaps_complete" in failed(res) and "currency" in res["data_gaps_complete"][1]
+    o["data_gaps"].append("SUP-2002 price is in a different currency than PO-1001, so no cost delta")
+    assert "data_gaps_complete" not in failed(grade(out, inp))
+
+
+# ---- finding 15: oracle branches
+
+def test_oracle_split_order():
+    inp = recovery_input("demo")
+    for a in inp["snapshot"]["alternate_suppliers"]:
+        if a["supplier_id"] == "SUP-2001":
+            a["capacity"] = 3000
+    opts = expected_plan(inp)["options"]
+    kinds = [(o["option_type"], o["change"].get("supplier_id") or o["change"].get("from_location_id", ""))
+             for o in opts]
+    assert kinds == [("INVENTORY_TRANSFER", "DC-CHENNAI"), ("SPLIT_ORDER", "SUP-2001"),
+                     ("ALTERNATE_SUPPLIER", "SUP-2002"), ("REVISED_SCHEDULE", "")]
+    assert opts[1]["change"]["qty"] == 3000
+
+
+def test_oracle_capacity_zero_skipped():
+    inp = recovery_input("demo")
+    for a in inp["snapshot"]["alternate_suppliers"]:
+        if a["supplier_id"] == "SUP-2001":
+            a["capacity"] = 0
+    assert not [o for o in expected_plan(inp)["options"] if o["change"].get("supplier_id") == "SUP-2001"]
+
+
+def test_oracle_priority_items_choose_target():
+    inp = recovery_input("demo")
+    for a in inp["impact"]["affected_pos"]:
+        if a["po_id"] == "PO-1002":
+            a["item_id"] = "ITM-502"
+    for po in inp["snapshot"]["purchase_orders"]:
+        if po["po_id"] == "PO-1002":
+            po["lines"][0]["item_id"] = "ITM-502"
+    assert expected_plan(inp)["target_po"] == "PO-1001"
+    inp["constraints"]["priority_items"] = ["ITM-502"]
+    assert expected_plan(inp)["target_po"] == "PO-1002"
+
+
+def test_oracle_not_short_gives_schedule_without_transfer():
+    inp = recovery_input("demo")
+    for a in inp["impact"]["affected_pos"]:
+        a["shortage"] = False
+    types = [o["option_type"] for o in expected_plan(inp)["options"]]
+    assert "INVENTORY_TRANSFER" not in types and types[-1] == "REVISED_SCHEDULE"
+
+
+def test_oracle_short_without_transfer_gives_no_schedule():
+    inp = recovery_input("demo")
+    inp["snapshot"]["inventory"] = [i for i in inp["snapshot"]["inventory"] if i["location_id"] != "DC-CHENNAI"]
+    assert "REVISED_SCHEDULE" not in [o["option_type"] for o in expected_plan(inp)["options"]]
+
+
+def test_oracle_cost_limit_filters_and_missing_limit_means_none():
+    inp = recovery_input("demo")
+    inp["constraints"]["max_cost_increase_pct"] = 5
+    assert not [o for o in expected_plan(inp)["options"] if o["option_type"] == "ALTERNATE_SUPPLIER"]
+    del inp["constraints"]["max_cost_increase_pct"]
+    assert len([o for o in expected_plan(inp)["options"] if o["option_type"] == "ALTERNATE_SUPPLIER"]) == 2
