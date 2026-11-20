@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-20 | da4b861 | nikhil | N-06 | review | Merge origin/collaboration into nikhil/N-06-recovery-agent |
+| 2026-11-20 | cd470cf | nikhil | N-06 | review | merge: N-06 Recovery Planning agent (Agentstudio) (auto-merge) |
 | 2026-11-20 | 49192fe | nikhil | N-06 | review | docs(agents): N-06 recovery planner deployed in Agentstudio |
 | 2026-11-20 | d288171 | nikhil | N-06 | review | feat(agents): N-06 recovery planner live v1.3.0 runs, set to review |
 | 2026-11-20 | 0de814d | nikhil | N-06 | in-progress | fix(agents): N-06 recovery planner prompt v1.3.0 text templates |
@@ -107,5 +109,3 @@
 | 2026-11-20 | 90d5086 | nikhil | N-05 | review | test(agents): clean v1.3.0 acceptance set for N-05, set to review |
 | 2026-11-20 | b1cffba | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - agent live, re-run pending |
 | 2026-11-20 | 76056e7 | nikhil | N-05 | in-progress | feat(agents): harden grader after review, ADV-05 run, docs |
-| 2026-11-19 | 058e037 | roop | R-11 | in-progress | merge: R-11 --script sub-branch into task branch |
-| 2026-11-19 | 6bf5382 | roop | R-06 | in-progress | merge: R-06 --flow-spec sub-branch into task branch |
