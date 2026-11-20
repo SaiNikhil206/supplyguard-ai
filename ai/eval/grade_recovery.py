@@ -34,13 +34,30 @@ SCENARIO_ALIASES = {"DEMO": "demo", "TC05": "tc05_no_alternates"}
 CENT = Decimal("0.01")
 INJECTION_NOTE_RE = re.compile(r"instruction\w*[^.|]{0,40}(ignored|disregarded)", re.I)
 HEDGE_RE = re.compile(r"\b(likely|probably|typically|usually|should be able|expected to|can expedite|best guess|estimates?)\b", re.I)
+SENTENCE_NEGATED_OK = {"estimate", "estimates"}  # "no transit time or cost estimate is possible" is a gap statement
 NAME_PHRASE_RE = re.compile(r"\b[A-Z][a-z]+(?:\s+(?:&\s+)?[A-Z][a-z]+)+")
 COMPANY_WORD_RE = re.compile(r"\b(ltd|limited|inc|llc|corp|gmbh|industries|castings|electronics|components|enterprises|"
                              r"traders|engineering|works|metals|plastics)\b", re.I)
 UNITS_RE = re.compile(r"(?<![\w.])(\d[\d,]*)\s+(?:(?!per\b)[A-Za-z]+\s+)?(?:units?|pcs|pieces)\b", re.I)
 DAYS_RE = re.compile(r"(\d+)[- ]days?\b", re.I)
 DELAY_DAYS_RE = re.compile(r"(\d+)[- ]days?\s+(?:estimated\s+)?delay", re.I)
-MONEY_RE = re.compile(r"\b[A-Z]{3}\s+(\d[\d,]*(?:\.\d+)?)")
+DELAY_OF_RE = re.compile(r"delay\w*\s+(?:of\s+|by\s+)?(\d+)[- ]days?\b", re.I)  # "estimated delay of 2 days"
+MONEY_RE = re.compile(r"(?:\b[A-Z]{3}\s+|\bRs\.?\s*|\u20b9\s*)(\d[\d,]*(?:\.\d+)?)")
+QTY_CONTEXT_RES = (  # a quantity written without the word "units"
+    re.compile(r"(?<![\w.])(\d[\d,]*)\s+(?:of|from|to)\s+ITM-"),
+    re.compile(r"\b(?:order|move|transfer|place|ship|buy|purchase|reduce|cut|cover)\w*\s+(?:(?:(?!INR\b|USD\b|EUR\b|Rs\b)[A-Za-z]+\s+){0,3})"
+               r"(?<![\w.-])(\d[\d,]*)(?![\d,]*[.\d-])(?!\s*[- ]days?\b)(?!\s*%)", re.I),
+)
+NEGATION_WORD_RE = re.compile(r"\b(no|not|none|nor|cannot|can't|neither|without|unable)\b", re.I)
+GUESS_MODAL_RE = re.compile(r"\b(?:may|might|could)\b[^.|]{0,30}\b(?:be able|ship|deliver|expedite|arrive|supply|fulfil\w*)\b", re.I)
+GUESS_COMPARATIVE_RE = re.compile(r"\b(?:sooner|faster|quicker|earlier)\b", re.I)
+BUSINESS_WORDS = {"Purchase", "Order", "Orders", "Safety", "Stock", "Lead", "Time", "Times", "Transit", "Transfer", "Cost",
+                  "Reserved", "Revised", "Schedule", "Inventory", "Supplier", "Alternate", "Split", "Price", "Quantity",
+                  "Delay", "Due", "Date", "Expected", "Capacity", "Snapshot", "Shortage", "Risk", "Plan", "Unit",
+                  "Units", "On", "Hand", "Daily", "Demand", "Affected", "Option", "Impact"}
+SINGLE_NAME_RE = re.compile(r"\b([A-Z][a-z]+)\s+(?:also\s+|can\s+|could\s+)?(?:makes|supplies|produces|manufactures|"
+                            r"supply|sells|stocks)\b")
+PRONOUNS = {"It", "This", "That", "They", "There", "He", "She", "We", "Which", "What", "Who", "These", "Those"}
 STEP_NUMBER_RE = re.compile(r"^\s*\d+[.)]\s+")
 LISTED_NAME_KEYS = {"name", "item_name", "city", "category"}
 CHANGE_KEYS = {
@@ -478,6 +495,8 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
                 nums.add(Decimal(_spare(frm)))
             if q is not None and ch.get("qty") is not None:
                 nums.add(Decimal(q - ch["qty"]))  # the part the transfer does not cover
+        if o["option_type"] == "REVISED_SCHEDULE" and q is not None:
+            nums.add(Decimal(q))  # the PO quantity the schedule change applies to
         if ch.get("expected_date"):
             dates.add(ch["expected_date"])
         return {n for n in nums if n is not None}, dates
@@ -498,11 +517,15 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
             bad = [str(n) for n in tn if not _matches(n, nums)] + [d for d in td if d not in dates]
             # money: exact value, no rounding to the written precision
             bad += [f"money {m}" for m in MONEY_RE.findall(t) if _dec(m) not in nums]
-            # quantities ("<n> units"): tied to this option's qty / Q / capacity / spare stock
-            for m in UNITS_RE.findall(t):
+            # quantities ("<n> units", "<n> of ITM-..", "order <n>"): tied to this option's qty / Q / capacity / spare stock
+            found = list(UNITS_RE.findall(t))
+            for rx in QTY_CONTEXT_RES:
+                found += rx.findall(t)
+            for m in dict.fromkeys(found):
                 n = _dec(m)
                 if kind == "step":
-                    ok = n == qty or (typ == "SPLIT_ORDER" and n == rest)
+                    ok = n == qty or (typ in ("SPLIT_ORDER", "INVENTORY_TRANSFER") and n == rest) \
+                        or (typ == "REVISED_SCHEDULE" and n == q)
                     if q is not None and n > q:
                         ok = False
                 else:
@@ -514,11 +537,13 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
                     bad.append(f"quantity {m} units")
             # lead times ("<n> days"): a supplier / lead-time sentence must carry this option's lead time
             for s in _sentences(t):
-                for dm in DELAY_DAYS_RE.findall(s):  # "<n>-day (estimated) delay" is the PO's delay
+                for dm in DELAY_DAYS_RE.findall(s) + DELAY_OF_RE.findall(s):  # "<n>-day delay" / "delay of <n> days"
                     if tgt and _dec(dm) != _dec(tgt["estimated_delay_days"]):
                         bad.append(f"{dm}-day delay (impact says {tgt['estimated_delay_days']})")
-                rest_s = DELAY_DAYS_RE.sub(" ", s)
-                supplier_sentence = bool((sup and sup in s) or re.search(r"lead time|deliver", s, re.I))
+                rest_s = DELAY_OF_RE.sub(" ", DELAY_DAYS_RE.sub(" ", s))
+                # in a supplier option every other duration is that supplier's lead time, named or not
+                supplier_sentence = bool(typ in SUPPLIER_TYPES or (sup and sup in s)
+                                         or re.search(r"lead time|deliver", s, re.I))
                 allowed = {_dec(lead)} if lead is not None else set()
                 if not supplier_sentence and tgt:
                     allowed.add(_dec(tgt["estimated_delay_days"]))
@@ -542,8 +567,26 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
         return p
     r["assumptions_qualitative"] = per_option(assumptions)
 
-    hedges = [f"'{m.group(0)}' in '{t[:50]}'" for o in opts for t in [*o["action_steps"], *o["trade_offs"], *o["assumptions"]]
-              for m in HEDGE_RE.finditer(t)] + [f"'{m.group(0)}' in reason" for m in HEDGE_RE.finditer(reason or "")]
+    def hedge_hits(text, expected_date=None):
+        hits = []
+        for sent in _sentences(text):
+            negated = bool(NEGATION_WORD_RE.search(sent))
+            for m in HEDGE_RE.finditer(sent):
+                w = m.group(0).lower()
+                if w in SENTENCE_NEGATED_OK and negated:
+                    continue
+                if w == "expected to" and expected_date and expected_date in sent:
+                    continue  # "PO-1001 is now expected to arrive on <the option's own new date>"
+                hits.append(m.group(0))
+            if not negated:
+                hits += [m.group(0) for m in GUESS_MODAL_RE.finditer(sent)]
+                hits += [m.group(0) for m in GUESS_COMPARATIVE_RE.finditer(sent)]
+        return hits
+
+    hedges = [f"'{h}' in '{t[:50]}'" for o in opts
+              for t in [*o["action_steps"], *o["trade_offs"], *o["assumptions"]]
+              for h in hedge_hits(t, o["proposed_action"]["change"].get("expected_date"))] + \
+             [f"'{h}' in reason" for h in hedge_hits(reason or "")]
     r["no_hedged_guess"] = (not hedges, f"hedged/guessed wording {hedges}" if hedges else "ok")
 
     def scope(o):
@@ -559,6 +602,7 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
                 ok = ((bool(tgt) and ent == tgt["po_id"] and it in (None, item))
                       or (o["option_type"] in SUPPLIER_TYPES and ent == ch.get("supplier_id") and it in (None, item))
                       or (o["option_type"] == "INVENTORY_TRANSFER" and ent == item and e.get("location_id") in locs)
+                      or (o["option_type"] != "INVENTORY_TRANSFER" and ent == item and e.get("location_id") is not None)
                       or ent == snap["supplier"]["supplier_id"])
             if not ok:
                 p.append(f"evidence {src}/{ent}/{e['field']} is outside this option's scope")
@@ -630,7 +674,12 @@ def _unlisted_names(out: dict, inp: dict) -> list[str]:
     own = inp["snapshot"]["supplier"]["name"].lower()
     hits = []
     for t in _all_texts(out):
-        hits += [m.group(0) for m in NAME_PHRASE_RE.finditer(t) if not any(m.group(0) in v for v in listed)]
+        hits += [m.group(0) for m in NAME_PHRASE_RE.finditer(t)
+                 if not all(w in BUSINESS_WORDS for w in re.findall(r"[A-Z][a-z]+", m.group(0)))
+                 and not any(m.group(0) in v for v in listed)]
+        hits += [m.group(1) for m in SINGLE_NAME_RE.finditer(t)
+                 if m.group(1) not in BUSINESS_WORDS and m.group(1) not in PRONOUNS
+                 and not any(m.group(1) in v for v in listed)]
         hits += [m.group(0) for m in COMPANY_WORD_RE.finditer(t) if m.group(0).lower() not in own]
     return list(dict.fromkeys(hits))
 

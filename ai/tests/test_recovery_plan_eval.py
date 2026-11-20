@@ -629,3 +629,104 @@ def test_oracle_cost_limit_filters_and_missing_limit_means_none():
     assert not [o for o in expected_plan(inp)["options"] if o["option_type"] == "ALTERNATE_SUPPLIER"]
     del inp["constraints"]["max_cost_increase_pct"]
     assert len([o for o in expected_plan(inp)["options"] if o["option_type"] == "ALTERNATE_SUPPLIER"]) == 2
+
+
+# ================================================================ round 2 (re-review of 36db3ff)
+
+TRANSFER = ("INVENTORY_TRANSFER", None)
+REVISED = ("REVISED_SCHEDULE", None)
+
+
+# ---- false failures that must pass (1)-(4), (8)-(10)
+
+def test_r2_1_delay_in_any_word_order_allowed():
+    r = demo_with(lambda o: opt(o, *SUP2002)["trade_offs"].__setitem__(
+        0, "The SUP-2002 lead time of 5 days is longer than the PO-1001 estimated delay of 2 days."))
+    assert passed(r), r
+
+
+def test_r2_1b_wrong_delay_still_caught():
+    r = demo_with(lambda o: opt(o, *SUP2002)["trade_offs"].__setitem__(
+        0, "The SUP-2002 lead time of 5 days is longer than the PO-1001 estimated delay of 3 days."))
+    assert "claims_numbers_backed" in failed(r)
+
+
+def test_r2_2_negated_estimate_is_a_gap_statement():
+    r = demo_with(lambda o: add(o, *TRANSFER, "trade_offs", "No transit time or cost estimate is possible from the snapshot."))
+    assert passed(r), r
+    r = demo_with(lambda o: add(o, *TRANSFER, "trade_offs", "The cost estimate is small."))
+    assert "no_hedged_guess" in failed(r)
+
+
+def test_r2_3_expected_to_arrive_on_own_new_date_allowed():
+    r = demo_with(lambda o: add(o, *REVISED, "trade_offs", "PO-1001 is now expected to arrive on 2026-12-05."))
+    assert passed(r), r
+    r = demo_with(lambda o: add(o, *REVISED, "trade_offs", "PO-1001 is expected to arrive soon."))
+    assert "no_hedged_guess" in failed(r)
+
+
+def test_r2_4_negation_inside_the_clause_allowed():
+    reason = ("No option for PO-1015: no supplier in the snapshot could supply ITM-540 and no qualified alternate "
+              "exists, DC-PUNE is the only location holding ITM-540, and a revised schedule would leave PO-1015 short.")
+    r = case_with("RP-ADV-01", "tc05", lambda o: o.update(no_viable_option_reason=reason))
+    assert passed(r), r
+    positive = ("No option for PO-1015 from the alternate rows. A supplier could supply ITM-540 if asked, "
+                "DC-PUNE holds ITM-540 alone.")
+    r = case_with("RP-ADV-01", "tc05", lambda o: o.update(no_viable_option_reason=positive))
+    assert "case_must_not_match" in failed(r)
+
+
+def test_r2_8_business_nouns_allowed():
+    r = demo_with(lambda o: add(o, *SUP2001, "trade_offs", "Raise a Purchase Order and keep the Safety Stock and Lead Time rules."))
+    assert "no_unlisted_names" not in failed(r)
+
+
+def test_r2_9_po_quantity_in_schedule_step_and_remainder_in_transfer_step_allowed():
+    r = demo_with(lambda o: add(o, *REVISED, "action_steps", "Keep the PO quantity of 4000 units unchanged."))
+    assert "claims_numbers_backed" not in failed(r)
+    r = demo_with(lambda o: add(o, *TRANSFER, "action_steps", "The remaining 3500 units stay with SUP-1008."))
+    assert "claims_numbers_backed" not in failed(r)
+    r = demo_with(lambda o: add(o, *REVISED, "action_steps", "Keep the PO quantity of 4500 units unchanged."))
+    assert "claims_numbers_backed" in failed(r)
+
+
+def test_r2_10_own_item_inventory_evidence_in_scope_for_supplier_option():
+    ev = {"source": "ERP", "entity": "ITM-501", "location_id": "DC-PUNE", "field": "daily_demand", "value": 600}
+    r = demo_with(lambda o: opt(o, *SUP2001)["evidence"].append(ev))
+    assert "evidence_in_scope" not in failed(r), r["evidence_in_scope"]
+
+
+# ---- holes that must fail (5)-(7), (11), (12)
+
+def test_r2_5_quantity_without_the_word_units_caught():
+    r = demo_with(lambda o: opt(o, *SUP2001)["action_steps"].__setitem__(
+        0, "Order 5000 of ITM-501 from SUP-2001 at INR 84.00 each."))
+    assert "claims_numbers_backed" in failed(r)
+    r = demo_with(lambda o: opt(o, *SUP2001)["action_steps"].__setitem__(
+        0, "Order 4000 of ITM-501 from SUP-2001 at INR 84.00 each."))
+    assert "claims_numbers_backed" not in failed(r)
+
+
+def test_r2_6_unnamed_supplier_sentence_uses_option_lead_time():
+    r = demo_with(lambda o: add(o, *SUP2002, "trade_offs", "It arrives in 2 days."))
+    assert "claims_numbers_backed" in failed(r)
+    r = demo_with(lambda o: add(o, *SUP2002, "trade_offs", "It arrives in 5 days."))
+    assert "claims_numbers_backed" not in failed(r)
+
+
+@pytest.mark.parametrize("text", ["SUP-2002 may be able to ship sooner if asked.", "SUP-2002 could ship sooner if asked."])
+def test_r2_7_modal_guess_caught(text):
+    r = demo_with(lambda o: add(o, *SUP2002, "assumptions", text))
+    assert "no_hedged_guess" in failed(r)
+
+
+def test_r2_11_single_word_invented_name_caught():
+    r = demo_with(lambda o: add(o, *SUP2001, "trade_offs", "Kaveri also makes ITM-501."))
+    assert "no_unlisted_names" in failed(r)
+
+
+@pytest.mark.parametrize("money", ["Rs. 80", "INR 80", "Rs 80"])
+def test_r2_12_rounded_money_caught(money):
+    r = demo_with(lambda o: opt(o, *SUP2002)["trade_offs"].__setitem__(
+        1, f"Costs INR 15600.00 more than PO-1001: {money} against INR 76 per unit."))
+    assert "claims_numbers_backed" in failed(r)
