@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 1 | 0 | 2 | 0 | 9 | 0 | 8% | - |
+| Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | - |
 | Nikhil | 0 | 0 | 3 | 0 | 11 | 0 | 0% | - |
 | Uday | 1 | 0 | 0 | 0 | 11 | 0 | 8% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
@@ -38,7 +38,7 @@
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
 | R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | review | 0/1 | - |
-| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | todo | 0/2 | - |
+| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 0/2 | - |
 | U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | todo | 0/2 | - |
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | todo | 0/3 | - |
