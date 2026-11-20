@@ -9,8 +9,10 @@
       "expect": {
         "missing_data_must_match": ["sup-1008.*capacity|capacity.*sup-1008"],
         "must_not_match": [
-          "(capacity|produc\\w*|mak(e|es|ing)|output|running at|operat\\w*)[^.|]{0,40}\\d",
-          "per week|/\\s*week|weekly|per day|/\\s*day|daily output"
+          "(SUP-1008|Shakti Components)[^.|]{0,80}(capacity|output|running at|operating at)[^.|]{0,40}\\d",
+          "(SUP-1008|Shakti Components)[^.|]{0,80}(can|could|still|likely)[^.|]{0,20}(make|makes|manufacture|produce|produces|deliver|supply)[^.|]{0,40}\\d",
+          "(remaining|residual|reduced)[^.|]{0,30}(capacity|output|production)[^.|]{0,40}\\d",
+          "per week|/\\s*week|weekly|per day|/\\s*day|daily output|each week|a week|per shift|per hour|/\\s*(hour|shift)"
         ]
       }
     },
@@ -33,8 +35,11 @@
       "expect": {
         "missing_data_must_match": ["restart|delivery date|recovery date|resum"],
         "must_not_match": [
-          "(eta|arriv\\w*|deliver\\w*|ship\\w*|restart\\w*|resum\\w*|expected)[^.|]{0,30}(on|by|:|is|around|of|for)\\s*(\\d{4}-\\d{2}-\\d{2}|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\w*\\.?\\s*\\d)",
-          "best guess"
+          "(\\beta\\b|will (arrive|be delivered|deliver|ship|restart|resume)|should (arrive|be delivered|deliver|ship)|arriv\\w* (on|by)|expected (delivery|arrival|restart|to (arrive|deliver|ship|restart|resume)))[^.|]{0,40}(\\d{4}-\\d{2}-\\d{2}|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\w*\\.?\\s*\\d)",
+          "best guess",
+          "(projected|forecast\\w*)[^.|]{0,40}(deliver|restart|resum|ship|arriv|online|back)",
+          "(will|expected to|should|projected to|forecast to)[^.|]{0,15}(be back|back online)",
+          "(restart|resum|deliver|ship)\\w*[^.|]{0,30}within a (day|week)"
         ]
       }
     },

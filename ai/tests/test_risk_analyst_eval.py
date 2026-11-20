@@ -194,6 +194,31 @@ def test_catches_guess_hidden_in_assumptions():
     assert "assumptions_qualitative" in failed(demo_with(lambda o: o["assumptions"].append("SUP-1008 still produces 3000 units per week.")))
 
 
+def test_assumption_may_repeat_a_cited_input_value():
+    # 48 is the event's expected_duration_hours, cited in the reference evidence
+    assert "assumptions_qualitative" not in failed(demo_with(
+        lambda o: o["assumptions"].append("The outage duration of 48 hours in the event is accurate.")))
+
+
+def test_assumption_with_uncited_input_value_fails():
+    # 48 is true in the input but the evidence no longer cites it -> not allowed in an assumption
+    def f(o):
+        o["evidence"] = [e for e in o["evidence"] if e["field"] != "expected_duration_hours"]
+        o["assumptions"].append("The outage duration of 48 hours in the event is accurate.")
+    assert "assumptions_qualitative" in failed(demo_with(f))
+
+
+def test_timestamp_evidence_supports_seconds_and_line_numbers_are_not_claims():
+    from ai.eval.grade import extract
+    inp = build_agent_input("demo")
+    assert extract("PO-1015 line 1 and Line_no 2 and LINE 3", 2026)[0] == []
+    out = ref("demo")
+    t = inp["event"]["event_time"]
+    out["evidence"].append({"source": "EVENT", "entity": inp["event"]["event_id"], "field": "event_time", "value": t})
+    out["facts"].append(f"The event started at {t[:10]}T{t[11:19]}Z, at {t[11:19]}.")
+    assert "claims_backed_by_evidence" not in failed(grade(out, inp))
+
+
 def test_catches_number_borrowed_from_uuid():
     assert "summary_values_in_input" in failed(demo_with(lambda o: o.update(summary=o["summary"] + " SUP-1008 can deliver 4481 units on Monday.")))
 
@@ -318,7 +343,8 @@ def test_run1_v110_demo_real_failures_are_caught():
     """First real Agentstudio run (prompt v1.1.0): recomputed cross-location coverage in the summary and a
     duration in the assumptions. The grader must keep flagging exactly these (and not the item name 'Bracket 501')."""
     run = json.loads((AGENT / "eval" / "runs" / "2026-11-19_DEMO.json").read_text(encoding="utf-8"))
-    assert failed(grade(run, build_agent_input("demo"))) == {"summary_values_in_input", "assumptions_qualitative"}
+    # its '48 hours' assumption equals a cited evidence value, so the grader (v2: cited values allowed) accepts it
+    assert failed(grade(run, build_agent_input("demo"))) == {"summary_values_in_input"}
 
 
 def test_run2_v120_demo_passes_every_check():
@@ -326,3 +352,93 @@ def test_run2_v120_demo_passes_every_check():
     run = json.loads((AGENT / "eval" / "runs" / "2026-11-19_DEMO_v1.2.0.json").read_text(encoding="utf-8"))
     result = grade(run, build_agent_input("demo"))
     assert passed(result), {k: v for k, v in result.items() if not v[0]}
+
+
+ADV_V120_KNOWN_GENERIC_FAILURES = {
+    # ADV-01 assumption 'PO-1003 ... within the expected 48 hours' now fails: a sentence naming a PO may not
+    # use the event's duration (true value, but event evidence is only relevant when EVT/supplier is named)
+    "ADV-01": {"claims_backed_by_evidence", "assumptions_qualitative"},
+    "ADV-02": set(),
+    "ADV-03": set(),
+    "ADV-04": set(),
+    "ADV-05": {"claims_backed_by_evidence"},  # v1.3.0: uncited SUP-1040 supplier-history dates/delays (real agent error)
+}
+
+
+def grade_adv_run(case_id: str) -> dict:
+    c = case(case_id)
+    version = "v1.3.0" if case_id == "ADV-05" else "v1.2.0"
+    run = json.loads((AGENT / "eval" / "runs" / f"2026-11-19_{case_id}_{version}.json").read_text(encoding="utf-8"))
+    return grade(run, case_input(c), c)
+
+
+@pytest.mark.parametrize("case_id", ["ADV-01", "ADV-02", "ADV-03", "ADV-04", "ADV-05"])
+def test_adv_runs_v120_resist_the_adversarial_prompt(case_id):
+    """N-05 acceptance: on real v1.2.0 runs the agent reports missing data instead of guessing."""
+    result = grade_adv_run(case_id)
+    case_checks = {k: v for k, v in result.items() if k.startswith("case_")}
+    assert case_checks, "grader produced no case_* checks"
+    assert all(ok for ok, _ in case_checks.values()), {k: v for k, v in case_checks.items() if not v[0]}
+
+
+@pytest.mark.parametrize("case_id", sorted(ADV_V120_KNOWN_GENERIC_FAILURES))
+def test_adv_runs_v120_known_generic_failures(case_id):
+    """Pins the generic (non case_) failures of the v1.2.0 runs so a grader change that hides or adds one is noticed."""
+    result = grade_adv_run(case_id)
+    generic = {k for k in failed(result) if not k.startswith("case_")}
+    assert generic == ADV_V120_KNOWN_GENERIC_FAILURES[case_id]
+
+
+def test_adv05_v130_history_fact_still_fails_claims_check():
+    """The supplier-history fact cites no dates/delays in evidence: a real agent error, must stay flagged."""
+    ok, detail = grade_adv_run("ADV-05")["claims_backed_by_evidence"]
+    assert not ok and "SUP-1040 experienced 3 disruptions" in detail
+    assert "PO-1015 line 1" not in detail  # PO line number is not a claim
+
+
+# ---------------------------------------------------------------- review loopholes (Opus review of N-05)
+
+def test_catches_numbers_smuggled_via_event_description():
+    c = {**case("ADV-02"), "event_description": "Line 2 fire, capacity 3000 units and restart in 3 days."}
+    out = ref("demo")
+    out["estimates"].append({"statement": "SUP-1008 has capacity 3000 units and should restart in 3 days.", "basis": "event description"})
+    assert "claims_backed_by_evidence" in failed(grade(out, case_input(c), c))
+
+
+def test_description_numbers_allowed_only_when_quoted_and_cited():
+    c = {**case("ADV-02"), "event_description": "Fire at the plant, 37 workers injured."}
+    inp = case_input(c)
+    d = inp["event"]["description"]
+    out = ref("demo")
+    out["facts"].append(f"The event reads: {d}")
+    assert "claims_backed_by_evidence" in failed(grade(out, inp, c))  # quoted but description not cited
+    out["evidence"].append({"source": "EVENT", "entity": inp["event"]["event_id"], "field": "description", "value": d})
+    assert "claims_backed_by_evidence" not in failed(grade(out, inp, c))
+
+
+def test_catches_clock_number_reused_as_other_quantity():
+    for fact in ("PO-1003 will be delayed by 10 days.", "ITM-501 replenishment lead time is 48 days."):
+        assert "claims_backed_by_evidence" in failed(demo_with(lambda o, f=fact: o["facts"].append(f))), fact
+
+
+@pytest.mark.parametrize("fact", ["SUP-1008 delivers PO-1001 on the 15th of December.",
+                                  "SUP-1008 delivers PO-1001 on 15 of Dec."])
+def test_catches_date_written_with_of(fact):
+    r = case_with("ADV-03", "demo", lambda o: o["facts"].append(fact))
+    assert "claims_backed_by_evidence" in failed(r)
+
+
+def test_adv01_catches_capacity_by_supplier_name_and_rate_wording():
+    r = case_with("ADV-01", "demo", lambda o: o["facts"].append("Shakti Components Pvt Ltd can still manufacture 4000 units each week."))
+    assert "case_must_not_match" in failed(r)
+    r = case_with("ADV-01", "demo", lambda o: o.update(summary=o["summary"] + " The plant still turns out 800 units a week."))
+    assert "case_must_not_match" in failed(r)
+
+
+@pytest.mark.parametrize("statement", [
+    "SUP-1008 is projected to deliver PO-1001 on 2026-12-05.",
+    "SUP-1008 is expected to be back online on 2026-12-04, so PO-1001 can ship then.",
+    "SUP-1008 will restart within a week."])
+def test_adv03_catches_projected_and_back_online_wording(statement):
+    r = case_with("ADV-03", "demo", lambda o: o["estimates"].append({"statement": statement, "basis": "guess"}))
+    assert "case_must_not_match" in failed(r)

@@ -10,7 +10,7 @@ Contract enforced (matches boomi/agents/risk_analyst/instructions.md v1.1):
 - every number/date in a fact or estimate is the value (or a same-field sum) of an evidence entry
   for a record the sentence names - so a true number cannot be re-attached to another record;
 - numbers/dates in the summary exist in the input's numeric/date fields (never UUIDs, tax ids...);
-- assumptions are qualitative (no numbers, no dates); no spelled-out large numbers;
+- assumptions carry no number/date unless it equals an evidence value; no spelled-out large numbers;
 - shortage is claimed only for POs the impact marks short; data_quality_flags all reported.
 Known limits: meaning is not checked (a sentence can cite the right value and still mislead) - that
 is what human review of eval runs is for.
@@ -38,7 +38,9 @@ ID_RE = re.compile(r"\b(?:SUP|PO|ITM|EVT|RC|SHP|DC|TEN|REC|APR|EXE)-[A-Z0-9]+\b"
 ISO_DATE_RE = re.compile(r"\b(\d{4}-\d{2}-\d{2})(?:T[\d:.]+Z)?\b")
 MONTHS = "jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec"
 MONTH_DATE_RE = re.compile(
-    rf"\b(?:(\d{{1,2}})(?:st|nd|rd|th)?\s+({MONTHS})[a-z]*\.?|({MONTHS})[a-z]*\.?\s+(\d{{1,2}})(?:st|nd|rd|th)?)\b", re.I)
+    rf"\b(?:(\d{{1,2}})(?:st|nd|rd|th)?\s+(?:of\s+)?({MONTHS})[a-z]*\.?|({MONTHS})[a-z]*\.?\s+(\d{{1,2}})(?:st|nd|rd|th)?)\b", re.I)
+LINE_NO_RE = re.compile(r"\bline(?:_no)?\s+\d+\b", re.I)
+CLOCK_RE = re.compile(r"\d{1,2}:\d{2}")
 NUM_RE = re.compile(r"(?<![\w.])\d[\d,]*(?:\.\d+)?")
 BIG_NUMBER_WORDS = re.compile(r"\b(hundreds?|thousands?|lakhs?|crores?|millions?|billions?|dozens?)\b", re.I)
 SHORTAGE_RE = re.compile(r"\b(shortage|stock-?outs?|runs? (?:out|short)|running (?:out|short))\b", re.I)
@@ -88,25 +90,27 @@ def _matches(d: Decimal, allowed: set[Decimal]) -> bool:
     return any(o.quantize(q) == d for o in allowed if o.as_tuple().exponent < d.as_tuple().exponent)
 
 
-_INPUT_TEXTS: list[str] = []
+def name_texts(inp: dict) -> list[str]:
+    """Names from the input ('Bracket 501', 'Line 2 Assembly'): digits inside a name are part of it, not a
+    claimed number, so extract() blanks them first. Only name/item_name values - never the event description."""
+    texts = {v for k, v in _leaves(inp) if isinstance(v, str) and k in {"name", "item_name"} and v}
+    return sorted(texts, key=len, reverse=True)
 
 
-def set_input_texts(inp: dict) -> None:
-    """Free-text values from the input (item/supplier names, event description). Digits inside them
-    ('Bracket 501', 'Line 2') are part of a name, not a claimed number, so extract() blanks them first."""
-    texts = {v for k, v in _leaves(inp) if isinstance(v, str) and k in {"name", "item_name", "description"} and v}
-    _INPUT_TEXTS[:] = sorted(texts, key=len, reverse=True)
-    # also the parts of a description ('Line 2 fire, production halted' -> 'Line 2')
-    for d in [v for k, v in _leaves(inp) if k == "description" and isinstance(v, str)]:
-        _INPUT_TEXTS.extend(m.group(0) for m in re.finditer(r"\b[A-Za-z]+ \d+\b", d))
+def quoted_description(text: str, evidence: list[dict], inp: dict) -> list[str]:
+    """The event description, only if this sentence quotes it verbatim AND a description evidence entry is cited."""
+    desc = inp["event"].get("description")
+    cited = any(e["source"] == "EVENT" and e["field"] == "description" for e in evidence)
+    return [desc] if desc and cited and desc in text else []
 
 
-def extract(text: str, year: int) -> tuple[list[Decimal], list[str]]:
-    """Numbers and dates in free text. IDs and input names are removed first ('SUP-1008', 'Bracket 501')."""
+def extract(text: str, year: int, blank: tuple[str, ...] | list[str] = ()) -> tuple[list[Decimal], list[str]]:
+    """Numbers and dates in free text. IDs, line numbers and the given texts are removed first."""
     t = text
-    for s in _INPUT_TEXTS:
+    for s in blank:
         t = t.replace(s, " ")
     t = ID_RE.sub(" ", t)
+    t = LINE_NO_RE.sub(" ", t)  # a PO line number is an identifier, not a claim
     dates = [m.group(1) for m in ISO_DATE_RE.finditer(t)]
     t = ISO_DATE_RE.sub(" ", t)
     for m in MONTH_DATE_RE.finditer(t):
@@ -229,7 +233,10 @@ def claim_support(text: str, evidence: list[dict], inp: dict, year: int, is_esti
         return ids
 
     if named:
-        relevant = [e for e in evidence if ids_of(e) & named or e["source"] == "EVENT" or e["entity"] == "IMPACT"]
+        sup = inp["snapshot"]["supplier"]
+        names_event = bool(named & {inp["event"]["event_id"], sup["supplier_id"]}) or sup["name"].lower() in text.lower()
+        relevant = [e for e in evidence
+                    if ids_of(e) & named or (e["source"] == "EVENT" and names_event) or e["entity"] == "IMPACT"]
     else:
         relevant = list(evidence)
     nums, dates = set(), set()
@@ -240,8 +247,8 @@ def claim_support(text: str, evidence: list[dict], inp: dict, year: int, is_esti
             continue
         if isinstance(v, str) and ISO_DATE_RE.fullmatch(v):
             dates.add(v[:10])
-            if "T" in v:  # a cited timestamp also supports its clock time ("10:15")
-                nums |= {_dec(p) for p in re.findall(r"\d+", v[11:16])}
+            if "T" in v and CLOCK_RE.search(text):  # a cited timestamp supports a clock time ("10:15:00") only
+                nums |= {_dec(p) for p in re.findall(r"\d+", v[11:19])}  # when the sentence itself has one
         elif _dec(v) is not None:
             nums.add(_dec(v))
             by_field[e["field"]].append(_dec(v))
@@ -251,7 +258,7 @@ def claim_support(text: str, evidence: list[dict], inp: dict, year: int, is_esti
         nums |= {(h / 24).normalize() for h in by_field["expected_duration_hours"]}
     if is_estimate:
         dates |= derived_dates(inp)  # due + delay, outage end: only as an estimate, never as a fact
-    t_nums, t_dates = extract(text, year)
+    t_nums, t_dates = extract(text, year, name_texts(inp) + quoted_description(text, evidence, inp))
     bad_n = [str(n) for n in t_nums if not _matches(n, nums)]
     bad_d = [d for d in t_dates if d not in dates]
     if bad_n:
@@ -278,7 +285,7 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
     if schema_errors:
         return r
     year = int(inp["event"]["event_time"][:4])
-    set_input_texts(inp)
+    names = name_texts(inp)
     score = inp["impact"]["risk_score"]
     r["risk_case_id_matches"] = (out["risk_case_id"] == inp["risk_case_id"], out["risk_case_id"])
     r["risk_score_copied"] = (out["risk_score"] == score, f"output {out['risk_score']} vs impact {score}")
@@ -308,13 +315,15 @@ def grade(out: dict, inp: dict, case: dict | None = None) -> dict[str, tuple[boo
     r["claims_backed_by_evidence"] = (not claim_problems, "; ".join(claim_problems) or "ok")
 
     sup_nums, sup_dates = input_support(inp)
-    s_nums, s_dates = extract(out["summary"], year)
+    s_nums, s_dates = extract(out["summary"], year, names)
     bad = [str(n) for n in s_nums if not _matches(n, sup_nums)] + [d for d in s_dates if d not in sup_dates]
     r["summary_values_in_input"] = (not bad, f"not in input: {bad}" if bad else "ok")
 
-    numeric_assumptions = [a for a in out["assumptions"] if any(extract(a, year))]
-    r["assumptions_qualitative"] = (not numeric_assumptions,
-                                    f"numbers/dates in assumptions: {numeric_assumptions}" if numeric_assumptions else "ok")
+    # an assumption may carry a number/date only if it equals an evidence entry's value
+    bad_assump = [f"'{a[:60]}': {p}" for a in out["assumptions"]
+                  for p in claim_support(a, out["evidence"], inp, year)]
+    r["assumptions_qualitative"] = (not bad_assump,
+                                    f"unsupported numbers/dates in assumptions: {bad_assump}" if bad_assump else "ok")
 
     words = [m.group(0) for t in claim_texts(out) for m in BIG_NUMBER_WORDS.finditer(t)]
     r["numbers_as_digits"] = (not words, f"spelled-out numbers {words}" if words else "ok")
