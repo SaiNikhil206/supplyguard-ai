@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | - |
+| Roop | 1 | 2 | 3 | 0 | 6 | 0 | 8% | R-07 |
 | Nikhil | 0 | 0 | 3 | 0 | 11 | 0 | 0% | - |
 | Uday | 1 | 0 | 0 | 0 | 11 | 0 | 8% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
@@ -48,8 +48,8 @@
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
-| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | todo | 0/1 | - |
-| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | todo | 0/1 | - |
+| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | in-progress | 0/1 | - |
+| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | in-progress | 0/1 | - |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | todo | 0/2 | - |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | todo | 0/1 | - |
