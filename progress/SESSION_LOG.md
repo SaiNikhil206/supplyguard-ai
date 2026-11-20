@@ -131,3 +131,12 @@ Template:
 - Next: S-01 contracts call; U-01 Boomi check by a human
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-20 - nikhil - N-05
+- Branch: nikhil/N-05-risk-analyst
+- Did: Risk Analyst agent live in Agentstudio on prompt v1.3.0; 7 real runs saved and graded (DEMO v1.2.0 all pass, ADV-01..05 resisted on case_* checks); grader hardened after an Opus review (event-description digits, clock numbers, input texts passed explicitly); README/agent.json/runs index updated.
+- Tests: ai/tests 158 passed
+- Status now: in-progress (acceptance needs single-version v1.3.0 re-run)
+- Next: re-run DEMO + ADV-01..05 on v1.3.0 in Agentstudio, grade, then set N-05 to review
+- Blockers: U-07 tools not built (agent has no tools); U-03 for N-04
+- Models used: advisor opus; subagents/sessions sonnet + opus reviewer

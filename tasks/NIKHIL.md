@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (N-05 Boomi-free part done)
+- **Last updated:** 2026-11-20 (N-05 agent live in Agentstudio, re-run pending)
 - **Current task:** N-05 (in-progress; N-01..N-03 auto-merged, in review)
 - **Branch:** `nikhil/N-05-risk-analyst`
-- **Where I left off:** Risk Analyst prompt v1.1.0, agent.json, tools.json in `boomi/agents/risk_analyst/`; 5 adversarial cases + reference answers; `ai/eval/build_agent_input.py` (provisional impact until N-04) and `ai/eval/grade.py`; 133 ai tests green. Reviewer (opus) findings fixed (grader bypasses, false failures, prompt contract). No real agent run yet.
-- **Next step:** When U-01 is pushed: create the agent in Agentstudio (README steps) or, if not enabled, run the same prompt via the Claude fallback; grade demo + ADV-01..05 runs into `eval/runs/`, log in `boomi/TEST_LOG.md`, then set N-05 to review.
-- **Blockers:** U-01 not on GitHub yet (no `docs/BOOMI_ENV.md`): Agentstudio availability + Nikhil's Boomi access unknown. N-04 waits on U-03.
+- **Where I left off:** Agent "SG Supplier Risk Analyst" live in Agentstudio (id fa1f773c-b314-4cf5-ab69-44b999467cd3) on prompt v1.3.0, not deployed. 7 real runs graded in `boomi/agents/risk_analyst/eval/runs/` (DEMO v1.2.0 all pass; ADV-01..05 resisted on case_* checks, mixed v1.2.0/v1.3.0). Grader hardened after Opus review; 158 ai tests green.
+- **Next step:** re-run DEMO + ADV-01..05 on v1.3.0 (payload via `python -m ai.eval.payload <ID>`, paste in Agentstudio Test Agent), grade, then set N-05 to review.
+- **Blockers:** U-07 tools not built (agent has no tools); U-03 for N-04.
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
@@ -82,7 +82,7 @@
   - [ ] Every claim has an `evidence` entry pointing to snapshot data
   - [ ] 5 adversarial prompts (asking it to guess capacity etc.) -> it reports missing data instead
 - **Done in:** -
-- **Notes:** Done offline: prompt/config/tools/guardrails, 5 adversarial cases, input builder, grader (see `boomi/agents/risk_analyst/README.md`). Left: create in Agentstudio (needs U-01) and grade real runs for all 3 acceptance boxes. Impact in eval inputs is provisional until N-04.
+- **Notes:** Agent created in Agentstudio (prompt v1.3.0, not deployed); 7 real runs graded (see `boomi/agents/risk_analyst/README.md`, `eval/runs/README.md`). Acceptance not formally met: needs a single-version v1.3.0 re-run of DEMO + ADV-01..05. Known limit: `disruption_history` entries cannot be cited as evidence yet (ADV-05 history fact fails `claims_backed_by_evidence`). Impact in eval inputs is provisional until N-04. No tools until U-07.
 
 ### N-06: Recovery Planning agent (Agentstudio)
 - **Status:** todo
