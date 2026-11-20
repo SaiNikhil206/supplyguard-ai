@@ -123,6 +123,15 @@ Template:
 - Blockers: none
 - Models used: advisor opus
 
+## 2026-11-19 - nikhil - N-01 (autopilot, run by Roop's machine)
+- Branch: nikhil/N-01-agent-schemas
+- Did: Autopilot round: nothing ready (N-04 waits on U-03, N-05 on U-01). Used the wait to fix N-01 reviewer follow-ups in `ai/`: optional PO header `expected_date` in the agent_input snapshot (proposed for CONTRACTS s5), complete S-01 tightening list and tenant rule in `ai/README.md`, valid fixture with every option_type + invalid SPLIT_ORDER/INVENTORY_TRANSFER/REVISED_SCHEDULE/PO-date cases, fixture inventory aligned to `data/seed/`, `bundled_schema` docstring, option-type coverage test.
+- Tests: run_checks.py exit 0 - ai 93, data 33, mock-erp 46, backend 3, frontend 76 passed
+- Status now: review (unchanged)
+- Next: S-01 call ratifies the proposals; N-04 after U-03, N-05 after U-01
+- Blockers: Uday U-01/U-03; S-01
+- Models used: advisor opus; reviewer opus x1
+
 ## 2026-11-19 - roop - SETUP (autopilot removed)
 - Branch: roop/S-02-remove-autopilot (separate worktree)
 - Did: Removed the `/autopilot` command and its docs (CLAUDE.md, AI_WORKFLOW, README) - team decided it costs too many tokens while tasks wait on human steps; Nikhil/Uday autopilot sessions stopped. Kept `progress.py <member> --ready` as a plain status check and "review deps count as satisfied".
@@ -131,6 +140,42 @@ Template:
 - Next: S-01 contracts call; U-01 Boomi check by a human
 - Blockers: none
 - Models used: advisor opus
+
+## 2026-11-19 15:00 - roop - R-09
+- Branch: roop/R-09-ci @ 0d95fec
+- Did: Added `.github/workflows/ci.yml` (backend ruff+pytest on Postgres 16, frontend lint/typecheck/test/build, ai/data/mock-erp suites, `ci-ok` aggregate; task-branch pushes, PRs, nightly, manual). ESLint 9 in frontend. Auto-merge gate now runs lint + ruff. Started early while U-02 in review.
+- Tests: run_checks.py ai/data/mock-erp/backend/frontend PASS locally; frontend 76 tests, lint 0 warnings. GitHub run not observed (private repo, no gh auth).
+- Status now: review
+- Next: confirm CI green on GitHub; team agrees required check = `ci-ok` on main only; then done
+- Blockers: team decision on required checks; Uday ruff pin + format; bot [skip ci]
+- Models used: advisor opus; implementer sonnet x3, reviewer opus x2
+
+## 2026-11-19 - roop - SETUP (model routing enforced)
+- Branch: roop/S-02-model-routing (separate worktree)
+- Did: Advisor = Opus at medium effort (project default `model: opus`, `effortLevel: medium`); PreToolUse hook `scripts/hooks/advisor_guard.py` blocks the main session from editing code so it must delegate; `implementer`/`boomi-builder` run with `isolation: worktree` in nested branches `<task-branch>--<sub>` cut from HEAD (`worktree.baseRef: head` - before this, subagent worktrees were cut from the default branch); new `reviewer-lite` (Sonnet) is the default review, Opus `reviewer` only for sensitive areas; commands get explicit effort (handoff/status haiku low, sync sonnet low, resume/done/merge-prs opus medium); mandatory plan table.
+- Tests: guard hook: main-session code edit blocked (exit 2), subagent allowed, task/docs allowed, Windows paths handled; settings.json valid
+- Status now: live for new sessions on collaboration
+- Next: members restart Claude Code to pick up the settings
+- Blockers: none
+- Models used: advisor opus; claude-code-guide (docs check)
+
+## 2026-11-19 - roop - SETUP (nested sessions)
+- Branch: roop/S-02-nested-sessions (separate worktree)
+- Did: Clarified the work model: every task's code pieces run as nested Claude Code sessions (visible in the Desktop sidebar, own model/effort/worktree, branch `<task-branch>--<sub>`, started in parallel), not in-chat subagents. Advisor = Opus medium: plan table, briefs, merge, review gate. Subagents only for short read-only jobs (investigator, test-runner, reviewer-lite/reviewer, docs-writer); implementer/boomi-builder are the CLI fallback. Guard hook now lets nested sessions (on `--sub` branches) edit code. CLAUDE.md section 4, AI_WORKFLOW section 5, /resume and /done updated.
+- Tests: guard: advisor on task branch blocked (2), nested session on --sub branch allowed, subagent allowed, docs allowed
+- Status now: live for new sessions on collaboration
+- Next: members restart Claude Code and run /resume <name>
+- Blockers: none
+- Models used: advisor opus
+
+## 2026-11-19 16:00 - roop - R-03
+- Branch: roop/R-03-overview-suppliers @ 01204b1
+- Did: Built Executive Overview (KPI tiles, trend charts), Supplier list (URL filters, risk badges, pagination), Supplier detail (KPIs, disruption history, 404) on MSW mocks via 3 visible parallel sessions on nested branches; advisor merged them.
+- Tests: frontend lint/typecheck PASS, 13 files / 96 tests PASS, build PASS
+- Status now: in-progress (real-data acceptance waits on R-02)
+- Next: polish nits; R-02 when U-03/U-04 land
+- Blockers: Uday U-03/U-04
+- Models used: advisor opus; 3 sonnet/medium sessions, test-runner haiku, reviewer-lite sonnet
 
 ## 2026-11-20 - nikhil - N-05
 - Branch: nikhil/N-05-risk-analyst

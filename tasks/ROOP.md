@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (R-01 done)
-- **Current task:** - (R-01 done; auto-merge Action merges `roop/R-01-frontend-scaffold` into `collaboration`)
-- **Branch:** `roop/R-01-frontend-scaffold` (deleted by auto-merge once merged)
-- **Where I left off:** `frontend/` complete: shell + 9 placeholder screens, login/JWT refresh, MSW mocks (`src/mocks/`), typed API (`src/api/`), UI kit (`src/components/ui/`). 76 tests green.
-- **Next step:** Nothing ready yet. R-09 (CI) starts when Uday's U-02 lands; R-02 after U-03/U-04; R-07 after N-11. Meanwhile can draft R-03 screen layouts against MSW mocks.
-- **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
+- **Last updated:** 2026-11-19 (R-03 screens built on mocks)
+- **Current task:** R-03 Executive Overview + Supplier Intelligence - `in-progress` (waits on R-02 for real data); R-09 in `review`
+- **Branch:** `roop/R-03-overview-suppliers` (nested `--overview`, `--supplier-list`, `--supplier-detail` merged, kept on GitHub)
+- **Where I left off:** All 3 screens done against MSW mocks; review nits fixed in `--polish` and merged; 101 tests, lint, typecheck, build green.
+- **Next step:** When Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
+- **Blockers:** R-02 waits on Uday U-03/U-04. R-09 needs team decision: `ci-ok` required on `main` only. Uday: pin ruff, `ruff format backend`, short refresh lifetime + rotation off, `/me` shape provisional. Team: drop `[skip ci]` from bot commits.
 
 ---
 
@@ -45,7 +45,7 @@
 - **Notes:** -
 
 ### R-03: Executive Overview + Supplier Intelligence screens
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S2 (1-5 Dec) | **Est:** 2d | **Depends:** R-01, R-02
 - **Branch:** `roop/R-03-overview-suppliers`
 - **Model hint:** sonnet / medium
@@ -53,10 +53,10 @@
 - **Acceptance:**
   - [ ] Real seed data shown; loading / empty / error states handled
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04). Built in 3 visible parallel sessions: `--overview` (6 KPI tiles + Recharts exposure/cases trends), `--supplier-list` (URL filters search/status/risk, risk badges, pagination), `--supplier-detail` (`/suppliers/:id`, KPIs, disruption history, 404 view), all merged; lint/typecheck/96 tests/build green; reviewer-lite APPROVE WITH NITS. Polish session (`--polish`) fixed all nits: shared `src/features/suppliers/status.ts` + `src/lib/format.ts`, sr-only chart summaries, fake-timer debounce test, out-of-range `?page` clamp, severity-tinted risk meter; 101 tests green. Left: after R-02 swap to real API + check field names, tick "real seed data". (Nits were: one supplier-status meta shared by list+detail, shared date/INR formatters in `src/lib/format.ts`, sr-only text summary for charts, fake timers in list debounce test, clamp out-of-range `?page`.) Note for R-04: case links use `/risk?case=<RC-id>`. Landed in collaboration on mocks (status review); real-data acceptance items stay unticked until backend APIs exist.
 
 ### R-04: Risk Command Center + case detail
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S2-S3 (4-10 Dec) | **Est:** 2.5d | **Depends:** R-02, U-06
 - **Branch:** `roop/R-04-risk-center`
 - **Model hint:** sonnet / medium
@@ -65,7 +65,7 @@
   - [ ] New case appears within 5 s of the simulate click
   - [ ] Estimates and missing data visibly labelled (AC-03)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. Landed in collaboration on mocks (status review); real-data acceptance items stay unticked until backend APIs exist.
 
 ### R-05: AI Recommendations + Approval Center
 - **Status:** todo
@@ -114,7 +114,7 @@
 - **Notes:** -
 
 ### R-09: CI pipeline
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S1 (24-26 Nov) | **Est:** 0.5d | **Depends:** R-01, U-02
 - **Branch:** `roop/R-09-ci`
 - **Model hint:** haiku / low
@@ -122,7 +122,7 @@
 - **Acceptance:**
   - [ ] CI green on `collaboration`; added as required check on both protected branches
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Built on nested branches `--lint`, `--workflow`, `--gate` (subagents). `ci.yml` jobs: backend (ruff + pytest on Postgres 16), frontend (lint/typecheck/test/build, Node from `.nvmrc`), python-suites matrix (ai, data, mock-erp), `ci-ok` aggregate. Triggers: task-branch pushes, PRs + pushes to collaboration/main, nightly 02:00 UTC, manual. ESLint 9 flat config added (`npm run lint`, 0 warnings). Auto-merge gate (`scripts/run_checks.py`) now also runs frontend lint + backend ruff. Opus review x2: CHANGES REQUIRED -> APPROVE WITH NITS (nits fixed). Local `run_checks.py`: all 5 suites PASS. Why `review` not `done`: acceptance "required check on both protected branches" conflicts with bots pushing directly to collaboration (GITHUB_TOKEN cannot bypass) -> proposed SHARED change: require `ci-ok` on `main` only; prove collaboration green via nightly/manual run. Deferred: bot `[skip ci]` in `scripts/gitflow.py` + `progress.yml` blocks milestone PR checks (team); ruff unpinned in `backend/requirements-dev.txt` (Uday).
 
 ### R-10: UX polish + demo mode
 - **Status:** todo

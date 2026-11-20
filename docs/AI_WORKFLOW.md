@@ -33,7 +33,7 @@ Automatic (no command needed): when Claude Code starts it pulls your branch and 
 
 ## 3. Advisor pattern
 ```
-                 ┌──────────────── ADVISOR (main session, Opus 5.5, high effort) ────────────────┐
+                 ┌──────────────── ADVISOR (main session, Opus 5.5, medium effort) ────────────────┐
                  │ reads task + CONTRACTS, splits into subtasks, picks agents, reviews, commits │
                  └───────┬──────────────┬──────────────┬──────────────┬──────────────┬──────────┘
                          │              │              │              │              │
@@ -53,7 +53,9 @@ Automatic (no command needed): when Claude Code starts it pulls your branch and 
 | Work type | Model | Effort | Why |
 |---|---|---|---|
 | Architecture, contracts, data model, state machine, security/tenant logic, agent prompt design | Opus 5.5 | high | mistakes here are expensive and spread to other streams |
-| Final review before `done`, debugging something that failed twice | Opus 5.5 | high | judgment |
+| Final review of auth/tenancy, approvals, ERP writes, AI validation, security, CONTRACTS (`reviewer`); debugging something that failed twice | Opus 5.5 | high | judgment |
+| Ordinary review before `done` (`reviewer-lite`) | Sonnet 5.5 | medium | good enough for screens, read APIs, data, docs |
+| The advisor itself (main session) | Opus 5.5 | medium | plans and decides; never writes code |
 | Feature code with clear spec (views, serializers, React screens, Boomi processes, tests) | Sonnet 5.5 | medium | best speed/quality for implementation |
 | Searching code, reading docs, running tests, formatting, task-file/progress updates, changelogs | Haiku 5.5 | low | cheap and fast |
 
@@ -64,11 +66,20 @@ Token hygiene:
 - Point subagents at files/sections instead of pasting content.
 - One task per session where possible; `/handoff` and start a fresh session for the next task.
 
-## 5. Nested sessions for parallel work
-For a big task (e.g. R-04 + R-05 screens, or N-05 + N-06 agents) the advisor can start separate Claude Code sessions / worktrees per subtask. Rules:
-- Each sub-session works on its own sub-branch `<member>/<TASK-ID>-<slug>--<sub>` cut from the task branch.
-- Sub-sessions never touch the same files.
-- The advisor merges sub-branches into the task branch, runs tests, then reviewer, then PR to `collaboration`.
+## 5. Nested sessions (how every task is built)
+The advisor (Opus, medium) never writes code. For each code piece of a task it starts a **nested session**: a separate Claude Code session, visible in the Claude Desktop sidebar under the advisor, with its own model, effort, worktree and branch.
+```
+advisor session  roop/R-02-read-apis          Opus / medium  - plan table, briefs, merge, decide
+ ├─ nested session  ...--serializers            Sonnet / medium  } started in one message,
+ ├─ nested session  ...--views                  Sonnet / medium  } run at the same time,
+ └─ nested session  ...--tests                  Sonnet / medium  } each pushes its branch
+subagents in the advisor: investigator (Haiku), test-runner (Haiku), reviewer-lite (Sonnet)
+advisor merges the 3 branches -> test-runner -> reviewer-lite -> /done -> auto-merge to collaboration
+```
+- Model/effort per piece and the brief template: CLAUDE.md section 4.
+- Pieces never touch the same files. Fixes go back to the nested session that built the piece.
+- Nested sessions are not archived; the member can reopen any of them from the sidebar.
+- Terminal-only (`claude` CLI, no Desktop app): the same pieces run as `implementer` / `boomi-builder` subagents with `isolation: worktree` on the same `--sub` branches.
 
 ## 6. What "done" means for Claude
 A task is `done` only when: acceptance boxes ticked with evidence, tests pass (output seen, not assumed), reviewer found no blocking issue, task file + PROGRESS.md updated, merged into `collaboration` (Claude merges it itself). Then Claude moves straight on to the next ready task. If any of this is missing, status is `review` or `in-progress` - never claim `done`.
