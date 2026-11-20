@@ -158,3 +158,12 @@ Template:
 - Next: optional prompt tweak for capacity-unknown suppliers; deploy only after the team decides
 - Blockers: U-03 for N-04; U-07 tools not built
 - Models used: run/doc session haiku (no advisor)
+
+## 2026-11-20 - nikhil - N-06 deployment record
+- Branch: nikhil/N-06-recovery-agent
+- Did: agent "SG Recovery Planner" (b5f2f51a-0b4e-41e6-998d-e04031f2a9d0, prompt v1.3.0) deployed in Agentstudio via Review > Create > Package & Deploy: package "SG Recovery Planner" 1.0 (94004c6f-f9c7-4804-b5cc-fa8e8b4236ff), deployment 1142f95b-7b4a-466f-a895-89a2140068ac, environment Agent Garden Production, Boomi reports active. Deployed on Uday's training account with his agreement. Recorded in agent.json, agent README and NIKHIL.md. Not done: Agent Control Tower account and an Agent Step in an Integration process (Uday's stream).
+- Tests: ai/tests 279 passed; run_checks.py all suites PASS
+- Status now: review
+- Next: optional prompt tweak for capacity-unknown suppliers (needs a new deploy); Agent Control Tower + Agent Step with Uday; N-04 / N-07
+- Blockers: U-03 for N-04; U-07 tools not built; Agent Control Tower account for Integration use
+- Models used: deploy and doc session haiku (no advisor)

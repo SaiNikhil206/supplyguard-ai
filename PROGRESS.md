@@ -70,11 +70,11 @@
 - **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ### Nikhil
-- **Last updated:** 2026-11-20 (N-06 acceptance runs done, in review)
+- **Last updated:** 2026-11-20 (N-06 acceptance runs done, agent deployed, in review)
 - **Current task:** N-06 (review; N-05 in review)
 - **Branch:** `nikhil/N-06-recovery-agent`
-- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0, draft, not deployed. Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
-- **Next step:** optional prompt tweak adding an assumption template for capacity-unknown suppliers; deploy only after the team decides. Then N-04 / N-07 per dependencies.
+- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0 and deployed 2026-11-20 (package 1.0, deployment 1142f95b-7b4a-466f-a895-89a2140068ac, Agent Garden Production, active). Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
+- **Next step:** optional prompt tweak adding an assumption template for capacity-unknown suppliers (the agent is already deployed, so a prompt change needs a new deploy). Calling it from Integration needs an Agent Control Tower account and an Agent Step (Uday's `boomi/processes/`). Then N-04 / N-07 per dependencies.
 - **Blockers:** U-03 for N-04; U-07 tools not built (agents have no tools).
 
 ### Uday
@@ -89,8 +89,16 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-20 | d288171 | nikhil | N-06 | review | feat(agents): N-06 recovery planner live v1.3.0 runs, set to review |
 | 2026-11-20 | 0de814d | nikhil | N-06 | in-progress | fix(agents): N-06 recovery planner prompt v1.3.0 text templates |
 | 2026-11-20 | 1709e47 | nikhil | N-06 | in-progress | fix(agents): N-06 recovery planner prompt v1.2.0 + v1.1.0 baseline runs |
+| 2026-11-20 | 52f5e6d | uday | U-01 | blocked | docs(boomi): U-01 - teammates use their own Boomi accounts, no invites |
+| 2026-11-20 | 84d3395 | roop | R-07 | review | chore(ci): re-trigger auto-merge for R-07 |
+| 2026-11-20 | 4693960 | roop | R-07 | review | chore(tasks): R-07 to review - land mock-built screens in collaboration |
+| 2026-11-20 | 58f20e2 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
+| 2026-11-20 | 6332e9b | roop | R-04 | review | chore(tasks): R-04 to review - land mock-built screens in collaboration |
+| 2026-11-20 | 76f38c8 | roop | R-03 | review | merge: R-03 Executive Overview + Supplier Intelligence screens (auto-merge) |
+| 2026-11-20 | 96efb0a | roop | R-03 | review | chore(tasks): R-03 to review - land mock-built screens in collaboration |
 | 2026-11-20 | a76c094 | nikhil | N-06 | in-progress | fix(agents): N-06 grader round 2 after re-review |
 | 2026-11-20 | 36db3ff | nikhil | N-06 | in-progress | fix(agents): N-06 grader + prompt v1.1.0 after Opus review |
 | 2026-11-20 | cd48e18 | nikhil | N-06 | in-progress | feat(agents): N-06 recovery planner design (prompt, schemas config, references, adversarial cases) |
@@ -101,11 +109,3 @@
 | 2026-11-19 | 058e037 | roop | R-11 | in-progress | merge: R-11 --script sub-branch into task branch |
 | 2026-11-19 | 6bf5382 | roop | R-06 | in-progress | merge: R-06 --flow-spec sub-branch into task branch |
 | 2026-11-19 | 06e0a21 | roop | R-05 | in-progress | merge: R-05 --approvals sub-branch into task branch |
-| 2026-11-19 | e38dc81 | roop | R-05 | in-progress | merge: R-05 --recommendations sub-branch into task branch |
-| 2026-11-19 | d86578d | roop | R-08 | in-progress | merge: R-08 --settings sub-branch into task branch |
-| 2026-11-19 | ddfeb93 | roop | R-08 | in-progress | merge: R-08 --audit sub-branch into task branch |
-| 2026-11-19 | 54a6bb0 | roop | R-07 | in-progress | merge: R-07 --simulator sub-branch into task branch |
-| 2026-11-19 | 4a7a066 | roop | R-04 | in-progress | merge: R-04 --inbox sub-branch into task branch |
-| 2026-11-19 | 81e29b1 | roop | R-05 | in-progress | feat(approvals): Approval Center with decision, execution status and retry |
-| 2026-11-19 | cb32f74 | roop | R-07 | in-progress | feat(frontend): What-if simulator chart text alternative, robust timing test |
-| 2026-11-19 | ae15b49 | roop | R-04 | in-progress | refactor(frontend): inbox review nits - 400 on unknown scenario, SCENARIOS in mocks |

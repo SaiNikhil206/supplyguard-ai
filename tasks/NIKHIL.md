@@ -9,11 +9,11 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-20 (N-06 acceptance runs done, in review)
+- **Last updated:** 2026-11-20 (N-06 acceptance runs done, agent deployed, in review)
 - **Current task:** N-06 (review; N-05 in review)
 - **Branch:** `nikhil/N-06-recovery-agent`
-- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0, draft, not deployed. Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
-- **Next step:** optional prompt tweak adding an assumption template for capacity-unknown suppliers; deploy only after the team decides. Then N-04 / N-07 per dependencies.
+- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0 and deployed 2026-11-20 (package 1.0, deployment 1142f95b-7b4a-466f-a895-89a2140068ac, Agent Garden Production, active). Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
+- **Next step:** optional prompt tweak adding an assumption template for capacity-unknown suppliers (the agent is already deployed, so a prompt change needs a new deploy). Calling it from Integration needs an Agent Control Tower account and an Agent Step (Uday's `boomi/processes/`). Then N-04 / N-07 per dependencies.
 - **Blockers:** U-03 for N-04; U-07 tools not built (agents have no tools).
 ---
 
@@ -95,7 +95,7 @@
   - [x] TC-05 scenario -> `options: []` + `no_viable_option_reason`
   - [x] Output validates against `recovery_plan.schema.json`
 - **Done in:** -
-- **Notes:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio as a saved draft, not deployed, prompt v1.3.0. Six live v1.3.0 runs graded 2026-11-20: DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34. Known issue (open): `assumptions_qualitative` fails in DEMO and RP-ADV-04 - the SUP-2002 option (capacity unknown) assumes "sufficient capacity available". Optional next: a prompt assumption template for capacity-unknown suppliers; deploy only after the team decides. See `boomi/agents/recovery_planner/eval/runs/README.md`.
+- **Notes:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio as a saved draft, not deployed, prompt v1.3.0. Six live v1.3.0 runs graded 2026-11-20: DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34. Known issue (open): `assumptions_qualitative` fails in DEMO and RP-ADV-04 - the SUP-2002 option (capacity unknown) assumes "sufficient capacity available". Deployed in Agentstudio 2026-11-20: package "SG Recovery Planner" 1.0 (94004c6f-f9c7-4804-b5cc-fa8e8b4236ff), deployment 1142f95b-7b4a-466f-a895-89a2140068ac, environment Agent Garden Production, Boomi reports active. Not yet callable from Integration (needs an Agent Control Tower account and an Agent Step, Uday's stream). Optional next: a prompt assumption template for capacity-unknown suppliers. See `boomi/agents/recovery_planner/eval/runs/README.md`.
 
 ### N-07: Agent output validator + persistence
 - **Status:** todo

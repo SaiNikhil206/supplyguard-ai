@@ -68,7 +68,7 @@
     "Agentstudio has no prompt-injection switch: injection resistance = instructions rule 6 + RP-ADV-04",
     "Not denied on purpose: requests to guess capacity/lead time or override quantities - a blocked reply is not JSON; the prompt answers those via data_gaps (rule 7)"
   ],
-  "status": "built in Agentstudio, draft, not deployed; tested v1.3.0 (6 live runs graded; known issue: assumptions_qualitative on SUP-2002 capacity in DEMO and RP-ADV-04)",
+  "status": "deployed in Agentstudio 2026-11-20 (package active, Agent Garden Production); tested v1.3.0 (6 live runs graded; known issue: assumptions_qualitative on SUP-2002 capacity in DEMO and RP-ADV-04). Not yet callable from an Integration: needs an Agent Control Tower account + Agent Step (Uday's boomi/processes/ stream)",
   "agentstudio": {
     "account": "Uday's training account (same as SG Supplier Risk Analyst)",
     "agent_mode": "Structured",
@@ -78,6 +78,17 @@
     "output_schema": "inlined recovery_plan (3 top-level keys, option with 10 required keys, change object, money, evidence minItems 1, no extra keys); Agentstudio may not accept if/then - grader + N-07 enforce those rules; authoritative: ai/schemas/recovery_plan.schema.json",
     "tools": "none - the snapshot in the input carries the data",
     "test_runtime": "USA East Agent Garden Cloud 01",
-    "agent_id": "b5f2f51a-0b4e-41e6-998d-e04031f2a9d0"
+    "agent_id": "b5f2f51a-0b4e-41e6-998d-e04031f2a9d0",
+    "prompt_version": "1.3.0",
+    "deployment": {
+      "date": "2026-11-20",
+      "package": "SG Recovery Planner",
+      "package_version": "1.0",
+      "package_id": "94004c6f-f9c7-4804-b5cc-fa8e8b4236ff",
+      "deployment_id": "1142f95b-7b4a-466f-a895-89a2140068ac",
+      "environment": "Agent Garden Production",
+      "status": "active",
+      "next_step": "Agent Control Tower account, then an Agent Step in an Integration process (owned by Uday, boomi/processes/)"
+    }
   }
 }

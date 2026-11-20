@@ -18,7 +18,19 @@ Output = `ai/schemas/recovery_plan.schema.json`.
 
 > `impact` numbers are provisional until N-04 (see `ai/eval/build_agent_input.py`). The plan depends on `affected_qty`, `estimated_delay_days` and `shortage`; if N-04 changes them, regenerate the references.
 
-Status: **built in Agentstudio, draft, not deployed; tested v1.3.0** (Agentstudio saved draft, not deployed) (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on). v1.1.0 runs: decisions correct in all six cases, v1.2.0 fixed assumptions and data_gaps; v1.3.0 adds fixed text templates for action_steps and trade_offs; v1.3.0 live runs (DEMO, TC05, RP-ADV-01..04) graded: DEMO 30/31 (FAIL `assumptions_qualitative`: SUP-2002 capacity assumed sufficient while capacity is unknown), TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34 (same SUP-2002 check). Known issue, open: no assumption template for capacity-unknown suppliers; a prompt tweak is optional and deploy only after the team decides. Results table in `eval/runs/README.md`. No tools (the snapshot carries the data).
+Status: **deployed in Agentstudio 2026-11-20; tested v1.3.0** (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on).
+
+### Deployment (2026-11-20)
+| Item | Value |
+|---|---|
+| Package | "SG Recovery Planner", version 1.0 (package id `94004c6f-f9c7-4804-b5cc-fa8e8b4236ff`) |
+| Deployment | id `1142f95b-7b4a-466f-a895-89a2140068ac` |
+| Environment | Agent Garden Production |
+| Account | Uday's training account (used with his agreement) |
+| Prompt | v1.3.0 |
+| State | Boomi reports the agent as active |
+
+Next step to use it from Integration: create an account in Agent Control Tower, then add an Agent Step in a process. The process work belongs to Uday's `boomi/processes/` stream, not this folder. Not done yet. v1.1.0 runs: decisions correct in all six cases, v1.2.0 fixed assumptions and data_gaps; v1.3.0 adds fixed text templates for action_steps and trade_offs; v1.3.0 live runs (DEMO, TC05, RP-ADV-01..04) graded: DEMO 30/31 (FAIL `assumptions_qualitative`: SUP-2002 capacity assumed sufficient while capacity is unknown), TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34 (same SUP-2002 check). Known issue, open: no assumption template for capacity-unknown suppliers; a prompt tweak is optional and deploy only after the team decides. Results table in `eval/runs/README.md`. No tools (the snapshot carries the data).
 
 ## How the agent decides (summary of `instructions.md`)
 1. **Target PO** = one PO from `impact.affected_pos`: shortage first, then `constraints.priority_items`, then earliest line `due_date`, then lowest `po_id`. All options act on it; other affected POs are named in every option's `trade_offs`.
