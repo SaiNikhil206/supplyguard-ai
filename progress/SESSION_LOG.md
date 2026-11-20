@@ -149,3 +149,12 @@ Template:
 - Next: prompt gap (false 'event description contained instructions' line in ADV-01/03/04/05; restart-leaning 'resume immediately' assumption in ADV-03/05); N-04
 - Blockers: U-07 tools not built; U-03 for N-04
 - Models used: advisor opus; run/doc session sonnet
+
+## 2026-11-20 - nikhil - N-06
+- Branch: nikhil/N-06-recovery-agent
+- Did: six live v1.3.0 runs (DEMO, TC05, RP-ADV-01..04) saved to eval/runs and re-graded: DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34 (the one fail in DEMO and ADV-04 is assumptions_qualitative on SUP-2002, capacity unknown); agent README, runs index, agent.json, TEST_LOG and NIKHIL.md updated; N-06 set to review.
+- Tests: ai/tests 279 passed; run_checks.py all suites PASS (backend deps installed from backend/requirements-dev.txt)
+- Status now: review
+- Next: optional prompt tweak for capacity-unknown suppliers; deploy only after the team decides
+- Blockers: U-03 for N-04; U-07 tools not built
+- Models used: run/doc session haiku (no advisor)

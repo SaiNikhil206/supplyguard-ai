@@ -18,7 +18,7 @@ Output = `ai/schemas/recovery_plan.schema.json`.
 
 > `impact` numbers are provisional until N-04 (see `ai/eval/build_agent_input.py`). The plan depends on `affected_qty`, `estimated_delay_days` and `shortage`; if N-04 changes them, regenerate the references.
 
-Status: **built, testing** in Agentstudio (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on). v1.1.0 runs: decisions correct in all six cases, v1.2.0 fixed assumptions and data_gaps; v1.3.0 adds fixed text templates for action_steps and trade_offs (re-run pending). No tools (the snapshot carries the data).
+Status: **built in Agentstudio, draft, not deployed; tested v1.3.0** (Agentstudio saved draft, not deployed) (agent id `b5f2f51a-0b4e-41e6-998d-e04031f2a9d0`, Claude Sonnet 4.5, Structured mode, extended thinking on). v1.1.0 runs: decisions correct in all six cases, v1.2.0 fixed assumptions and data_gaps; v1.3.0 adds fixed text templates for action_steps and trade_offs; v1.3.0 live runs (DEMO, TC05, RP-ADV-01..04) graded: DEMO 30/31 (FAIL `assumptions_qualitative`: SUP-2002 capacity assumed sufficient while capacity is unknown), TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34 (same SUP-2002 check). Known issue, open: no assumption template for capacity-unknown suppliers; a prompt tweak is optional and deploy only after the team decides. Results table in `eval/runs/README.md`. No tools (the snapshot carries the data).
 
 ## How the agent decides (summary of `instructions.md`)
 1. **Target PO** = one PO from `impact.affected_pos`: shortage first, then `constraints.priority_items`, then earliest line `due_date`, then lowest `po_id`. All options act on it; other affected POs are named in every option's `trade_offs`.

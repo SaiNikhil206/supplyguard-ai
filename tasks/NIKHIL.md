@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-20 (N-05 acceptance run done, in review)
-- **Current task:** N-05 (review; N-01..N-03 auto-merged, in review)
-- **Branch:** `nikhil/N-05-risk-analyst`
-- **Where I left off:** Clean v1.3.0 set (DEMO + ADV-01..05, 2026-11-20) all pass the grader; N-05 set to review, 173 ai tests green. Agent "SG Supplier Risk Analyst" (id fa1f773c-b314-4cf5-ab69-44b999467cd3) not deployed, no tools yet.
-- **Next step:** fix the prompt gap (false injection line, restart-leaning assumption) in a later version if time allows; then N-04 / N-06 per dependencies.
-- **Blockers:** U-07 tools not built (agent has no tools); U-03 for N-04.
+- **Last updated:** 2026-11-20 (N-06 acceptance runs done, in review)
+- **Current task:** N-06 (review; N-05 in review)
+- **Branch:** `nikhil/N-06-recovery-agent`
+- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0, draft, not deployed. Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
+- **Next step:** optional prompt tweak adding an assumption template for capacity-unknown suppliers; deploy only after the team decides. Then N-04 / N-07 per dependencies.
+- **Blockers:** U-03 for N-04; U-07 tools not built (agents have no tools).
 ---
 
 ### N-01: Agent I/O JSON schemas + fixtures
@@ -85,17 +85,17 @@
 - **Notes:** Agent in Agentstudio (prompt v1.3.0, not deployed). Clean single-version acceptance set run 2026-11-20: DEMO passes every check; ADV-01..05 pass every `case_*` and generic check (see `boomi/agents/risk_analyst/README.md`, `eval/runs/README.md`). Tools pending U-07 (agent runs on the input snapshot only). Impact in eval inputs is provisional until N-04. Open for human review / next prompt version: ADV-01/03/04/05 add a false 'event description contained instructions' line (rule 5); ADV-03/05 assumption 'supplier will resume production immediately after the expected duration' is restart-leaning. Known limit: `disruption_history` entries cannot be cited as evidence yet.
 
 ### N-06: Recovery Planning agent (Agentstudio)
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S2 (3-6 Dec) | **Est:** 2d | **Depends:** N-01, N-05
 - **Branch:** `nikhil/N-06-recovery-agent`
 - **Model hint:** opus / high
 - **Deliverables:** agent comparing ALTERNATE_SUPPLIER, INVENTORY_TRANSFER, REVISED_SCHEDULE, SPLIT_ORDER; ranks by urgency, inventory, qualification, cost, priority; config in `boomi/agents/recovery_planner/`.
 - **Acceptance:**
-  - [ ] Demo scenario -> at least 2 ranked viable options (AC-04)
-  - [ ] TC-05 scenario -> `options: []` + `no_viable_option_reason`
-  - [ ] Output validates against `recovery_plan.schema.json`
+  - [x] Demo scenario -> at least 2 ranked viable options (AC-04)
+  - [x] TC-05 scenario -> `options: []` + `no_viable_option_reason`
+  - [x] Output validates against `recovery_plan.schema.json`
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio as a saved draft, not deployed, prompt v1.3.0. Six live v1.3.0 runs graded 2026-11-20: DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34. Known issue (open): `assumptions_qualitative` fails in DEMO and RP-ADV-04 - the SUP-2002 option (capacity unknown) assumes "sufficient capacity available". Optional next: a prompt assumption template for capacity-unknown suppliers; deploy only after the team decides. See `boomi/agents/recovery_planner/eval/runs/README.md`.
 
 ### N-07: Agent output validator + persistence
 - **Status:** todo

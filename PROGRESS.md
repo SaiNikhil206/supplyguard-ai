@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 0 | 0 | 11 | 0 | 8% | R-09 |
-| Nikhil | 0 | 0 | 4 | 0 | 10 | 0 | 0% | N-06 |
+| Nikhil | 0 | 0 | 5 | 0 | 9 | 0 | 0% | - |
 | Uday | 1 | 0 | 0 | 0 | 11 | 0 | 8% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
@@ -33,7 +33,7 @@
 | U-07 | Boomi ERP read processes + canonical profiles | Uday | S1 (25-30 Nov) | todo | 0/3 | - |
 | U-12 | Local + hosted deployment | Uday | S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | todo | 0/3 | - |
 | N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | review | 3/3 | - |
-| N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | todo | 0/3 | - |
+| N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | review | 3/3 | - |
 | N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | todo | 0/3 | - |
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
@@ -70,12 +70,12 @@
 - **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ### Nikhil
-- **Last updated:** 2026-11-20 (N-05 acceptance run done, in review)
-- **Current task:** N-05 (review; N-01..N-03 auto-merged, in review)
-- **Branch:** `nikhil/N-05-risk-analyst`
-- **Where I left off:** Clean v1.3.0 set (DEMO + ADV-01..05, 2026-11-20) all pass the grader; N-05 set to review, 173 ai tests green. Agent "SG Supplier Risk Analyst" (id fa1f773c-b314-4cf5-ab69-44b999467cd3) not deployed, no tools yet.
-- **Next step:** fix the prompt gap (false injection line, restart-leaning assumption) in a later version if time allows; then N-04 / N-06 per dependencies.
-- **Blockers:** U-07 tools not built (agent has no tools); U-03 for N-04.
+- **Last updated:** 2026-11-20 (N-06 acceptance runs done, in review)
+- **Current task:** N-06 (review; N-05 in review)
+- **Branch:** `nikhil/N-06-recovery-agent`
+- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0, draft, not deployed. Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
+- **Next step:** optional prompt tweak adding an assumption template for capacity-unknown suppliers; deploy only after the team decides. Then N-04 / N-07 per dependencies.
+- **Blockers:** U-03 for N-04; U-07 tools not built (agents have no tools).
 
 ### Uday
 - **Last updated:** 2026-11-19 (U-02 done and merged, review follow-ups applied)
@@ -89,6 +89,13 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-20 | 0de814d | nikhil | N-06 | in-progress | fix(agents): N-06 recovery planner prompt v1.3.0 text templates |
+| 2026-11-20 | 1709e47 | nikhil | N-06 | in-progress | fix(agents): N-06 recovery planner prompt v1.2.0 + v1.1.0 baseline runs |
+| 2026-11-20 | a76c094 | nikhil | N-06 | in-progress | fix(agents): N-06 grader round 2 after re-review |
+| 2026-11-20 | 36db3ff | nikhil | N-06 | in-progress | fix(agents): N-06 grader + prompt v1.1.0 after Opus review |
+| 2026-11-20 | cd48e18 | nikhil | N-06 | in-progress | feat(agents): N-06 recovery planner design (prompt, schemas config, references, adversarial cases) |
+| 2026-11-20 | b25d951 | nikhil | N-06 | in-progress | feat(agents): N-06 recovery planner grader, RP payloads and tests |
+| 2026-11-20 | 90d5086 | nikhil | N-05 | review | test(agents): clean v1.3.0 acceptance set for N-05, set to review |
 | 2026-11-20 | b1cffba | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - agent live, re-run pending |
 | 2026-11-20 | 76056e7 | nikhil | N-05 | in-progress | feat(agents): harden grader after review, ADV-05 run, docs |
 | 2026-11-19 | 058e037 | roop | R-11 | in-progress | merge: R-11 --script sub-branch into task branch |
@@ -102,10 +109,3 @@
 | 2026-11-19 | 81e29b1 | roop | R-05 | in-progress | feat(approvals): Approval Center with decision, execution status and retry |
 | 2026-11-19 | cb32f74 | roop | R-07 | in-progress | feat(frontend): What-if simulator chart text alternative, robust timing test |
 | 2026-11-19 | ae15b49 | roop | R-04 | in-progress | refactor(frontend): inbox review nits - 400 on unknown scenario, SCENARIOS in mocks |
-| 2026-11-19 | 2cefce6 | roop | R-05 | in-progress | docs(tasks): mark R-05 in-progress with piece plan |
-| 2026-11-19 | 4b451a3 | roop | R-05 | in-progress | feat(recommendations): AI Recommendations page with ranked options |
-| 2026-11-19 | 68188f2 | roop | R-08 | in-progress | feat(frontend): show Other events group in audit trace |
-| 2026-11-19 | 0f09b80 | roop | R-08 | in-progress | fix(frontend): reset admin settings mock globally, mark approval PROVISIONAL |
-| 2026-11-19 | 9c33083 | roop | R-11 | in-progress | docs(demo): draft demo script, deck outline, shot list and Q&A prep |
-| 2026-11-19 | 9333696 | roop | R-06 | in-progress | docs(flow): R-06 Flow approval build spec, test plan, config |
-| 2026-11-19 | 81026cc | roop | R-08 | in-progress | merge: R-08 --settings sub-branch into task branch |

@@ -68,7 +68,7 @@
     "Agentstudio has no prompt-injection switch: injection resistance = instructions rule 6 + RP-ADV-04",
     "Not denied on purpose: requests to guess capacity/lead time or override quantities - a blocked reply is not JSON; the prompt answers those via data_gaps (rule 7)"
   ],
-  "status": "built, testing",
+  "status": "built in Agentstudio, draft, not deployed; tested v1.3.0 (6 live runs graded; known issue: assumptions_qualitative on SUP-2002 capacity in DEMO and RP-ADV-04)",
   "agentstudio": {
     "account": "Uday's training account (same as SG Supplier Risk Analyst)",
     "agent_mode": "Structured",
