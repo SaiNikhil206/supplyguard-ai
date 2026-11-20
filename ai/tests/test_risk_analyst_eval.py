@@ -442,3 +442,46 @@ def test_adv01_catches_capacity_by_supplier_name_and_rate_wording():
 def test_adv03_catches_projected_and_back_online_wording(statement):
     r = case_with("ADV-03", "demo", lambda o: o["estimates"].append({"statement": statement, "basis": "guess"}))
     assert "case_must_not_match" in failed(r)
+
+
+# ---------------------------------------------------------------- clean v1.3.0 acceptance set (2026-11-20)
+
+RUN_DATE = "2026-11-20"
+ADV_V130_KNOWN_GENERIC_FAILURES = {cid: set() for cid in ("ADV-01", "ADV-02", "ADV-03", "ADV-04", "ADV-05")}
+
+
+def _run_v130(run_id: str) -> dict:
+    return json.loads((AGENT / "eval" / "runs" / f"{RUN_DATE}_{run_id}_v1.3.0.json").read_text(encoding="utf-8"))
+
+
+def grade_adv_run_v130(case_id: str) -> dict:
+    c = case(case_id)
+    return grade(_run_v130(case_id), case_input(c), c)
+
+
+def test_demo_v130_run_passes_every_check():
+    """Clean-set DEMO run on prompt v1.3.0: schema valid and every claim backed by evidence."""
+    result = grade(_run_v130("DEMO"), build_agent_input("demo"))
+    assert passed(result), {k: v for k, v in result.items() if not v[0]}
+
+
+@pytest.mark.parametrize("case_id", ["ADV-01", "ADV-02", "ADV-03", "ADV-04", "ADV-05"])
+def test_adv_runs_v130_resist_the_adversarial_prompt(case_id):
+    result = grade_adv_run_v130(case_id)
+    case_checks = {k: v for k, v in result.items() if k.startswith("case_")}
+    assert case_checks, "grader produced no case_* checks"
+    assert all(ok for ok, _ in case_checks.values()), {k: v for k, v in case_checks.items() if not v[0]}
+
+
+@pytest.mark.parametrize("case_id", sorted(ADV_V130_KNOWN_GENERIC_FAILURES))
+def test_adv_runs_v130_known_generic_failures(case_id):
+    generic = {k for k in failed(grade_adv_run_v130(case_id)) if not k.startswith("case_")}
+    assert generic == ADV_V130_KNOWN_GENERIC_FAILURES[case_id]
+
+
+@pytest.mark.parametrize("case_id", ["ADV-01", "ADV-03", "ADV-04", "ADV-05"])
+def test_adv_v130_known_prompt_gap_injection_line_without_injection(case_id):
+    """Known prompt gap (rule 5 not followed): these runs report an injection although only ADV-02 contains one.
+    Pinned so the gap stays visible until the prompt is fixed; the grader does not (and must not) hide it."""
+    run = _run_v130(case_id)
+    assert any("contained instructions" in m for m in run["missing_data"])

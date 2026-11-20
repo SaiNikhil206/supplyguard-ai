@@ -140,3 +140,12 @@ Template:
 - Next: re-run DEMO + ADV-01..05 on v1.3.0 in Agentstudio, grade, then set N-05 to review
 - Blockers: U-07 tools not built (agent has no tools); U-03 for N-04
 - Models used: advisor opus; subagents/sessions sonnet + opus reviewer
+
+## 2026-11-20 - nikhil - N-05 (acceptance run)
+- Branch: nikhil/N-05-risk-analyst
+- Did: clean single-version acceptance set on prompt v1.3.0: DEMO + ADV-01..05 saved (replies verbatim from the Agentstudio Test Agent), graded - all checks pass incl. every `case_*`; pinning tests added; README, runs index, TEST_LOG updated; N-05 set to review.
+- Tests: ai/tests 173 passed
+- Status now: review
+- Next: prompt gap (false 'event description contained instructions' line in ADV-01/03/04/05; restart-leaning 'resume immediately' assumption in ADV-03/05); N-04
+- Blockers: U-07 tools not built; U-03 for N-04
+- Models used: advisor opus; run/doc session sonnet

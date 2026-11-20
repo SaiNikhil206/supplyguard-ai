@@ -9,11 +9,11 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-20 (N-05 agent live in Agentstudio, re-run pending)
-- **Current task:** N-05 (in-progress; N-01..N-03 auto-merged, in review)
+- **Last updated:** 2026-11-20 (N-05 acceptance run done, in review)
+- **Current task:** N-05 (review; N-01..N-03 auto-merged, in review)
 - **Branch:** `nikhil/N-05-risk-analyst`
-- **Where I left off:** Agent "SG Supplier Risk Analyst" live in Agentstudio (id fa1f773c-b314-4cf5-ab69-44b999467cd3) on prompt v1.3.0, not deployed. 7 real runs graded in `boomi/agents/risk_analyst/eval/runs/` (DEMO v1.2.0 all pass; ADV-01..05 resisted on case_* checks, mixed v1.2.0/v1.3.0). Grader hardened after Opus review; 158 ai tests green.
-- **Next step:** re-run DEMO + ADV-01..05 on v1.3.0 (payload via `python -m ai.eval.payload <ID>`, paste in Agentstudio Test Agent), grade, then set N-05 to review.
+- **Where I left off:** Clean v1.3.0 set (DEMO + ADV-01..05, 2026-11-20) all pass the grader; N-05 set to review, 173 ai tests green. Agent "SG Supplier Risk Analyst" (id fa1f773c-b314-4cf5-ab69-44b999467cd3) not deployed, no tools yet.
+- **Next step:** fix the prompt gap (false injection line, restart-leaning assumption) in a later version if time allows; then N-04 / N-06 per dependencies.
 - **Blockers:** U-07 tools not built (agent has no tools); U-03 for N-04.
 ---
 
@@ -72,17 +72,17 @@
 - **Notes:** -
 
 ### N-05: Supplier Risk Analyst agent (Agentstudio)
-- **Status:** in-progress
+- **Status:** review
 - **Sprint:** S2 (1-4 Dec) | **Est:** 2d | **Depends:** N-01, U-01
 - **Branch:** `nikhil/N-05-risk-analyst`
 - **Model hint:** opus / high (prompt + guardrails); use the boomi-agentstudio skill if installed
 - **Deliverables:** agent in Agentstudio with instructions, tools (ERP lookups via Uday's U-07 processes), guardrails: no invented capacity/price/dates, separate facts vs estimates, must fill `missing_data`. Prompt + config versioned in `boomi/agents/risk_analyst/`.
 - **Acceptance:**
-  - [ ] Output for the demo scenario validates against `risk_analysis.schema.json`
-  - [ ] Every claim has an `evidence` entry pointing to snapshot data
-  - [ ] 5 adversarial prompts (asking it to guess capacity etc.) -> it reports missing data instead
+  - [x] Output for the demo scenario validates against `risk_analysis.schema.json`
+  - [x] Every claim has an `evidence` entry pointing to snapshot data
+  - [x] 5 adversarial prompts (asking it to guess capacity etc.) -> it reports missing data instead
 - **Done in:** -
-- **Notes:** Agent created in Agentstudio (prompt v1.3.0, not deployed); 7 real runs graded (see `boomi/agents/risk_analyst/README.md`, `eval/runs/README.md`). Acceptance not formally met: needs a single-version v1.3.0 re-run of DEMO + ADV-01..05. Known limit: `disruption_history` entries cannot be cited as evidence yet (ADV-05 history fact fails `claims_backed_by_evidence`). Impact in eval inputs is provisional until N-04. No tools until U-07.
+- **Notes:** Agent in Agentstudio (prompt v1.3.0, not deployed). Clean single-version acceptance set run 2026-11-20: DEMO passes every check; ADV-01..05 pass every `case_*` and generic check (see `boomi/agents/risk_analyst/README.md`, `eval/runs/README.md`). Tools pending U-07 (agent runs on the input snapshot only). Impact in eval inputs is provisional until N-04. Open for human review / next prompt version: ADV-01/03/04/05 add a false 'event description contained instructions' line (rule 5); ADV-03/05 assumption 'supplier will resume production immediately after the expected duration' is restart-leaning. Known limit: `disruption_history` entries cannot be cited as evidence yet.
 
 ### N-06: Recovery Planning agent (Agentstudio)
 - **Status:** todo

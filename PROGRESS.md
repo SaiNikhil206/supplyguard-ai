@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 0 | 0 | 11 | 0 | 8% | R-09 |
-| Nikhil | 0 | 1 | 3 | 0 | 10 | 0 | 0% | N-05 |
+| Nikhil | 0 | 0 | 4 | 0 | 10 | 0 | 0% | N-06 |
 | Uday | 1 | 0 | 0 | 0 | 11 | 0 | 8% | U-01 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
@@ -32,7 +32,7 @@
 | U-06 | Event intake + Boomi client (Django `apps/integrations`) | Uday | S1 (26-30 Nov) | todo | 0/5 | - |
 | U-07 | Boomi ERP read processes + canonical profiles | Uday | S1 (25-30 Nov) | todo | 0/3 | - |
 | U-12 | Local + hosted deployment | Uday | S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | todo | 0/3 | - |
-| N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | in-progress | 0/3 | - |
+| N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | review | 3/3 | - |
 | N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | todo | 0/3 | - |
 | N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | todo | 0/3 | - |
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
@@ -70,11 +70,11 @@
 - **Blockers:** Waiting on Uday U-02/U-03/U-04 (backend scaffold, models, tenancy). Ask Uday: keep simplejwt refresh lifetime short (<= 1 day) and ROTATE_REFRESH_TOKENS off; `/me` shape `{user:{id,username,full_name,email}, tenant:{id,name}, role}` is provisional in `frontend/src/api/types.ts`; deploy build must not set VITE_API_MOCK=true.
 
 ### Nikhil
-- **Last updated:** 2026-11-20 (N-05 agent live in Agentstudio, re-run pending)
-- **Current task:** N-05 (in-progress; N-01..N-03 auto-merged, in review)
+- **Last updated:** 2026-11-20 (N-05 acceptance run done, in review)
+- **Current task:** N-05 (review; N-01..N-03 auto-merged, in review)
 - **Branch:** `nikhil/N-05-risk-analyst`
-- **Where I left off:** Agent "SG Supplier Risk Analyst" live in Agentstudio (id fa1f773c-b314-4cf5-ab69-44b999467cd3) on prompt v1.3.0, not deployed. 7 real runs graded in `boomi/agents/risk_analyst/eval/runs/` (DEMO v1.2.0 all pass; ADV-01..05 resisted on case_* checks, mixed v1.2.0/v1.3.0). Grader hardened after Opus review; 158 ai tests green.
-- **Next step:** re-run DEMO + ADV-01..05 on v1.3.0 (payload via `python -m ai.eval.payload <ID>`, paste in Agentstudio Test Agent), grade, then set N-05 to review.
+- **Where I left off:** Clean v1.3.0 set (DEMO + ADV-01..05, 2026-11-20) all pass the grader; N-05 set to review, 173 ai tests green. Agent "SG Supplier Risk Analyst" (id fa1f773c-b314-4cf5-ab69-44b999467cd3) not deployed, no tools yet.
+- **Next step:** fix the prompt gap (false injection line, restart-leaning assumption) in a later version if time allows; then N-04 / N-06 per dependencies.
 - **Blockers:** U-07 tools not built (agent has no tools); U-03 for N-04.
 
 ### Uday
@@ -89,23 +89,23 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
-| 2026-11-19 | 498238b | nikhil | N-05 | in-progress | test(agents): v1.2.0 demo run passes all grader checks |
-| 2026-11-19 | fce0b3d | roop | R-03 | in-progress | refactor(frontend): R-03 review nits - shared status/format, chart a11y, deterministic tests |
-| 2026-11-19 | 7f0f7d0 | nikhil | N-05 | in-progress | feat(agents): first real Agentstudio run, prompt v1.2.0 |
-| 2026-11-19 | 0b37b88 | roop | R-03 | in-progress | chore(tasks): handoff R-03 - screens on mocks, waiting on R-02 |
-| 2026-11-19 | 01204b1 | roop | R-03 | in-progress | merge: R-03 --supplier-detail sub-branch into task branch |
-| 2026-11-19 | 57d4de8 | roop | R-03 | in-progress | merge: R-03 --supplier-list sub-branch into task branch |
-| 2026-11-19 | 308448b | roop | R-03 | in-progress | merge: R-03 --overview sub-branch into task branch |
-| 2026-11-19 | d50b1eb | nikhil | N-05 | in-progress | feat(agents): Risk Analyst created as draft in Agentstudio |
-| 2026-11-19 | b03365d | roop | R-03 | in-progress | feat(frontend): Supplier detail with KPIs and disruption history |
-| 2026-11-19 | 03102fa | roop | R-03 | in-progress | feat(frontend): Executive Overview KPIs and trend charts |
-| 2026-11-19 | 9a7211c | roop | R-03 | in-progress | feat(frontend): Supplier Intelligence list with filters and pagination |
-| 2026-11-19 | 93c00d8 | roop | S-02 | in-progress | docs(workflow): build every task with nested sessions, advisor only plans |
-| 2026-11-19 | 2b5d41a | roop | R-03 | in-progress | chore(tasks): start R-03 overview + supplier screens |
-| 2026-11-19 | 7152665 | roop | R-09 | review | merge: R-09 CI pipeline (auto-merge) |
-| 2026-11-19 | 029f90b | roop | S-02 | in-progress | feat(workflow): enforce model routing and nested branches per subtask |
-| 2026-11-19 | ba05765 | roop | R-09 | review | chore(tasks): handoff R-09 - in review |
-| 2026-11-19 | 0d95fec | roop | R-09 | in-progress | ci: address R-09 re-review nits |
-| 2026-11-19 | fba72b3 | nikhil | N-01 | review | merge: N-01 Agent I/O JSON schemas + fixtures (auto-merge) |
-| 2026-11-19 | fa79ece | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - offline part done, waiting on U-01 |
-| 2026-11-19 | f8604c7 | nikhil | N-05 | in-progress | feat(ai): Risk Analyst agent definition, eval inputs and grader |
+| 2026-11-20 | b1cffba | nikhil | N-05 | in-progress | chore(tasks): handoff N-05 - agent live, re-run pending |
+| 2026-11-20 | 76056e7 | nikhil | N-05 | in-progress | feat(agents): harden grader after review, ADV-05 run, docs |
+| 2026-11-19 | 058e037 | roop | R-11 | in-progress | merge: R-11 --script sub-branch into task branch |
+| 2026-11-19 | 6bf5382 | roop | R-06 | in-progress | merge: R-06 --flow-spec sub-branch into task branch |
+| 2026-11-19 | 06e0a21 | roop | R-05 | in-progress | merge: R-05 --approvals sub-branch into task branch |
+| 2026-11-19 | e38dc81 | roop | R-05 | in-progress | merge: R-05 --recommendations sub-branch into task branch |
+| 2026-11-19 | d86578d | roop | R-08 | in-progress | merge: R-08 --settings sub-branch into task branch |
+| 2026-11-19 | ddfeb93 | roop | R-08 | in-progress | merge: R-08 --audit sub-branch into task branch |
+| 2026-11-19 | 54a6bb0 | roop | R-07 | in-progress | merge: R-07 --simulator sub-branch into task branch |
+| 2026-11-19 | 4a7a066 | roop | R-04 | in-progress | merge: R-04 --inbox sub-branch into task branch |
+| 2026-11-19 | 81e29b1 | roop | R-05 | in-progress | feat(approvals): Approval Center with decision, execution status and retry |
+| 2026-11-19 | cb32f74 | roop | R-07 | in-progress | feat(frontend): What-if simulator chart text alternative, robust timing test |
+| 2026-11-19 | ae15b49 | roop | R-04 | in-progress | refactor(frontend): inbox review nits - 400 on unknown scenario, SCENARIOS in mocks |
+| 2026-11-19 | 2cefce6 | roop | R-05 | in-progress | docs(tasks): mark R-05 in-progress with piece plan |
+| 2026-11-19 | 4b451a3 | roop | R-05 | in-progress | feat(recommendations): AI Recommendations page with ranked options |
+| 2026-11-19 | 68188f2 | roop | R-08 | in-progress | feat(frontend): show Other events group in audit trace |
+| 2026-11-19 | 0f09b80 | roop | R-08 | in-progress | fix(frontend): reset admin settings mock globally, mark approval PROVISIONAL |
+| 2026-11-19 | 9c33083 | roop | R-11 | in-progress | docs(demo): draft demo script, deck outline, shot list and Q&A prep |
+| 2026-11-19 | 9333696 | roop | R-06 | in-progress | docs(flow): R-06 Flow approval build spec, test plan, config |
+| 2026-11-19 | 81026cc | roop | R-08 | in-progress | merge: R-08 --settings sub-branch into task branch |
