@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react';
 import type { RiskAnalysis, RiskCaseState } from '@/api/types';
 import { AnalysisPanel } from '@/features/risk/analysis';
 
@@ -9,13 +10,23 @@ export interface AnalysisSlotProps {
 
 export function AnalysisSlot({ status, analysis }: AnalysisSlotProps) {
   return (
-    <section aria-labelledby="analysis-heading" className="rounded-lg border border-border bg-surface p-4">
-      <h2 id="analysis-heading" className="mb-3 text-base font-semibold text-text">
-        AI risk analysis
-      </h2>
-      <div data-testid="analysis-slot">
-        <AnalysisPanel analysis={analysis} status={status} />
-      </div>
-    </section>
+    <div className="rounded-2xl bg-gradient-to-br from-violet-500/50 via-border to-transparent p-px">
+      <section aria-labelledby="analysis-heading" className="rounded-[15px] bg-card p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500">
+            <Sparkles aria-hidden="true" className="h-4 w-4" />
+          </span>
+          <h2 id="analysis-heading" className="text-base font-semibold">
+            AI risk analysis
+          </h2>
+          <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-500 ring-1 ring-violet-500/20">
+            AI
+          </span>
+        </div>
+        <div data-testid="analysis-slot">
+          <AnalysisPanel analysis={analysis} status={status} />
+        </div>
+      </section>
+    </div>
   );
 }
