@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { loginAs } from '@/test/loginAs';
@@ -14,7 +14,7 @@ describe('app shell (authenticated)', () => {
     const nav = await screen.findByRole('navigation', { name: 'Main' });
     expect(navItems).toHaveLength(9);
     for (const item of navItems) {
-      const link = screen.getByRole('link', { name: new RegExp(item.label) });
+      const link = within(nav).getByRole('link', { name: new RegExp(item.label) });
       expect(nav).toContainElement(link);
       expect(link).toHaveAttribute('href', item.path);
     }
