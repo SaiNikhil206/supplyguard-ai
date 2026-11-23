@@ -444,3 +444,183 @@ def test_risk_known_capacity_not_required_in_missing_data(analysis, demo):
     analysis["missing_data"] = []
     ev(analysis, "SUP-1008", "capacity_per_week")["value"] = 1000
     assert run_risk(analysis, demo)["valid"]
+
+
+# ----------------------------------------------------------------------- review fixes (round 2)
+
+
+def alt_option(plan):
+    return copy.deepcopy(opt(plan, 1))
+
+
+def only(plan, option):
+    plan = copy.deepcopy(plan)
+    plan["options"] = [option]
+    option["rank"] = 1
+    return plan
+
+
+def test_foreign_change_keys_per_option_type(plan, demo):
+    o = copy.deepcopy(opt(plan, 4))
+    o["proposed_action"]["change"]["supplier_id"] = "SUP-9999"
+    assert "CHANGE_FIELD_NOT_ALLOWED" in codes(run_plan(only(plan, o), demo))
+    o = copy.deepcopy(opt(plan, 2))
+    o["proposed_action"]["change"].update(
+        {"supplier_id": "SUP-9999", "expected_date": "2020-01-01"}
+    )
+    assert "CHANGE_FIELD_NOT_ALLOWED" in codes(run_plan(only(plan, o), demo))
+    o = alt_option(plan)
+    o["proposed_action"]["change"]["expected_date"] = "2020-01-01"
+    assert "CHANGE_FIELD_NOT_ALLOWED" in codes(run_plan(only(plan, o), demo))
+    o = alt_option(plan)
+    o["option_type"] = "SPLIT_ORDER"
+    o["proposed_action"]["change"]["item_id"] = "ITM-501"
+    assert "CHANGE_FIELD_NOT_ALLOWED" in codes(run_plan(only(plan, o), demo))
+
+
+def test_alternate_without_qty_cost_delta_still_checked(plan, demo):
+    o = alt_option(plan)
+    del o["proposed_action"]["change"]["qty"]
+    o["estimated_cost_delta"] = {"amount": "-99999.00", "currency": "INR"}
+    assert "COST_DELTA_MISMATCH" in codes(run_plan(only(plan, o), demo))
+    o["estimated_cost_delta"] = {
+        "amount": "33600.00",
+        "currency": "INR",
+    }  # on the affected qty 4000
+    assert not run_plan(only(plan, o), demo)["options"][0]["unsupported"]
+
+
+def test_null_unit_price_with_cost_delta_unsupported(plan, demo):
+    alt_row(demo["snapshot"], "SUP-2001")["unit_price"] = None
+    o = alt_option(plan)
+    o["evidence"] = [
+        e for e in o["evidence"] if e["field"] != "unit_price" or e["entity"] != "SUP-2001"
+    ]
+    assert "COST_DELTA_UNSUPPORTED" in codes(run_plan(only(plan, o), demo))
+    demo2 = copy.deepcopy(demo)
+    demo2["snapshot"]["alternate_suppliers"] = _reset_alt(demo2)
+    for po in demo2["snapshot"]["purchase_orders"]:
+        po["lines"][0]["unit_price"] = None
+    o = alt_option(plan)
+    o["evidence"] = [e for e in o["evidence"] if e["field"] != "unit_price"]
+    assert "COST_DELTA_UNSUPPORTED" in codes(run_plan(only(plan, o), demo2))
+
+
+def _reset_alt(demo):
+    return [a for a in eval_payload("RP-DEMO")["snapshot"]["alternate_suppliers"]]
+
+
+def test_float_qty_is_coerced_not_a_crash(plan, demo):
+    o = alt_option(plan)
+    o["proposed_action"]["change"]["qty"] = 4000.0
+    r = run_plan(only(plan, o), demo)
+    assert r["valid"] and not r["options"][0]["unsupported"]
+
+
+def test_fractional_qty_flagged(plan, demo):
+    o = alt_option(plan)
+    o["proposed_action"]["change"]["qty"] = 3999.5
+    r = val.fact_check_recovery_plan(only(plan, o), demo["snapshot"], demo["impact"])
+    assert "QTY_INVALID" in {x["code"] for x in r["options"][0]["unsupported_reasons"]}
+
+
+def test_null_inventory_numbers_fail_closed(plan, demo):
+    for r in demo["snapshot"]["inventory"]:
+        r["reserved"] = None
+    r = run_plan(only(plan, copy.deepcopy(opt(plan, 2))), demo)
+    assert "TRANSFER_STOCK_UNKNOWN" in codes(r) and r["options"][0]["unsupported"]
+
+
+def test_unexpected_exception_marks_option_unsupported(plan, demo):
+    bad = copy.deepcopy(plan)
+    bad["options"][0]["evidence"] = [
+        {"source": "ERP"}
+    ]  # malformed evidence slips past a direct call
+    r = val.fact_check_recovery_plan(bad, demo["snapshot"], demo["impact"])
+    assert "VALIDATOR_ERROR" in {x["code"] for x in r["options"][0]["unsupported_reasons"]}
+
+
+def test_plan_level_error_marks_all_options_unsupported(plan, demo):
+    r = run_plan(plan, demo, risk_case_id="RC-000999")
+    assert not r["valid"] and r["actionable_count"] == 0
+    assert all(o["unsupported"] for o in r["options"])
+    assert all(
+        "RISK_CASE_MISMATCH" in {x["code"] for x in o["unsupported_reasons"]} for o in r["options"]
+    )
+
+
+def test_duplicate_option_flagged(plan, demo):
+    dup = copy.deepcopy(opt(plan, 1))
+    dup["rank"] = 5
+    plan["options"].append(dup)
+    r = run_plan(plan, demo)
+    assert "DUPLICATE_OPTION" in codes(r, 5) and "DUPLICATE_OPTION" not in codes(r, 1)
+
+
+def test_alternate_without_supplier_evidence(plan, demo):
+    o = alt_option(plan)
+    o["evidence"] = [e for e in o["evidence"] if e["source"] == "IMPACT"]
+    assert "EVIDENCE_MISSING" in codes(run_plan(only(plan, o), demo))
+
+
+def test_qty_compared_to_the_options_item(plan, demo):
+    # second affected item on the PO with a small qty: qty above that item is flagged
+    demo["impact"]["affected_pos"].append(
+        {**demo["impact"]["affected_pos"][0], "item_id": "ITM-502", "affected_qty": 10}
+    )
+    demo["snapshot"]["purchase_orders"][0]["lines"].append(
+        {
+            "item_id": "ITM-502",
+            "qty": 10,
+            "due_date": "2026-12-03",
+            "unit_price": {"amount": "1.00", "currency": "INR"},
+        }
+    )
+    demo["snapshot"]["alternate_suppliers"].append(
+        {
+            "item_id": "ITM-502",
+            "supplier_id": "SUP-2001",
+            "qualified": True,
+            "lead_time_days": 2,
+            "unit_price": {"amount": "2.00", "currency": "INR"},
+            "capacity": 100,
+        }
+    )
+    o = alt_option(plan)
+    o["proposed_action"]["change"]["qty"] = 50
+    o["evidence"] = [
+        e
+        for e in o["evidence"]
+        if e["field"] not in ("unit_price", "lead_time_days", "capacity")
+        or e["entity"] == "PO-1001"
+    ]
+    for e in o["evidence"]:
+        e["item_id"] = "ITM-502" if e["entity"] == "SUP-2001" else e.get("item_id")
+    r = val.fact_check_recovery_plan(only(plan, o), demo["snapshot"], demo["impact"])
+    assert "QTY_EXCEEDS_AFFECTED" in {x["code"] for x in r["options"][0]["unsupported_reasons"]}
+
+
+def test_scientific_notation_string_is_not_a_number(plan, demo):
+    ev(opt(plan, 1), "SUP-2001", "capacity")["value"] = "5e3"
+    assert "CAPACITY_MISMATCH" in codes(run_plan(plan, demo))
+    assert val._dec("NaN") is None and val._dec("Infinity") is None and val._dec(True) is None
+
+
+def test_demo_capacity_claim_test_runs_on_null_capacity(demo):
+    assert (
+        demo["snapshot"]["supplier"]["capacity_per_week"] is None
+    )  # the CAPACITY_INVENTED test relies on it
+
+
+def test_schema_dir_configurable(monkeypatch, tmp_path, plan, demo):
+    monkeypatch.setenv("SG_SCHEMA_DIR", str(tmp_path))
+    with pytest.raises(RuntimeError, match="SG_SCHEMA_DIR"):
+        val.validate_schema(PLAN_KIND, plan)
+    monkeypatch.setenv("SG_SCHEMA_DIR", str(ROOT / "ai" / "schemas"))
+    assert val.validate_schema(PLAN_KIND, plan) == []
+
+
+def test_schema_dir_from_django_setting(monkeypatch, tmp_path, plan, settings):
+    monkeypatch.delenv("SG_SCHEMA_DIR", raising=False)
+    settings.SG_SCHEMA_DIR = str(ROOT / "ai" / "schemas")
+    assert val.validate_schema(PLAN_KIND, plan) == []
