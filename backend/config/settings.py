@@ -194,3 +194,19 @@ EXECUTION_MAX_RETRIES = env.int("EXECUTION_MAX_RETRIES", default=3)
 # --- Seed data (manage.py load_seed, docs/CONTRACTS.md section 10) ---------------------------
 # Folder with tenants.json, suppliers.json, ...; default is <repo>/data/seed.
 SEED_DATA_DIR = Path(env("SEED_DATA_DIR", default=str(BASE_DIR.parent / "data" / "seed")))
+
+# --- Boomi (U-06; docs/BOOMI_ENV.md) ---------------------------------------------------------
+# Empty BOOMI_BASE_URL = not configured: events are stored but not published.
+BOOMI_BASE_URL = env("BOOMI_BASE_URL", default="").strip()
+BOOMI_API_KEY = env("BOOMI_API_KEY", default="")  # secret: never log it
+# 'apikey' -> X-Api-Key header; 'basic' -> BOOMI_API_KEY is 'user:password' (HTTP Basic).
+BOOMI_AUTH_MODE = env("BOOMI_AUTH_MODE", default="apikey").strip().lower()
+# PLACEHOLDER path until U-08/U-09 define the real Boomi listener / gateway route.
+BOOMI_EVENT_PATH = env("BOOMI_EVENT_PATH", default="/ws/simple/createDisruptionEvent")
+BOOMI_TIMEOUT_CONNECT = env.float("BOOMI_TIMEOUT_CONNECT", default=3)
+BOOMI_TIMEOUT_READ = env.float("BOOMI_TIMEOUT_READ", default=10)
+BOOMI_MAX_RETRIES = env.int("BOOMI_MAX_RETRIES", default=2)
+BOOMI_BACKOFF_SECONDS = env.float("BOOMI_BACKOFF_SECONDS", default=0.5)
+
+# Folder with the demo scenarios (data/scenarios); /data/scenarios inside Docker.
+SCENARIO_DIR = Path(env("SCENARIO_DIR", default=str(BASE_DIR.parent / "data" / "scenarios")))

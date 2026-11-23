@@ -28,6 +28,16 @@ def _user_body():
     }
 
 
+def _event_body():
+    return {
+        "event_id": f"EVT-{7000 + next(_seq)}",
+        "supplier_id": "SUP-NOPE",
+        "event_type": "FACTORY_OUTAGE",
+        "severity": "HIGH",
+        "event_time": "2026-12-02T10:15:00Z",
+    }
+
+
 # The expected permissions, written out by hand from docs/CONTRACTS.md s2 + s4 and the DESIGN
 # paragraph of U-04 in tasks/UDAY.md. It is deliberately NOT derived from ROLE_MATRIX: a change
 # to the matrix must fail this test until this table is changed on purpose, too.
@@ -53,8 +63,11 @@ EXPECTED = {
     "internal.execution-result": {"POST": {"SYSTEM"}},
     "integrations.status": {"GET": {"ADMIN"}},
 }
-EXPECTED_ROUTED = {"me.read", "settings.read", "settings.write", "users.read", "users.write",
-                   "audit.read"}  # keys that have a real endpoint today; add when routed
+# keys that have a real endpoint today; add when routed
+EXPECTED_ROUTED = {
+    "me.read", "settings.read", "settings.write", "users.read", "users.write", "audit.read",
+    "events.create", "demo.simulate", "integrations.status",
+}
 
 # permission_key -> (path, body factory or None). One entry per ROUTED matrix row.
 ROUTES = {
@@ -64,8 +77,11 @@ ROUTES = {
     "users.read": (API + "users", None),
     "users.write": (API + "users", _user_body),
     "audit.read": (API + "audit", None),
+    "events.create": (API + "events/disruptions", _event_body),
+    "demo.simulate": (API + "demo/simulate-disruption", lambda: {"scenario": "demo"}),
+    "integrations.status": (API + "integrations/status", None),
 }
-OK = {200, 201}
+OK = {200, 201, 202}
 
 
 def _request(client, method, path, body_factory):
