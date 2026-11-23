@@ -17,10 +17,10 @@ export function Switch({
 }) {
   const id = useId();
   return (
-    <div className="flex items-start justify-between gap-4 rounded-xl border border-border/60 bg-card/60 p-4">
+    <div className="flex items-start justify-between gap-4 rounded-lg border border-border bg-card p-4">
       <div className="flex items-start gap-3">
         {icon && (
-          <span className="mt-0.5 text-primary [&_svg]:h-5 [&_svg]:w-5">
+          <span className="mt-0.5 text-muted [&_svg]:h-4 [&_svg]:w-4">
             {icon}
           </span>
         )}
@@ -39,15 +39,15 @@ export function Switch({
         aria-labelledby={`${id}-l`}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          checked ? "bg-primary" : "bg-border",
+          "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          checked ? "bg-primary" : "bg-slate-300 dark:bg-slate-600",
         )}
       >
         <span
           aria-hidden="true"
           className={cn(
-            "inline-block h-5 w-5 rounded-full bg-white shadow transition-transform",
-            checked ? "translate-x-[22px]" : "translate-x-0.5",
+            "inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+            checked ? "translate-x-[18px]" : "translate-x-0.5",
           )}
         />
       </button>

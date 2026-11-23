@@ -1,11 +1,4 @@
-import { useEffect, useState } from "react";
-import {
-  AlertTriangle,
-  CheckCircle2,
-  ClipboardList,
-  Timer,
-  Trophy,
-} from "lucide-react";
+import { CheckCircle2, Timer } from "lucide-react";
 import type { WhatIfResult } from "@/api/whatif";
 import {
   Badge,
@@ -21,36 +14,14 @@ import {
   formatMoney,
 } from "@/components/ui";
 import { ChartCard } from "@/features/admin/ui/ChartCard";
-import { IconTile } from "@/features/admin/ui/StatCard";
+import { StatCard } from "@/features/admin/ui/StatCard";
 import { InventoryGapChart } from "./InventoryGapChart";
 import { OPTION_LABELS } from "./labels";
 
-function useCountUp(target: number, ms = 600) {
-  const [v, setV] = useState(0);
-  useEffect(() => {
-    if (!Number.isFinite(target)) return;
-    const reduced =
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
-    const t0 = performance.now();
-    const tick = (t: number) => {
-      const p = reduced ? 1 : Math.min(1, (t - t0) / ms);
-      setV(target * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, ms]);
-  return v;
-}
-
-const card =
-  "rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur";
+const card = "rounded-lg border border-border bg-card";
 
 export function WhatIfResults({ result }: { result: WhatIfResult }) {
   const best = result.best_option;
-  const amount = useCountUp(Number(result.exposure.amount));
   return (
     <div
       className="space-y-4 duration-300 animate-in fade-in slide-in-from-bottom-2"
@@ -64,29 +35,19 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
         </Badge>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-primary/40 via-border to-transparent p-px">
-        <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-card p-6">
-          <div className="space-y-1">
-            <p className="text-sm text-muted">Estimated exposure</p>
-            <p className="text-4xl font-semibold tabular-nums tracking-tight text-rose-600 dark:text-rose-400">
-              <span className="sr-only">{formatMoney(result.exposure)}</span>
-              <span aria-hidden="true">
-                {formatMoney({ amount, currency: result.exposure.currency })}
-              </span>
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <IconTile tint="amber">
-              <ClipboardList />
-            </IconTile>
-            <div>
-              <p className="text-3xl font-semibold tabular-nums">
-                {result.affected_pos.length}
-              </p>
-              <p className="text-sm text-muted">Affected POs</p>
-            </div>
-          </div>
-        </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <StatCard
+          label="Estimated exposure"
+          value={
+            <span className="text-danger">{formatMoney(result.exposure)}</span>
+          }
+          hint="Value of purchase orders at risk"
+        />
+        <StatCard
+          label="Affected POs"
+          value={result.affected_pos.length}
+          hint="Open orders from this supplier in the window"
+        />
       </div>
 
       <ChartCard
@@ -97,12 +58,12 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
       </ChartCard>
 
       <div className={card}>
-        <div className="flex items-center justify-between border-b border-border/60 px-5 py-3.5">
-          <h3 className="text-sm font-semibold tracking-tight">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <h3 className="text-sm font-semibold">
             Affected purchase orders
           </h3>
         </div>
-        <div className="p-2">
+        <div>
           <Table>
             <THead>
               <TR>
@@ -141,21 +102,17 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-emerald-500/40 via-border to-transparent p-px">
-        <div className="space-y-3 rounded-2xl bg-card p-5">
-          <div className="flex items-center gap-3">
-            <IconTile tint={best ? "emerald" : "rose"}>
-              {best ? <Trophy /> : <AlertTriangle />}
-            </IconTile>
-            <h3 className="text-sm font-semibold tracking-tight">
-              Best option
-            </h3>
-          </div>
+      <div className={card}>
+        <div className="border-b border-border px-5 py-4">
+          <h3 className="text-sm font-semibold">Best option</h3>
+        </div>
+        <div className="space-y-2 p-5 text-sm">
           {best ? (
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 text-lg font-semibold">
+            <>
+              <div className="flex items-center gap-2 text-base font-semibold">
                 <CheckCircle2
-                  className="h-5 w-5 text-emerald-500"
+                  className="h-4 w-4 text-success"
+                  strokeWidth={1.75}
                   aria-hidden="true"
                 />
                 {OPTION_LABELS[best.option_type]}
@@ -168,9 +125,9 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
                   : `${best.estimated_lead_time_days} days`}
                 {" · "}Cost change: <Money value={best.estimated_cost_delta} />
               </p>
-            </div>
+            </>
           ) : (
-            <p className="text-sm font-semibold">No viable option</p>
+            <p className="font-semibold">No viable option</p>
           )}
         </div>
       </div>
@@ -178,11 +135,11 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
       <div className="grid gap-4 md:grid-cols-2">
         <div
           className={
-            result.missing_data.length ? `${card} border-rose-500/40` : card
+            result.missing_data.length ? `${card} border-warning/40` : card
           }
         >
-          <div className="border-b border-border/60 px-5 py-3.5">
-            <h3 className="text-sm font-semibold tracking-tight">
+          <div className="border-b border-border px-5 py-4">
+            <h3 className="text-sm font-semibold">
               Missing data
             </h3>
           </div>
@@ -202,8 +159,8 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
           </div>
         </div>
         <div className={card}>
-          <div className="border-b border-border/60 px-5 py-3.5">
-            <h3 className="text-sm font-semibold tracking-tight">
+          <div className="border-b border-border px-5 py-4">
+            <h3 className="text-sm font-semibold">
               Assumptions
             </h3>
           </div>

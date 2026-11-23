@@ -83,9 +83,9 @@ export function WhatIfForm({
   return (
     <form onSubmit={submit} aria-label="What-if scenario" className="space-y-6">
       <div className="space-y-2">
-        <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
+        <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted">
           <Sparkles
-            className="h-3.5 w-3.5 text-violet-500"
+            className="h-3.5 w-3.5 text-primary"
             aria-hidden="true"
           />{" "}
           Quick scenarios
@@ -96,7 +96,6 @@ export function WhatIfForm({
               key={p.label}
               size="sm"
               variant="secondary"
-              className="rounded-full"
               onClick={() => onPreset(p)}
               disabled={disabled || suppliers.length === 0}
             >
@@ -149,13 +148,13 @@ export function WhatIfForm({
                 aria-checked={on}
                 onClick={() => set({ event_type: t })}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex cursor-pointer flex-col items-center gap-1.5 rounded-md border p-3 text-center text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   on
-                    ? "border-primary bg-primary/10 text-primary shadow-sm"
-                    : "border-border/60 bg-card text-muted hover:border-primary/40 hover:text-foreground",
+                    ? "border-primary bg-accent text-accent-foreground"
+                    : "border-border bg-card text-muted hover:bg-surface-2 hover:text-foreground",
                 )}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                 {EVENT_LABELS[t]}
               </button>
             );
@@ -170,7 +169,7 @@ export function WhatIfForm({
         >
           <span>Duration</span>
           <span
-            className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold tabular-nums text-primary-foreground"
+            className="text-sm font-medium tabular-nums text-foreground"
             data-testid="duration-bubble"
           >
             {days}
@@ -204,7 +203,7 @@ export function WhatIfForm({
         <p className="text-sm font-medium">
           Severity <span className="font-normal text-muted">(optional)</span>
         </p>
-        <div className="grid grid-cols-5 gap-1 rounded-xl bg-surface-2 p-1">
+        <div className="grid grid-cols-5 gap-1 rounded-md bg-surface-2 p-1">
           {([undefined, ...SEVERITIES] as (Severity | undefined)[]).map((s) => {
             const on = values.severity === s;
             return (
@@ -215,11 +214,11 @@ export function WhatIfForm({
                 aria-checked={on}
                 onClick={() => set({ severity: s })}
                 className={cn(
-                  "rounded-lg px-1 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "cursor-pointer rounded px-1 py-1.5 text-xs font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   on
                     ? s
-                      ? cn("shadow-sm ring-1", SEVERITY_STYLE[s])
-                      : "bg-card text-foreground shadow-sm"
+                      ? cn("ring-1", SEVERITY_STYLE[s])
+                      : "bg-card text-foreground ring-1 ring-border"
                     : "text-muted hover:text-foreground",
                 )}
               >
@@ -235,7 +234,6 @@ export function WhatIfForm({
 
       <Button
         type="submit"
-        size="lg"
         className="w-full"
         loading={running}
         disabled={disabled || !values.supplier_id}
@@ -247,7 +245,7 @@ export function WhatIfForm({
       {!canRun && (
         <p
           id={noteId}
-          className="flex items-start gap-2 rounded-xl bg-surface-2 p-3 text-sm text-muted"
+          className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-sm text-muted"
         >
           <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           Your role is read-only, so you can&apos;t run simulations. Ask an Ops

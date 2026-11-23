@@ -3,6 +3,7 @@ import { UserPlus, Users } from "lucide-react";
 import { ApiError } from "@/api/client";
 import { USER_ROLES, type NewUser } from "@/api/admin/settings";
 import {
+  Badge,
   Button,
   Dialog,
   DialogContent,
@@ -33,15 +34,6 @@ const label = (r: string) =>
     .split("_")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
-
-const ROLE_STYLE: Record<string, string> = {
-  ADMIN: "bg-rose-500/10 text-rose-600 ring-rose-500/20 dark:text-rose-400",
-  PROCUREMENT_MANAGER:
-    "bg-violet-500/10 text-violet-600 ring-violet-500/20 dark:text-violet-400",
-  OPS_MANAGER: "bg-sky-500/10 text-sky-600 ring-sky-500/20 dark:text-sky-400",
-  VIEWER:
-    "bg-slate-500/10 text-slate-600 ring-slate-500/20 dark:text-slate-300",
-};
 
 const initials = (name: string) =>
   name
@@ -109,7 +101,7 @@ export function UsersPanel() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold">Users &amp; roles</h2>
+          <h2 className="text-sm font-semibold">Users &amp; roles</h2>
           <p className="text-sm text-muted">
             Who can see, approve and administer this tenant.
           </p>
@@ -183,7 +175,7 @@ export function UsersPanel() {
         <div className="space-y-2" role="status" aria-busy="true">
           <span className="sr-only">Loading users</span>
           {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+            <Skeleton key={i} className="h-14 w-full rounded-md" />
           ))}
         </div>
       )}
@@ -198,18 +190,20 @@ export function UsersPanel() {
         />
       )}
       {users.data && users.data.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border px-6 py-12 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Users className="h-6 w-6" aria-hidden="true" />
-          </span>
-          <p className="text-lg font-semibold">No users yet</p>
+        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border bg-card px-6 py-12 text-center">
+          <Users
+            className="h-10 w-10 text-muted"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+          <p className="text-sm font-semibold">No users yet</p>
           <p className="text-sm text-muted">
             Add the first user to start collaborating.
           </p>
         </div>
       )}
       {users.data && users.data.length > 0 && (
-        <div className="rounded-2xl border border-border/60 bg-card/80 p-2 shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-border bg-card">
           <Table>
             <THead>
               <TR>
@@ -221,12 +215,12 @@ export function UsersPanel() {
             </THead>
             <TBody>
               {users.data.map((u) => (
-                <TR key={u.id} className="h-14">
+                <TR key={u.id}>
                   <TD>
                     <div className="flex items-center gap-3">
                       <span
                         aria-hidden="true"
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-violet-500 text-xs font-semibold text-white"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-xs font-medium text-muted"
                       >
                         {initials(u.full_name)}
                       </span>
@@ -240,22 +234,17 @@ export function UsersPanel() {
                   </TD>
                   <TD>{u.email}</TD>
                   <TD>
-                    <span
-                      className={cn(
-                        "rounded-full px-2.5 py-0.5 text-xs font-medium ring-1",
-                        ROLE_STYLE[u.role] ?? ROLE_STYLE.VIEWER,
-                      )}
-                    >
+                    <Badge tone={u.role === "ADMIN" ? "primary" : "neutral"}>
                       {label(u.role)}
-                    </span>
+                    </Badge>
                   </TD>
                   <TD>
                     <span className="inline-flex items-center gap-1.5 text-sm">
                       <span
                         aria-hidden="true"
                         className={cn(
-                          "h-2 w-2 rounded-full",
-                          u.active ? "bg-emerald-500" : "bg-slate-400",
+                          "h-1.5 w-1.5 rounded-full",
+                          u.active ? "bg-success" : "bg-slate-400",
                         )}
                       />
                       {u.active ? "Active" : "Inactive"}

@@ -75,7 +75,7 @@ export default function AuditCenter() {
     setParams(new URLSearchParams());
   };
   const panel =
-    "rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur";
+    "overflow-hidden rounded-lg border border-border bg-card";
 
   return (
     <section className="space-y-6">
@@ -140,7 +140,7 @@ export default function AuditCenter() {
         </div>
         <form
           onSubmit={onSearch}
-          className="flex flex-wrap items-end gap-3 border-t border-border/60 p-4"
+          className="flex flex-wrap items-end gap-3 border-t border-border p-4"
         >
           <Field label="Correlation ID" className="min-w-72 flex-1">
             <Input
@@ -168,7 +168,7 @@ export default function AuditCenter() {
             <div className="space-y-2 p-4" aria-busy="true">
               <span className="sr-only">Loading audit events</span>
               {Array.from({ length: 6 }, (_, i) => (
-                <Skeleton key={i} className="h-12 w-full rounded-lg" />
+                <Skeleton key={i} className="h-12 w-full rounded-md" />
               ))}
             </div>
           )}
@@ -179,11 +179,13 @@ export default function AuditCenter() {
             />
           )}
           {q.data && q.data.results.length === 0 && (
-            <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <ScrollText className="h-6 w-6" aria-hidden="true" />
-              </span>
-              <p className="text-lg font-semibold">No audit events match</p>
+            <div className="flex flex-col items-center gap-2 px-6 py-14 text-center">
+              <ScrollText
+                className="h-10 w-10 text-muted"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+              <p className="text-sm font-semibold">No audit events match</p>
               <p className="text-sm text-muted">
                 Try widening the date range or clearing a filter.
               </p>
@@ -195,7 +197,7 @@ export default function AuditCenter() {
           {q.data && q.data.count > PAGE_SIZE && (
             <nav
               aria-label="Pagination"
-              className="flex items-center justify-between border-t border-border/60 p-3 text-sm"
+              className="flex items-center justify-between border-t border-border p-3 text-sm"
             >
               <Button
                 variant="secondary"
