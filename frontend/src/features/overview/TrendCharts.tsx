@@ -1,16 +1,28 @@
-import { useId } from 'react';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import type { TrendPoint } from '@/api/types';
-import { ChartTooltip } from '@/components/patterns';
-import { compactInr, shortDate } from '@/lib/format';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import type { TrendPoint } from "@/api/types";
+import { ChartTooltip } from "@/components/patterns";
+import { compactInr, shortDate } from "@/lib/format";
 
 const hsl = (name: string) => `hsl(var(--${name}))`;
-const axisTick = { fill: hsl('muted-text'), fontSize: 12 };
-const PRIMARY = 'hsl(243 75% 60%)';
-const AMBER = '#f59e0b';
+const axisTick = { fill: hsl("muted-text"), fontSize: 12 };
+const PRIMARY = hsl("primary");
 
 /** Screen-reader text alternative: latest value and min-max over the period. */
-function summarize(data: TrendPoint[], label: string, fmt: (n: number) => string): string {
+function summarize(
+  data: TrendPoint[],
+  label: string,
+  fmt: (n: number) => string,
+): string {
   if (data.length === 0) return `No ${label} data.`;
   const values = data.map((p) => p.value);
   const last = data[data.length - 1];
@@ -18,27 +30,60 @@ function summarize(data: TrendPoint[], label: string, fmt: (n: number) => string
 }
 
 export function ExposureTrendChart({ data }: { data: TrendPoint[] }) {
-  const gid = `exp${useId().replace(/:/g, '')}`;
   return (
     <>
-      <p className="sr-only">{summarize(data, 'Exposure', compactInr)}</p>
-      <div role="img" aria-label="Area chart of exposure over time" className="h-72 w-full">
+      <p className="sr-only">{summarize(data, "Exposure", compactInr)}</p>
+      <div
+        role="img"
+        aria-label="Line chart of exposure over time"
+        className="h-72 w-full"
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={PRIMARY} stopOpacity={0.4} />
-                <stop offset="100%" stopColor={PRIMARY} stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke={hsl('border')} strokeOpacity={0.5} vertical={false} />
-            <XAxis dataKey="date" tickFormatter={shortDate} tick={axisTick} axisLine={false} tickLine={false} minTickGap={24} />
-            <YAxis tickFormatter={compactInr} tick={axisTick} axisLine={false} tickLine={false} width={56} />
-            <Tooltip
-              cursor={{ stroke: PRIMARY, strokeOpacity: 0.3 }}
-              content={<ChartTooltip labelFormatter={shortDate} valueFormatter={compactInr} seriesLabel="Exposure" />}
+          <AreaChart
+            data={data}
+            margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid stroke={hsl("border")} vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickFormatter={shortDate}
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+              minTickGap={24}
             />
-            <Area type="monotone" dataKey="value" stroke={PRIMARY} strokeWidth={2.5} fill={`url(#${gid})`} />
+            <YAxis
+              tickFormatter={compactInr}
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+              width={56}
+            />
+            <Tooltip
+              cursor={{ stroke: hsl("border") }}
+              content={
+                <ChartTooltip
+                  labelFormatter={shortDate}
+                  valueFormatter={compactInr}
+                  seriesLabel="Exposure"
+                />
+              }
+            />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={PRIMARY}
+              strokeWidth={2}
+              fill={PRIMARY}
+              fillOpacity={0.08}
+              dot={false}
+              activeDot={{
+                r: 4,
+                strokeWidth: 2,
+                stroke: hsl("card"),
+                fill: PRIMARY,
+              }}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -49,18 +94,49 @@ export function ExposureTrendChart({ data }: { data: TrendPoint[] }) {
 export function CasesTrendChart({ data }: { data: TrendPoint[] }) {
   return (
     <>
-      <p className="sr-only">{summarize(data, 'Open risk cases', String)}</p>
-      <div role="img" aria-label="Bar chart of open risk cases over time" className="h-72 w-full">
+      <p className="sr-only">{summarize(data, "Open risk cases", String)}</p>
+      <div
+        role="img"
+        aria-label="Bar chart of open risk cases over time"
+        className="h-72 w-full"
+      >
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid stroke={hsl('border')} strokeOpacity={0.5} vertical={false} />
-            <XAxis dataKey="date" tickFormatter={shortDate} tick={axisTick} axisLine={false} tickLine={false} minTickGap={24} />
-            <YAxis allowDecimals={false} tick={axisTick} axisLine={false} tickLine={false} width={32} />
-            <Tooltip
-              cursor={{ fill: hsl('surface-2'), fillOpacity: 0.6 }}
-              content={<ChartTooltip labelFormatter={shortDate} seriesLabel="Cases" />}
+          <BarChart
+            data={data}
+            margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid stroke={hsl("border")} vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickFormatter={shortDate}
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+              minTickGap={24}
             />
-            <Bar dataKey="value" fill={AMBER} radius={[8, 8, 0, 0]} maxBarSize={28} />
+            <YAxis
+              allowDecimals={false}
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+              width={32}
+            />
+            <Tooltip
+              cursor={{ fill: hsl("surface-2"), fillOpacity: 0.7 }}
+              content={
+                <ChartTooltip
+                  labelFormatter={shortDate}
+                  seriesLabel="Open cases"
+                />
+              }
+            />
+            <Bar
+              dataKey="value"
+              fill={PRIMARY}
+              fillOpacity={0.85}
+              radius={[4, 4, 0, 0]}
+              maxBarSize={14}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

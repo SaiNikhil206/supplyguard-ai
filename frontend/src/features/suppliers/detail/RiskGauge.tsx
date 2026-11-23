@@ -1,15 +1,15 @@
-import { PolarAngleAxis, RadialBar, RadialBarChart } from 'recharts';
-import type { RiskLevel } from '@/api/types';
+import type { RiskLevel } from "@/api/types";
+import { cn } from "@/lib/utils";
+import { LEVEL_BAR } from "../list/risk";
 
-const COLOR: Record<RiskLevel, string> = {
-  LOW: '#10b981',
-  MEDIUM: '#f59e0b',
-  HIGH: '#f97316',
-  CRITICAL: '#f43f5e',
-};
-
-/** Radial 0-100 risk gauge exposed as an accessible meter. */
-export function RiskGauge({ score, level }: { score: number; level: RiskLevel }) {
+/** 0-100 risk score as a bullet/progress bar with number, exposed as an accessible meter. */
+export function RiskGauge({
+  score,
+  level,
+}: {
+  score: number;
+  level: RiskLevel;
+}) {
   const v = Math.max(0, Math.min(100, score));
   return (
     <div
@@ -19,23 +19,30 @@ export function RiskGauge({ score, level }: { score: number; level: RiskLevel })
       aria-valuemax={100}
       aria-valuenow={v}
       aria-valuetext={`${v} out of 100`}
-      className="relative h-36 w-36 shrink-0"
+      className="w-full min-w-[12rem] max-w-xs"
     >
-      <RadialBarChart
-        width={144}
-        height={144}
-        innerRadius="76%"
-        outerRadius="100%"
-        data={[{ name: 'risk', value: v, fill: COLOR[level] }]}
-        startAngle={90}
-        endAngle={-270}
+      <div className="text-xs font-medium uppercase tracking-wide text-muted">
+        Risk score
+      </div>
+      <div className="mt-1 flex items-baseline gap-1">
+        <span
+          aria-hidden="true"
+          className="text-3xl font-semibold tabular-nums tracking-tight"
+        >
+          {v}
+        </span>
+        <span aria-hidden="true" className="text-sm text-muted">
+          / 100
+        </span>
+      </div>
+      <div
+        aria-hidden="true"
+        className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2"
       >
-        <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-        <RadialBar dataKey="value" cornerRadius={12} background={{ fill: 'hsl(var(--border))', fillOpacity: 0.5 }} />
-      </RadialBarChart>
-      <div aria-hidden="true" className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-semibold tabular-nums tracking-tight">{v}</span>
-        <span className="text-[10px] uppercase tracking-wider text-muted">of 100</span>
+        <div
+          className={cn("h-full rounded-full", LEVEL_BAR[level])}
+          style={{ width: `${v}%` }}
+        />
       </div>
     </div>
   );
