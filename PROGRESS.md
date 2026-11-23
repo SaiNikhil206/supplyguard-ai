@@ -7,8 +7,8 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | - |
-| Nikhil | 0 | 0 | 6 | 0 | 8 | 0 | 0% | N-11 |
-| Uday | 1 | 0 | 1 | 0 | 10 | 0 | 8% | U-07 |
+| Nikhil | 0 | 0 | 7 | 0 | 7 | 0 | 0% | N-11 |
+| Uday | 1 | 0 | 2 | 0 | 9 | 0 | 8% | U-04 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 0 | 0% | S-01 |
 
 ## Task board
@@ -23,7 +23,7 @@
 | S-01 | Freeze contracts v1 | Shared | S0 (19-20 Nov) | in-progress | 0/3 | - |
 | U-01 | Boomi environment and service verification | Uday | S0 (19-20 Nov) | review | 3/3 | - |
 | U-02 | Backend scaffold | Uday | S0 (19-21 Nov) | done | 3/3 | 8dcf1b8 |
-| U-03 | Core data model + seed loader | Uday | S0 (21-23 Nov) | todo | 0/4 | - |
+| U-03 | Core data model + seed loader | Uday | S0 (21-23 Nov) | review | 4/4 | - |
 | N-04 | Deterministic impact + risk scoring engine | Nikhil | S1 (25-30 Nov) | review | 4/4 | - |
 | R-02 | Read APIs for the UI (Django `apps/portal`) | Roop | S1 (26-30 Nov) | todo | 0/3 | - |
 | R-09 | CI pipeline | Roop | S1 (24-26 Nov) | review | 0/1 | - |
@@ -34,7 +34,7 @@
 | U-12 | Local + hosted deployment | Uday | S1 tunnel (by 28 Nov), S4 hosted (15-20 Dec) | todo | 0/3 | - |
 | N-05 | Supplier Risk Analyst agent (Agentstudio) | Nikhil | S2 (1-4 Dec) | review | 3/3 | - |
 | N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | review | 3/3 | - |
-| N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | todo | 0/3 | - |
+| N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | review | 2/3 | - |
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
 | R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | review | 0/1 | - |
@@ -70,12 +70,12 @@
 - **Blockers:** R-02 waits on Uday U-03/U-04. R-09 needs team decision: `ci-ok` required on `main` only. Uday: pin ruff, `ruff format backend`, short refresh lifetime + rotation off, `/me` shape provisional. Team: drop `[skip ci]` from bot commits.
 
 ### Nikhil
-- **Last updated:** 2026-11-20 (N-06 acceptance runs done, agent deployed, in review)
-- **Current task:** N-06 (review; N-05 in review)
-- **Branch:** `nikhil/N-06-recovery-agent`
-- **Where I left off:** Agent "SG Recovery Planner" (id b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) built in Agentstudio with prompt v1.3.0 and deployed 2026-11-20 (package 1.0, deployment 1142f95b-7b4a-466f-a895-89a2140068ac, Agent Garden Production, active). Six live v1.3.0 runs graded (DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34). Known issue: `assumptions_qualitative` on SUP-2002 (capacity unknown) in DEMO and ADV-04.
-- **Next step:** N-04 engine in review. Next: give Uday the OK on CONTRACTS s10 point 7 (per-tenant `risk_thresholds.exposure_full_scale` in the Tenant settings shape), then N-04 service wiring after U-03 merges, then N-07 / N-11. Optional N-06 prompt tweak for capacity-unknown suppliers still open (needs a new deploy).
-- **Blockers:** U-03 not yet in collaboration (awaiting re-review + s10 approvals). U-07 tools not built (agents have no tools).
+- **Last updated:** 2026-11-23 (N-07 validator built + reviewed, in review)
+- **Current task:** N-04 and N-07 engines (both review; N-06 in review, N-05 in review)
+- **Branch:** `nikhil/N-07-validator` (docs on `nikhil/N-07-validator--docs`)
+- **Where I left off:** N-07 validator `backend/apps/intelligence/validation.py` built and Opus-approved (task branch e9ff488): pure functions, 163 tests, 98% coverage, all 26 live agent runs pass. Persistence and the analysis endpoint wait on U-03 and N-10.
+- **Next step:** N-04 and N-07 engines in review; waiting on U-03 merge (send Uday the point-7 OK + `jsonschema>=4.18` / schema-folder asks), then the N-04 and N-07 persistence steps and N-10. N-11 what-if is ready to start now.
+- **Blockers:** U-03 not in collaboration (awaiting re-review + s10 approvals). U-07 tools not built (agents have no tools).
 
 ### Uday
 - **Last updated:** 2026-11-19 (U-02 done and merged, review follow-ups applied)
@@ -89,23 +89,23 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
-| 2026-11-23 | 48d7d6d | nikhil | N-07 | todo | merge: align N-07 task text with U-03 models |
-| 2026-11-23 | 81c1e51 | nikhil | N-07 | todo | docs(tasks): align N-07 with U-03 unsupported flag and AgentRun |
-| 2026-11-23 | f8626e8 | nikhil | N-04 | review | merge: N-04 Deterministic impact + risk scoring engine (auto-merge) |
-| 2026-11-23 | 1bf07fe | roop | R-10 | in-progress | feat(frontend): redesign app shell and login on the shadcn kit |
-| 2026-11-23 | c5015bf | roop | R-10 | in-progress | feat(frontend): adopt shadcn/ui kit and indigo/slate theme tokens |
-| 2026-11-23 | bccab55 | nikhil | N-04 | review | docs(tasks): N-04 impact engine to review |
-| 2026-11-23 | 400c940 | nikhil | N-04 | review | merge: N-04 Deterministic impact + risk scoring engine (auto-merge) |
-| 2026-11-23 | 2754189 | nikhil | N-04 | review | merge: N-04 task file to review |
-| 2026-11-23 | e0ab4a4 | nikhil | N-04 | in-progress | merge: N-04 design + impl pieces into task branch |
-| 2026-11-23 | a85f296 | roop | R-10 | in-progress | chore(tasks): start R-10 shadcn redesign |
-| 2026-11-23 | 653bad7 | roop | R-10 | in-progress | merge: R-08-admin-screens into R-10 polish base |
-| 2026-11-23 | d0116c9 | roop | R-10 | in-progress | merge: R-07-what-if-ui into R-10 polish base |
-| 2026-11-23 | dfc4667 | roop | R-10 | in-progress | merge: R-05-approvals into R-10 polish base |
-| 2026-11-23 | 593c7fe | nikhil | N-04 | in-progress | feat(intelligence): N-04 impact + risk scoring engine |
-| 2026-11-23 | d05b25c | uday | U-05 | in-progress | chore(tasks): U-05 built and verified live, acceptance ticked, held at in-progress |
-| 2026-11-23 | 40b9007 | uday | U-05 | in-progress | merge: U-05 review fixes (fail-closed tenant, redaction, tenant mismatch, log ids) |
-| 2026-11-23 | 6044ee1 | uday | U-05 | in-progress | fix(audit): review + smoke findings (log ids on django.request, fail-closed tenant, redaction, tenant mismatch) |
-| 2026-11-23 | defa9a7 | nikhil | N-04 | in-progress | docs(intelligence): N-04 impact + risk scoring design spec |
-| 2026-11-23 | 4ebd50c | uday | U-05 | in-progress | merge: U-05 audit piece into uday/U-05-audit |
-| 2026-11-23 | c602d2f | uday | U-05 | in-progress | feat(audit): record(), correlation-id middleware, log filter, GET /audit, JSON 404/500 |
+| 2026-11-23 | 19d3c18 | nikhil | N-07 | review | merge: N-07 task file to review |
+| 2026-11-23 | 4f504ef | nikhil | N-07 | review | docs(tasks): N-07 validator to review |
+| 2026-11-23 | a703e67 | nikhil | N-07 | review | merge: N-07 Agent output validator + persistence (auto-merge) |
+| 2026-11-23 | e9ff488 | nikhil | N-07 | in-progress | merge: N-07 re-review fixes into task branch |
+| 2026-11-23 | 5bbe7a6 | nikhil | N-07 | in-progress | fix(intelligence): N-07 re-review fixes |
+| 2026-11-23 | 3081fc5 | uday | U-04 | in-progress | build(deploy): ship ai/ package (schema_registry) in image and dev mount |
+| 2026-11-23 | b9de053 | roop | R-10 | in-progress | docs(frontend): design system v2 from ui-ux-pro-max (minimal enterprise light) |
+| 2026-11-23 | 51d6b43 | uday | U-04 | in-progress | build(deploy): add jsonschema dep and ai/schemas to backend image |
+| 2026-11-23 | c3af4db | nikhil | N-07 | in-progress | merge: N-07 review fixes into task branch |
+| 2026-11-23 | 3377dd2 | nikhil | N-07 | in-progress | fix(intelligence): N-07 review fixes - change-field allowlist, fail-closed checks, schema dir |
+| 2026-11-23 | ace8e62 | roop | R-10 | in-progress | merge: R-10 --screens-admin sub-branch into task branch |
+| 2026-11-23 | ebb164f | roop | R-10 | in-progress | merge: R-10 --screens-risk sub-branch into task branch |
+| 2026-11-23 | f3a5c7a | roop | R-10 | in-progress | merge: R-10 --screens-insight sub-branch into task branch |
+| 2026-11-23 | ecb0c3a | roop | R-10 | in-progress | feat(frontend): premium redesign of overview, supplier list and detail |
+| 2026-11-23 | c6a0191 | nikhil | N-07 | in-progress | merge: N-07 validator piece into task branch |
+| 2026-11-23 | b0a1e4b | nikhil | N-07 | in-progress | feat(intelligence): N-07 agent output schema + fact-check validator |
+| 2026-11-23 | 3a228f6 | roop | R-10 | in-progress | feat(frontend): premium redesign of risk, recommendations and approvals screens |
+| 2026-11-23 | 819ffba | roop | R-10 | in-progress | feat(frontend): premium redesign of admin screens (R-10 screens-admin) |
+| 2026-11-23 | 199df21 | uday | U-04 | in-progress | merge: U-04 tenancy piece (tenant mixin, role matrix, /settings, /users) into uday/U-04-auth-tenancy |
+| 2026-11-23 | 2632881 | uday | U-03 | review | merge: U-03 Core data model + seed loader (auto-merge) |
