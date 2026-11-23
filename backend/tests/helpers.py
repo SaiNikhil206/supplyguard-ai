@@ -9,6 +9,18 @@ from rest_framework.test import APIClient
 from apps.accounts.serializers import TokenObtainSerializer
 
 
+def set_throttle_rates(monkeypatch, **rates):
+    """Override login/refresh throttle rates for one test (the suite default is 'off')."""
+    from rest_framework.throttling import ScopedRateThrottle
+
+    from apps.accounts.throttles import LoginUsernameThrottle
+
+    merged = {"auth": "100000/min", "auth_username": "100000/min", "auth_refresh": "100000/min"}
+    merged.update(rates)
+    for cls in (ScopedRateThrottle, LoginUsernameThrottle):
+        monkeypatch.setattr(cls, "THROTTLE_RATES", merged)
+
+
 def jwt_client(user) -> APIClient:
     client = APIClient()
     token = str(TokenObtainSerializer.get_token(user).access_token)

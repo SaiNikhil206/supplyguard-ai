@@ -2,13 +2,15 @@
 import logging
 from datetime import timedelta
 
+from django.conf import settings
 from django.utils import timezone
 from rest_framework.authentication import BaseAuthentication
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.exceptions import AuthenticationFailed, Throttled
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.tenants.models import Tenant
 
+from . import failguard
 from .apikeys import hash_key, key_prefix, looks_well_formed
 from .models import ApiKey
 from .principals import SystemPrincipal
@@ -52,9 +54,13 @@ class ApiKeyAuthentication(BaseAuthentication):
         raw = request.META.get(self.header_meta)
         if not raw:
             return None
+        if failguard.api_key_failures(request) >= settings.AUTH_FAIL_LIMIT_PER_MIN:
+            raise Throttled(wait=failguard.WINDOW)  # before looking at the key at all
         key = ApiKey.objects.select_related("tenant").filter(key_hash=hash_key(raw)).first()
         if key is None or not key.is_active or key.tenant.status != Tenant.Status.ACTIVE:
-            self._audit_rejected(raw)
+            failguard.record_api_key_failure(request)
+            if failguard.should_audit_failure(request, "security.api_key_rejected"):
+                self._audit_rejected(raw)
             raise AuthenticationFailed("Invalid API key.", code="invalid_api_key")
         self._touch(key)
         request._request.tenant = key.tenant

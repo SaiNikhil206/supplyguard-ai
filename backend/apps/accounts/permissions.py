@@ -63,23 +63,9 @@ ROLE_MATRIX: dict[str, Rule] = {
 }
 
 
-class IsTenantUser(BasePermission):
-    """A real (non-SYSTEM) user that belongs to an ACTIVE tenant.
-
-    Extend by subclassing with `allowed_roles = {...}` (None = any role). SYSTEM callers and
-    tenant-less superusers never pass.
-    """
-
-    message = "No active tenant for this user."
-    allowed_roles: frozenset[str] | set[str] | None = None
-
-    def has_permission(self, request, view):
-        user = request.user
-        if not (user and user.is_authenticated) or isinstance(user, SystemPrincipal):
-            return False
-        if not _has_active_tenant(user):
-            return False
-        return self.allowed_roles is None or user.role in self.allowed_roles
+NO_TENANT_MESSAGE = "No active tenant for this credential."
+ROLE_DENIED_MESSAGE = "Your role is not permitted for this endpoint."
+SYSTEM_DENIED_MESSAGE = "This credential is not permitted for this endpoint."
 
 
 def _has_active_tenant(user) -> bool:
@@ -99,7 +85,7 @@ def _keys_of(view) -> dict | None:
     return key if isinstance(key, dict) else {"*": key}
 
 
-class RolePermission(IsTenantUser):
+class RolePermission(BasePermission):
     """Allow when the matrix lists the caller's role for the view's key and method.
 
     Requires an authenticated principal whose tenant is ACTIVE (tenant-less superusers and
@@ -110,12 +96,22 @@ class RolePermission(IsTenantUser):
     answers 405 as usual.
     """
 
+    message = ROLE_DENIED_MESSAGE
+
     def has_permission(self, request, view):
         user = request.user
         if not (user and user.is_authenticated):
             return False  # DRF turns this into 401 (the first authenticator has a header)
         if not _has_active_tenant(user):
+            self.message = NO_TENANT_MESSAGE
             return False
+        self.message = (
+            SYSTEM_DENIED_MESSAGE if isinstance(user, SystemPrincipal) else ROLE_DENIED_MESSAGE
+        )
+        return self._role_allowed(request, view, user)
+
+    @staticmethod
+    def _role_allowed(request, view, user) -> bool:
         keys = _keys_of(view)
         if keys is None:
             return False

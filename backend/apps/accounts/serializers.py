@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
@@ -46,6 +47,18 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
         token["role"] = user.role
         return token
 
+    def _audit_failure(self, username):
+        from . import failguard
+
+        request = self.context.get("request")
+        if request is not None and not failguard.should_audit_failure(request, "auth.login_failed"):
+            return
+        # People paste passwords into the username box: keep the text only when it names an
+        # existing user, otherwise record that it was unknown.
+        known = get_user_model().objects.filter(username__iexact=username).exists()
+        data = {"username": username} if known else {"username_known": False}
+        _audit("anonymous", "auth.login_failed", ("User", ""), data=data)
+
     def validate(self, attrs):
         username = str(attrs.get(self.username_field, ""))[:150]
         try:
@@ -53,7 +66,7 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
             if not can_sign_in(self.user):  # no tenant (incl. superusers) or tenant not ACTIVE
                 raise AuthenticationFailed(NO_ACCOUNT, "no_active_account")
         except AuthenticationFailed:
-            _audit("anonymous", "auth.login_failed", ("User", ""), data={"username": username})
+            self._audit_failure(username)
             raise AuthenticationFailed(NO_ACCOUNT, "no_active_account") from None
         _audit(self.user, "auth.login", self.user, data={"username": self.user.get_username()})
         return {"access": data["access"], "refresh": data["refresh"]}
@@ -100,7 +113,13 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ["is_active"]
 
     def validate_username(self, value):
-        if get_user_model().objects.filter(username=value).exists():
+        User = get_user_model()
+        value = User.normalize_username(value)  # NFKC: fullwidth lookalikes become ASCII
+        try:
+            UnicodeUsernameValidator()(value)  # letters, digits and . @ + - _ only
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages)) from None
+        if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("This username is not available.")
         return value
 
