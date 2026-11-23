@@ -13,6 +13,7 @@ import {
   users,
   type MockUser,
 } from './fixtures';
+import { whatIfHandlers } from './whatif';
 
 export const ACCESS_TTL_SECONDS = 15 * 60;
 export const REFRESH_TTL_SECONDS = 7 * 24 * 3600;
@@ -230,4 +231,5 @@ export const handlers: HttpHandler[] = [
       );
     }),
   ),
+  ...whatIfHandlers,
 ];
