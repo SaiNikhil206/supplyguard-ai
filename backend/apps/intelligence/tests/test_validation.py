@@ -624,3 +624,87 @@ def test_schema_dir_from_django_setting(monkeypatch, tmp_path, plan, settings):
     monkeypatch.delenv("SG_SCHEMA_DIR", raising=False)
     settings.SG_SCHEMA_DIR = str(ROOT / "ai" / "schemas")
     assert val.validate_schema(PLAN_KIND, plan) == []
+
+
+# --------------------------------------------------------------------------- re-review fixes
+
+
+def test_revised_date_unrecomputable_is_unsupported(plan, demo):
+    o = copy.deepcopy(opt(plan, 4))
+    o["proposed_action"]["change"]["expected_date"] = "2031-01-01"
+    o["estimated_lead_time_days"] = None
+    o["data_gaps"] = ["delay unknown"]
+    demo["impact"]["affected_pos"][0]["estimated_delay_days"] = None
+    r = run_plan(only(plan, o), demo)
+    assert "REVISED_DATE_UNSUPPORTED" in codes(r) and r["options"][0]["unsupported"]
+    # due date missing from the snapshot (and the impact row): same outcome
+    demo2 = copy.deepcopy(demo)
+    demo2["impact"]["affected_pos"][0]["estimated_delay_days"] = 2
+    demo2["snapshot"]["purchase_orders"][0]["lines"][0].pop("due_date")
+    assert "REVISED_DATE_UNSUPPORTED" in codes(run_plan(only(plan, copy.deepcopy(o)), demo2))
+
+
+def test_revised_date_without_affected_line(plan, demo):
+    demo["impact"]["affected_pos"] = []
+    assert "REVISED_DATE_UNSUPPORTED" in codes(
+        run_plan(only(plan, copy.deepcopy(opt(plan, 4))), demo)
+    )
+
+
+def test_duplicate_option_ignores_int_vs_float_qty(plan, demo):
+    dup = copy.deepcopy(opt(plan, 1))
+    dup["rank"] = 5
+    dup["proposed_action"]["change"]["qty"] = 4000.0
+    plan["options"].append(dup)
+    assert "DUPLICATE_OPTION" in codes(run_plan(plan, demo), 5)
+
+
+def test_evidence_missing_needs_relevant_supplier_field(plan, demo):
+    o = alt_option(plan)
+    o["evidence"] = [e for e in o["evidence"] if e["entity"] != "SUP-2001"]
+    o["evidence"].append(
+        {"source": "ERP", "entity": "SUP-2001", "field": "tenant_id", "value": "TEN-ACME"}
+    )
+    assert "EVIDENCE_MISSING" in codes(run_plan(only(plan, o), demo))
+
+
+def test_split_must_be_partial(plan, demo):
+    o = alt_option(plan)
+    o["option_type"] = "SPLIT_ORDER"
+    assert "SPLIT_NOT_PARTIAL" in codes(run_plan(only(plan, o), demo))
+    o["proposed_action"]["change"]["qty"] = 3000
+    o["estimated_cost_delta"]["amount"] = "25200.00"
+    assert "SPLIT_NOT_PARTIAL" not in codes(run_plan(only(plan, o), demo))
+
+
+def test_transfer_destination_checked_when_po_has_delivery_location(plan, demo):
+    o = copy.deepcopy(opt(plan, 2))
+    assert "TRANSFER_WRONG_DESTINATION" not in codes(
+        run_plan(only(plan, o), demo)
+    )  # no field: skipped
+    demo["snapshot"]["purchase_orders"][0]["delivery_location_id"] = "DC-CHENNAI"
+    assert "TRANSFER_WRONG_DESTINATION" in codes(run_plan(only(plan, copy.deepcopy(o)), demo))
+
+
+def test_risk_check_fails_closed_on_malformed_impact(analysis, demo):
+    demo["impact"]["affected_pos"] = [{"item_id": "ITM-501"}]
+    r = run_risk(analysis, demo)
+    assert not r["valid"] and "VALIDATOR_ERROR" in fact_codes(r)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "The supplier can still ship 1,200 units per week.",
+        "Capacity is down to forty percent.",
+        "SUP-1008 has 40% capacity left.",
+    ],
+)
+def test_risk_free_text_capacity_claims(analysis, demo, text):
+    analysis["facts"].append(text)
+    assert "CAPACITY_INVENTED" in fact_codes(run_risk(analysis, demo))
+
+
+def test_risk_capacity_gap_statement_is_fine(analysis, demo):
+    analysis["facts"].append("Supplier capacity is not provided in the snapshot.")
+    assert run_risk(analysis, demo)["valid"]

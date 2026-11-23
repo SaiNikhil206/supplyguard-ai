@@ -50,6 +50,15 @@ CENT = Decimal("0.01")
 _ID_TOKEN = re.compile(r"\b[A-Z]{2,5}-[0-9A-Z-]*\d[0-9A-Z-]*\b")
 _DATE_TOKEN = re.compile(r"\b\d{4}-\d{2}-\d{2}(?:T[\d:.]+Z?)?\b")
 _CAPACITY_EVENT = re.compile(r"capacity[ _]reduction", re.I)  # an event type, not a capacity figure
+_NUMBER_WORD = (
+    r"(?:\d|percent|%|half|quarter|zero|one|two|three|four|five|six|seven|eight|nine|ten|twenty|"
+    r"thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand)"
+)
+_CAPACITY_TALK = re.compile(
+    r"\d[\d,.]*\s*(?:units?\s*)?(?:per|/|a)\s*(?:week|day)"
+    r"|capacity\s+(?:is|was|has|had|dropped|fell|down|reduced)\b[^.;]{0,40}?\b" + _NUMBER_WORD,
+    re.I,
+)
 _CAPACITY_FIGURE = re.compile(r"capacity[^.;]{0,30}?\d|\d[^.;]{0,30}?capacity", re.I)
 
 
@@ -309,6 +318,7 @@ def check_evidence(evidence: list[dict], c: _Ctx) -> list[dict]:
 # --------------------------------------------------------------------------- recovery plan
 
 
+SUPPLIER_EVIDENCE_FIELDS = {"unit_price", "lead_time_days", "qualified", "capacity"}
 ALLOWED_CHANGE_KEYS = {
     "ALTERNATE_SUPPLIER": {"supplier_id", "qty"},
     "SPLIT_ORDER": {"supplier_id", "qty"},
@@ -375,7 +385,12 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
             ),
             None,
         )
-        if not any(e.get("source") == "ERP" and e.get("entity") == sup for e in option["evidence"]):
+        if not any(
+            e.get("source") == "ERP"
+            and e.get("entity") == sup
+            and e.get("field") in SUPPLIER_EVIDENCE_FIELDS
+            for e in option["evidence"]
+        ):
             reasons.append(reason("EVIDENCE_MISSING", f"no ERP evidence cited for supplier {sup}"))
         alt = _alt_row(c, sup, items, evidence_item)
         if sup == c.disrupted_supplier:
@@ -401,6 +416,15 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
         else:
             target = next((r for r in affected if r["item_id"] == alt["item_id"]), target)
             reasons += _qty_limit_reason(qty, affected, alt["item_id"], po_id)
+            if otype == "SPLIT_ORDER" and qty is not None and target is not None:
+                if qty >= target["affected_qty"]:
+                    reasons.append(
+                        reason(
+                            "SPLIT_NOT_PARTIAL",
+                            f"a split must move less than the affected qty "
+                            f"{target['affected_qty']}",
+                        )
+                    )
             if alt.get("qualified") is not True:
                 reasons.append(
                     reason("SUPPLIER_NOT_QUALIFIED", f"{sup} is not qualified for {alt['item_id']}")
@@ -415,7 +439,7 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
             reasons += _check_alt_numbers(option, c, po_id, alt, cost_qty)
     elif otype == "INVENTORY_TRANSFER":
         reasons += _qty_limit_reason(qty, affected, change.get("item_id"), po_id)
-        reasons += _check_transfer(option, c, change, items, qty)
+        reasons += _check_transfer(option, c, change, items, qty, po_id)
     elif otype == "REVISED_SCHEDULE":
         reasons += _check_revised(option, c, po_id, target, change)
 
@@ -475,7 +499,9 @@ def _check_alt_numbers(option: dict, c: _Ctx, po_id: str, alt: dict, qty) -> lis
     return out
 
 
-def _check_transfer(option: dict, c: _Ctx, change: dict, items: list[str], qty) -> list[dict]:
+def _check_transfer(
+    option: dict, c: _Ctx, change: dict, items: list[str], qty, po_id: str = ""
+) -> list[dict]:
     out = []
     item, src, dst = (
         change.get("item_id"),
@@ -484,6 +510,12 @@ def _check_transfer(option: dict, c: _Ctx, change: dict, items: list[str], qty) 
     )
     if items and item not in items:
         out.append(reason("ITEM_NOT_AFFECTED", f"{item} is not an affected item of the PO"))
+    po = c.pos.get(po_id) or {}
+    delivery = po.get("delivery_location_id") or po.get("location_id")
+    if delivery and dst != delivery:
+        out.append(
+            reason("TRANSFER_WRONG_DESTINATION", f"{po_id} is delivered to {delivery}, not {dst}")
+        )
     if src == dst:
         out.append(reason("TRANSFER_SAME_LOCATION", f"from and to location are both {src}"))
     from_row, to_row = c.inv_row(item, src), c.inv_row(item, dst)
@@ -540,16 +572,35 @@ def _check_revised(
                 )
             )
         due = c.due_date(po_id, target)
-        if due and delay is not None and float(delay).is_integer():
-            expected = (date.fromisoformat(due) + timedelta(days=int(delay))).isoformat()
-            if change.get("expected_date") != expected:
-                out.append(
-                    reason(
-                        "REVISED_DATE_MISMATCH",
-                        f"expected_date {change.get('expected_date')} differs from due date {due} "
-                        f"+ {int(delay)} day(s) = {expected}",
-                    )
+        delay_days = _int(delay) if _int(delay) is not None else None
+        try:
+            expected = (
+                (date.fromisoformat(due) + timedelta(days=delay_days)).isoformat()
+                if due and delay_days is not None
+                else None
+            )
+        except (ValueError, TypeError):
+            expected = None
+        if expected is None:
+            out.append(
+                reason(
+                    "REVISED_DATE_UNSUPPORTED",
+                    "expected_date cannot be recomputed (estimated delay or due date unknown); "
+                    "it must not be written to the ERP",
                 )
+            )
+        elif change.get("expected_date") != expected:
+            out.append(
+                reason(
+                    "REVISED_DATE_MISMATCH",
+                    f"expected_date {change.get('expected_date')} differs from due date {due} "
+                    f"+ {delay_days} day(s) = {expected}",
+                )
+            )
+    else:
+        out.append(
+            reason("REVISED_DATE_UNSUPPORTED", "no affected line to recompute expected_date from")
+        )
     cost = option.get("estimated_cost_delta")
     if cost is not None and _dec(cost["amount"]) != 0:
         out.append(
@@ -596,8 +647,13 @@ def fact_check_recovery_plan(
             reasons.append(
                 reason("DUPLICATE_RANK", f"rank {option['rank']} is used by more than one option")
             )
+        change = dict((option.get("proposed_action") or {}).get("change") or {})
+        if _int(change.get("qty")) is not None:
+            change["qty"] = _int(change["qty"])
         key = json.dumps(
-            [option.get("option_type"), option.get("proposed_action")], sort_keys=True, default=str
+            [option.get("option_type"), (option.get("proposed_action") or {}).get("po_id"), change],
+            sort_keys=True,
+            default=str,
         )
         if key in seen:
             msg = "same option type and proposed action as an earlier option"
@@ -643,7 +699,7 @@ def _capacity_null(c: _Ctx) -> bool:
     )
 
 
-def fact_check_risk_analysis(
+def _fact_check_risk_analysis(
     analysis: dict,
     snapshot: dict,
     impact: dict,
@@ -721,7 +777,9 @@ def fact_check_risk_analysis(
                 other_supplier = re.findall(r"SUP-\d+", sentence)
                 about_disrupted = c.disrupted_supplier in other_supplier or not other_supplier
                 cleaned = _CAPACITY_EVENT.sub("", _DATE_TOKEN.sub("", _ID_TOKEN.sub("", sentence)))
-                if about_disrupted and _CAPACITY_FIGURE.search(cleaned):
+                if about_disrupted and (
+                    _CAPACITY_FIGURE.search(cleaned) or _CAPACITY_TALK.search(cleaned)
+                ):
                     out.append(
                         reason(
                             "CAPACITY_INVENTED",
@@ -782,3 +840,27 @@ def validate_agent_output(
     if not result["valid"]:
         result["actionable_count"] = 0
     return result
+
+
+def fact_check_risk_analysis(
+    analysis: dict,
+    snapshot: dict,
+    impact: dict,
+    *,
+    event: dict | None = None,
+    risk_case_id: str | None = None,
+) -> list[dict]:
+    """Plan-wide fact errors for a risk analysis (empty list = every checkable claim matches).
+
+    Fails closed: malformed data gives a VALIDATOR_ERROR entry.
+    """
+    try:
+        return _fact_check_risk_analysis(
+            analysis, snapshot, impact, event=event, risk_case_id=risk_case_id
+        )
+    except Exception as exc:
+        return [
+            reason(
+                "VALIDATOR_ERROR", f"analysis could not be checked ({type(exc).__name__}: {exc})"
+            )
+        ]
