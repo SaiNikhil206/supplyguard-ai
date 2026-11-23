@@ -1,24 +1,35 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import { Check, Zap } from 'lucide-react';
 import { useSimulateDisruption } from '@/api/queries';
 import { ApiError } from '@/api/client';
-import { Button } from '@/components/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  SeverityBadge,
+} from '@/components/ui';
+import { cn } from '@/lib/utils';
 import { SCENARIOS } from '@/mocks/scenarios';
+import { EVENT_ICON, SEV_META } from '../ui';
 
-/** Admin-only trigger: pick a scenario, POST it, show pending / error / event id. */
+/** Admin-only trigger: pick a scenario card in a dialog, POST it, show pending / error / event id. */
 export function SimulateDisruption() {
   const [open, setOpen] = useState(false);
   const [scenario, setScenario] = useState(SCENARIOS[0].name);
   const [note, setNote] = useState<string | null>(null);
   const mutation = useSimulateDisruption();
-  const firstRadio = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (open) firstRadio.current?.focus();
-  }, [open]);
-
-  const close = () => {
-    setOpen(false);
-    mutation.reset();
+  const onOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (next) {
+      setNote(null);
+      mutation.reset();
+    }
   };
 
   const run = () => {
@@ -39,64 +50,72 @@ export function SimulateDisruption() {
         : null;
 
   return (
-    <div className="relative">
-      <Button
-        onClick={() => {
-          setNote(null);
-          mutation.reset();
-          setOpen((o) => !o);
-        }}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-      >
-        Simulate Supplier Disruption
-      </Button>
-      {open && (
-        <div
-          role="dialog"
-          aria-label="Simulate supplier disruption"
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') close();
-          }}
-          className="absolute right-0 z-20 mt-2 w-80 space-y-3 rounded-lg border border-border bg-surface p-4 shadow-lg"
-        >
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold text-text">Choose a scenario</legend>
-            {SCENARIOS.map((s, i) => (
-              <label key={s.name} className="flex cursor-pointer items-start gap-2 text-sm">
-                <input
-                  ref={i === 0 ? firstRadio : undefined}
-                  type="radio"
-                  name="scenario"
-                  value={s.name}
-                  checked={scenario === s.name}
-                  onChange={() => setScenario(s.name)}
-                  className="mt-1"
-                />
-                <span>
-                  <span className="block font-medium text-text">{s.label}</span>
-                  <span className="block text-xs text-muted">{s.description}</span>
-                </span>
-              </label>
-            ))}
+    <div className="flex flex-col items-end gap-1">
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogTrigger asChild>
+          <Button className="bg-gradient-to-r from-primary to-violet-600 text-white shadow-md transition hover:opacity-90 hover:shadow-lg">
+            <Zap aria-hidden="true" className="h-4 w-4" />
+            Simulate Supplier Disruption
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Simulate a supplier disruption</DialogTitle>
+            <DialogDescription>Pick a scenario. SupplyGuard detects it, analyses impact and recommends recovery.</DialogDescription>
+          </DialogHeader>
+          <fieldset className="grid gap-3 sm:grid-cols-2">
+            <legend className="sr-only">Choose a scenario</legend>
+            {SCENARIOS.map((s) => {
+              const Icon = EVENT_ICON[s.event_type];
+              const selected = scenario === s.name;
+              const m = SEV_META[s.severity];
+              return (
+                <label
+                  key={s.name}
+                  className={cn(
+                    'relative flex cursor-pointer gap-3 rounded-xl border p-4 transition hover:shadow-md',
+                    'focus-within:ring-2 focus-within:ring-ring',
+                    selected ? 'border-primary bg-primary/5 ring-1 ring-primary/40' : 'border-border/70 bg-card',
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="scenario"
+                    value={s.name}
+                    checked={selected}
+                    onChange={() => setScenario(s.name)}
+                    className="sr-only"
+                  />
+                  <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', m.tint, m.text)}>
+                    <Icon aria-hidden="true" className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 space-y-1">
+                    <span className="block text-sm font-semibold">{s.label}</span>
+                    <span className="block text-xs text-muted">{s.description}</span>
+                    <SeverityBadge severity={s.severity} />
+                  </span>
+                  {selected && <Check aria-hidden="true" className="absolute right-3 top-3 h-4 w-4 text-primary" />}
+                </label>
+              );
+            })}
           </fieldset>
           {error && (
             <p role="alert" className="text-sm font-medium text-danger">
               {error}
             </p>
           )}
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" size="sm" onClick={close}>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button size="sm" onClick={run} loading={mutation.isPending}>
+            <Button onClick={run} loading={mutation.isPending}>
               {mutation.isPending ? 'Starting...' : 'Run simulation'}
             </Button>
-          </div>
-        </div>
-      )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {note && (
-        <p role="status" className="mt-2 text-xs text-muted">
+        <p role="status" className="text-xs text-muted">
           {note}
         </p>
       )}

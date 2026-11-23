@@ -32,7 +32,7 @@ describe('Approval Center', () => {
     await loginAs('manager');
     open('/approvals');
     expect(await screen.findByRole('heading', { level: 1, name: 'Approval Center' })).toBeInTheDocument();
-    const queue = await screen.findByRole('table', { name: 'Pending approvals' });
+    const queue = await screen.findByRole('list', { name: 'Pending approvals' });
     expect(await within(queue).findByText('RC-000045')).toBeInTheDocument();
     expect(within(queue).getByText('Alternate supplier')).toBeInTheDocument();
     const history = screen.getByRole('table', { name: 'Decision history' });
@@ -51,6 +51,7 @@ describe('Approval Center', () => {
     await loginAs('manager');
     open();
     await userEvent.click(await button('Approve'));
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirm approval' }));
     expect(await screen.findByText('Approved. Execution started.')).toBeInTheDocument();
     expect(await screen.findByTestId('execution-status')).toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId('execution-status')).toHaveTextContent('Succeeded'), { timeout: 3000 });
@@ -69,8 +70,39 @@ describe('Approval Center', () => {
 
     await userEvent.type(screen.getByLabelText('Comment'), 'Too expensive');
     await userEvent.click(screen.getByRole('button', { name: 'Reject' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirm rejection' }));
     expect(await screen.findByText('Recommendation rejected.')).toBeInTheDocument();
     expect(await screen.findByText('No approvals waiting')).toBeInTheDocument();
+  });
+
+  describe('confirm dialog', () => {
+    it('summarises the decision and does not submit until confirmed', async () => {
+      await loginAs('manager');
+      open();
+      await userEvent.click(await button('Approve'));
+      const dialog = await screen.findByRole('dialog', { name: 'Approve this recommendation?' });
+      expect(within(dialog).getByText('RC-000045')).toBeInTheDocument();
+      expect(within(dialog).getByText(/Alternate supplier/)).toBeInTheDocument();
+      expect(within(dialog).getByText('No comment')).toBeInTheDocument();
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(screen.queryByTestId('execution-status')).not.toBeInTheDocument();
+      expect(screen.getByText('Pending approval')).toBeInTheDocument();
+    });
+
+    it('requires a comment for request changes before any dialog opens', async () => {
+      await loginAs('manager');
+      open();
+      await userEvent.click(await button('Request changes'));
+      expect(await screen.findByText('A comment is required to reject or request changes.')).toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await userEvent.type(screen.getByLabelText('Comment'), 'Need a cheaper lane');
+      await userEvent.click(screen.getByRole('button', { name: 'Request changes' }));
+      const dialog = await screen.findByRole('dialog', { name: 'Request changes?' });
+      expect(within(dialog).getByText('Need a cheaper lane')).toBeInTheDocument();
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Confirm request for changes' }));
+      expect(await screen.findByText('Changes requested.')).toBeInTheDocument();
+    });
   });
 
   it.each([
@@ -109,6 +141,7 @@ describe('Approval Center', () => {
     const approve = await button('Approve');
     await submitDecision('REC-000101', { decision: 'APPROVE', comments: '' }); // someone else got there first
     await userEvent.click(approve);
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirm approval' }));
     // the form unmounts once the refetch shows the case is decided, so the error survives in the toast
     expect(await screen.findByText(/has already been decided/)).toBeInTheDocument();
   });
@@ -118,6 +151,7 @@ describe('Approval Center', () => {
     open();
     await userEvent.click(await screen.findByRole('radio', { name: /Inventory transfer/ }));
     await userEvent.click(screen.getByRole('button', { name: 'Approve' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Confirm approval' }));
     await waitFor(() => expect(screen.getByTestId('execution-status')).toHaveTextContent('Failed'), { timeout: 3000 });
     expect(screen.getByRole('alert')).toHaveTextContent(/connection reset/);
 
