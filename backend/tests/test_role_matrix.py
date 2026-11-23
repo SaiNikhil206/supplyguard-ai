@@ -28,6 +28,34 @@ def _user_body():
     }
 
 
+# The expected permissions, written out by hand from docs/CONTRACTS.md s2 + s4 and the DESIGN
+# paragraph of U-04 in tasks/UDAY.md. It is deliberately NOT derived from ROLE_MATRIX: a change
+# to the matrix must fail this test until this table is changed on purpose, too.
+_ALL4 = {"ADMIN", "PROCUREMENT_MANAGER", "OPS_MANAGER", "VIEWER"}
+EXPECTED = {
+    "me.read": {"GET": _ALL4},
+    "settings.read": {"GET": {"ADMIN"}},
+    "settings.write": {"PATCH": {"ADMIN"}},
+    "users.read": {"GET": {"ADMIN"}},
+    "users.write": {"POST": {"ADMIN"}},
+    # agenda D-2.6, not yet approved - update here and in ROLE_MATRIX together
+    "audit.read": {"GET": {"ADMIN", "PROCUREMENT_MANAGER"}},
+    "suppliers.read": {"GET": _ALL4},
+    "dashboard.read": {"GET": _ALL4},
+    "risk-cases.read": {"GET": _ALL4},
+    "what-if": {"POST": {"ADMIN", "PROCUREMENT_MANAGER", "OPS_MANAGER"}},
+    "recommendations.decision": {"POST": {"PROCUREMENT_MANAGER"}},
+    "executions.retry": {"POST": {"PROCUREMENT_MANAGER"}},
+    "events.create": {"POST": {"SYSTEM", "ADMIN"}},
+    "demo.simulate": {"POST": {"ADMIN"}},
+    "internal.risk-cases": {"POST": {"SYSTEM"}},
+    "internal.analysis": {"POST": {"SYSTEM"}},
+    "internal.execution-result": {"POST": {"SYSTEM"}},
+    "integrations.status": {"GET": {"ADMIN"}},
+}
+EXPECTED_ROUTED = {"me.read", "settings.read", "settings.write", "users.read", "users.write",
+                   "audit.read"}  # keys that have a real endpoint today; add when routed
+
 # permission_key -> (path, body factory or None). One entry per ROUTED matrix row.
 ROUTES = {
     "me.read": (API + "me", None),
@@ -46,10 +74,15 @@ def _request(client, method, path, body_factory):
 
 
 def routed_cases():
-    for key, rule in ROLE_MATRIX.items():
-        if rule.routed:
-            for method in rule.methods:
-                yield key, method
+    for key in sorted(EXPECTED_ROUTED):
+        for method in EXPECTED[key]:
+            yield key, method
+
+
+def test_role_matrix_equals_the_hand_written_expectation():
+    actual = {k: {m: set(r) for m, r in rule.methods.items()} for k, rule in ROLE_MATRIX.items()}
+    assert actual == EXPECTED
+    assert {k for k, rule in ROLE_MATRIX.items() if rule.routed} == EXPECTED_ROUTED
 
 
 def _views_with_keys():
@@ -102,7 +135,7 @@ def test_matrix_every_routed_row_for_every_principal(principal):
     for key, method in routed_cases():
         path, body = ROUTES[key]
         response = _request(client, method, path, body)
-        allowed = principal in ROLE_MATRIX[key].methods[method]
+        allowed = principal in EXPECTED[key][method]
         where = f"{principal} {method} {path} ({key})"
         if allowed:
             assert response.status_code in OK, f"{where}: {response.status_code}"
@@ -110,7 +143,7 @@ def test_matrix_every_routed_row_for_every_principal(principal):
             assert response.status_code == 403, f"{where}: {response.status_code}"
             assert response.json()["error"]["code"] == "FORBIDDEN"
         checked += 1
-    assert checked == sum(len(r.methods) for r in ROLE_MATRIX.values() if r.routed)
+    assert checked == sum(len(EXPECTED[k]) for k in EXPECTED_ROUTED)
 
 
 def test_unauthenticated_is_401_everywhere():

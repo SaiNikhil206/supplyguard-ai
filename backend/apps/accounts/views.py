@@ -13,7 +13,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
 from apps.audit import record
 from apps.core.tenancy import TenantScopedMixin
 from apps.tenants.models import Tenant
-from apps.tenants.settings_schema import validate_tenant_settings
+from apps.tenants.settings_schema import effective_settings, validate_tenant_settings
 
 from .permissions import RolePermission
 from .serializers import (
@@ -22,21 +22,24 @@ from .serializers import (
     TokenRefreshSerializer,
     UserSerializer,
 )
+from .throttles import LoginUsernameThrottle
 
 
-class _Throttled:
-    throttle_classes = [ScopedRateThrottle]
-    throttle_scope = "auth"
+class _Public:
     permission_classes = [AllowAny]
 
 
 @extend_schema(summary="Log in: returns access and refresh tokens", auth=[])
-class TokenObtainView(_Throttled, TokenObtainPairView):
+class TokenObtainView(_Public, TokenObtainPairView):
+    throttle_classes = [ScopedRateThrottle, LoginUsernameThrottle]
+    throttle_scope = "auth"  # per client IP; LoginUsernameThrottle adds a per-username limit
     serializer_class = TokenObtainSerializer
 
 
 @extend_schema(summary="Exchange a refresh token for a new access token", auth=[])
-class TokenRefreshView(_Throttled, TokenViewBase):
+class TokenRefreshView(_Public, TokenViewBase):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_refresh"  # its own budget: refreshing must not consume logins
     serializer_class = TokenRefreshSerializer
 
 
@@ -53,11 +56,11 @@ class MeView(generics.RetrieveAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        summary="The tenant's settings (exposure_full_scale defaults to 500000 when absent)",
+        summary="The tenant's effective settings (exposure_full_scale shows 500000 when not set)",
         responses=OpenApiTypes.OBJECT,
     ),
     patch=extend_schema(
-        summary="Partially update the tenant's settings",
+        summary="Partially update the tenant's settings; returns the effective settings",
         request=OpenApiTypes.OBJECT,
         responses=OpenApiTypes.OBJECT,
     ),
@@ -71,7 +74,7 @@ class SettingsView(APIView):
     permission_key = {"GET": "settings.read", "PATCH": "settings.write"}
 
     def get(self, request):
-        return Response(request.tenant.settings or {})
+        return Response(effective_settings(request.tenant.settings))
 
     def patch(self, request):
         with transaction.atomic():
@@ -86,7 +89,7 @@ class SettingsView(APIView):
             tenant.settings = new
             tenant.save(update_fields=["settings"])
             record(request.user, "settings.updated", tenant, data={"changed": changed})
-        return Response(new)
+        return Response(effective_settings(new))
 
 
 @extend_schema_view(

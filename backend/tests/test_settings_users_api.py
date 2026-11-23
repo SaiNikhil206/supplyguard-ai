@@ -54,8 +54,20 @@ def new_user(**kw):
 
 
 # --- settings ---------------------------------------------------------------------------------
-def test_get_returns_stored_settings(api):
-    assert api.get(SETTINGS).json() == STORED
+EFFECTIVE = copy.deepcopy(STORED)
+EFFECTIVE["risk_thresholds"]["exposure_full_scale"] = 500000
+
+
+def test_get_returns_effective_settings_with_default_exposure_not_stored(api, acme):
+    assert api.get(SETTINGS).json() == EFFECTIVE
+    acme.refresh_from_db()
+    assert "exposure_full_scale" not in acme.settings["risk_thresholds"]  # default is not saved
+
+
+def test_get_shows_stored_exposure_when_set(api, acme):
+    acme.settings["risk_thresholds"]["exposure_full_scale"] = 123
+    acme.save()
+    assert api.get(SETTINGS).json()["risk_thresholds"]["exposure_full_scale"] == 123
 
 
 def test_get_empty_settings_is_empty_object(api, acme):
@@ -80,7 +92,10 @@ def test_patch_partial_merge_and_audit(api, acme, admin):
     assert r.json() == expected
     acme.refresh_from_db()
     assert acme.settings == expected
-    row = AuditEvent.objects.get(action="settings.updated")
+
+    r2 = api.patch(SETTINGS, {"max_cost_increase_pct": 1}, format="json")
+    assert r2.json()["risk_thresholds"]["exposure_full_scale"] == 100000  # kept
+    row = AuditEvent.objects.filter(action="settings.updated").order_by("id").first()
     assert (row.tenant_id, row.actor, row.entity_type, row.entity_id) == (
         "TEN-ACME", f"USR-{admin.pk}", "Tenant", "TEN-ACME"
     )
@@ -123,7 +138,7 @@ def test_patch_tenant_in_body_rejected_and_other_tenant_untouched(api, globex, k
 def test_tenant_in_query_ignored_for_get_and_patch(api, acme, globex, key):
     globex.settings = {"max_cost_increase_pct": 1}
     globex.save()
-    assert api.get(f"{SETTINGS}?{key}=TEN-GLOBEX").json() == STORED
+    assert api.get(f"{SETTINGS}?{key}=TEN-GLOBEX").json() == EFFECTIVE
     r = api.patch(f"{SETTINGS}?{key}=TEN-GLOBEX", {"max_cost_increase_pct": 77}, format="json")
     assert r.status_code == 200
     globex.refresh_from_db()

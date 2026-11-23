@@ -6,7 +6,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema
 from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from apps.accounts.permissions import RolePermission
+from apps.accounts.permissions import NO_TENANT_MESSAGE, RolePermission
 
 from .models import AuditEvent
 from .serializers import AuditEventSerializer
@@ -53,10 +53,10 @@ class AuditEventList(generics.ListAPIView):
     def get_queryset(self):
         # Never read a tenant from query/body. Fail closed: filter(tenant=None) would match
         # `tenant_id IS NULL`, so a missing tenant must never reach the query.
-        tid = getattr(self.request.user, "tenant_id", None)
-        if not tid:
-            raise PermissionDenied(RolePermission.message)
-        qs = AuditEvent.objects.filter(tenant_id=tid)
+        tenant = getattr(self.request, "tenant", None)  # set from the credential only
+        if tenant is None:
+            raise PermissionDenied(NO_TENANT_MESSAGE)
+        qs = AuditEvent.objects.filter(tenant_id=tenant.pk)
         params = self.request.query_params
         if params.get("entity_type"):
             qs = qs.filter(entity_type=params["entity_type"])

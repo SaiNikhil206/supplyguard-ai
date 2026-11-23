@@ -4,12 +4,12 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from rest_framework.test import APIClient
-from rest_framework.throttling import ScopedRateThrottle
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from apps.accounts.serializers import TokenObtainSerializer
 from apps.audit.models import AuditEvent
 from tests.factories import make_user
+from tests.helpers import set_throttle_rates
 
 pytestmark = pytest.mark.django_db
 PASSWORD = "pw-not-secret-1"
@@ -95,9 +95,20 @@ def test_login_audit_rows_and_no_password_anywhere(api, user):
     assert "wrong-password-xyz" not in dump and PASSWORD not in dump
 
 
-def test_failed_login_username_truncated(api):
+def test_failed_login_username_truncated(api, tenant_a):
+    make_user(tenant_a, username="u" * 150)
     login(api, username="u" * 400)
     assert len(AuditEvent.objects.get(action="auth.login_failed").data["username"]) == 150
+
+
+def test_failed_login_audit_keeps_username_only_when_it_names_a_user(api, user):
+    login(api, username="ALICE", password="bad")  # known, case-insensitive
+    pasted = "my-secret-pw-Tr0ub4dor"
+    login(api, username=pasted, password="bad")  # someone pasted a password as username
+    rows = {tuple(r.data) : r.data for r in AuditEvent.objects.filter(action="auth.login_failed")}
+    assert rows[("username",)] == {"username": "ALICE"}
+    assert rows[("username_known",)] == {"username_known": False}
+    assert pasted not in str(list(AuditEvent.objects.values_list("data", flat=True)))
 
 
 def test_audit_failure_does_not_break_login(api, user, monkeypatch):
@@ -192,14 +203,55 @@ def test_no_credentials_is_401(api):
 
 # --- throttle -----------------------------------------------------------------------------------
 def test_login_throttled_after_low_rate(api, user, monkeypatch):
-    monkeypatch.setattr(ScopedRateThrottle, "THROTTLE_RATES", {"auth": "3/min"})
+    set_throttle_rates(monkeypatch, auth="3/min")
     codes = [login(api, password="bad").status_code for _ in range(5)]
     assert codes == [401, 401, 401, 429, 429]
-    assert api.post(REFRESH, {"refresh": "x"}, format="json").status_code == 429  # shared scope
+    body = login(api, password="bad").json()["error"]
+    assert body["code"] == "RATE_LIMITED"  # 429 has its own code (agenda D-1.5)
+
+
+def test_refresh_has_its_own_budget(api, user, monkeypatch):
+    set_throttle_rates(monkeypatch, auth="2/min", auth_refresh="3/min")
+    assert [login(api, password="bad").status_code for _ in range(3)] == [401, 401, 429]
+    refresh = TokenObtainSerializer.get_token(user)
+    codes = [
+        api.post(REFRESH, {"refresh": str(refresh)}, format="json").status_code for _ in range(4)
+    ]
+    assert codes == [200, 200, 200, 429]  # login exhaustion did not touch refresh
+
+
+def test_rotating_x_forwarded_for_does_not_defeat_the_ip_limit(api, user, monkeypatch):
+    set_throttle_rates(monkeypatch, auth="3/min")
+    codes = [
+        api.post(
+            TOKEN,
+            {"username": f"u{i}", "password": "bad"},
+            format="json",
+            HTTP_X_FORWARDED_FOR=f"203.0.113.{i}",
+        ).status_code
+        for i in range(5)
+    ]
+    assert codes == [401, 401, 401, 429, 429]  # NUM_PROXIES=0: the header is ignored
+
+
+def test_num_proxies_default_is_zero():
+    from django.conf import settings
+
+    assert settings.REST_FRAMEWORK["NUM_PROXIES"] == 0
+
+
+def test_login_throttled_per_lowercased_username(api, user, monkeypatch):
+    set_throttle_rates(monkeypatch, auth_username="2/min")
+    codes = [
+        login(api, username=name, password="bad").status_code
+        for name in ("alice", "ALICE", "Alice", "alice")
+    ]
+    assert codes == [401, 401, 429, 429]
+    assert login(api, username="bob", password="bad").status_code == 401  # other name unaffected
 
 
 def test_other_endpoints_not_throttled(api, user, monkeypatch):
-    monkeypatch.setattr(ScopedRateThrottle, "THROTTLE_RATES", {"auth": "1/min"})
+    set_throttle_rates(monkeypatch, auth="1/min")
     access = login(api).json()["access"]
     for _ in range(4):
         assert api.get(ME, **bearer(access)).status_code == 200

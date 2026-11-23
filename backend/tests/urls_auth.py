@@ -1,5 +1,6 @@
 """Test-only urlconf: the real routes plus an endpoint that echoes the authenticated caller."""
 from django.urls import path
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -7,6 +8,8 @@ from config.urls import urlpatterns as real_urlpatterns
 
 
 class WhoAmI(APIView):
+    permission_classes = [IsAuthenticated]  # the project default is RolePermission
+
     def get(self, request):
         tenant = getattr(request, "tenant", None)
         return Response(
