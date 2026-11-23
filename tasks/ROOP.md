@@ -125,7 +125,7 @@
 - **Notes:** Built on nested branches `--lint`, `--workflow`, `--gate` (subagents). `ci.yml` jobs: backend (ruff + pytest on Postgres 16), frontend (lint/typecheck/test/build, Node from `.nvmrc`), python-suites matrix (ai, data, mock-erp), `ci-ok` aggregate. Triggers: task-branch pushes, PRs + pushes to collaboration/main, nightly 02:00 UTC, manual. ESLint 9 flat config added (`npm run lint`, 0 warnings). Auto-merge gate (`scripts/run_checks.py`) now also runs frontend lint + backend ruff. Opus review x2: CHANGES REQUIRED -> APPROVE WITH NITS (nits fixed). Local `run_checks.py`: all 5 suites PASS. Why `review` not `done`: acceptance "required check on both protected branches" conflicts with bots pushing directly to collaboration (GITHUB_TOKEN cannot bypass) -> proposed SHARED change: require `ci-ok` on `main` only; prove collaboration green via nightly/manual run. Deferred: bot `[skip ci]` in `scripts/gitflow.py` + `progress.yml` blocks milestone PR checks (team); ruff unpinned in `backend/requirements-dev.txt` (Uday).
 
 ### R-10: UX polish + demo mode
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S5 (21-26 Dec) | **Est:** 1.5d | **Depends:** R-03, R-04, R-05, R-07, R-08
 - **Branch:** `roop/R-10-polish`
 - **Model hint:** sonnet / medium; opus / high for a final UI review
@@ -133,7 +133,7 @@
 - **Acceptance:**
   - [ ] Full demo path clicked through with zero console errors
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Redesign with shadcn/ui on Tailwind (user request). Base = collaboration + R-05/R-07/R-08 merged. Plan: shadcn foundation (theme, `src/components/ui` rebuilt on shadcn with same exports, app shell + command palette) | nested session | sonnet/medium | `roop/R-10-polish--foundation`; then in parallel: overview+suppliers screens | session | sonnet/medium | `--screens-insight`; risk+recommendations+approvals | session | sonnet/medium | `--screens-risk`; what-if+integrations+audit+settings+login | session | sonnet/medium | `--screens-admin`; final UI review | reviewer | opus/high | -.
 
 ### R-11: Demo script, deck, video storyboard
 - **Status:** todo
