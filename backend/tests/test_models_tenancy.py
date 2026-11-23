@@ -57,13 +57,13 @@ def test_cross_tenant_fk_is_rejected(tenant_a, tenant_b, model, fk_name):
     foreign = BUILDERS_BY_TARGET[related.__name__](tenant_b)
     setattr(obj, fk_name, foreign)
     with pytest.raises(ValidationError):
-        obj.save()
+        obj.clean()  # the same guard save() runs; append-only rows refuse save() earlier
 
 
 def test_same_tenant_fks_save_fine_for_every_model(tenant_a):
     for name, builder in BUILDERS.items():
         obj = builder(tenant_a)
-        obj.save()  # re-save of a valid row passes the guard
+        obj.clean()  # a valid row passes the guard
         assert obj.tenant_id == tenant_a.id, name
 
 

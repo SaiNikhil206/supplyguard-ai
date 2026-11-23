@@ -21,6 +21,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=200, blank=True)
 
     class Meta(AbstractUser.Meta):
+        ordering = ["id"]
         constraints = [
             models.CheckConstraint(
                 condition=Q(is_superuser=True) | Q(tenant__isnull=False),

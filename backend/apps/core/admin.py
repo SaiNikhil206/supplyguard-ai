@@ -17,6 +17,19 @@ from .models import (
 )
 
 
+class ReadOnlyAdmin(admin.ModelAdmin):
+    """View only: these rows are written by the workflow / AI / ERP code paths, never by hand."""
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Supplier)
 class SupplierAdmin(admin.ModelAdmin):
     list_display = ("erp_id", "name", "tenant", "status", "risk_level", "country")
@@ -72,7 +85,7 @@ class RiskCaseAdmin(admin.ModelAdmin):
 
 
 @admin.register(AgentRun)
-class AgentRunAdmin(admin.ModelAdmin):
+class AgentRunAdmin(ReadOnlyAdmin):
     list_display = ("id", "tenant", "risk_case", "agent", "round", "valid", "created_at")
     list_filter = ("tenant", "agent", "valid")
     search_fields = ("risk_case__id",)
@@ -86,26 +99,26 @@ class AffectedPOAdmin(admin.ModelAdmin):
 
 
 @admin.register(Recommendation)
-class RecommendationAdmin(admin.ModelAdmin):
+class RecommendationAdmin(ReadOnlyAdmin):
     list_display = ("id", "tenant", "risk_case", "round", "rank", "option_type", "status")
     list_filter = ("tenant", "option_type", "status", "unsupported")
     search_fields = ("id", "risk_case__id")
 
 
 @admin.register(Approval)
-class ApprovalAdmin(admin.ModelAdmin):
+class ApprovalAdmin(ReadOnlyAdmin):
     list_display = ("id", "tenant", "risk_case", "round", "decision", "decided_by", "decided_at")
     list_filter = ("tenant", "decision")
     search_fields = ("id", "risk_case__id")
 
 
 @admin.register(Execution)
-class ExecutionAdmin(admin.ModelAdmin):
+class ExecutionAdmin(ReadOnlyAdmin):
     list_display = ("id", "tenant", "approval", "status", "error_class", "retry_count")
     list_filter = ("tenant", "status", "error_class")
     search_fields = ("id", "approval__id")
 
 
 @admin.register(IdSequence)
-class IdSequenceAdmin(admin.ModelAdmin):
+class IdSequenceAdmin(ReadOnlyAdmin):
     list_display = ("prefix", "last_value")
