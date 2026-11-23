@@ -1,7 +1,9 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
+import { integrationHandlers } from './admin/integrations';
 import type { ErrorCode, Paginated } from '@/api/types';
 import { SCENARIOS } from './scenarios';
 import { approvalHandlers } from './approvals';
+import { auditHandlers } from './admin/audit';
 import {
   addSimulatedCase,
   dashboardSummary,
@@ -14,6 +16,7 @@ import {
   type MockUser,
 } from './fixtures';
 import { whatIfHandlers } from './whatif';
+import { adminSettingsHandlers } from './admin/settings';
 
 export const ACCESS_TTL_SECONDS = 15 * 60;
 export const REFRESH_TTL_SECONDS = 7 * 24 * 3600;
@@ -124,6 +127,7 @@ const API = '*/api/v1';
 
 export const handlers: HttpHandler[] = [
   ...approvalHandlers, // stateful R-05 overrides of /risk-cases* + decision/retry; must stay first
+  ...adminSettingsHandlers,
   http.post(`${API}/auth/token`, async ({ request }) => {
     const body = (await request.json().catch(() => ({}))) as { username?: string; password?: string };
     if (!body.username || !body.password) {
@@ -232,4 +236,6 @@ export const handlers: HttpHandler[] = [
     }),
   ),
   ...whatIfHandlers,
+  ...integrationHandlers,
+  ...auditHandlers,
 ];

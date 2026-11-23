@@ -1,7 +1,11 @@
+import type { Role } from '@/api/types';
+
 export interface NavItem {
   path: string;
   label: string;
   icon: string; // simple glyph
+  /** When set, the item is only shown to these roles. */
+  roles?: Role[];
 }
 
 export const navItems: NavItem[] = [
@@ -13,5 +17,5 @@ export const navItems: NavItem[] = [
   { path: '/what-if', label: 'What-if Simulator', icon: '⇄' },
   { path: '/integrations', label: 'Integration Center', icon: '⛓' },
   { path: '/audit', label: 'Audit Center', icon: '☰' },
-  { path: '/settings', label: 'Tenant Settings', icon: '⚒' },
+  { path: '/settings', label: 'Tenant Settings', icon: '⚒', roles: ['ADMIN'] },
 ];

@@ -5,6 +5,7 @@ import { server } from '@/mocks/server';
 import { clearTokens } from '@/api/tokens';
 import { resetMockState } from '@/mocks/fixtures';
 import { resetApprovalsMock } from '@/mocks/approvals';
+import { resetAdminSettingsMock } from '@/mocks/admin/settings';
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());
@@ -15,6 +16,7 @@ afterEach(() => {
   resetMockState();
   resetApprovalsMock();
   clearTokens();
+  resetAdminSettingsMock();
   document.documentElement.classList.remove('dark');
   try {
     localStorage.clear();
