@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@/lib/utils';
 
 export interface MoneyValue {
   amount: string | number;
@@ -36,5 +36,5 @@ export interface MoneyProps {
 
 export function Money({ value, amount, currency, className }: MoneyProps) {
   const v = value !== undefined ? value : amount !== undefined && currency ? { amount, currency } : null;
-  return <span className={clsx('tabular-nums', className)}>{formatMoney(v)}</span>;
+  return <span className={cn('tabular-nums', className)}>{formatMoney(v)}</span>;
 }
