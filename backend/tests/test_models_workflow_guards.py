@@ -202,3 +202,41 @@ def test_agent_runs_are_kept_per_call(tenant_a):
     make_agent_run(tenant_a, case, raw={"a": 2}, valid=True)
     assert case.agent_runs.count() == 2
     assert make_user(tenant_a).tenant_id == tenant_a.id
+
+
+# --- Approval integrity ------------------------------------------------------------------------
+def test_approval_risk_case_must_match_recommendation(tenant_a):
+    rec = make_rec(tenant_a)
+    other_case = make_case(tenant_a)
+    with pytest.raises(ValidationError):
+        Approval.objects.create(
+            risk_case=other_case,
+            recommendation=rec,
+            decided_by=make_user(tenant_a),
+            decision="REJECT",
+            round=rec.round,
+        )
+
+
+def test_approval_round_must_match_recommendation(tenant_a):
+    rec = make_rec(tenant_a, round=2)
+    with pytest.raises(ValidationError):
+        make_approval(tenant_a, rec, round=1)
+
+
+def test_approval_round_defaults_from_recommendation(tenant_a):
+    rec = make_rec(tenant_a, round=3)
+    approval = Approval.objects.create(
+        risk_case=rec.risk_case,
+        recommendation=rec,
+        decided_by=make_user(tenant_a),
+        decision="APPROVE",
+    )
+    assert approval.round == 3
+    assert approval.tenant_id == tenant_a.id
+
+
+def test_approval_happy_path(tenant_a):
+    rec = make_rec(tenant_a)
+    approval = make_approval(tenant_a, rec, round=rec.round)
+    assert (approval.risk_case_id, approval.round) == (rec.risk_case_id, rec.round)

@@ -125,7 +125,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
                 ('id', models.CharField(editable=False, max_length=20, primary_key=True, serialize=False)),
-                ('round', models.PositiveIntegerField(default=1)),
+                ('round', models.PositiveIntegerField(blank=True)),
                 ('decision', models.CharField(choices=[('APPROVE', 'Approve'), ('REJECT', 'Reject'), ('REQUEST_CHANGES', 'Request Changes')], max_length=20)),
                 ('comments', models.TextField(blank=True)),
                 ('decided_at', models.DateTimeField(default=django.utils.timezone.now)),

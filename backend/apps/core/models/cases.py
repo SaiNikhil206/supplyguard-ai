@@ -273,7 +273,8 @@ class Approval(TenantOwned):
 
     id = models.CharField(primary_key=True, max_length=20, editable=False)
     risk_case = models.ForeignKey(RiskCase, on_delete=models.PROTECT, related_name="approvals")
-    round = models.PositiveIntegerField(default=1)
+    # No default: left unset, save() copies it from the recommendation.
+    round = models.PositiveIntegerField(blank=True)
     recommendation = models.ForeignKey(
         Recommendation, on_delete=models.PROTECT, related_name="approvals"
     )
@@ -297,6 +298,16 @@ class Approval(TenantOwned):
 
     def __str__(self):
         return self.id
+
+    def save(self, *args, **kwargs):
+        rec = self.recommendation
+        if self.round is None:
+            self.round = rec.round
+        if rec.risk_case_id != self.risk_case_id:
+            raise ValidationError("Approval.risk_case must match recommendation.risk_case.")
+        if rec.round != self.round:
+            raise ValidationError("Approval.round must match recommendation.round.")
+        super().save(*args, **kwargs)
 
 
 class Execution(TenantOwned):
