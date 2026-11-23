@@ -1,22 +1,34 @@
+/* eslint-disable react-refresh/only-export-components -- route table module: lazy page consts are not exported components */
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { AppShell } from '@/layout/AppShell';
-import ExecutiveOverview from '@/pages/ExecutiveOverview';
-import SupplierIntelligence from '@/pages/SupplierIntelligence';
-import SupplierDetail from '@/pages/SupplierDetail';
-import RiskCommandCenter from '@/pages/RiskCommandCenter';
-import RiskCaseDetail from '@/pages/RiskCaseDetail';
-import AiRecommendations from '@/pages/AiRecommendations';
-import ApprovalCenter from '@/pages/ApprovalCenter';
-import WhatIfSimulator from '@/pages/WhatIfSimulator';
-import IntegrationCenter from '@/pages/IntegrationCenter';
-import AuditCenter from '@/pages/AuditCenter';
-import TenantSettings from '@/pages/TenantSettings';
-import NotFound from '@/pages/NotFound';
-import Login from '@/pages/Login';
+import { PageSkeleton } from '@/layout/PageSkeleton';
 import { ProtectedRoute } from '@/auth/ProtectedRoute';
 
+// Route pages are code-split; AppShell wraps <Outlet/> in a Suspense with a skeleton.
+const ExecutiveOverview = lazy(() => import('@/pages/ExecutiveOverview'));
+const SupplierIntelligence = lazy(() => import('@/pages/SupplierIntelligence'));
+const SupplierDetail = lazy(() => import('@/pages/SupplierDetail'));
+const RiskCommandCenter = lazy(() => import('@/pages/RiskCommandCenter'));
+const RiskCaseDetail = lazy(() => import('@/pages/RiskCaseDetail'));
+const AiRecommendations = lazy(() => import('@/pages/AiRecommendations'));
+const ApprovalCenter = lazy(() => import('@/pages/ApprovalCenter'));
+const WhatIfSimulator = lazy(() => import('@/pages/WhatIfSimulator'));
+const IntegrationCenter = lazy(() => import('@/pages/IntegrationCenter'));
+const AuditCenter = lazy(() => import('@/pages/AuditCenter'));
+const TenantSettings = lazy(() => import('@/pages/TenantSettings'));
+const NotFound = lazy(() => import('@/pages/NotFound'));
+const Login = lazy(() => import('@/pages/Login'));
+
 export const routes: RouteObject[] = [
-  { path: '/login', element: <Login /> },
+  {
+    path: '/login',
+    element: (
+      <Suspense fallback={<PageSkeleton />}>
+        <Login />
+      </Suspense>
+    ),
+  },
   {
     path: '/',
     element: (

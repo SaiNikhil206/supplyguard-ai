@@ -2,7 +2,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Inbox } from 'lucide-react';
 import {
+  AiChip,
   Alert,
+  TablePagination,
   AlertDescription,
   AlertTitle,
   Button,
@@ -61,7 +63,7 @@ describe('Button', () => {
 });
 
 describe('KpiTile', () => {
-  it('renders icon and sparkline slots plus an accessible delta', () => {
+  it('renders the sparkline slot plus an accessible delta (v2: no icon squares)', () => {
     render(
       <KpiTile
         label="Exposure"
@@ -71,7 +73,7 @@ describe('KpiTile', () => {
         delta={{ value: '4%', direction: 'down', tone: 'good' }}
       />,
     );
-    expect(screen.getByTestId('ico')).toBeInTheDocument();
+    expect(screen.queryByTestId('ico')).not.toBeInTheDocument();
     expect(screen.getByTestId('spark')).toBeInTheDocument();
     expect(screen.getByText(/decrease, favourable/)).toBeInTheDocument();
   });
@@ -178,5 +180,21 @@ describe('toast', () => {
     );
     toast.success('Saved changes');
     expect(await screen.findByText('Saved changes')).toBeInTheDocument();
+  });
+});
+
+describe('v2 additions', () => {
+  it('AiChip labels AI content', () => {
+    render(<AiChip />);
+    expect(screen.getByText('AI')).toBeInTheDocument();
+  });
+
+  it('TablePagination reports the range and pages', async () => {
+    const onPageChange = vi.fn();
+    render(<TablePagination page={1} pageSize={10} total={52} onPageChange={onPageChange} />);
+    expect(screen.getByText('1-10 of 52')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Previous page' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(onPageChange).toHaveBeenCalledWith(2);
   });
 });

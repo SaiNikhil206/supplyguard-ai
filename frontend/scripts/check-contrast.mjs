@@ -53,7 +53,8 @@ for (const [name, sel] of [['light', ':root'], ['dark', '\\.dark']]) {
     rows.push([`${k} on background`, ratio(c(k), c('background'))]);
     rows.push([`${k} on ${k}/10 tint`, ratio(c(k), mix(c(k), c('card'), 0.1))]);
   }
-  rows.push(['primary-foreground on sidebar active (primary)', ratio(c('primary-foreground'), c('primary'))]);
+  rows.push(['accent-foreground on sidebar/card (active nav)', ratio(c('accent-foreground'), c('accent'))]);
+  rows.push(['sidebar-fg on accent', ratio(c('sidebar-fg'), c('background'))]);
   for (const [label, r] of rows) {
     const ok = r >= 4.5;
     if (!ok) failed++;

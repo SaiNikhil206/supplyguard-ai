@@ -6,24 +6,24 @@ import { Spinner } from './Spinner';
 
 // eslint-disable-next-line react-refresh/only-export-components -- cva helper shared with link-styled buttons
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors ' +
+  'inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-150 ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ' +
     'disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        primary: 'bg-primary text-primary-foreground shadow-soft hover:bg-primary/90',
-        secondary: 'border border-input bg-card text-foreground shadow-soft hover:bg-surface-2',
-        outline: 'border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
+        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        secondary: 'border border-border bg-card text-foreground hover:bg-surface-2',
+        outline: 'border border-border bg-transparent text-foreground hover:bg-surface-2',
         ghost: 'bg-transparent text-foreground hover:bg-surface-2',
-        danger: 'bg-destructive text-destructive-foreground shadow-soft hover:bg-destructive/90',
+        danger: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         link: 'h-auto p-0 text-primary underline-offset-4 hover:underline',
       },
       size: {
-        sm: 'h-8 gap-1.5 px-3',
-        md: 'h-10 gap-2 px-4',
-        lg: 'h-11 gap-2 px-6 text-base',
-        icon: 'h-10 w-10',
+        sm: 'h-8 gap-1.5 px-3 text-[13px]',
+        md: 'h-9 gap-2 px-3.5',
+        lg: 'h-10 gap-2 px-5',
+        icon: 'h-9 w-9',
       },
     },
     defaultVariants: { variant: 'primary', size: 'md' },

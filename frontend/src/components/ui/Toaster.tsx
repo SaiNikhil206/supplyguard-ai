@@ -12,7 +12,7 @@ export function Toaster() {
       toastOptions={{
         classNames: {
           toast:
-            'group rounded-lg border border-border bg-popover text-popover-foreground shadow-lift font-sans text-sm',
+            'group rounded-lg border border-border bg-popover text-popover-foreground shadow-sm font-sans text-sm',
           description: '!text-muted',
           actionButton: '!bg-primary !text-primary-foreground',
           cancelButton: '!bg-surface-2 !text-foreground',
