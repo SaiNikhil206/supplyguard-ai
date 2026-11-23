@@ -89,6 +89,9 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-23 | 2754189 | nikhil | N-04 | review | merge: N-04 task file to review |
+| 2026-11-23 | bccab55 | nikhil | N-04 | review | docs(tasks): N-04 impact engine to review |
+| 2026-11-23 | 400c940 | nikhil | N-04 | review | merge: N-04 Deterministic impact + risk scoring engine (auto-merge) |
 | 2026-11-23 | e0ab4a4 | nikhil | N-04 | in-progress | merge: N-04 design + impl pieces into task branch |
 | 2026-11-23 | a85f296 | roop | R-10 | in-progress | chore(tasks): start R-10 shadcn redesign |
 | 2026-11-23 | 653bad7 | roop | R-10 | in-progress | merge: R-08-admin-screens into R-10 polish base |
@@ -106,6 +109,3 @@
 | 2026-11-23 | bf9037b | uday | U-03 | in-progress | fix(core): move User ordering to accounts 0002, restore save() in tenancy tests, instance fallback |
 | 2026-11-23 | 87aed4e | uday | U-03 | in-progress | chore(tasks): U-03 built and verified on Postgres, hand-offs recorded |
 | 2026-11-23 | 3c023a0 | uday | U-03 | in-progress | merge: U-03 review fixes into uday/U-03-core-models |
-| 2026-11-23 | f5e99c9 | uday | U-03 | in-progress | fix(core): close review findings (id collisions, append-only rows, status guard, approvals, admin) |
-| 2026-11-23 | 2d77279 | uday | U-03 | in-progress | docs(contracts): section 10 - manifest line count, Docker seed mount, immutable approvals |
-| 2026-11-23 | ce95a3b | uday | U-03 | in-progress | merge: U-03 seed loader piece into uday/U-03-core-models |
