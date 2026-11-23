@@ -25,7 +25,7 @@ class SupplyGuardUserCreationForm(TenantRequiredMixin, AdminUserCreationForm):
 
 class SupplyGuardUserChangeForm(TenantRequiredMixin, UserChangeForm):
     def _superuser_allowed(self):
-        return bool(self.cleaned_data.get("is_superuser"))
+        return bool(self.cleaned_data.get("is_superuser", self.instance.is_superuser))
 
 
 @admin.register(User)

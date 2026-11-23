@@ -337,3 +337,14 @@ def test_tenant_cannot_be_deleted_while_tenant_owned_rows_exist(tenant_a, name):
     BUILDERS[name](tenant_a)
     with pytest.raises(ProtectedError), transaction.atomic():
         tenant_a.delete()
+
+
+def test_change_form_superuser_check_falls_back_to_instance(rf, tenant_a):
+    from apps.accounts.admin import SupplyGuardUserChangeForm
+
+    form = SupplyGuardUserChangeForm(instance=User(username="su", is_superuser=True))
+    form.cleaned_data = {}
+    assert form._superuser_allowed() is True
+    form = SupplyGuardUserChangeForm(instance=User(username="x", is_superuser=False))
+    form.cleaned_data = {}
+    assert form._superuser_allowed() is False
