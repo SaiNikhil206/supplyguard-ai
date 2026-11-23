@@ -16,48 +16,6 @@ const INITIAL: WhatIfRequest = {
   duration_days: 7,
 };
 
-function IdleIllustration() {
-  return (
-    <svg viewBox="0 0 160 120" className="h-28 w-36" aria-hidden="true">
-      <defs>
-        <linearGradient id="wi-g" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="hsl(var(--primary))" stopOpacity="0.35" />
-          <stop offset="1" stopColor="hsl(var(--primary))" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <rect
-        x="8"
-        y="10"
-        width="144"
-        height="100"
-        rx="14"
-        fill="hsl(var(--surface-2))"
-        stroke="hsl(var(--border))"
-      />
-      <path
-        d="M20 88 L50 62 L76 74 L104 40 L140 52 L140 100 L20 100 Z"
-        fill="url(#wi-g)"
-      />
-      <path
-        d="M20 88 L50 62 L76 74 L104 40 L140 52"
-        fill="none"
-        stroke="hsl(var(--primary))"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="104" cy="40" r="5" fill="hsl(var(--primary))" />
-      <circle
-        cx="104"
-        cy="40"
-        r="10"
-        fill="hsl(var(--primary))"
-        opacity="0.15"
-      />
-    </svg>
-  );
-}
-
 export default function WhatIfSimulator() {
   const { hasRole } = useAuth();
   const canRun = hasRole("ADMIN", "OPS_MANAGER", "PROCUREMENT_MANAGER");
@@ -96,11 +54,9 @@ export default function WhatIfSimulator() {
         }
       />
       <div className="grid gap-6 lg:grid-cols-[24rem_1fr]">
-        <div className="self-start rounded-2xl bg-gradient-to-br from-primary/40 via-border to-transparent p-px lg:sticky lg:top-4">
-          <div className="rounded-2xl bg-card p-5">
-            <h2 className="mb-4 text-sm font-semibold tracking-tight">
-              Scenario
-            </h2>
+        <div className="self-start lg:sticky lg:top-4">
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h2 className="mb-4 text-sm font-semibold">Scenario</h2>
             <WhatIfForm
               suppliers={list}
               suppliersLoading={suppliers.isLoading}
@@ -120,9 +76,9 @@ export default function WhatIfSimulator() {
               className="space-y-4"
               aria-busy="true"
             >
-              <Skeleton className="h-28 w-full rounded-2xl" />
-              <Skeleton className="h-72 w-full rounded-2xl" />
-              <Skeleton className="h-40 w-full rounded-2xl" />
+              <Skeleton className="h-28 w-full rounded-lg" />
+              <Skeleton className="h-72 w-full rounded-lg" />
+              <Skeleton className="h-40 w-full rounded-lg" />
             </div>
           )}
           {!mutation.isPending && err && (
@@ -140,12 +96,13 @@ export default function WhatIfSimulator() {
             <WhatIfResults result={mutation.data} />
           )}
           {mutation.isIdle && (
-            <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-6 py-16 text-center">
-              <IdleIllustration />
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <FlaskConical className="h-4 w-4" aria-hidden="true" />
-              </div>
-              <h2 className="text-lg font-semibold">No simulation yet</h2>
+            <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border bg-card px-6 py-16 text-center">
+              <FlaskConical
+                className="h-10 w-10 text-muted"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+              <h2 className="text-sm font-semibold">No simulation yet</h2>
               <p className="max-w-sm text-sm text-muted">
                 Pick a supplier, event and duration, then run the simulation, or
                 start from a quick scenario.

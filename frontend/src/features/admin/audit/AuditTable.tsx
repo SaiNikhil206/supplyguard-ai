@@ -10,6 +10,7 @@ import {
   User,
 } from "lucide-react";
 import {
+  Badge,
   Table,
   TBody,
   TD,
@@ -24,17 +25,9 @@ import { cn } from "@/lib/utils";
 import { formatTime } from "./stages";
 
 const ACTOR = {
-  USER: { icon: User, cls: "bg-primary/10 text-primary", label: "User" },
-  SYSTEM: {
-    icon: Cpu,
-    cls: "bg-slate-500/10 text-slate-600 dark:text-slate-300",
-    label: "System",
-  },
-  AGENT: {
-    icon: Bot,
-    cls: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
-    label: "AI agent",
-  },
+  USER: { icon: User, cls: "bg-surface-2 text-muted", label: "User" },
+  SYSTEM: { icon: Cpu, cls: "bg-surface-2 text-muted", label: "System" },
+  AGENT: { icon: Bot, cls: "bg-accent text-accent-foreground", label: "AI agent" },
 } as const;
 
 export function ActorCell({ actor }: { actor: AuditEvent["actor"] }) {
@@ -45,11 +38,11 @@ export function ActorCell({ actor }: { actor: AuditEvent["actor"] }) {
       <span
         aria-hidden="true"
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
           m.cls,
         )}
       >
-        <Icon className="h-4 w-4" />
+        <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
       </span>
       <div className="leading-tight">
         <div className="text-sm font-medium">{actor.name}</div>
@@ -61,7 +54,7 @@ export function ActorCell({ actor }: { actor: AuditEvent["actor"] }) {
 
 export function EntityCell({ e }: { e: AuditEvent }) {
   const chip =
-    "rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted";
+    "rounded-md bg-surface-2 px-1.5 py-0.5 text-xs font-medium uppercase tracking-wide text-muted";
   if (e.entity_type === "RISK_CASE") {
     return (
       <span className="inline-flex items-center gap-1.5">
@@ -94,7 +87,7 @@ export function StateChange({
 }) {
   if (!from && !to) return <span className="text-muted">-</span>;
   const chip =
-    "rounded-md border border-border/60 bg-surface-2 px-1.5 py-0.5 text-xs font-medium";
+    "rounded-md border border-border bg-surface-2 px-1.5 py-0.5 text-xs font-medium";
   return (
     <span
       className="inline-flex items-center gap-1.5"
@@ -103,7 +96,7 @@ export function StateChange({
       <span className={chip}>{from ?? "-"}</span>
       <ArrowRight className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
       <span
-        className={cn(chip, "border-primary/30 bg-primary/10 text-primary")}
+        className={cn(chip, "border-primary/25 bg-accent text-accent-foreground")}
       >
         {to ?? "-"}
       </span>
@@ -130,11 +123,11 @@ export function CopyId({
     }
   };
   return (
-    <span className="inline-flex items-center overflow-hidden rounded-md border border-border/60 bg-surface-2 font-mono text-xs">
+    <span className="inline-flex items-center overflow-hidden rounded-md border border-border bg-surface-2 font-mono text-xs">
       {onTrace ? (
         <button
           type="button"
-          className="flex items-center gap-1 px-2 py-1 text-primary hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex items-center gap-1 px-2 py-1 text-primary hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={() => onTrace(id)}
           aria-label={`Trace ${id}`}
         >
@@ -148,10 +141,10 @@ export function CopyId({
         type="button"
         onClick={() => void copy()}
         aria-label={`Copy ${id}`}
-        className="border-l border-border/60 px-1.5 py-1 text-muted hover:bg-surface-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="border-l border-border px-1.5 py-1 text-muted hover:bg-surface-2 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {done ? (
-          <Check className="h-3 w-3 text-emerald-500" aria-hidden="true" />
+          <Check className="h-3 w-3 text-success" aria-hidden="true" />
         ) : (
           <Copy className="h-3 w-3" aria-hidden="true" />
         )}
@@ -184,7 +177,7 @@ export function AuditTable({
           <TableEmptyRow colSpan={6}>No audit events match</TableEmptyRow>
         )}
         {events.map((e) => (
-          <TR key={e.id} className="h-14">
+          <TR key={e.id}>
             <TD className="whitespace-nowrap font-mono text-xs">
               {formatTime(e.at)}
             </TD>
@@ -195,9 +188,7 @@ export function AuditTable({
               <EntityCell e={e} />
             </TD>
             <TD>
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                {e.action}
-              </span>
+              <Badge tone="primary">{e.action}</Badge>
             </TD>
             <TD>
               <StateChange from={e.from_state} to={e.to_state} />

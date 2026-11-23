@@ -1,8 +1,9 @@
+import { PageHeader } from "@/features/admin/ui/PageHeader";
+
 export function PagePlaceholder({ title }: { title: string }) {
   return (
-    <section>
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <p className="mt-2 text-sm text-muted">This screen is coming soon.</p>
+    <section className="space-y-6">
+      <PageHeader title={title} description="This screen is coming soon." />
     </section>
   );
 }

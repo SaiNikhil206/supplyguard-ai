@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ShieldAlert, SlidersHorizontal, Users } from "lucide-react";
 import {
   ErrorState,
   Skeleton,
@@ -15,9 +14,9 @@ import { UsersPanel } from "@/features/admin/settings/UsersPanel";
 import { PageHeader } from "@/features/admin/ui/PageHeader";
 
 const TABS = [
-  { id: "thresholds", label: "Risk thresholds", icon: SlidersHorizontal },
-  { id: "approval", label: "Approval", icon: ShieldAlert },
-  { id: "users", label: "Users & roles", icon: Users },
+  { id: "thresholds", label: "Risk thresholds" },
+  { id: "approval", label: "Approval" },
+  { id: "users", label: "Users & roles" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 
@@ -25,7 +24,7 @@ function Loading() {
   return (
     <div role="status" aria-busy="true" className="space-y-4">
       <span className="sr-only">Loading settings</span>
-      <Skeleton className="h-64 w-full rounded-2xl" />
+      <Skeleton className="h-64 w-full rounded-lg" />
     </div>
   );
 }
@@ -66,8 +65,7 @@ export default function TenantSettings() {
       >
         <TabsList aria-label="Settings sections">
           {TABS.map((t) => (
-            <TabsTrigger key={t.id} value={t.id} className="gap-2">
-              <t.icon className="h-4 w-4" aria-hidden="true" />
+            <TabsTrigger key={t.id} value={t.id} >
               {t.label}
             </TabsTrigger>
           ))}

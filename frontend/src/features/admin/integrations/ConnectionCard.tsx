@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { ChevronDown, Clock, LifeBuoy } from "lucide-react";
 import type { Connection } from "@/api/admin/integrations";
-import { Alert, AlertDescription } from "@/components/ui";
+import { Alert, AlertDescription, Badge } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { KIND_META, STATUS_META } from "./statusMeta";
 import { relativeTime } from "./relativeTime";
@@ -9,27 +9,9 @@ import { relativeTime } from "./relativeTime";
 export function StatusPill({ status }: { status: Connection["status"] }) {
   const meta = STATUS_META[status];
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1",
-        meta.pill,
-      )}
-    >
-      <span aria-hidden="true" className="relative flex h-2 w-2">
-        {status !== "DOWN" && (
-          <span
-            className={cn(
-              "absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:animate-none",
-              meta.dot,
-            )}
-          />
-        )}
-        <span
-          className={cn("relative inline-flex h-2 w-2 rounded-full", meta.dot)}
-        />
-      </span>
+    <Badge tone={meta.tone} dot>
       {meta.label}
-    </span>
+    </Badge>
   );
 }
 
@@ -47,22 +29,19 @@ export function ConnectionCard({ connection: c }: { connection: Connection }) {
   return (
     <div
       data-testid={`connection-${c.id}`}
-      className="rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur transition hover:shadow-md"
+      className="rounded-lg border border-border bg-card p-5"
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <span
               aria-hidden="true"
-              className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-sm font-bold text-white shadow-sm",
-                kind.gradient,
-              )}
+              className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-surface-2 text-xs font-semibold text-muted"
             >
               {kind.mono}
             </span>
             <div>
-              <h2 className="text-base font-semibold leading-tight">
+              <h2 className="text-sm font-semibold leading-tight">
                 {c.name}
               </h2>
               <p className="text-xs text-muted">{kind.sub}</p>
@@ -81,11 +60,11 @@ export function ConnectionCard({ connection: c }: { connection: Connection }) {
             </dd>
             <div
               aria-hidden="true"
-              className="h-1.5 overflow-hidden rounded-full bg-surface-2"
+              className="h-1 overflow-hidden rounded-full bg-surface-2"
             >
               <div
                 className={cn(
-                  "h-full rounded-full transition-all duration-500",
+                  "h-full rounded-full transition-all duration-200",
                   meta.bar,
                 )}
                 style={{ width: `${pct}%` }}
@@ -105,7 +84,7 @@ export function ConnectionCard({ connection: c }: { connection: Connection }) {
 
         {c.fallback_note && (
           <Alert variant="info" className="text-sm">
-            <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+            <LifeBuoy className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
             <AlertDescription>{c.fallback_note}</AlertDescription>
           </Alert>
         )}
@@ -131,7 +110,7 @@ export function ConnectionCard({ connection: c }: { connection: Connection }) {
             {open && (
               <div
                 id={panelId}
-                className="mt-2 space-y-1 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm duration-200 animate-in fade-in slide-in-from-top-1"
+                className="mt-2 space-y-1 rounded-md border border-danger/25 bg-danger/5 p-3 text-sm duration-200 animate-in fade-in slide-in-from-top-1"
               >
                 <p className="font-mono text-xs font-semibold">
                   {c.last_error.code}

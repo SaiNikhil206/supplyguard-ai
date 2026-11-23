@@ -22,13 +22,13 @@ export function SaveBar({
       data-testid="save-bar"
       data-dirty={dirty}
       className={cn(
-        "sticky bottom-4 z-20 flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card/95 px-4 py-3 shadow-lg backdrop-blur transition-all duration-200",
+        "sticky bottom-4 z-20 flex items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3 shadow-sm transition-all duration-200",
         dirty
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-3 opacity-0 motion-reduce:transition-none",
       )}
     >
-      <p className="flex items-center gap-2 text-sm font-medium" role="status">
+      <p className="flex items-center gap-2 text-sm text-muted" role="status">
         {dirty && (
           <>
             <span
