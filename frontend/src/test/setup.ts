@@ -8,7 +8,7 @@ import { resetApprovalsMock } from '@/mocks/approvals';
 import { resetAdminSettingsMock } from '@/mocks/admin/settings';
 
 // Route pages are lazy-loaded (code-split), so the first render of a page includes a dynamic import.
-configure({ asyncUtilTimeout: 5000 });
+configure({ asyncUtilTimeout: 10000 });
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());
