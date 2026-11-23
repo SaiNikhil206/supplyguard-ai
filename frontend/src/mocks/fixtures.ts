@@ -148,6 +148,10 @@ function trendDate(i: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Gradual, plausible 14-day series (INR exposure; open case count). */
+const EXPOSURE_SERIES = [3.1, 3.2, 3.4, 3.3, 3.6, 3.9, 4.2, 4.1, 4.4, 4.3, 4.6, 4.5, 4.4, 4.475].map((v) => v * 1_000_000);
+const CASES_SERIES = [2, 2, 3, 3, 3, 4, 4, 4, 5, 4, 4, 4, 3, 3];
+
 export const dashboardSummary: DashboardSummary = {
   suppliers: suppliers.length,
   open_pos: suppliers.reduce((a, s) => a + s.open_po_count, 0),
@@ -157,11 +161,11 @@ export const dashboardSummary: DashboardSummary = {
   recovered_value: inr('2100000.00'),
   exposure_trend: Array.from({ length: 14 }, (_, i) => ({
     date: trendDate(i),
-    value: 2_000_000 + ((i * 337_000) % 2_800_000),
+    value: EXPOSURE_SERIES[i],
   })),
   cases_trend: Array.from({ length: 14 }, (_, i) => ({
     date: trendDate(i),
-    value: 1 + ((i * 3) % 6),
+    value: CASES_SERIES[i],
   })),
 };
 
