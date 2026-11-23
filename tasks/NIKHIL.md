@@ -155,16 +155,16 @@
 - **Notes:** Roop's R-05 and R-06 need this by 11 Dec.
 
 ### N-11: What-if simulator backend
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S3 (11-14 Dec) | **Est:** 1.5d | **Depends:** N-04
 - **Branch:** `nikhil/N-11-what-if`
 - **Model hint:** sonnet / medium
 - **Deliverables:** `POST /what-if` (supplier_id, duration_days, event_type) and `POST /risk-cases/{id}/what-if`; reuses impact engine on a fresh snapshot; returns affected POs, inventory gaps, exposure, best option estimate, assumptions; no DB writes except an audit row.
 - **Acceptance:**
-  - [ ] "Supplier A out for 7 days" returns in < 3 s on seed data
-  - [ ] Response labels everything as estimate + lists assumptions (AC-03)
+  - [x] "Supplier A out for 7 days" returns in < 3 s on seed data
+  - [x] Response labels everything as estimate + lists assumptions (AC-03)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Built (impl piece): `backend/apps/intelligence/{whatif,views,serializers,urls}.py`, URLs included in `config/urls.py`, `what-if` matrix row now routed (+ route/stub in `test_role_matrix.py`), settings `ERP_BASE_URL` (default http://localhost:8081) / `ERP_API_KEY` / `ERP_TIMEOUT_SECONDS` (2.0, per call), `httpx` added to requirements. Roles: ADMIN, PROCUREMENT_MANAGER, OPS_MANAGER (matrix); VIEWER and API keys get 403. Tenant from JWT; ERP is called with `X-Tenant-ID`, foreign supplier/case = 404; ERP timeout = 504 `DOWNSTREAM_TIMEOUT`, ERP down/5xx = 502 `DOWNSTREAM_ERROR`. One audit row `what_if.run` per successful call, no other writes. 25 tests; SUP-1008 7 days = 0.58 s in test (6 ERP calls). **R-07 shapes.** `POST /api/v1/what-if` body `{supplier_id:'SUP-1008', duration_days:1..90 (int), event_type: FACTORY_OUTAGE|SHIPMENT_DELAY|QUALITY_HOLD|CAPACITY_REDUCTION|LOGISTICS_DISRUPTION}`; `POST /api/v1/risk-cases/{id}/what-if` body `{duration_days?}` (optional override; if the case event has no duration it is required). Response 200: `estimate:true`, `disclaimer`, `labels{affected_pos,inventory,exposure,risk,best_option_estimate:'ESTIMATE'}`, `scenario{supplier_id,supplier_name,event_type,severity,duration_days,duration_hours,start,end,risk_case_id|null,source:'REQUEST'|'RISK_CASE'}`, `affected_pos[]` (po_id,item_id,line_nos,due_date,affected_qty,estimated_delay_days,exposure_amount{amount,currency},inventory_coverage_days,shortage), `inventory{gaps[] (items with shortage),items[],coverage[]}`, `exposure{amount,currency}`, `estimated_delay_days`, `shortage`, `risk{score,level,components}`, `best_option_estimate{is_estimate,rule,items[{item_id,affected_qty,recommended{option_type:ALTERNATE_SUPPLIER|INVENTORY_TRANSFER,...}|null,note}],uncovered_item_ids,total_estimated_cost_delta,max_lead_time_days}|null`, `assumptions[]`, `data_gaps[]`. Gotchas: the window starts NOW, so a short outage may touch no PO (seed POs fall due around 3 Dec) - the response then says so in `data_gaps` and `affected_pos` is empty; typed scenarios derive severity from duration (<=3 d MEDIUM, <=14 d HIGH, else CRITICAL), case-based ones copy the case's severity. CONTRACTS gaps: no request/response shape for what-if (this Notes is the spec until added), VIEWER excluded per matrix while s2 only says OPS_MANAGER 'run what-if', `ERP_*` env names are new.
 
 ### N-12: Data Hub supplier golden record (OPTIONAL)
 - **Status:** todo
