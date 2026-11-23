@@ -32,10 +32,12 @@ Reason / error entries are `{"code": <stable code>, "message": <human text>}`. C
 
 from __future__ import annotations
 
+import json
+import os
 import re
-import sys
 from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 
 from apps.intelligence.impact import rows
@@ -58,20 +60,52 @@ def reason(code: str, message: str) -> dict:
 # --------------------------------------------------------------------------- schema
 
 
+SCHEMA_DIR_ENV = "SG_SCHEMA_DIR"
+SCHEMA_FILES = ("common", "risk_analysis", "recovery_plan")
+
+
+def _schema_dir() -> Path:
+    """Folder with the agent JSON Schemas: $SG_SCHEMA_DIR, Django setting SG_SCHEMA_DIR, else the
+    repo ai/schemas folder (a backend-only Docker image must set the variable)."""
+    configured = os.environ.get(SCHEMA_DIR_ENV)
+    if not configured:
+        try:
+            from django.conf import settings
+
+            configured = getattr(settings, SCHEMA_DIR_ENV, None)
+        except Exception:  # settings not configured (pure-function use)
+            configured = None
+    folder = (
+        Path(configured) if configured else Path(__file__).resolve().parents[3] / "ai" / "schemas"
+    )
+    if all((folder / f"{n}.schema.json").is_file() for n in SCHEMA_FILES):
+        return folder
+    names = ", ".join(n + ".schema.json" for n in SCHEMA_FILES)
+    raise RuntimeError(
+        f"agent JSON Schemas not found in {folder}. Set {SCHEMA_DIR_ENV} to a folder "
+        f"containing {names} (the repo ai/schemas folder)."
+    )
+
+
+@lru_cache(maxsize=4)
+def _validator_for(folder: str, name: str):
+    from jsonschema import Draft202012Validator
+    from referencing import Registry, Resource
+
+    docs = {
+        n: json.loads((Path(folder) / f"{n}.schema.json").read_text(encoding="utf-8"))
+        for n in SCHEMA_FILES
+    }
+    registry = Registry().with_resources(
+        [(d["$id"], Resource.from_contents(d)) for d in docs.values()]
+    )
+    return Draft202012Validator(docs[name], registry=registry)
+
+
 def _schema_validator(kind: str):
     if kind not in KINDS:
         raise ValueError(f"unknown kind {kind!r}; expected one of {sorted(KINDS)}")
-    try:
-        from ai.schema_registry import validator_for
-    except (
-        ImportError
-    ):  # `ai/` lives at the repo root: backend/apps/intelligence/validation.py -> parents[3]
-        root = Path(__file__).resolve().parents[3]
-        if not (root / "ai" / "schema_registry.py").exists():
-            raise
-        sys.path.insert(0, str(root))
-        from ai.schema_registry import validator_for
-    return validator_for(KINDS[kind])
+    return _validator_for(str(_schema_dir()), KINDS[kind])
 
 
 def validate_schema(kind: str, payload) -> list[dict]:
@@ -88,12 +122,28 @@ def validate_schema(kind: str, payload) -> list[dict]:
 
 
 def _dec(value) -> Decimal | None:
+    """Plain decimal numbers only: no bool, no exponent notation (5e3), no NaN/Infinity."""
     if isinstance(value, bool) or value is None:
         return None
+    text = str(value).replace(",", "")
+    if isinstance(value, str) and re.search(r"[eE]", text):
+        return None
     try:
-        return Decimal(str(value).replace(",", ""))
+        d = Decimal(text)
     except (InvalidOperation, ValueError):
         return None
+    return d if d.is_finite() else None
+
+
+def _int(value) -> int | None:
+    """An integer value (4000 or 4000.0); None for anything else, so callers fail closed."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return None
 
 
 def _amount(value):
@@ -167,8 +217,7 @@ class _Ctx:
 
 
 def _candidates(ev: dict, c: _Ctx) -> list | None:
-    """Every input value the evidence pointer can address; None = source not checkable (EVENT "
-    "without event)."""
+    """Every input value the evidence pointer can address; None = not checkable (no event)."""
     src, ent, field = ev["source"], ev["entity"], ev["field"]
     item, loc = ev.get("item_id"), ev.get("location_id")
     out: list = []
@@ -260,6 +309,14 @@ def check_evidence(evidence: list[dict], c: _Ctx) -> list[dict]:
 # --------------------------------------------------------------------------- recovery plan
 
 
+ALLOWED_CHANGE_KEYS = {
+    "ALTERNATE_SUPPLIER": {"supplier_id", "qty"},
+    "SPLIT_ORDER": {"supplier_id", "qty"},
+    "INVENTORY_TRANSFER": {"item_id", "from_location_id", "to_location_id", "qty"},
+    "REVISED_SCHEDULE": {"expected_date"},
+}
+
+
 def _alt_row(c: _Ctx, supplier_id: str, items: list[str], preferred: str | None):
     rows_ = [
         a for a in c.alternates if a.get("supplier_id") == supplier_id and a.get("item_id") in items
@@ -269,13 +326,34 @@ def _alt_row(c: _Ctx, supplier_id: str, items: list[str], preferred: str | None)
     return next((a for a in rows_ if a.get("item_id") == preferred), rows_[0])
 
 
+def _qty_limit_reason(qty: int | None, affected: list[dict], item: str | None, po_id: str):
+    """qty must not exceed the affected qty of the option item (any item of the PO if unknown)."""
+    rows_ = [r for r in affected if r.get("item_id") == item] or affected
+    if qty is None or not rows_:
+        return []
+    limit = max(r["affected_qty"] for r in rows_)
+    if qty > limit:
+        msg = f"qty {qty} is above the affected qty {limit} of {po_id}"
+        return [reason("QTY_EXCEEDS_AFFECTED", msg)]
+    return []
+
+
 def _check_option(option: dict, c: _Ctx) -> list[dict]:
     reasons: list[dict] = []
     action = option["proposed_action"]
     change = action["change"]
     po_id = action["po_id"]
     otype = option["option_type"]
-    qty = change.get("qty")
+    raw_qty = change.get("qty")
+    qty = _int(raw_qty)
+    if raw_qty is not None and qty is None:
+        reasons.append(reason("QTY_INVALID", f"qty {raw_qty!r} is not a whole number"))
+
+    foreign = sorted(set(change) - ALLOWED_CHANGE_KEYS.get(otype, set(change)))
+    if foreign:
+        reasons.append(
+            reason("CHANGE_FIELD_NOT_ALLOWED", f"{otype} may not change {', '.join(foreign)}")
+        )
 
     affected = c.affected_rows(po_id)
     if po_id not in c.pos:
@@ -287,15 +365,6 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
     items = [r["item_id"] for r in affected]
     target = affected[0] if affected else None
 
-    if qty is not None and affected and qty > max(r["affected_qty"] for r in affected):
-        reasons.append(
-            reason(
-                "QTY_EXCEEDS_AFFECTED",
-                f"qty {qty} is above the affected qty {max(r['affected_qty'] for r in affected)} "
-                f"of {po_id}",
-            )
-        )
-
     if otype in ("ALTERNATE_SUPPLIER", "SPLIT_ORDER"):
         sup = change.get("supplier_id")
         evidence_item = next(
@@ -306,12 +375,15 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
             ),
             None,
         )
+        if not any(e.get("source") == "ERP" and e.get("entity") == sup for e in option["evidence"]):
+            reasons.append(reason("EVIDENCE_MISSING", f"no ERP evidence cited for supplier {sup}"))
         alt = _alt_row(c, sup, items, evidence_item)
         if sup == c.disrupted_supplier:
             reasons.append(
                 reason("SUPPLIER_DISRUPTED", f"{sup} is the disrupted supplier, not an alternate")
             )
         if alt is None:
+            reasons += _qty_limit_reason(qty, affected, None, po_id)
             if not any(a.get("supplier_id") == sup for a in c.alternates):
                 reasons.append(
                     reason(
@@ -328,17 +400,21 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
                 )
         else:
             target = next((r for r in affected if r["item_id"] == alt["item_id"]), target)
+            reasons += _qty_limit_reason(qty, affected, alt["item_id"], po_id)
             if alt.get("qualified") is not True:
                 reasons.append(
                     reason("SUPPLIER_NOT_QUALIFIED", f"{sup} is not qualified for {alt['item_id']}")
                 )
-            cap = alt.get("capacity")
+            cap = _int(alt.get("capacity"))
             if cap is not None and qty is not None and qty > cap:
                 reasons.append(
-                    reason("QTY_EXCEEDS_CAPACITY", f"qty {qty} is above {sup}'s capacity {cap}")
+                    reason("QTY_EXCEEDS_CAPACITY", f"qty {qty} is above {sup} capacity {cap}")
                 )
-            reasons += _check_alt_numbers(option, c, po_id, alt, qty)
+            # no qty = the whole affected line: recompute the cost delta on that
+            cost_qty = qty if qty is not None else (target or {}).get("affected_qty")
+            reasons += _check_alt_numbers(option, c, po_id, alt, cost_qty)
     elif otype == "INVENTORY_TRANSFER":
+        reasons += _qty_limit_reason(qty, affected, change.get("item_id"), po_id)
         reasons += _check_transfer(option, c, change, items, qty)
     elif otype == "REVISED_SCHEDULE":
         reasons += _check_revised(option, c, po_id, target, change)
@@ -359,10 +435,18 @@ def _check_alt_numbers(option: dict, c: _Ctx, po_id: str, alt: dict, qty) -> lis
             )
         )
     cost = option.get("estimated_cost_delta")
+    if cost is None:
+        return out
     alt_price, alt_cur = _money(alt.get("unit_price"))
     line = c.po_line(po_id, alt["item_id"])
     po_price, po_cur = _money(line.get("unit_price")) if line else (None, None)
-    if cost is None or alt_price is None or po_price is None or qty is None:
+    if alt_price is None or po_price is None or qty is None:
+        out.append(
+            reason(
+                "COST_DELTA_UNSUPPORTED",
+                "no usable unit price (alternate or PO) or qty in the snapshot to compute a delta",
+            )
+        )
         return out
     if alt_cur != po_cur:
         out.append(
@@ -407,16 +491,24 @@ def _check_transfer(option: dict, c: _Ctx, change: dict, items: list[str], qty) 
         if r is None:
             out.append(reason("LOCATION_NOT_FOUND", f"no inventory record for {item} at {loc}"))
     if from_row is not None and qty is not None:
-        available = from_row["on_hand"] - from_row["reserved"] - from_row["safety_stock"]
-        if qty > available:
+        stock = [_int(from_row.get(k)) for k in ("on_hand", "reserved", "safety_stock")]
+        if None in stock:
             out.append(
                 reason(
-                    "TRANSFER_EXCEEDS_AVAILABLE",
-                    f"qty {qty} is above the {available} available at {src} "
-                    f"(on_hand {from_row['on_hand']} - reserved {from_row['reserved']} "
-                    f"- safety_stock {from_row['safety_stock']})",
+                    "TRANSFER_STOCK_UNKNOWN",
+                    f"on_hand / reserved / safety_stock of {item} at {src} are not all known",
                 )
             )
+        else:
+            available = stock[0] - stock[1] - stock[2]
+            if qty > available:
+                out.append(
+                    reason(
+                        "TRANSFER_EXCEEDS_AVAILABLE",
+                        f"qty {qty} is above the {available} available at {src} "
+                        f"(on_hand {stock[0]} - reserved {stock[1]} - safety_stock {stock[2]})",
+                    )
+                )
     if option.get("estimated_lead_time_days") is not None:
         out.append(
             reason("LEAD_TIME_UNSUPPORTED", "snapshot has no transit time; lead time must be null")
@@ -496,14 +588,26 @@ def fact_check_recovery_plan(
         )
     options = plan.get("options") or []
     ranks = [o["rank"] for o in options]
+    seen: set[str] = set()
     results = []
     for option in options:
-        reasons = []
+        reasons = list(plan_errors)  # a plan-wide failure makes every option unsupported
         if ranks.count(option["rank"]) > 1:
             reasons.append(
                 reason("DUPLICATE_RANK", f"rank {option['rank']} is used by more than one option")
             )
-        reasons += _check_option(option, c)
+        key = json.dumps(
+            [option.get("option_type"), option.get("proposed_action")], sort_keys=True, default=str
+        )
+        if key in seen:
+            msg = "same option type and proposed action as an earlier option"
+            reasons.append(reason("DUPLICATE_OPTION", msg))
+        seen.add(key)
+        try:
+            reasons += _check_option(option, c)
+        except Exception as exc:  # fail closed: one odd payload must not stop the AgentRun
+            msg = f"option could not be checked ({type(exc).__name__}: {exc})"
+            reasons.append(reason("VALIDATOR_ERROR", msg))
         results.append(
             {"rank": option["rank"], "unsupported": bool(reasons), "unsupported_reasons": reasons}
         )
