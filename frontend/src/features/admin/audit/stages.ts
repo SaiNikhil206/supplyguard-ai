@@ -1,15 +1,15 @@
-import type { AuditEntityType, AuditEvent } from '@/api/admin/audit';
+import type { AuditEntityType, AuditEvent } from "@/api/admin/audit";
 
-export const STAGES = ['Event', 'Analysis', 'Approval', 'Execution'] as const;
+export const STAGES = ["Event", "Analysis", "Approval", "Execution"] as const;
 export type Stage = (typeof STAGES)[number];
 
 const STAGE_OF: Partial<Record<AuditEntityType, Stage>> = {
-  EVENT: 'Event',
-  RISK_CASE: 'Analysis',
-  ANALYSIS: 'Analysis',
-  RECOMMENDATION: 'Analysis',
-  APPROVAL: 'Approval',
-  EXECUTION: 'Execution',
+  EVENT: "Event",
+  RISK_CASE: "Analysis",
+  ANALYSIS: "Analysis",
+  RECOMMENDATION: "Analysis",
+  APPROVAL: "Approval",
+  EXECUTION: "Execution",
 };
 
 export function stageOf(e: AuditEvent): Stage | null {
@@ -22,7 +22,10 @@ export interface StageGroup {
 }
 
 /** Events sorted oldest first, grouped into the four fixed stages (empty groups kept). */
-export function groupByStage(events: AuditEvent[]): { groups: StageGroup[]; other: AuditEvent[] } {
+export function groupByStage(events: AuditEvent[]): {
+  groups: StageGroup[];
+  other: AuditEvent[];
+} {
   const sorted = [...events].sort((a, b) => a.at.localeCompare(b.at));
   const groups: StageGroup[] = STAGES.map((stage) => ({ stage, events: [] }));
   const other: AuditEvent[] = [];
@@ -34,8 +37,28 @@ export function groupByStage(events: AuditEvent[]): { groups: StageGroup[]; othe
   return { groups, other };
 }
 
-export const AUDIT_ACTIONS = ['CREATED', 'DECIDED', 'RECEIVED', 'RESULT', 'STORED', 'TRANSITION', 'UPDATED'];
+export const AUDIT_ACTIONS = [
+  "CREATED",
+  "DECIDED",
+  "RECEIVED",
+  "RESULT",
+  "STORED",
+  "TRANSITION",
+  "UPDATED",
+];
 
 export function formatTime(iso: string): string {
-  return iso.replace('T', ' ').replace(/:\d\dZ$/, 'Z').replace(/Z$/, ' UTC');
+  return iso
+    .replace("T", " ")
+    .replace(/:\d\dZ$/, "Z")
+    .replace(/Z$/, " UTC");
+}
+
+export function formatGap(ms: number): string {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
+  if (s < 3600) return `${Math.floor(s / 60)}m ${s % 60}s`;
+  if (s < 86400)
+    return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
+  return `${Math.floor(s / 86400)}d ${Math.floor((s % 86400) / 3600)}h`;
 }
