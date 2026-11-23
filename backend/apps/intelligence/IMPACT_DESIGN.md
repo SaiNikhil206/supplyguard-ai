@@ -1,6 +1,6 @@
 # N-04 Impact + risk scoring engine - design spec
 
-Owner: Nikhil. Status: design (implementation in `nikhil/N-04-impact-engine--impl`).
+Owner: Nikhil. Status: implemented in `impact.py` (branch `nikhil/N-04-impact-engine--impl`); Q1-Q3 resolved (see s8).
 Implement exactly this; anything not stated here is out of scope for N-04.
 
 **In pipeline terms:** `impact.py` is one pure transform step. Input = one event record + one ERP extract
@@ -57,7 +57,7 @@ class TenantThresholds:
 ```
 `thresholds_from_tenant(tenant: dict | None) -> TenantThresholds` maps a `tenants.json` row
 (`settings.risk_thresholds.{medium,high,critical}`, `settings.require_qualified_alternates`, `currency`,
-optional `settings.exposure_full_scale`, `settings.delay_full_scale_days`, `settings.recovery_buffer_days`);
+optional `settings.risk_thresholds.exposure_full_scale` (per-tenant exposure scale, sits next to 40/65/85; legacy fallback `settings.exposure_full_scale`), `settings.delay_full_scale_days`, `settings.recovery_buffer_days`);
 missing keys fall back to the defaults. Validate `0 <= medium <= high <= critical <= 100` else `ValueError`.
 
 ---
@@ -428,10 +428,10 @@ Unit tests use tiny inline dicts. Target >= 90% line coverage of `impact.py` (`p
 - Fact-checking agent output against the snapshot -> N-07. What-if endpoint -> N-11 (calls `compute_impact`).
 - Incoming supply from other suppliers' open POs, partial deliveries, DC-to-PO allocation: not modelled (documented assumption).
 
-## 8. Open questions for Nikhil
-- **Q1 coverage formula:** README/demo table uses `(on_hand - reserved)/daily_demand` (PUNE 1.5, CHENNAI 4.7);
-  the N-04 brief uses net of safety stock (1.0 / 3.33). Spec decides net for decisions and emits both. If you agree,
-  update the `data/README.md` demo row to "1.0 days (1.5 gross)" / "3.3 days (4.7 gross)" in an N-02 follow-up.
-- **Q2 exposure scale per tenant:** 500,000 is in tenant currency (fine for INR, large for GLOBEX USD). Add
-  `settings.exposure_full_scale` to tenant settings (U-03 / CONTRACTS) or keep one default?
-- **Q3 demo label:** demo scores 67 HIGH (CONTRACTS s6 example shows 92 CRITICAL, illustrative only). OK, or tune weights so the live demo lands CRITICAL?
+## 8. Decisions on the former open questions (Nikhil)
+- **Q1 coverage formula - decided: net of safety stock** for decisions (PUNE 1.00, CHENNAI 3.33 days); gross is still
+  emitted. `data/README.md` demo row updated.
+- **Q2 exposure scale per tenant - decided: per-tenant parameter** `settings.risk_thresholds.exposure_full_scale`
+  (default 500000, same object as medium/high/critical so each tenant can override it). To be added to tenant settings
+  in U-03 / CONTRACTS; until then the default applies.
+- **Q3 demo label - decided: weights are not tuned**; the demo scores 67 HIGH.
