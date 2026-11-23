@@ -15,6 +15,12 @@ def _auth_throttle_off(monkeypatch):
     cache.clear()
 
 
+@pytest.fixture(autouse=True)
+def _fast_password_hasher(settings):
+    """Test-only: PBKDF2 makes every make_user() slow. Hashing is still real (MD5 here)."""
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
 @pytest.fixture
 def tenant_a(db):
     return make_tenant("TEN-A")

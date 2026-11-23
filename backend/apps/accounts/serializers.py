@@ -1,6 +1,8 @@
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -78,6 +80,46 @@ class TokenRefreshSerializer(serializers.Serializer):
 class TenantSummarySerializer(serializers.Serializer):
     id = serializers.CharField()
     name = serializers.CharField()
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """List/create for `/users`. Only these fields exist, so `tenant`, `tenant_id`, `is_staff`,
+    `is_superuser` in a request body are simply ignored; the tenant is set by the view."""
+
+    id = serializers.CharField(source="api_id", read_only=True)
+    username = serializers.CharField(max_length=150)
+    email = serializers.EmailField(required=False, allow_blank=True, default="")
+    name = serializers.CharField(max_length=200, required=False, allow_blank=True, default="")
+    # The 4 user roles only: SYSTEM (or anything else) is a 400.
+    role = serializers.ChoiceField(choices=[r.value for r in get_user_model().Role])
+    password = serializers.CharField(write_only=True, trim_whitespace=False, max_length=128)
+
+    class Meta:
+        model = get_user_model()
+        fields = ["id", "username", "email", "name", "role", "is_active", "password"]
+        read_only_fields = ["is_active"]
+
+    def validate_username(self, value):
+        if get_user_model().objects.filter(username=value).exists():
+            raise serializers.ValidationError("This username is not available.")
+        return value
+
+    def validate(self, attrs):
+        candidate = get_user_model()(
+            username=attrs["username"], email=attrs.get("email", ""), name=attrs.get("name", "")
+        )
+        try:
+            validate_password(attrs["password"], candidate)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": list(exc.messages)}) from None
+        return attrs
+
+    def create(self, validated_data):
+        password = validated_data.pop("password")
+        user = get_user_model()(**validated_data, is_staff=False, is_superuser=False)
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class MeSerializer(serializers.Serializer):
