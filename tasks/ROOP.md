@@ -68,7 +68,7 @@
 - **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. Landed in collaboration on mocks (status review); real-data acceptance items stay unticked until backend APIs exist.
 
 ### R-05: AI Recommendations + Approval Center
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S3 (8-12 Dec) | **Est:** 2d | **Depends:** R-04, N-10
 - **Branch:** `roop/R-05-approvals`
 - **Model hint:** sonnet / medium
@@ -77,7 +77,7 @@
   - [ ] Buttons hidden/disabled for roles that cannot decide
   - [ ] UNSUPPORTED options shown but not approvable
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (N-10 not done). Pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
 
 ### R-06: Boomi Flow approval workflow
 - **Status:** todo

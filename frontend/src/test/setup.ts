@@ -4,6 +4,7 @@ import { cleanup } from '@testing-library/react';
 import { server } from '@/mocks/server';
 import { clearTokens } from '@/api/tokens';
 import { resetMockState } from '@/mocks/fixtures';
+import { resetApprovalsMock } from '@/mocks/approvals';
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());
@@ -12,6 +13,7 @@ afterEach(() => {
   cleanup();
   server.resetHandlers();
   resetMockState();
+  resetApprovalsMock();
   clearTokens();
   document.documentElement.classList.remove('dark');
   try {
