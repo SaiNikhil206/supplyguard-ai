@@ -1,11 +1,11 @@
 # Boomi environment (U-01)
 
-**Owner:** Uday. **Status:** platform facts filled in on 2026-11-19 by Claude, **read-only**, through the browser pane signed in as Uday. Nothing was created, changed or run in Boomi. Items marked **OPEN** need Uday (account actions or decisions); they are why U-01 is still `blocked`.
+**Owner:** Uday. **Status:** in review. Platform facts filled in on 2026-11-19 by Claude, **read-only**, through the browser pane signed in as Uday; nothing was created, changed or run in Boomi. Decisions recorded 2026-11-23 (no invites, no native Flow app). Items still marked **OPEN** are follow-ups for Uday, Roop or Nikhil; they do not gate U-07.
 
 This file is the single source of truth for "what Boomi do we actually have". Every later Boomi task (U-07..U-11, N-05/N-06/N-08, R-06, R-12) reads it. Never put passwords, API tokens or shared secrets here - only names, IDs and yes/no facts. Credentials go into each member's `.env` (gitignored).
 
 **Headline (read this first):**
-1. **Flow is NOT available** in this account -> R-06 / the Flow approval screens need the CONTRACTS section 8 fallback (see section 5). **OPEN: confirm.**
+1. **Flow is NOT available in this account, and it does not need to be.** Decision (Uday, 2026-11-23): we build **no native Flow app**. The UI is Roop's React/Vite app; its built HTML is exported and pasted into Flow, which only hosts it (section 5). Flow access is needed only in the account where Roop does that paste.
 2. **Each member works in their own Boomi training account.** This file describes **Uday's** account only. Roop and Nikhil do not need an invite; they record their own account in section 9. Consequence: Boomi components are not shared automatically between accounts (section 9).
 3. The only runtime is a **local runtime on Uday's own PC (`ESI-PC28`)**, attached to the only environment, which belongs to the BIMBA project. It can reach `localhost` on that PC, so no tunnel is needed for Uday's own S1 testing.
 4. **Account expiry is not shown anywhere readable** (Account Information and Licensing pages). It is a `Training-` account. **OPEN: confirm it outlives 31 Dec 2026.**
@@ -50,7 +50,7 @@ What this means:
 | 1 | Integration (processes, connectors, maps) | **Yes** (access) | Build and Runtime Management open; account already contains BIMBA processes and connectors | U-07, U-08, U-10, U-11, N-08 |
 | 2 | Event Streams (topics, publish/subscribe) | **Yes** (access) | `EventStreams.html` opens and lists environment `BIMBA-OPCUA-Test` (USA East); roles "Event Streams - Administrator / Access" exist. No topic created. | U-08 |
 | 3 | Agentstudio / Agent Garden (AI agents) | **Yes** (access) | Agentstudio home opens; roles "Agent Garden - Administrator / Developer / User" exist. No agent created. | N-05, N-06 |
-| 4 | Flow (human approval UI) | **NO** | `flow.boomi.com` says "You are not a user in any tenants"; no Flow tile on Home, no Flow role in Account Information | R-06 |
+| 4 | Flow (hosts the exported React HTML; no native Flow app) | **NO** (in this account) | `flow.boomi.com` says "You are not a user in any tenants"; no Flow tile on Home, no Flow role in Account Information | R-06 |
 | 5 | API Management (API proxy, key policy, rate limit) | **Yes** (access) | `ApiSphere.html` opens; roles for API Manager / Administrator exist; API Lifecycle feature ON; "Cloud API Management" under Manage. No API created. | U-09 |
 | 6 | Data Hub (optional master data) | **Yes** (access), optional | `MdmSphere.html` ("Boomi Hub") opens; MDM roles exist. No repository checked. | optional |
 
@@ -78,13 +78,13 @@ Contracts (event shape, API, schemas) do not change - only where a step runs.
 |---|---|---|---|
 | Event Streams | Yes (access) | None needed. Re-check when U-08 creates the first topic. | U-08, N-08 |
 | Agentstudio / Agent Garden | Yes (access) | None needed. Re-check when N-05 creates the first agent. | N-05, N-06 |
-| **Flow** | **No, in Uday's account.** Unknown in Roop's own account. | **OPEN - Roop checks `flow.boomi.com` in his own account first.** If his account has Flow, no fallback is needed: he builds R-06 there. If no account has Flow, use the fallback: approval only in the SaaS Approval Center, Django triggers the Boomi execution process after the decision, and the Boomi Flow screens leave R-06/R-12 scope. | R-06, U-10, Roop's Flow work (`boomi/flow/`) |
+| **Flow** | **No, in Uday's account.** Not yet checked in Roop's own account. | **DECIDED (Uday, 2026-11-23): no native Flow app.** Approval stays in the React UI (SaaS Approval Center) and calls Django `POST /recommendations/{id}/decision` as in CONTRACTS section 4. The built HTML of that UI is exported and pasted into Flow, which only hosts it; nothing else is created in Flow. Django still triggers the Boomi execution process after the decision. Roop needs Flow in his own account for the paste - he should confirm that (and that the hosted page can reach the Django API: CORS/HTTPS) before the demo. If his account has no Flow, the React UI is shown standalone. | R-06 (scope changes from "Flow app" to "export + host"), U-10 |
 | API Management | Yes (access) | None needed. Re-check when U-09 creates the first API. | U-09, U-06 |
 | Data Hub | Yes (access) | n/a (optional) | - |
 
-- [ ] Fallback decision recorded for every missing service (Flow proposed above, not yet confirmed)
+- [x] Fallback decision recorded for every missing service (Flow: no native app, host the exported React HTML - decided 2026-11-23)
 
-If the Flow fallback is confirmed, tell Roop and Nikhil (their tasks change). No contract shape changes, so no CONTRACTS changelog line is needed.
+**Tell Roop:** `tasks/ROOP.md` R-06 still describes a native Flow app ("approval page... decision calls the endpoint"). That is Roop's file, so it is not edited here; R-06 should be re-scoped to "export the React build and host it in Flow". No contract shape changes, so no CONTRACTS changelog line is needed.
 
 ## 6. Credentials checklist (values go to `.env`, never here)
 
@@ -116,7 +116,7 @@ Each member builds in their own training account, so these facts are per account
 | Account ID | TODO | TODO |
 | Account expiry (must be after 31 Dec 2026) | TODO | TODO |
 | Runtime (type, host, online?) | TODO | TODO |
-| Integration / Event Streams / Agentstudio / Flow / API Management / Data Hub available? | TODO (**Flow is the one that matters**) | TODO (**Agentstudio is the one that matters**) |
+| Integration / Event Streams / Agentstudio / Flow / API Management / Data Hub available? | TODO (**Flow matters: needed to host the exported UI**) | TODO (**Agentstudio is the one that matters**) |
 
 **Consequence of separate accounts - OPEN, decide before U-07/N-08:** Boomi processes cannot call processes in another account, and Event Streams topics, API Management gateways and runtimes are per account. The design in the task files assumes one shared account in places:
 - **N-08** (Nikhil's correlation process) "reads via Uday's ERP processes" `SG_Get_*` (U-07), and **N-05/N-06** agents use those processes as tools.

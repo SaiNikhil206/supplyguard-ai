@@ -19,7 +19,7 @@
 ---
 
 ### U-01: Boomi environment and service verification
-- **Status:** blocked
+- **Status:** review
 - **Sprint:** S0 (19-20 Nov) | **Est:** 1d | **Depends:** -
 - **Branch:** `uday/U-01-boomi-env`
 - **Model hint:** haiku / low (checklist + docs); the Boomi UI clicks are manual
@@ -27,9 +27,9 @@
 - **Acceptance:**
   - [x] All 6 services checked and recorded as enabled / not enabled
   - [x] Roop and Nikhil have Boomi platform access
-  - [ ] Fallback decision recorded for every missing service
+  - [x] Fallback decision recorded for every missing service
 - **Done in:** -
-- **Notes:** UPDATE 2026-11-20: Roop and Nikhil use their own Boomi training accounts (per Uday), so no invites; box ticked on that basis. Flow fallback now waits on Roop checking Flow in his own account; separate accounts also mean processes are not shared automatically (BOOMI_ENV.md section 9, decide before U-07/N-08). Original notes: `docs/BOOMI_ENV.md` filled in read-only on 2026-11-19 (nothing created/changed in Boomi). Findings: Flow NOT available (flow.boomi.com: no tenants); Integration, Event Streams, Agentstudio, API Management, Data Hub are access-verified only (not build-verified); only Uday has a Boomi login; only runtime is the local runtime on Uday's PC ESI-PC28, attached to the BIMBA-OPCUA-Test environment. Still needs Uday: (1) invite Roop + Nikhil in Settings > User Management, (2) confirm Flow fallback (proposed: approval in SaaS Approval Center only, affects R-06/R-12), (3) confirm account expiry is after 31 Dec 2026 (not shown in the UI), (4) choose reuse BIMBA environment vs new SG-Dev + second runtime. Then tick the two open boxes and set Status review. Checklist drafted by Roop's Claude session.
+- **Notes:** `docs/BOOMI_ENV.md` filled in read-only on 2026-11-19 (nothing created or changed in Boomi). Services: Integration, Event Streams, Agentstudio, API Management, Data Hub are access-verified only (not build-verified); Flow is not available in Uday's account. Decisions: (1) Roop and Nikhil use their own Boomi training accounts (per Uday), so no invites; (2) no native Flow app - the React/Vite UI is exported as HTML and hosted in Flow (Roop's account), so no Flow fallback build is needed (decided 2026-11-23). Follow-ups that do not gate U-07: confirm this account's expiry is after 31 Dec 2026 (not shown in the UI); choose reuse BIMBA-OPCUA-Test vs new SG-Dev + second runtime; Roop and Nikhil fill BOOMI_ENV.md section 9; separate accounts mean processes are not shared automatically - decide the hand-off (section 9) before U-07/N-08; R-06 in tasks/ROOP.md still says native Flow app and needs re-scoping by Roop. Checklist template drafted by Roop's Claude session; facts filled in by Claude (read-only, signed in as Uday).
 
 ### U-02: Backend scaffold
 - **Status:** done
