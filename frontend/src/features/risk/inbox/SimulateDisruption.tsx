@@ -15,7 +15,7 @@ import {
 } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { SCENARIOS } from '@/mocks/scenarios';
-import { EVENT_ICON, SEV_META } from '../ui';
+import { EVENT_ICON } from '../ui';
 
 /** Admin-only trigger: pick a scenario card in a dialog, POST it, show pending / error / event id. */
 export function SimulateDisruption() {
@@ -53,7 +53,7 @@ export function SimulateDisruption() {
     <div className="flex flex-col items-end gap-1">
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger asChild>
-          <Button className="bg-gradient-to-r from-primary to-violet-600 text-white shadow-md transition hover:opacity-90 hover:shadow-lg">
+          <Button>
             <Zap aria-hidden="true" className="h-4 w-4" />
             Simulate Supplier Disruption
           </Button>
@@ -68,14 +68,13 @@ export function SimulateDisruption() {
             {SCENARIOS.map((s) => {
               const Icon = EVENT_ICON[s.event_type];
               const selected = scenario === s.name;
-              const m = SEV_META[s.severity];
               return (
                 <label
                   key={s.name}
                   className={cn(
-                    'relative flex cursor-pointer gap-3 rounded-xl border p-4 transition hover:shadow-md',
+                    'relative flex cursor-pointer gap-3 rounded-lg border p-4 transition-colors duration-150 hover:bg-surface-2/40',
                     'focus-within:ring-2 focus-within:ring-ring',
-                    selected ? 'border-primary bg-primary/5 ring-1 ring-primary/40' : 'border-border/70 bg-card',
+                    selected ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-border bg-card',
                   )}
                 >
                   <input
@@ -86,8 +85,8 @@ export function SimulateDisruption() {
                     onChange={() => setScenario(s.name)}
                     className="sr-only"
                   />
-                  <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', m.tint, m.text)}>
-                    <Icon aria-hidden="true" className="h-5 w-5" />
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-surface-2 text-muted">
+                    <Icon aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
                   </span>
                   <span className="min-w-0 space-y-1">
                     <span className="block text-sm font-semibold">{s.label}</span>

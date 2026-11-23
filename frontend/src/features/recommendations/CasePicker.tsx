@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { EmptyState, ErrorState, Money, SeverityBadge, Skeleton } from '@/components/ui';
 import { useRiskCases } from '@/api/queries';
-import { Monogram, SEV_META } from '@/features/risk/ui';
-import { cn } from '@/lib/utils';
+import { Monogram } from '@/features/risk/ui';
 
 const PICKABLE = ['RECOMMENDATION_READY', 'PENDING_APPROVAL'];
 
@@ -12,8 +11,8 @@ export function CasePicker() {
   if (q.isPending)
     return (
       <div role="status" aria-label="Loading cases" className="grid gap-4 md:grid-cols-2">
-        <Skeleton className="h-28 rounded-2xl" />
-        <Skeleton className="h-28 rounded-2xl" />
+        <Skeleton className="h-28 rounded-lg" />
+        <Skeleton className="h-28 rounded-lg" />
       </div>
     );
   if (q.isError) return <ErrorState message={q.error.message} onRetry={() => void q.refetch()} />;
@@ -28,18 +27,17 @@ export function CasePicker() {
     );
   return (
     <section aria-label="Choose a case">
-      <h2 className="mb-3 text-sm font-semibold">Choose a case</h2>
+      <h2 className="mb-3 text-sm font-semibold text-foreground">Choose a case</h2>
       <ul className="grid gap-4 md:grid-cols-2">
         {cases.map((c) => (
           <li key={c.id}>
-            <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur transition hover:shadow-md">
-              <span aria-hidden="true" className={cn('absolute inset-y-0 left-0 w-1', SEV_META[c.severity].bar)} />
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-5 transition-colors duration-150 hover:bg-surface-2/40">
               <div className="flex min-w-0 items-center gap-3">
-                <Monogram name={c.supplier_name} className="h-10 w-10" />
+                <Monogram name={c.supplier_name} className="h-9 w-9" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{c.title}</p>
                   <p className="text-xs text-muted">
-                    {c.id} · {c.supplier_name} · {c.status.replace(/_/g, ' ').toLowerCase()}
+                    <span className="font-mono">{c.id}</span> · {c.supplier_name} · {c.status.replace(/_/g, ' ').toLowerCase()}
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs">
                     <SeverityBadge severity={c.severity} />
