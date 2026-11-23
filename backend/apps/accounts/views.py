@@ -13,7 +13,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenViewBase
 from apps.audit import record
 from apps.core.tenancy import TenantScopedMixin
 from apps.tenants.models import Tenant
-from apps.tenants.settings_schema import effective_settings, validate_tenant_settings
+from apps.tenants.settings_schema import (
+    drop_default_exposure,
+    effective_settings,
+    validate_tenant_settings,
+)
 
 from .permissions import RolePermission
 from .serializers import (
@@ -81,14 +85,17 @@ class SettingsView(APIView):
             # Row lock: two concurrent PATCHes apply one after the other, never lose an update.
             tenant = Tenant.objects.select_for_update().get(pk=request.tenant.pk)
             old = tenant.settings or {}
-            new = validate_tenant_settings(request.data, partial=True, current=old)
+            new = drop_default_exposure(
+                validate_tenant_settings(request.data, partial=True, current=old), old
+            )
             changed = {}
             for key, value in new.items():
                 if key not in old or old[key] != value:
                     changed[key] = {"old": old.get(key), "new": value}
-            tenant.settings = new
-            tenant.save(update_fields=["settings"])
-            record(request.user, "settings.updated", tenant, data={"changed": changed})
+            if changed:  # a no-op PATCH (e.g. GET body sent back) writes neither row nor audit
+                tenant.settings = new
+                tenant.save(update_fields=["settings"])
+                record(request.user, "settings.updated", tenant, data={"changed": changed})
         return Response(effective_settings(new))
 
 

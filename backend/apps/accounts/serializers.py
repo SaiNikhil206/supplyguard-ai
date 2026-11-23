@@ -2,7 +2,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
@@ -12,6 +12,8 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.tenants.models import Tenant
+
+from .throttles import LoginUsernameThrottle
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +68,7 @@ class TokenObtainSerializer(TokenObtainPairSerializer):
             if not can_sign_in(self.user):  # no tenant (incl. superusers) or tenant not ACTIVE
                 raise AuthenticationFailed(NO_ACCOUNT, "no_active_account")
         except AuthenticationFailed:
+            LoginUsernameThrottle.record_failure(username)
             self._audit_failure(username)
             raise AuthenticationFailed(NO_ACCOUNT, "no_active_account") from None
         _audit(self.user, "auth.login", self.user, data={"username": self.user.get_username()})
@@ -116,7 +119,7 @@ class UserSerializer(serializers.ModelSerializer):
         User = get_user_model()
         value = User.normalize_username(value)  # NFKC: fullwidth lookalikes become ASCII
         try:
-            UnicodeUsernameValidator()(value)  # letters, digits and . @ + - _ only
+            ASCIIUsernameValidator()(value)  # letters, digits and . @ + - _ only
         except DjangoValidationError as exc:
             raise serializers.ValidationError(list(exc.messages)) from None
         if User.objects.filter(username__iexact=value).exists():
