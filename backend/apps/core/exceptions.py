@@ -26,6 +26,10 @@ def _correlation_id(request) -> str:
     """Reuse the request's correlation id (U-05 middleware sets `request.correlation_id`),
     else a well-formed `X-Correlation-ID` header, else mint a new one."""
     candidate = getattr(request, "correlation_id", None)
+    if not candidate:
+        from apps.audit.context import get_correlation_id
+
+        candidate = get_correlation_id()
     if not candidate and request is not None:
         candidate = request.META.get("HTTP_X_CORRELATION_ID")
     try:
