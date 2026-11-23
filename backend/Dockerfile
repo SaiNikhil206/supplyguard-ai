@@ -14,6 +14,8 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=app:app backend/. .
+# ai/ python package (schema registry) + schemas; eval/fixtures/tests stay out of the image.
+COPY --chown=app:app ai/__init__.py ai/schema_registry.py /app/ai/
 COPY --chown=app:app ai/schemas /app/ai/schemas
 USER app
 

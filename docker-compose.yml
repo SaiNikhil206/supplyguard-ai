@@ -41,7 +41,7 @@ services:
     volumes:
       - ./backend:/app
       - ./data:/data:ro
-      - ./ai/schemas:/app/ai/schemas:ro
+      - ./ai:/app/ai:ro
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
