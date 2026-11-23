@@ -127,8 +127,12 @@ CORS_EXPOSE_HEADERS = ["X-Correlation-ID"]
 # --- DRF / JWT / OpenAPI --------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "apps.accounts.authentication.TenantJWTAuthentication",
+        "apps.accounts.authentication.ApiKeyAuthentication",
     ],
+    # Only views that set throttle_scope are throttled (login endpoints, scope "auth").
+    # Each gunicorn worker counts separately (LocMemCache); see backend/README.md.
+    "DEFAULT_THROTTLE_RATES": {"auth": env("AUTH_THROTTLE_RATE", default="10/min")},
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
