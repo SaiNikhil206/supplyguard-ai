@@ -51,6 +51,11 @@ class AuditEvent(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is not None and not self._state.adding:
             raise AuditAppendOnly("AuditEvent rows cannot be modified.")
+        # Always INSERT: a constructor with an existing pk must collide, not UPDATE.
+        if args:
+            args = (True, *args[1:])
+        else:
+            kwargs["force_insert"] = True
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

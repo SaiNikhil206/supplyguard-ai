@@ -2,7 +2,9 @@ from .base import TenantOwned
 from .cases import (
     AffectedPO,
     AgentRun,
+    AgentRunAppendOnly,
     Approval,
+    ApprovalImmutable,
     Execution,
     Recommendation,
     RiskCase,
@@ -28,6 +30,8 @@ __all__ = [
     "RiskCase",
     "RiskCaseQuerySet",
     "Shipment",
+    "AgentRunAppendOnly",
+    "ApprovalImmutable",
     "StatusChangeNotAllowed",
     "Supplier",
     "TenantOwned",

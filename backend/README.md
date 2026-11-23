@@ -12,7 +12,7 @@ Contracts: `docs/CONTRACTS.md` section 4. Run (after U-01): `docker compose up b
 ## Seed data
 `python manage.py load_seed [--data-dir PATH] [--demo-users]` loads `data/seed/` (tenants, suppliers,
 purchase orders + lines, inventory, shipments) in one transaction. It is idempotent: run it again and
-it reports 0 created / 0 updated. Any validation failure aborts everything with a `CommandError`
+it reports 0 created / 0 updated. In Docker the compose file mounts `./data` read-only at `/data`, so the default seed folder resolves; run `docker compose exec backend python manage.py load_seed`. Any validation failure aborts everything with a `CommandError`
 naming the file, the record id and the rule.
 - `--data-dir PATH` loads another seed folder (e.g. one made with `data/generate_seed.py --as-of ... --out ...`);
   records are updated in place. Default comes from `SEED_DATA_DIR` (settings), else `<repo>/data/seed`.

@@ -23,6 +23,14 @@ class StatusChangeNotAllowed(RuntimeError):
     """RiskCase.status was changed outside apps.workflow.services.transition()."""
 
 
+class ApprovalImmutable(RuntimeError):
+    """An Approval is a recorded decision; it cannot be changed after it is inserted."""
+
+
+class AgentRunAppendOnly(RuntimeError):
+    """An AgentRun is a raw record of one agent call; it cannot be changed after insert."""
+
+
 @contextmanager
 def status_change_allowed():
     """Allow `RiskCase.status` to be changed and saved inside the `with` block.
@@ -39,6 +47,8 @@ def status_change_allowed():
             # ...write the AuditEvent in the same transaction...
 
     `QuerySet.update(status=...)` is rejected even inside the block; use save().
+    Do not spawn asyncio tasks inside the block: tasks created there inherit the contextvar
+    and would be allowed to change the status too.
     """
     token = _status_change_depth.set(_status_change_depth.get() + 1)
     try:
@@ -136,17 +146,21 @@ class RiskCase(TenantOwned):
     def save(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields")
         saving_status = update_fields is None or "status" in update_fields
-        if (
-            saving_status
-            and not self._state.adding
-            and self._loaded_status is not _UNSET
-            and self.status != self._loaded_status
-            and _status_change_depth.get() == 0
-        ):
-            raise StatusChangeNotAllowed(
-                f"RiskCase.status {self._loaded_status} -> {self.status} outside "
-                "workflow.services.transition()."
-            )
+        if saving_status and not self._state.adding and _status_change_depth.get() == 0:
+            baseline = self._loaded_status
+            if baseline is _UNSET:
+                # Deferred / never loaded: compare with what is stored.
+                baseline = (
+                    type(self)
+                    ._base_manager.filter(pk=self.pk)
+                    .values_list("status", flat=True)
+                    .first()
+                )
+            if baseline is not None and self.status != baseline:
+                raise StatusChangeNotAllowed(
+                    f"RiskCase.status {baseline} -> {self.status} outside "
+                    "workflow.services.transition()."
+                )
         super().save(*args, **kwargs)
         if saving_status:
             self._loaded_status = self.__dict__.get("status", _UNSET)
@@ -173,6 +187,11 @@ class AgentRun(TenantOwned):
 
     class Meta:
         ordering = ["risk_case", "created_at", "id"]
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise AgentRunAppendOnly("AgentRun rows cannot be modified.")
+        super().save(*args, **kwargs)
 
 
 class AffectedPO(TenantOwned):
@@ -299,7 +318,9 @@ class Approval(TenantOwned):
     def __str__(self):
         return self.id
 
-    def save(self, *args, **kwargs):
+    def check_integrity(self):
+        if self.recommendation_id is None:
+            return
         rec = self.recommendation
         if self.round is None:
             self.round = rec.round
@@ -307,6 +328,17 @@ class Approval(TenantOwned):
             raise ValidationError("Approval.risk_case must match recommendation.risk_case.")
         if rec.round != self.round:
             raise ValidationError("Approval.round must match recommendation.round.")
+        if self.decision == self.Decision.APPROVE and rec.unsupported:
+            raise ValidationError("An unsupported recommendation cannot be approved.")
+
+    def clean(self):
+        super().clean()
+        self.check_integrity()
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ApprovalImmutable("An Approval cannot be modified after it is recorded.")
+        self.check_integrity()
         super().save(*args, **kwargs)
 
 
@@ -348,10 +380,17 @@ class Execution(TenantOwned):
         ordering = ["-created_at", "-id"]
         indexes = [models.Index(fields=["tenant", "status"], name="exec_tenant_status_idx")]
 
-    def save(self, *args, **kwargs):
+    def check_approval(self):
         # No ERP write without a recorded approval (CLAUDE.md s6).
-        if self.approval.decision != Approval.Decision.APPROVE:
+        if self.approval_id is not None and self.approval.decision != Approval.Decision.APPROVE:
             raise ValidationError("An Execution requires an Approval with decision APPROVE.")
+
+    def clean(self):
+        super().clean()
+        self.check_approval()
+
+    def save(self, *args, **kwargs):
+        self.check_approval()
         super().save(*args, **kwargs)
 
     @property
