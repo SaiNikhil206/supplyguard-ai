@@ -15,7 +15,17 @@ from django.db import IntegrityError, transaction
 
 from apps.core.models import AffectedPO, DisruptionEvent, RiskCase
 
-from .impact import TenantThresholds, compute_impact, rows, thresholds_from_tenant
+from .impact import (
+    SnapshotError,
+    TenantThresholds,
+    compute_impact,
+    rows,
+    thresholds_from_tenant,
+)
+
+COVERAGE_MAX = Decimal("9999999.99")  # AffectedPO.inventory_coverage_days is Decimal(9, 2)
+COVERAGE_OUT_OF_RANGE = "COVERAGE_OUT_OF_RANGE"
+CURRENCY_MISMATCH = "CURRENCY_MISMATCH"
 
 
 class TenantMismatch(ValueError):
@@ -47,21 +57,30 @@ def _event_dict(event: DisruptionEvent) -> dict:
 
 
 def _check_snapshot_tenant(tenant_id: str, snapshot: dict) -> None:
-    supplier = snapshot.get("supplier")
-    candidates = [supplier] if supplier else []
-    for key in ("purchase_orders", "inventory", "alternate_suppliers"):
-        candidates += rows(snapshot.get(key))
-    for row in candidates:
-        tid = row.get("tenant_id")
-        if tid is not None and tid != tenant_id:
-            raise TenantMismatch(f"snapshot row belongs to tenant {tid}, case is for {tenant_id}")
+    """Every snapshot row must carry this tenant's id (rows without one are rejected)."""
+    if not isinstance(snapshot, dict):
+        raise SnapshotError("snapshot must be a JSON object")
+    try:
+        supplier = snapshot.get("supplier")
+        candidates = [supplier] if supplier else []
+        for key in ("purchase_orders", "inventory", "alternate_suppliers"):
+            candidates += rows(snapshot.get(key))
+        for row in candidates:
+            tid = row.get("tenant_id")
+            if tid != tenant_id:
+                raise TenantMismatch(f"snapshot row has tenant {tid!r}, case is for {tenant_id!r}")
+    except (AttributeError, TypeError) as exc:
+        raise SnapshotError(f"malformed snapshot: {exc!r}") from exc
 
 
 def _captured_at(snapshot: dict) -> datetime | None:
     raw = snapshot.get("captured_at")
     if not raw:
         return None
-    dt = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    try:
+        dt = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise SnapshotError(f"invalid snapshot captured_at {raw!r}") from exc
     return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
 
@@ -93,18 +112,65 @@ def _summary(result: dict, supplier_label: str, event: DisruptionEvent) -> tuple
     return title[:300], summary
 
 
+def _currency(value, what: str) -> str:
+    if not isinstance(value, str) or len(value) != 3:
+        raise SnapshotError(f"missing or invalid currency on {what}: {value!r}")
+    return value
+
+
+def _build_rows(result: dict, snapshot: dict) -> tuple[list[dict], list[str]]:
+    """Convert the engine's affected rows to AffectedPO field values (no DB access).
+
+    Returns (rows, extra data-quality flags). Raises SnapshotError on a missing currency.
+    """
+    names = _item_names(snapshot)
+    flags: list[str] = []
+    out = []
+    for row in result["affected_pos"]:
+        cov = row["inventory_coverage_days"]
+        cov_dec = None if cov is None else Decimal(str(cov))
+        if cov_dec is not None and (not cov_dec.is_finite() or abs(cov_dec) > COVERAGE_MAX):
+            flags.append(
+                f"{COVERAGE_OUT_OF_RANGE}: {row['po_id']} / {row['item_id']} "
+                f"coverage {cov} days stored as null"
+            )
+            cov_dec = None
+        out.append(
+            {
+                "po_id": row["po_id"],
+                "item_id": row["item_id"],
+                "item_name": names.get(row["item_id"], ""),
+                "affected_qty": row["affected_qty"],
+                "estimated_delay_days": Decimal(str(row["estimated_delay_days"])),
+                "exposure_amount": Decimal(row["exposure_amount"]["amount"]),
+                "currency": _currency(row["exposure_amount"]["currency"], row["po_id"]),
+                "due_date": date.fromisoformat(row["due_date"]),
+                "inventory_coverage_days": cov_dec,
+                "shortage": row["shortage"],
+            }
+        )
+    return out, flags
+
+
 def create_risk_case(
     *,
     tenant,
     event: DisruptionEvent,
     snapshot: dict,
     thresholds: TenantThresholds | None = None,
-) -> RiskCase | None:
+) -> tuple[RiskCase | None, bool]:
     """Run the impact engine and save RiskCase + AffectedPO rows.
 
-    Returns the existing case unchanged if the event already has one (idempotent), None when
-    the engine finds no affected PO line (nothing is written), else the new RiskCase.
-    Raises TenantMismatch (nothing written) if the event or snapshot is another tenant's.
+    Returns `(case, created)`:
+    - `(new_case, True)` when a case was written;
+    - `(existing_case, False)` when the event already has a case (returned unchanged);
+    - `(None, False)` when no case applies: unknown supplier (TC-02) or no affected PO line.
+      Nothing is written.
+
+    Errors (nothing is written for any of them): `TenantMismatch` if the event or a snapshot
+    row is another tenant's or has no tenant_id; `SnapshotError` for a malformed snapshot, a
+    snapshot supplier that is not the event's supplier, or a missing currency; `ValueError`
+    for bad event/threshold values. `TenantMismatch` and `SnapshotError` are `ValueError`s.
     """
     if event.tenant_id != tenant.id:
         raise TenantMismatch(f"event {event.event_id} belongs to tenant {event.tenant_id}")
@@ -112,20 +178,42 @@ def create_risk_case(
 
     existing = RiskCase.objects.filter(event=event).first()
     if existing is not None:
-        return existing
+        return existing, False
+    if event.supplier_id is None:
+        return None, False  # unknown or foreign supplier: no case (TC-02)
+
+    supplier = snapshot.get("supplier")
+    if supplier and supplier.get("supplier_id") != event.supplier_erp_id:
+        raise SnapshotError(
+            f"snapshot supplier {supplier.get('supplier_id')!r} does not match the "
+            f"event supplier {event.supplier_erp_id!r}"
+        )
 
     if thresholds is None:
         thresholds = thresholds_from_tenant(
             {"settings": tenant.settings, "currency": tenant.currency}
         )
-    result = compute_impact(_event_dict(event), snapshot, thresholds)
-    if not result["affected_pos"]:
-        return None
+    try:
+        result = compute_impact(_event_dict(event), snapshot, thresholds)
+        if not result["affected_pos"]:
+            return None, False
+        affected, extra_flags = _build_rows(result, snapshot)
+        exposure = result["total_exposure"]
+        currency = _currency(exposure["currency"], "total_exposure")
+        exposure_amount = Decimal(exposure["amount"])
+        captured_at = _captured_at(snapshot)
+    except (KeyError, TypeError, AttributeError, ArithmeticError) as exc:
+        raise SnapshotError(f"malformed snapshot: {exc!r}") from exc
 
-    names = _item_names(snapshot)
-    supplier_label = (snapshot.get("supplier") or {}).get("name") or event.supplier_erp_id
+    if tenant.currency and currency != tenant.currency:
+        extra_flags.append(
+            f"{CURRENCY_MISMATCH}: snapshot currency {currency}, tenant currency {tenant.currency}"
+        )
+    flags = [*result["data_quality_flags"], *extra_flags]
+    result["data_quality_flags"] = flags
+
+    supplier_label = (supplier or {}).get("name") or event.supplier_erp_id
     title, summary = _summary(result, supplier_label, event)
-    exposure = result["total_exposure"]
 
     try:
         with transaction.atomic():
@@ -137,34 +225,20 @@ def create_risk_case(
                 risk_score=result["risk_score"],
                 title=title,
                 impact_summary=summary,
-                exposure_amount=Decimal(exposure["amount"]),
-                currency=exposure["currency"],
+                exposure_amount=exposure_amount,
+                currency=currency,
                 snapshot=snapshot,
-                snapshot_captured_at=_captured_at(snapshot),
+                snapshot_captured_at=captured_at,
                 impact=result,
-                data_quality_flags=result["data_quality_flags"],
+                data_quality_flags=flags,
                 correlation_id=event.correlation_id,
             )
-            for row in result["affected_pos"]:
-                cov = row["inventory_coverage_days"]
-                AffectedPO.objects.create(
-                    tenant=tenant,
-                    risk_case=case,
-                    po_id=row["po_id"],
-                    item_id=row["item_id"],
-                    item_name=names.get(row["item_id"], ""),
-                    affected_qty=row["affected_qty"],
-                    estimated_delay_days=Decimal(str(row["estimated_delay_days"])),
-                    exposure_amount=Decimal(row["exposure_amount"]["amount"]),
-                    currency=row["exposure_amount"]["currency"],
-                    due_date=date.fromisoformat(row["due_date"]),
-                    inventory_coverage_days=None if cov is None else Decimal(str(cov)),
-                    shortage=row["shortage"],
-                )
+            for fields in affected:
+                AffectedPO.objects.create(tenant=tenant, risk_case=case, **fields)
     except IntegrityError:
         # Lost a race with a concurrent call for the same event: return the winner's case.
-        existing = RiskCase.objects.filter(event=event).first()
-        if existing is None:
+        winner = RiskCase.objects.filter(event=event).first()
+        if winner is None:
             raise
-        return existing
-    return case
+        return winner, False
+    return case, True
