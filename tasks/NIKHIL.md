@@ -142,7 +142,7 @@
 - **Notes:** -
 
 ### N-10: Workflow app - state machine + decisions
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S3 (8-11 Dec) | **Est:** 2d | **Depends:** U-03, U-04, U-05
 - **Branch:** `nikhil/N-10-state-machine`
 - **Model hint:** opus / high design, sonnet / medium implement
@@ -152,7 +152,12 @@
   - [ ] TC-06: reject -> no execution call, comments audited
   - [ ] OPS_MANAGER / VIEWER cannot decide (403)
 - **Done in:** -
-- **Notes:** Roop's R-05 and R-06 need this by 11 Dec.
+- **Notes:** Roop's R-05 and R-06 need this by 11 Dec. Design spec: `backend/apps/workflow/WORKFLOW_DESIGN.md`. Plan:
+  | piece | runs as | model / effort | branch |
+  |---|---|---|---|
+  | design spec | nested session | opus / medium | `nikhil/N-10-state-machine--design` |
+  | services + decision API + tests | nested session | sonnet / medium | `nikhil/N-10-state-machine--impl` |
+  | review | subagent reviewer | opus / high | - |
 
 ### N-11: What-if simulator backend
 - **Status:** todo
