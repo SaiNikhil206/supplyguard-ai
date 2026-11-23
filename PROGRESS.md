@@ -89,6 +89,9 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-23 | 19d3c18 | nikhil | N-07 | review | merge: N-07 task file to review |
+| 2026-11-23 | 4f504ef | nikhil | N-07 | review | docs(tasks): N-07 validator to review |
+| 2026-11-23 | a703e67 | nikhil | N-07 | review | merge: N-07 Agent output validator + persistence (auto-merge) |
 | 2026-11-23 | e9ff488 | nikhil | N-07 | in-progress | merge: N-07 re-review fixes into task branch |
 | 2026-11-23 | 5bbe7a6 | nikhil | N-07 | in-progress | fix(intelligence): N-07 re-review fixes |
 | 2026-11-23 | 3081fc5 | uday | U-04 | in-progress | build(deploy): ship ai/ package (schema_registry) in image and dev mount |
@@ -106,6 +109,3 @@
 | 2026-11-23 | 819ffba | roop | R-10 | in-progress | feat(frontend): premium redesign of admin screens (R-10 screens-admin) |
 | 2026-11-23 | 199df21 | uday | U-04 | in-progress | merge: U-04 tenancy piece (tenant mixin, role matrix, /settings, /users) into uday/U-04-auth-tenancy |
 | 2026-11-23 | 2632881 | uday | U-03 | review | merge: U-03 Core data model + seed loader (auto-merge) |
-| 2026-11-23 | b814c8c | uday | U-03 | review | chore(tasks): U-03 to review - merge into collaboration on Uday's instruction |
-| 2026-11-23 | dd2f643 | uday | U-04 | in-progress | test(accounts): role matrix, settings/users API, tenant mixin and OpenAPI tests; README roles section |
-| 2026-11-23 | 623a0e4 | uday | U-04 | in-progress | feat(core): TenantScopedMixin with cross-tenant audit; shared tenant settings validator |
