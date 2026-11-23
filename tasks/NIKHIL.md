@@ -58,7 +58,7 @@
 - **Notes:** Uday's U-07 (Boomi ERP reads) needs this by 25 Nov. Compose box ticks once Uday adds the service (snippet in `mock-erp/README.md`); image already builds/runs via `docker build -f mock-erp/Dockerfile .`. Extensions beyond CONTRACTS s5 (GET PO by id, shipments, X-Tenant-ID, PATCH body, INTERNAL_ERROR) listed for S-01.
 
 ### N-04: Deterministic impact + risk scoring engine
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S1 (25-30 Nov) | **Est:** 3d | **Depends:** U-03, N-02
 - **Branch:** `nikhil/N-04-impact-engine`
 - **Model hint:** opus / high for the scoring design, sonnet / medium to implement + tests
@@ -69,7 +69,13 @@
   - [ ] Demo scenario numbers match `data/README.md`
   - [ ] Pure functions, 90%+ line coverage on `impact.py`
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Design spec: `backend/apps/intelligence/IMPACT_DESIGN.md`. Plan:
+  | piece | runs as | model / effort | branch |
+  |---|---|---|---|
+  | design spec | nested session | opus / medium | `nikhil/N-04-impact-engine--design` |
+  | impact.py + tests | nested session | sonnet / medium | `nikhil/N-04-impact-engine--impl` |
+  | service wiring to POST /internal/risk-cases | after U-03 | sonnet / medium | later |
+  | review | subagent reviewer-lite | sonnet / medium | - |
 
 ### N-05: Supplier Risk Analyst agent (Agentstudio)
 - **Status:** review
