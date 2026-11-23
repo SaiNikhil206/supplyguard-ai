@@ -46,6 +46,14 @@ def test_the_tenant_owned_set_is_what_the_spec_lists():
     }
 
 
+def _guard(obj):
+    """Update path through check_same_tenant; Approval and AgentRun are insert-only."""
+    if type(obj).__name__ in {"Approval", "AgentRun"}:
+        obj.clean()
+    else:
+        obj.save()
+
+
 @pytest.mark.parametrize(
     ("model", "fk_name"),
     CROSS_TENANT_CASES,
@@ -57,13 +65,13 @@ def test_cross_tenant_fk_is_rejected(tenant_a, tenant_b, model, fk_name):
     foreign = BUILDERS_BY_TARGET[related.__name__](tenant_b)
     setattr(obj, fk_name, foreign)
     with pytest.raises(ValidationError):
-        obj.clean()  # the same guard save() runs; append-only rows refuse save() earlier
+        _guard(obj)
 
 
 def test_same_tenant_fks_save_fine_for_every_model(tenant_a):
     for name, builder in BUILDERS.items():
         obj = builder(tenant_a)
-        obj.clean()  # a valid row passes the guard
+        _guard(obj)
         assert obj.tenant_id == tenant_a.id, name
 
 
