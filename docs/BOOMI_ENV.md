@@ -5,7 +5,7 @@
 This file is the single source of truth for "what Boomi do we actually have". Every later Boomi task (U-07..U-11, N-05/N-06/N-08, R-06, R-12) reads it. Never put passwords, API tokens or shared secrets here - only names, IDs and yes/no facts. Credentials go into each member's `.env` (gitignored).
 
 **Headline (read this first):**
-1. **Flow is NOT available in this account, and it does not need to be.** Decision (Uday, 2026-11-23): we build **no native Flow app**. The UI is Roop's React/Vite app; its built HTML is exported and pasted into Flow, which only hosts it (section 5). Flow access is needed only in the account where Roop does that paste.
+1. **Flow is NOT available in this account, and it does not need to be.** Decision (Uday, 2026-11-23): we build **no native Flow app**. The UI is Roop's React/Vite app; it is built into one HTML file (`vite-plugin-singlefile`) and uploaded to Flow, which only hosts it (section 5). Flow access is needed only in the account where Roop does that paste.
 2. **Each member works in their own Boomi training account.** This file describes **Uday's** account only. Roop and Nikhil do not need an invite; they record their own account in section 9. Consequence: Boomi components are not shared automatically between accounts (section 9).
 3. The only runtime is a **local runtime on Uday's own PC (`ESI-PC28`)**, attached to the only environment, which belongs to the BIMBA project. It can reach `localhost` on that PC, so no tunnel is needed for Uday's own S1 testing.
 4. **Account expiry is not shown anywhere readable** (Account Information and Licensing pages). It is a `Training-` account. **OPEN: confirm it outlives 31 Dec 2026.**
@@ -78,13 +78,13 @@ Contracts (event shape, API, schemas) do not change - only where a step runs.
 |---|---|---|---|
 | Event Streams | Yes (access) | None needed. Re-check when U-08 creates the first topic. | U-08, N-08 |
 | Agentstudio / Agent Garden | Yes (access) | None needed. Re-check when N-05 creates the first agent. | N-05, N-06 |
-| **Flow** | **No, in Uday's account.** Not yet checked in Roop's own account. | **DECIDED (Uday, 2026-11-23): no native Flow app.** Approval stays in the React UI (SaaS Approval Center) and calls Django `POST /recommendations/{id}/decision` as in CONTRACTS section 4. The built HTML of that UI is exported and pasted into Flow, which only hosts it; nothing else is created in Flow. Django still triggers the Boomi execution process after the decision. Roop needs Flow in his own account for the paste - he should confirm that (and that the hosted page can reach the Django API: CORS/HTTPS) before the demo. If his account has no Flow, the React UI is shown standalone. | R-06 (scope changes from "Flow app" to "export + host"), U-10 |
+| **Flow** | **No, in Uday's account.** Not yet checked in Roop's own account. | **DECIDED (Uday, 2026-11-23): no native Flow app.** Approval stays in the React UI (SaaS Approval Center) and calls Django `POST /recommendations/{id}/decision` as in CONTRACTS section 4. The UI is built into **one self-contained HTML file with the Vite plugin `vite-plugin-singlefile`** (JS/CSS inlined) and uploaded to Flow, which only hosts it; nothing else is created in Flow. All frontend work stays in React/Vite (`frontend/`); none is done inside Flow. Django still triggers the Boomi execution process after the decision. Roop needs Flow in his own account for the paste - he should confirm that (and that the hosted page can reach the Django API: CORS/HTTPS) before the demo. If his account has no Flow, the React UI is shown standalone. | R-06 (scope changes from "Flow app" to "export + host"), U-10 |
 | API Management | Yes (access) | None needed. Re-check when U-09 creates the first API. | U-09, U-06 |
 | Data Hub | Yes (access) | n/a (optional) | - |
 
 - [x] Fallback decision recorded for every missing service (Flow: no native app, host the exported React HTML - decided 2026-11-23)
 
-**Tell Roop:** `tasks/ROOP.md` R-06 still describes a native Flow app ("approval page... decision calls the endpoint"). That is Roop's file, so it is not edited here; R-06 should be re-scoped to "export the React build and host it in Flow". No contract shape changes, so no CONTRACTS changelog line is needed.
+**Tell Roop:** `tasks/ROOP.md` R-06 still describes a native Flow app ("approval page... decision calls the endpoint"). That is Roop's file, so it is not edited here; R-06 should be re-scoped to "build a single-file HTML with `vite-plugin-singlefile` and host it in Flow". For Roop to verify (not checked here): how Flow accepts the uploaded file; routing that works from one HTML file (e.g. hash routing); an absolute API base URL baked in at build time; and the Flow page's origin being allowed in Django `CORS_ALLOWED_ORIGINS` (Uday adds it once the origin is known). No contract shape changes, so no CONTRACTS changelog line is needed.
 
 ## 6. Credentials checklist (values go to `.env`, never here)
 
