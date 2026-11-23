@@ -16,5 +16,7 @@ urlpatterns = [
 ]
 
 # JSON error body (CONTRACTS s1) for /api/ paths; other paths keep Django's pages.
-handler404 = "apps.core.handlers.not_found"
+handler400 = "apps.core.handlers.bad_request"
+handler403 = "apps.core.handlers.permission_denied"
+handler404 ="apps.core.handlers.not_found"
 handler500 = "apps.core.handlers.server_error"

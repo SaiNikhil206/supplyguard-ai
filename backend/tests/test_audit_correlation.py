@@ -52,6 +52,13 @@ def test_malformed_replaced_never_echoed(client, bad):
     assert uuid.UUID(value).version == 4
 
 
+def test_nil_uuid_is_rejected(client):
+    nil = "00000000-0000-0000-0000-000000000000"
+    value = client.get("/api/ok", HTTP_X_CORRELATION_ID=nil)["X-Correlation-ID"]
+    assert value != nil
+    assert uuid.UUID(value).version == 4
+
+
 def test_missing_header_generates_distinct_v4_per_request(client):
     first = client.get("/api/ok")["X-Correlation-ID"]
     second = client.get("/api/ok")["X-Correlation-ID"]
@@ -106,3 +113,31 @@ def test_log_records_carry_correlation_id(client):
     lines = buffer.getvalue().splitlines()
     assert any(f"[{cid}]" in line and "hello from view" in line for line in lines)
     assert any("[-]" in line and "outside request" in line for line in lines)
+
+
+def _console_output(run):
+    handler = logging.getLogger().handlers[0]
+    buffer = io.StringIO()
+    old = handler.setStream(buffer)
+    try:
+        run()
+    finally:
+        handler.setStream(old)
+    return buffer.getvalue()
+
+
+@pytest.mark.parametrize("path", ["/api/protected", "/api/missing"])
+def test_django_request_log_lines_carry_id_after_context_reset(client, path):
+    # django.request logs 4xx after the middleware chain, when the ContextVar is reset.
+    cid = str(uuid.uuid4())
+    out = _console_output(lambda: client.get(path, HTTP_X_CORRELATION_ID=cid))
+    lines = [ln for ln in out.splitlines() if "django.request" in ln]
+    assert lines, out
+    assert all(f"[{cid}]" in ln for ln in lines), lines
+
+
+def test_django_request_500_logged_once_with_id(client):
+    cid = str(uuid.uuid4())
+    out = _console_output(lambda: client.get("/api/boom", HTTP_X_CORRELATION_ID=cid))
+    assert out.count("Traceback") == 1
+    assert f"[{cid}]" in out

@@ -8,17 +8,18 @@ META_KEY = "HTTP_X_CORRELATION_ID"
 
 
 def normalise_uuid(value) -> str | None:
-    """Lowercase hyphenated form of any valid UUID (any version), else None."""
+    """Lowercase hyphenated form of any valid, non-nil UUID (any version), else None."""
     try:
-        return str(uuid.UUID(str(value).strip()))
+        parsed = uuid.UUID(str(value).strip())
     except (ValueError, AttributeError, TypeError):
         return None
+    return None if parsed.int == 0 else str(parsed)
 
 
 class CorrelationIdMiddleware:
     """Must be FIRST in MIDDLEWARE so that errors raised by later middleware still get the id.
 
-    A malformed incoming value is never echoed: a fresh v4 is generated instead.
+    A malformed (or nil) incoming value is never echoed: a fresh v4 is generated instead.
     """
 
     def __init__(self, get_response):

@@ -62,12 +62,35 @@ def test_bad_entity():
 
 
 def test_tenant_derivation_order(tenant_a, tenant_b):
-    user_b = make_user(tenant_b)
+    user_a = make_user(tenant_a)
     supplier_a = make_supplier(tenant_a)
-    assert record(user_b, "a", entity=supplier_a, tenant=tenant_b).tenant == tenant_b  # explicit
-    assert record(user_b, "a", entity=supplier_a).tenant == tenant_a  # entity beats actor
-    assert record(user_b, "a").tenant == tenant_b  # actor
+    assert record(user_a, "a", entity=supplier_a, tenant=tenant_a).tenant == tenant_a  # explicit
+    assert record("SYSTEM", "a", entity=supplier_a).tenant == tenant_a  # entity
+    assert record(user_a, "a").tenant == tenant_a  # actor
+    assert record("SYSTEM", "a", tenant=tenant_b).tenant == tenant_b  # explicit, tenant-less actor
     assert record("SYSTEM", "a").tenant is None  # nothing
+
+
+def test_tenant_mismatch_pairs_raise(tenant_a, tenant_b):
+    user_a = make_user(tenant_a)
+    supplier_a = make_supplier(tenant_a)
+    with pytest.raises(ValueError):  # explicit vs entity
+        record("SYSTEM", "a", entity=supplier_a, tenant=tenant_b)
+    with pytest.raises(ValueError):  # explicit vs actor
+        record(user_a, "a", tenant=tenant_b)
+    with pytest.raises(ValueError):  # entity vs actor
+        record(make_user(tenant_b), "a", entity=supplier_a)
+    assert AuditEvent.objects.count() == 0
+
+
+def test_superuser_without_tenant_may_record_for_entity_tenant(tenant_a):
+    from django.contrib.auth import get_user_model
+
+    su = get_user_model().objects.create_superuser(
+        username="root", password="pw-not-secret-1", email="r@example.com"
+    )
+    event = record(su, "a", entity=make_supplier(tenant_a))
+    assert event.tenant == tenant_a
 
 
 def test_correlation_id_from_context_explicit_and_none():
@@ -161,3 +184,81 @@ def test_lazy_import_does_not_need_registry():
 
     assert callable(apps.audit.record)
     assert make_tenant  # silence unused import lint if helper changes
+
+
+def test_redaction_normalises_separators_and_keeps_numbers():
+    stored = record(
+        "SYSTEM",
+        "a",
+        data={
+            "X-Api-Key": "k1",
+            "x-api-key": "k2",
+            "api-key": "k3",
+            "private-key": "k4",
+            "refresh": "r",
+            "access": "a",
+            "key": "plain-key",
+            "jwt": "j",
+            "session_id": "s",
+            "signature": "sig",
+            "prompt_tokens": 12,
+            "max_tokens": 100,
+            "tokens_used": 5,
+            "token_ok": True,
+            "tokens_str": "abc",
+            "note": "Bearer abc",
+            "note2": "basic dXNlcjpwdw==",
+            "keyboard": "visible",
+            "items": ({"Authorization": "x", "n": 1}, [{"api_key": "y"}]),
+        },
+    ).data
+    for key in (
+        "X-Api-Key", "x-api-key", "api-key", "private-key", "refresh", "access", "key",
+        "jwt", "session_id", "signature", "tokens_str", "note", "note2",
+    ):  # fmt: skip
+        assert stored[key] == "[REDACTED]", key
+    assert stored["prompt_tokens"] == 12
+    assert stored["max_tokens"] == 100
+    assert stored["tokens_used"] == 5
+    assert stored["token_ok"] is True
+    assert stored["keyboard"] == "visible"
+    assert stored["items"] == [{"Authorization": "[REDACTED]", "n": 1}, [{"api_key": "[REDACTED]"}]]
+
+
+def test_bearer_string_redacted_inside_list_under_innocent_key():
+    data = record("SYSTEM", "a", data={"x": ["Bearer zzz", "fine"]}).data
+    assert data["x"] == ["[REDACTED]", "fine"]
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "actor"),
+    [
+        ({"action": "a" * 101}, "SYSTEM"),
+        ({"entity_type": "t" * 51}, "SYSTEM"),
+        ({"entity_id": "i" * 81}, "SYSTEM"),
+        ({"action": "ok"}, "u" * 101),
+    ],
+)
+def test_overlong_fields_raise_value_error(kwargs, actor):
+    args = {"action": "ok", **kwargs}
+    with pytest.raises(ValueError):
+        record(actor, **args)
+    assert AuditEvent.objects.count() == 0
+
+
+def test_field_lengths_at_limit_are_accepted():
+    event = record("a" * 100, "b" * 100, entity_type="c" * 50, entity_id="d" * 80)
+    assert len(event.entity_id) == 80
+
+
+def test_circular_and_too_deep_data_rejected():
+    circular = {}
+    circular["self"] = circular
+    with pytest.raises(TypeError):
+        record("SYSTEM", "a", data=circular)
+    deep = current = {}
+    for _ in range(5000):
+        current["n"] = {}
+        current = current["n"]
+    with pytest.raises(TypeError):
+        record("SYSTEM", "a", data=deep)

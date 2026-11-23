@@ -4,7 +4,7 @@ from datetime import UTC, datetime, time
 from django.utils.dateparse import parse_date, parse_datetime
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import generics
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import BasePermission
 
 from apps.tenants.models import Tenant
@@ -49,12 +49,13 @@ def _parse_moment(name: str, raw: str) -> datetime:
     return value.astimezone(UTC)
 
 
+_TZ_NOTE = "{} bound (ISO date/datetime, UTC). URL-encode a +05:30 offset (%2B) or use Z."
 _PARAMS = [
     OpenApiParameter("entity_type", str, description="Exact entity type, e.g. RiskCase."),
     OpenApiParameter("action", str, description="Exact action name."),
     OpenApiParameter("correlation_id", str, description="UUID of the request/flow."),
-    OpenApiParameter("from", str, description="Inclusive lower bound (ISO date/datetime, UTC)."),
-    OpenApiParameter("to", str, description="Exclusive upper bound (ISO date/datetime, UTC)."),
+    OpenApiParameter("from", str, description=_TZ_NOTE.format("Inclusive lower")),
+    OpenApiParameter("to", str, description=_TZ_NOTE.format("Exclusive upper")),
 ]
 
 
@@ -68,8 +69,12 @@ class AuditEventList(generics.ListAPIView):
     permission_classes = [HasActiveTenant]
 
     def get_queryset(self):
-        # Never read a tenant from query/body. Null-tenant rows can never match this filter.
-        qs = AuditEvent.objects.filter(tenant=self.request.user.tenant)
+        # Never read a tenant from query/body. Fail closed: filter(tenant=None) would match
+        # `tenant_id IS NULL`, so a missing tenant must never reach the query.
+        tid = getattr(self.request.user, "tenant_id", None)
+        if not tid:
+            raise PermissionDenied(HasActiveTenant.message)
+        qs = AuditEvent.objects.filter(tenant_id=tid)
         params = self.request.query_params
         if params.get("entity_type"):
             qs = qs.filter(entity_type=params["entity_type"])

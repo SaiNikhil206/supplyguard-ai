@@ -1,5 +1,6 @@
 """`record()`: the single way application code writes to the audit log (docs/CONTRACTS.md s10)."""
 import json
+import re
 import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
@@ -12,31 +13,51 @@ from .context import get_correlation_id
 from .models import AuditEvent
 
 REDACTED = "[REDACTED]"
+# Matched against the key with every non-alphanumeric character removed and lowercased,
+# so `X-Api-Key`, `api_key` and `apiKey` all become `apikey`.
 _SENSITIVE_PARTS = (
     "password",
     "passwd",
     "secret",
     "token",
-    "api_key",
-    "apikey",
     "authorization",
     "cookie",
     "credential",
-    "private_key",
+    "apikey",
+    "privatekey",
+    "jwt",
+    "bearer",
+    "signature",
+    "session",
 )
+_SENSITIVE_EXACT = {"access", "refresh", "key"}
+_AUTH_PREFIXES = ("bearer ", "basic ")
 
 
 def _is_sensitive(key) -> bool:
-    name = str(key).lower()
-    return any(part in name for part in _SENSITIVE_PARTS)
+    name = re.sub(r"[^a-z0-9]", "", str(key).lower())
+    return name in _SENSITIVE_EXACT or any(part in name for part in _SENSITIVE_PARTS)
 
 
 def redact(value):
-    """Return a copy with the value of every sensitive-looking dict key replaced."""
+    """Return a copy with sensitive values replaced by `[REDACTED]`.
+
+    Redaction is by key name (see `_is_sensitive`) plus any string starting with 'Bearer ' or
+    'Basic '. Numbers, booleans and null under a sensitive key stay visible (`prompt_tokens: 12`).
+    Callers must still never put raw credentials in values under innocent keys.
+    """
     if isinstance(value, dict):
-        return {k: REDACTED if _is_sensitive(k) else redact(v) for k, v in value.items()}
-    if isinstance(value, list):
+        out = {}
+        for k, v in value.items():
+            if _is_sensitive(k) and not (v is None or isinstance(v, (bool, int, float))):
+                out[k] = REDACTED
+            else:
+                out[k] = redact(v)
+        return out
+    if isinstance(value, (list, tuple)):
         return [redact(v) for v in value]
+    if isinstance(value, str) and value.lower().startswith(_AUTH_PREFIXES):
+        return REDACTED
     return value
 
 
@@ -48,8 +69,24 @@ def _json_safe(data) -> dict:
         raise TypeError("audit data must be a dict or None")
     try:
         return json.loads(json.dumps(data, cls=DjangoJSONEncoder, allow_nan=False))
-    except ValueError as exc:  # NaN / Infinity
+    except RecursionError as exc:
+        raise TypeError("audit data is nested too deeply or circular") from exc
+    except ValueError as exc:  # NaN / Infinity / circular reference
         raise TypeError(f"audit data is not JSON-safe: {exc}") from exc
+
+
+def _check_length(name: str, value: str) -> None:
+    limit = AuditEvent._meta.get_field(name).max_length
+    if len(value) > limit:
+        raise ValueError(f"{name} is longer than {limit} characters")
+
+
+def _resolve_tenant(explicit, entity_tenant, actor_tenant):
+    """explicit, else entity's, else actor's; the ones that are set must all agree."""
+    candidates = [t for t in (explicit, entity_tenant, actor_tenant) if t is not None]
+    if len({t.pk for t in candidates}) > 1:
+        raise ValueError("tenant mismatch between explicit tenant, entity and actor")
+    return candidates[0] if candidates else None
 
 
 def _actor_text(actor):
@@ -112,16 +149,28 @@ def record(
 ) -> AuditEvent:
     """Append one audit row and return it.
 
-    tenant: explicit, else the entity's tenant, else the actor's tenant, else None.
+    tenant: explicit, else the entity's tenant, else the actor's tenant, else None. If more than
+    one is set and they differ, ValueError (a cross-tenant record is never written).
     correlation_id: explicit, else the current request's, else None.
-    data: JSON-safe dict, sensitive keys redacted (the caller's object is never mutated).
+    data: JSON-safe dict; values under sensitive key names (and 'Bearer'/'Basic' strings) are
+    redacted, the caller's object is never mutated. Never put raw credentials in other values.
     """
     actor_text, actor_tenant = _actor_text(actor)
     etype, eid, entity_tenant = _entity_parts(entity, entity_type, entity_id)
     cid = _correlation(correlation_id)
-    payload = redact(_json_safe(data))
+    try:
+        payload = redact(_json_safe(data))
+    except RecursionError as exc:
+        raise TypeError("audit data is nested too deeply") from exc
+    for name, value in (
+        ("actor", actor_text),
+        ("action", action),
+        ("entity_type", etype),
+        ("entity_id", eid),
+    ):
+        _check_length(name, str(value))
     return AuditEvent.objects.create(
-        tenant=tenant or entity_tenant or actor_tenant,
+        tenant=_resolve_tenant(tenant, entity_tenant, actor_tenant),
         actor=actor_text,
         action=action,
         entity_type=etype,
