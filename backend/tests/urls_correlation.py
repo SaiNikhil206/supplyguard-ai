@@ -1,6 +1,7 @@
 """Tiny urlconf for middleware / handler tests (use with override_settings(ROOT_URLCONF=...))."""
 import logging
 
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import JsonResponse
 from django.urls import path
 from django.views.decorators.http import require_GET
@@ -24,6 +25,14 @@ def recording(request):
 def logging_view(request):
     logger.warning("hello from view")
     return JsonResponse({})
+
+
+def forbidden(request):
+    raise PermissionDenied("secret-reason")
+
+
+def bad(request):
+    raise SuspiciousOperation("secret-reason")
 
 
 def boom(request):
@@ -50,7 +59,13 @@ urlpatterns = [
     path("api/get-only", get_only),
     path("api/protected", Protected.as_view()),
     path("boom-html", boom),
+    path("api/forbidden", forbidden),
+    path("api/bad", bad),
+    path("forbidden-html", forbidden),
+    path("bad-html", bad),
 ]
 
-handler404 = "apps.core.handlers.not_found"
+handler400 = "apps.core.handlers.bad_request"
+handler403 = "apps.core.handlers.permission_denied"
+handler404 ="apps.core.handlers.not_found"
 handler500 = "apps.core.handlers.server_error"

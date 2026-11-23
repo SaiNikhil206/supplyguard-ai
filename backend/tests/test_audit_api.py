@@ -161,9 +161,36 @@ def test_write_methods_405(api, method):
     assert_error(getattr(api, method)(URL, {}, format="json"), 405, "VALIDATION_ERROR")
 
 
+def test_get_queryset_fails_closed_without_tenant_even_with_permissive_permission(
+    monkeypatch, tenant_a
+):
+    from rest_framework.exceptions import PermissionDenied
+    from rest_framework.permissions import AllowAny
+    from rest_framework.test import APIRequestFactory
+
+    from apps.audit.views import AuditEventList
+
+    mk(None)  # a null-tenant row that `filter(tenant=None)` would have returned
+    mk(tenant_a)
+    monkeypatch.setattr(AuditEventList, "permission_classes", [AllowAny])
+    ghost = SimpleNamespace(is_authenticated=True, is_active=True, tenant=None, tenant_id=None)
+    su = get_user_model().objects.create_superuser(
+        username="root2", password="pw-not-secret-1", email="r2@example.com"
+    )
+    for user in (ghost, su):
+        view = AuditEventList()
+        view.request = view.initialize_request(APIRequestFactory().get(URL))
+        view.request.user = user
+        with pytest.raises(PermissionDenied):
+            view.get_queryset()
+    # Through HTTP too: a permissive permission must still not leak the null-tenant row.
+    assert client_for(su).get(URL).status_code == 403
+
+
 def test_openapi_lists_audit_path():
     response = APIClient().get("/api/schema/")
     assert response.status_code == 200
     body = response.content.decode()
     assert "/api/v1/audit" in body
     assert "entity_type" in body
+    assert "%2B" in body  # from/to timezone-offset hint

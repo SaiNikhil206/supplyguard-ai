@@ -6,5 +6,10 @@ from .context import get_correlation_id
 
 class CorrelationIdFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        record.correlation_id = get_correlation_id() or "-"
+        # django.request logs 4xx/5xx AFTER the middleware chain, when the ContextVar is
+        # already reset; those records carry the request, so prefer its id.
+        request = getattr(record, "request", None)
+        record.correlation_id = (
+            getattr(request, "correlation_id", None) or get_correlation_id() or "-"
+        )
         return True
