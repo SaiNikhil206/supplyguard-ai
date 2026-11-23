@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui';
 export function CaseDetailSkeleton() {
   return (
     <div role="status" aria-label="Loading risk case" className="space-y-6">
-      <div className="space-y-4 rounded-2xl border border-border/60 bg-card/80 p-6">
+      <div className="space-y-4 rounded-lg border border-border bg-card p-6">
         <Skeleton className="h-4 w-32" />
         <Skeleton className="h-9 w-64" />
         <Skeleton className="h-4 w-96 max-w-full" />
@@ -15,11 +15,11 @@ export function CaseDetailSkeleton() {
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <Skeleton className="h-40 rounded-2xl" />
-          <Skeleton className="h-48 rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
+          <Skeleton className="h-40 rounded-lg" />
+          <Skeleton className="h-48 rounded-lg" />
+          <Skeleton className="h-64 rounded-lg" />
         </div>
-        <Skeleton className="h-96 rounded-2xl" />
+        <Skeleton className="h-96 rounded-lg" />
       </div>
     </div>
   );

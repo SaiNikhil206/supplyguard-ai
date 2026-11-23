@@ -1,7 +1,7 @@
 import { Factory, Truck, ShieldAlert, TrendingDown, Route, type LucideIcon } from 'lucide-react';
 import type { EventType, Severity } from '@/api/types';
 
-/** Severity hues: low=emerald, medium=amber, high=orange, critical=rose (via sev-* tokens). */
+/** Severity hues via sev-* tokens (low green, medium amber, high orange, critical red). Colour is for dots/badges only. */
 export const SEV_META: Record<Severity, { bar: string; tint: string; text: string; ring: string; label: string }> = {
   LOW: { bar: 'bg-sev-low', tint: 'bg-sev-low/10', text: 'text-sev-low', ring: 'ring-sev-low/25', label: 'Low' },
   MEDIUM: {

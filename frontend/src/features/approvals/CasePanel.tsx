@@ -1,6 +1,6 @@
 import { isPending, latestExecution, useWatchedCase } from '@/api/approvals';
 import { ApiError } from '@/api/client';
-import { Badge, ErrorState, Money, Skeleton, StatusBadge } from '@/components/ui';
+import { AiChip, Badge, ErrorState, Money, Skeleton, StatusBadge } from '@/components/ui';
 import { Monogram } from '@/features/risk/ui';
 import { DecisionForm } from './DecisionForm';
 import { ExecutionPanel } from './ExecutionPanel';
@@ -13,7 +13,7 @@ export interface CasePanelProps {
   onNotice: (message: string, tone: 'success' | 'error') => void;
 }
 
-const shell = 'rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur';
+const shell = 'rounded-lg border border-border bg-card';
 
 export function CasePanel({ caseId, canDecide, actor, onNotice }: CasePanelProps) {
   const q = useWatchedCase(caseId);
@@ -43,25 +43,26 @@ export function CasePanel({ caseId, canDecide, actor, onNotice }: CasePanelProps
   const c = q.data;
   const execution = latestExecution(c);
   return (
-    <section aria-label={`Case ${c.id}`} className={`${shell} animate-in fade-in-0 slide-in-from-right-2 space-y-5 p-5 duration-300`}>
+    <section aria-label={`Case ${c.id}`} className={`${shell} space-y-5 p-5`}>
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Monogram name={c.supplier_name} className="h-11 w-11" />
-          <h2 className="min-w-0 text-base font-semibold">
-            {c.id} · {c.supplier_name}
+          <Monogram name={c.supplier_name} />
+          <h2 className="min-w-0 text-sm font-semibold">
+            <span className="font-mono">{c.id}</span> · {c.supplier_name}
           </h2>
         </div>
         <StatusBadge status={c.status} />
       </header>
       <div className="space-y-1">
-        <p className="text-sm">{c.title}</p>
+        <p className="text-sm text-foreground">{c.title}</p>
         <p className="text-xs text-muted">
           Exposure <Money value={c.exposure} /> · {c.affected_po_count} affected POs
         </p>
         {c.analysis && (
-          <p className="mt-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 text-sm text-muted">
-            {c.analysis.summary}
-          </p>
+          <div className="mt-2 rounded-md border border-border bg-surface-2/50 p-3 text-sm text-muted">
+            <AiChip className="mb-1.5" />
+            <p>{c.analysis.summary}</p>
+          </div>
         )}
       </div>
 

@@ -128,15 +128,15 @@ export function DecisionForm({ riskCase, canDecide, actor, onNotice }: DecisionF
   return (
     <div className="space-y-4">
       <fieldset className="space-y-2">
-        <legend className="mb-1 text-sm font-semibold">Recommended options</legend>
+        <legend className="mb-1 text-sm font-semibold text-foreground">Recommended options</legend>
         {recs.map((r) => {
           const why = unsupportedReason(r);
           return (
             <label
               key={r.id}
               className={cn(
-                'flex cursor-pointer items-start gap-3 rounded-xl border border-border/70 bg-card p-3 text-sm transition hover:shadow-sm',
-                'has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary/40',
+                'flex cursor-pointer items-start gap-3 rounded-md border border-border bg-card p-3 text-sm transition-colors duration-150',
+                'has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:ring-1 has-[:checked]:ring-primary',
                 'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                 why && 'opacity-70',
               )}
@@ -188,7 +188,7 @@ export function DecisionForm({ riskCase, canDecide, actor, onNotice }: DecisionF
           aria-invalid={!!commentError || undefined}
           aria-describedby={commentError ? 'decision-comment-error' : undefined}
           placeholder="Required to reject or request changes"
-          className="block w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+          className="block w-full rounded-md border border-input bg-card px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
         />
         {commentError && (
           <p id="decision-comment-error" role="alert" className="text-xs font-medium text-danger">
@@ -198,7 +198,7 @@ export function DecisionForm({ riskCase, canDecide, actor, onNotice }: DecisionF
       </div>
 
       {reason && (
-        <p id="decision-reason" className="flex items-start gap-2 rounded-xl bg-warning/10 p-3 text-sm text-muted">
+        <p id="decision-reason" className="flex items-start gap-2 rounded-md bg-warning/10 p-3 text-sm text-muted">
           <TriangleAlert aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
           {reason}
         </p>
@@ -242,7 +242,7 @@ export function DecisionForm({ riskCase, canDecide, actor, onNotice }: DecisionF
               <DialogTitle>{CONFIRM[confirming].title}</DialogTitle>
               <DialogDescription>{CONFIRM[confirming].blurb}</DialogDescription>
             </DialogHeader>
-            <dl className="space-y-2 rounded-xl bg-surface-2/60 p-4 text-sm">
+            <dl className="space-y-2 rounded-md bg-surface-2/60 p-4 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-muted">Case</dt>
                 <dd className="font-mono">{riskCase.id}</dd>

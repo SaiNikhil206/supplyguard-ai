@@ -13,17 +13,17 @@ export function EventCard({ event }: { event: DisruptionEvent }) {
     ['Event ID', <span key="i" className="font-mono text-xs">{event.event_id}</span>],
   ];
   return (
-    <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="event-heading">
+    <Card className="overflow-hidden" role="region" aria-labelledby="event-heading">
       <CardHeader>
         <CardTitle id="event-heading">Disruption event</CardTitle>
       </CardHeader>
       <CardBody>
-        <p className="mb-4 text-sm text-text">{event.description}</p>
+        <p className="mb-4 text-sm text-foreground">{event.description}</p>
         <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
           {rows.map(([k, v]) => (
-            <div key={k} className="rounded-xl bg-surface-2/60 p-3">
-              <dt className="text-xs uppercase tracking-wide text-muted">{k}</dt>
-              <dd className="mt-0.5 text-text">{v}</dd>
+            <div key={k}>
+              <dt className="text-xs font-medium text-muted">{k}</dt>
+              <dd className="mt-0.5 text-foreground">{v}</dd>
             </div>
           ))}
         </dl>
