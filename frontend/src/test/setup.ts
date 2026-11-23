@@ -38,3 +38,13 @@ if (!window.matchMedia) {
     dispatchEvent: () => false,
   })) as unknown as typeof window.matchMedia;
 }
+
+// jsdom lacks ResizeObserver / scrollIntoView (needed by Radix ScrollArea and cmdk)
+if (!('ResizeObserver' in globalThis)) {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}
+if (!Element.prototype.scrollIntoView) Element.prototype.scrollIntoView = () => {};

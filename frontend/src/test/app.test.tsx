@@ -36,18 +36,35 @@ describe('app shell (authenticated)', () => {
     expect(document.documentElement).not.toHaveClass('dark');
   });
 
-  it('Escape closes the mobile menu and a skip link targets main', async () => {
+  it('mobile nav opens in a sheet, Escape closes it, and a skip link targets main', async () => {
     renderWithProviders({ path: '/' });
     const toggle = await screen.findByRole('button', { name: 'Toggle menu' });
     expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute('href', '#main');
     expect(document.getElementById('main')).toBeInTheDocument();
-    const aside = screen.getByLabelText('Sidebar') as HTMLElement & { inert: boolean };
-    expect(aside.inert).toBe(true);
+    expect(screen.getByLabelText('Sidebar')).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(aside.inert).toBe(false);
+    expect(await screen.findByRole('navigation', { name: 'Mobile' })).toBeInTheDocument();
     await userEvent.keyboard('{Escape}');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('navigation', { name: 'Mobile' })).not.toBeInTheDocument();
+  });
+
+  it('opens the command palette with Ctrl+K and jumps to a screen', async () => {
+    const { router } = renderWithProviders({ path: '/' });
+    await screen.findByRole('navigation', { name: 'Main' });
+    await userEvent.keyboard('{Control>}k{/Control}');
+    const input = await screen.findByPlaceholderText(/Search screens/);
+    await userEvent.type(input, 'audit');
+    await userEvent.click(await screen.findByRole('option', { name: /Audit Center/ }));
+    expect(router.state.location.pathname).toBe('/audit');
+  });
+
+  it('groups the sidebar into Monitor / Decide / Govern', async () => {
+    renderWithProviders({ path: '/' });
+    const nav = await screen.findByRole('navigation', { name: 'Main' });
+    for (const g of ['Monitor', 'Decide', 'Govern']) expect(nav).toHaveTextContent(g);
   });
 
   it('shows NotFound for unknown path', async () => {

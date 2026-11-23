@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Activity, ShieldCheck, Sparkles, UserCheck } from 'lucide-react';
 import { Button, Card, CardBody, Field, Input } from '@/components/ui';
 import { ApiError } from '@/api/client';
 import { config } from '@/config';
@@ -9,6 +10,12 @@ const DEMO_USERS = [
   { username: 'admin', role: 'ADMIN' },
   { username: 'manager', role: 'PROCUREMENT_MANAGER' },
   { username: 'viewer', role: 'VIEWER' },
+];
+
+const VALUE_POINTS = [
+  { icon: Activity, title: 'See disruptions early', text: 'Live supplier signals mapped to the purchase orders they put at risk.' },
+  { icon: Sparkles, title: 'Evidence-backed AI', text: 'Every recommendation shows its facts, estimates and what data is missing.' },
+  { icon: UserCheck, title: 'Human-approved recovery', text: 'No ERP change happens without a recorded approval and a full audit trail.' },
 ];
 
 function messageFor(e: unknown): string {
@@ -51,55 +58,98 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg p-4 text-text">
-      <Card className="w-full max-w-sm">
-        <CardBody className="space-y-4">
-          <h1 className="text-xl font-semibold">
-            <span className="text-primary">▣</span> SupplyGuard AI
-          </h1>
-          <p className="text-sm text-muted">Sign in to your workspace</p>
-          <form onSubmit={onSubmit} className="space-y-3" noValidate>
-            <Field label="Username">
-              <Input
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                autoFocus
-              />
-            </Field>
-            <Field label="Password">
-              <Input
-                type="password"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </Field>
-            {error && (
-              <p role="alert" className="text-sm font-medium text-danger">
-                {error}
-              </p>
-            )}
-            <Button type="submit" className="w-full" loading={submitting}>
-              Sign in
-            </Button>
-          </form>
-          {config.apiMock && (
-            <div data-testid="demo-hint" className="rounded-md bg-surface-2 p-3 text-xs text-muted">
-              <p className="font-medium text-text">Demo users (password demo123)</p>
-              <ul className="mt-1 space-y-0.5">
-                {DEMO_USERS.map((u) => (
-                  <li key={u.username}>
-                    <code>{u.username}</code> - {u.role}
-                  </li>
-                ))}
-              </ul>
+    <div className="grid min-h-screen bg-background text-foreground lg:grid-cols-2">
+      <aside
+        className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 p-12 text-white lg:flex"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/30 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl"
+        />
+        <div className="relative flex items-center gap-2.5 text-lg font-semibold">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
+            <ShieldCheck aria-hidden="true" className="h-5 w-5" />
+          </span>
+          SupplyGuard AI
+        </div>
+        <div className="relative max-w-md space-y-8">
+          <p className="text-3xl font-semibold leading-tight tracking-tight">
+            Spot supplier disruptions before they stop your line.
+          </p>
+          <ul className="space-y-5">
+            {VALUE_POINTS.map(({ icon: Icon, title, text }) => (
+              <li key={title} className="flex gap-3">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/10 ring-1 ring-white/15">
+                  <Icon aria-hidden="true" className="h-4 w-4" />
+                </span>
+                <div>
+                  <div className="text-sm font-semibold">{title}</div>
+                  <div className="text-sm text-indigo-100">{text}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="relative text-xs text-indigo-200">Boomi World 2027 Hackathon</p>
+      </aside>
+
+      <main className="flex items-center justify-center p-6">
+        <Card className="w-full max-w-sm shadow-lift">
+          <CardBody className="space-y-5 p-7">
+            <div className="space-y-1.5">
+              <h1 className="flex items-center gap-2 text-2xl font-semibold">
+                <ShieldCheck aria-hidden="true" className="h-6 w-6 text-primary lg:hidden" />
+                SupplyGuard AI
+              </h1>
+              <p className="text-sm text-muted">Sign in to your workspace</p>
             </div>
-          )}
-        </CardBody>
-      </Card>
+            <form onSubmit={onSubmit} className="space-y-4" noValidate>
+              <Field label="Username">
+                <Input
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoFocus
+                />
+              </Field>
+              <Field label="Password">
+                <Input
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </Field>
+              {error && (
+                <p role="alert" className="rounded-md bg-danger/10 px-3 py-2 text-sm font-medium text-danger">
+                  {error}
+                </p>
+              )}
+              <Button type="submit" className="w-full" loading={submitting}>
+                Sign in
+              </Button>
+            </form>
+            {config.apiMock && (
+              <div data-testid="demo-hint" className="rounded-md border border-border bg-surface-2 p-3 text-xs text-muted">
+                <p className="font-medium text-foreground">Demo users (password demo123)</p>
+                <ul className="mt-1 space-y-0.5">
+                  {DEMO_USERS.map((u) => (
+                    <li key={u.username}>
+                      <code>{u.username}</code> - {u.role}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </main>
     </div>
   );
 }
