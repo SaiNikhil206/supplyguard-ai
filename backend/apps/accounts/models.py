@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.utils import timezone
 
 from .ids import format_user_id
@@ -27,7 +28,9 @@ class User(AbstractUser):
             models.CheckConstraint(
                 condition=Q(is_superuser=True) | Q(tenant__isnull=False),
                 name="user_tenant_unless_superuser",
-            )
+            ),
+            # 'alice' and 'Alice' can never both exist, even under concurrent creates.
+            models.UniqueConstraint(Lower("username"), name="accounts_user_username_lower_uniq"),
         ]
 
     @property

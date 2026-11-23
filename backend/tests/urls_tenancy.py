@@ -54,6 +54,16 @@ class NarrowedRiskCaseViewSet(RiskCaseViewSet):
         return super().get_queryset().filter(risk_level="LOW")
 
 
+class NarrowedSupplierByErpViewSet(SupplierViewSet):
+    """ERP-keyed lookup (per-tenant key) behind a narrowing queryset."""
+
+    lookup_field = "erp_id"
+    lookup_url_kwarg = "pk"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(name="never-matches")
+
+
 class NoKeyView(APIView):
     """No permission_class and no permission_key: the project default must refuse it."""
 
@@ -62,6 +72,10 @@ class NoKeyView(APIView):
 
 
 urlpatterns = [
+    path(
+        "test/narrowed-suppliers/<str:pk>",
+        NarrowedSupplierByErpViewSet.as_view({"get": "retrieve"}),
+    ),
     path("test/narrowed/<str:pk>", NarrowedRiskCaseViewSet.as_view({"get": "retrieve"})),
     path("test/nokey", NoKeyView.as_view()),
     path("test/any/risk-cases/<str:pk>", AnyAuthRiskCaseViewSet.as_view({"get": "retrieve"})),

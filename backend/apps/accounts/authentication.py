@@ -54,10 +54,13 @@ class ApiKeyAuthentication(BaseAuthentication):
         raw = request.META.get(self.header_meta)
         if not raw:
             return None
-        if failguard.api_key_failures(request) >= settings.AUTH_FAIL_LIMIT_PER_MIN:
-            raise Throttled(wait=failguard.WINDOW)  # before looking at the key at all
+        # The key is looked up FIRST: a valid, active key on an ACTIVE tenant always
+        # authenticates, whatever the failure counter says (egress IPs such as Boomi's are
+        # shared between tenants, so one tenant's bad key must never block the others).
         key = ApiKey.objects.select_related("tenant").filter(key_hash=hash_key(raw)).first()
         if key is None or not key.is_active or key.tenant.status != Tenant.Status.ACTIVE:
+            if failguard.api_key_failures(request) >= settings.AUTH_FAIL_LIMIT_PER_MIN:
+                raise Throttled(wait=failguard.WINDOW)  # a FAILED attempt from a blocked IP
             failguard.record_api_key_failure(request)
             if failguard.should_audit_failure(request, "security.api_key_rejected"):
                 self._audit_rejected(raw)

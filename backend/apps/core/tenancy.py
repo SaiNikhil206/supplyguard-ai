@@ -56,6 +56,10 @@ class TenantScopedMixin:
     def _audit_if_foreign(self, model, value):
         tenant = self.get_request_tenant()
         try:
+            if model._base_manager.filter(
+                **{self.tenant_field: tenant, self.lookup_field: value}
+            ).exists():
+                return  # the requester's OWN row (a per-tenant key such as erp_id): not foreign
             # Only rows of OTHER tenants count: an own row hidden by a narrowing get_queryset()
             # (status filter etc.) is an ordinary 404, not a cross-tenant attempt.
             elsewhere = (

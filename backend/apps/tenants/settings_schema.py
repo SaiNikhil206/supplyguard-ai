@@ -80,6 +80,21 @@ def _check_ordering(rt, errors):
             return
 
 
+def drop_default_exposure(new: dict, old: dict) -> dict:
+    """GET shows the default `exposure_full_scale`, so a client may send it straight back.
+    When it equals the default and was not stored before, it is not a change: leave it out."""
+    rt = new.get("risk_thresholds")
+    old_rt = (old or {}).get("risk_thresholds") or {}
+    if (
+        isinstance(rt, dict)
+        and "exposure_full_scale" not in old_rt
+        and rt.get("exposure_full_scale") == DEFAULT_EXPOSURE_FULL_SCALE
+    ):
+        rt = {k: v for k, v in rt.items() if k != "exposure_full_scale"}
+        new = {**new, "risk_thresholds": rt}
+    return new
+
+
 def validate_tenant_settings(data, partial: bool = False, current: dict | None = None) -> dict:
     """Return the cleaned settings dict or raise `ValidationError`.
 

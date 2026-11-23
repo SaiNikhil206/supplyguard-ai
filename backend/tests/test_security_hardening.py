@@ -53,14 +53,40 @@ def test_429_for_api_keys_has_rate_limited_code():
     assert r.json()["error"]["code"] == "RATE_LIMITED"
 
 
-def test_valid_key_from_another_ip_unaffected_but_blocked_ip_is_blocked(tenant_a):
-    good = api_key_client(tenant_a)
-    raw = good._credentials["HTTP_X_API_KEY"]
-    post_bad_keys(35)
-    other = APIClient().get(ME, HTTP_X_API_KEY=raw, REMOTE_ADDR="10.0.0.2")
-    assert other.status_code == 403  # authenticated as SYSTEM, then refused by the matrix
-    blocked = APIClient().get(ME, HTTP_X_API_KEY=raw, REMOTE_ADDR="10.0.0.1")
-    assert blocked.status_code == 429  # refused before the key is even checked
+@override_settings(ROOT_URLCONF="tests.urls_auth")
+def test_blocked_ip_still_accepts_a_valid_key_but_429s_a_wrong_one(tenant_a):
+    """Egress IPs (Boomi) are shared between tenants: a valid key always authenticates."""
+    raw = api_key_client(tenant_a)._credentials["HTTP_X_API_KEY"]
+    post_bad_keys(35)  # 10.0.0.1 is now over the failure limit
+    from apps.accounts import failguard
+
+    def failures():
+        from django.test import RequestFactory
+
+        return failguard.api_key_failures(RequestFactory().get("/", REMOTE_ADDR="10.0.0.1"))
+
+    before = failures()
+    for _ in range(5):
+        ok = APIClient().get("/test/whoami", HTTP_X_API_KEY=raw, REMOTE_ADDR="10.0.0.1")
+        assert ok.status_code == 200 and ok.json()["role"] == "SYSTEM"
+    assert failures() == before  # valid requests are not counted
+    wrong = APIClient().get("/test/whoami", HTTP_X_API_KEY=bad_key(999), REMOTE_ADDR="10.0.0.1")
+    assert wrong.status_code == 429
+    other_ip = APIClient().get("/test/whoami", HTTP_X_API_KEY=bad_key(999), REMOTE_ADDR="10.0.0.2")
+    assert other_ip.status_code == 401
+
+
+@override_settings(ROOT_URLCONF="tests.urls_auth")
+def test_revoked_key_retry_loop_does_not_block_other_tenants_on_the_same_ip(tenant_a, tenant_b):
+    revoked = api_key_client(tenant_a)
+    good = api_key_client(tenant_b)
+    from apps.accounts.models import ApiKey
+
+    ApiKey.objects.filter(tenant=tenant_a).update(is_active=False)
+    for _ in range(40):
+        revoked.get("/test/whoami", REMOTE_ADDR="10.9.9.9")
+    r = good.get("/test/whoami", REMOTE_ADDR="10.9.9.9")
+    assert r.status_code == 200 and r.json()["tenant"] == "TEN-B"
 
 
 def test_spoofed_forwarded_for_does_not_escape_the_failure_counter():
