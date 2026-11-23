@@ -1,11 +1,14 @@
 import '@testing-library/jest-dom/vitest';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { server } from '@/mocks/server';
 import { clearTokens } from '@/api/tokens';
 import { resetMockState } from '@/mocks/fixtures';
 import { resetApprovalsMock } from '@/mocks/approvals';
 import { resetAdminSettingsMock } from '@/mocks/admin/settings';
+
+// Route pages are lazy-loaded (code-split), so the first render of a page includes a dynamic import.
+configure({ asyncUtilTimeout: 5000 });
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());

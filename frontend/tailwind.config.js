@@ -49,9 +49,10 @@ export default {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
+      // v2: cards carry no shadow. `soft` is kept as a no-op alias; `lift` is a popover-grade shadow-sm.
       boxShadow: {
-        soft: '0 1px 2px 0 hsl(var(--shadow) / 0.05), 0 1px 3px 0 hsl(var(--shadow) / 0.06)',
-        lift: '0 4px 12px -2px hsl(var(--shadow) / 0.10), 0 2px 4px -2px hsl(var(--shadow) / 0.06)',
+        soft: 'none',
+        lift: '0 1px 2px 0 rgb(15 23 42 / 0.06), 0 1px 3px 0 rgb(15 23 42 / 0.08)',
       },
     },
   },

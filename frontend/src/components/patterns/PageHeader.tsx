@@ -20,14 +20,14 @@ export function PageHeader({ eyebrow, title, description, actions, meta, classNa
         className,
       )}
     >
-      <div className="min-w-0 space-y-1.5">
+      <div className="min-w-0 space-y-1">
         {(eyebrow || meta) && (
           <div className="flex items-center gap-3">
-            {eyebrow && <p className="text-xs font-semibold uppercase tracking-wider text-primary">{eyebrow}</p>}
+            {eyebrow && <p className="text-xs font-medium text-muted">{eyebrow}</p>}
             {meta}
           </div>
         )}
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">{title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
         {description && <p className="text-sm text-muted">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}

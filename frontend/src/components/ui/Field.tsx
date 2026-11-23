@@ -9,7 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const control =
-  'block h-10 w-full rounded-md border bg-card px-3 py-2 text-sm text-foreground shadow-soft transition-colors placeholder:text-muted ' +
+  'block h-9 w-full rounded-md border bg-card px-3 py-1.5 text-sm text-foreground transition-colors duration-150 placeholder:text-muted ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

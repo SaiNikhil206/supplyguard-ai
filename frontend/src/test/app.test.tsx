@@ -67,6 +67,14 @@ describe('app shell (authenticated)', () => {
     for (const g of ['Monitor', 'Decide', 'Govern']) expect(nav).toHaveTextContent(g);
   });
 
+  it('breadcrumb shows real page names, not initials', async () => {
+    renderWithProviders({ path: '/risk/RC-000045' });
+    const crumb = await screen.findByRole('navigation', { name: 'Location' });
+    expect(crumb).toHaveTextContent('Risk');
+    expect(crumb).toHaveTextContent('RC-000045');
+    expect(crumb).not.toHaveTextContent('Workspace');
+  });
+
   it('shows NotFound for unknown path', async () => {
     renderWithProviders({ path: '/nope' });
     expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeInTheDocument();

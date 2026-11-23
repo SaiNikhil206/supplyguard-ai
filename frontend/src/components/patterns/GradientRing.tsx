@@ -1,21 +1,16 @@
 import type { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
 
 export interface GradientRingProps {
   children: ReactNode;
-  /** Tailwind gradient colour classes; defaults to the primary ring. */
+  /** Ignored (v2 removed gradient rings). Kept so existing callers compile. */
   gradient?: string;
-  /** Border radius class; defaults to rounded-2xl. */
+  /** Ignored. */
   radius?: string;
+  /** Ignored. */
   className?: string;
 }
 
-/** 1px gradient ring wrapper for important cards / avatars. */
-export function GradientRing({
-  children,
-  gradient = 'from-primary/50 via-border to-transparent',
-  radius = 'rounded-2xl',
-  className,
-}: GradientRingProps) {
-  return <div className={cn('bg-gradient-to-br p-px', radius, gradient, className)}>{children}</div>;
+/** @deprecated v2 no-op: renders its children unchanged. Remove usages when restyling screens. */
+export function GradientRing({ children }: GradientRingProps) {
+  return <>{children}</>;
 }

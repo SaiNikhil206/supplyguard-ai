@@ -3,83 +3,85 @@
 @tailwind utilities;
 
 /*
- * Design tokens (shadcn convention): space-separated HSL triples, consumed as hsl(var(--x) / <alpha>).
- * Palette: refined indigo primary on cool slate neutrals. All text/background pairs are >= 4.5:1.
- * Legacy semantic tokens (success/warning/danger/info/sev-*) are kept and re-tuned per theme.
+ * Design tokens v2 (docs/DESIGN_DIRECTION.md): Minimalism & Swiss. Premium light by default.
+ * shadcn convention: space-separated HSL triples, consumed as hsl(var(--x) / <alpha>).
+ * One accent (blue-600). Slate neutrals, 1px hairlines, no card shadows.
+ * Semantic text tokens (success/warning/danger/info/sev-*) use the -700 shades in light and -400 in dark so
+ * they are AA as text; tints are built as <token>/10 backgrounds. `node scripts/check-contrast.mjs` verifies.
+ * `muted-text` is the muted TEXT colour (text-muted); muted fills are `surface-2`.
  */
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 224 40% 11%;
+    --background: 210 40% 98%; /* #F8FAFC */
+    --foreground: 222 47% 11%; /* #0F172A */
     --card: 0 0% 100%;
-    --card-foreground: 224 40% 11%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 40% 11%;
-    --primary: 243 75% 55%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%; /* #2563EB */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 16% 93%;
-    --secondary-foreground: 224 30% 20%;
-    --surface-2: 220 18% 95%;
-    --muted-text: 220 9% 38%;
-    --accent: 243 100% 96%;
-    --accent-foreground: 243 55% 34%;
-    --destructive: 0 72% 42%;
+    --secondary: 210 40% 96%; /* #F1F5F9 */
+    --secondary-foreground: 222 47% 11%;
+    --surface-2: 210 40% 96%; /* #F1F5F9 muted fill */
+    --muted-text: 215 19% 35%; /* #475569 */
+    --accent: 214 100% 97%; /* #EFF6FF soft blue */
+    --accent-foreground: 224 76% 40%; /* blue-800-ish */
+    --destructive: 0 72% 51%; /* #DC2626 */
     --destructive-foreground: 0 0% 100%;
-    --border: 220 14% 89%;
-    --input: 220 14% 80%;
-    --ring: 243 75% 55%;
-    --radius: 0.75rem;
-    --shadow: 224 40% 11%;
+    --border: 214 32% 91%; /* #E2E8F0 */
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    --radius: 0.5rem;
 
-    --success: 142 76% 24%;
-    --warning: 30 95% 29%;
-    --danger: 0 72% 40%;
-    --info: 201 96% 28%;
-    --sev-low: 142 76% 24%;
-    --sev-medium: 36 95% 27%;
-    --sev-high: 20 90% 34%;
-    --sev-critical: 0 72% 40%;
+    --success: 142 72% 25%; /* green-800 */
+    --warning: 26 90% 30%; /* amber-800 */
+    --danger: 0 74% 42%; /* red-700 */
+    --info: 224 76% 48%; /* blue-700 */
+    --sev-low: 142 72% 25%;
+    --sev-medium: 26 90% 30%;
+    --sev-high: 17 88% 40%; /* orange-700 */
+    --sev-critical: 0 74% 42%;
 
-    --sidebar: 224 40% 11%;
-    --sidebar-fg: 220 20% 86%;
-    --sidebar-muted: 220 14% 64%;
+    /* Sidebar is a white surface in v2 */
+    --sidebar: 0 0% 100%;
+    --sidebar-fg: 215 25% 27%; /* slate-700 */
+    --sidebar-muted: 215 19% 35%;
     color-scheme: light;
   }
 
   .dark {
-    --background: 224 30% 8%;
-    --foreground: 220 20% 94%;
-    --card: 224 26% 11%;
-    --card-foreground: 220 20% 94%;
-    --popover: 224 26% 12%;
-    --popover-foreground: 220 20% 94%;
-    --primary: 238 90% 74%;
-    --primary-foreground: 224 40% 10%;
-    --secondary: 224 20% 17%;
-    --secondary-foreground: 220 20% 90%;
-    --surface-2: 224 22% 15%;
-    --muted-text: 220 14% 70%;
-    --accent: 238 40% 20%;
-    --accent-foreground: 238 90% 85%;
-    --destructive: 0 84% 70%;
-    --destructive-foreground: 224 40% 10%;
-    --border: 224 18% 21%;
-    --input: 224 16% 28%;
-    --ring: 238 90% 74%;
-    --shadow: 0 0% 0%;
+    --background: 222 84% 5%; /* #020617 */
+    --foreground: 210 40% 96%;
+    --card: 222 47% 11%; /* #0F172A */
+    --card-foreground: 210 40% 96%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 217 91% 60%; /* #3B82F6 */
+    --primary-foreground: 222 47% 8%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
+    --surface-2: 217 33% 17%; /* #1E293B */
+    --muted-text: 215 20% 65%; /* #94A3B8 */
+    --accent: 217 50% 20%;
+    --accent-foreground: 213 94% 78%;
+    --destructive: 0 91% 71%;
+    --destructive-foreground: 222 47% 8%;
+    --border: 217 33% 20%;
+    --input: 217 33% 24%;
+    --ring: 217 91% 60%;
 
-    --success: 142 70% 56%;
-    --warning: 38 95% 60%;
-    --danger: 0 90% 72%;
-    --info: 199 90% 64%;
-    --sev-low: 142 70% 56%;
-    --sev-medium: 48 96% 60%;
-    --sev-high: 25 95% 66%;
-    --sev-critical: 0 90% 72%;
+    --success: 142 69% 58%;
+    --warning: 43 96% 56%;
+    --danger: 0 91% 71%;
+    --info: 213 94% 68%;
+    --sev-low: 142 69% 58%;
+    --sev-medium: 43 96% 56%;
+    --sev-high: 27 96% 61%;
+    --sev-critical: 0 91% 71%;
 
-    --sidebar: 224 30% 7%;
-    --sidebar-fg: 220 20% 86%;
-    --sidebar-muted: 220 14% 64%;
+    --sidebar: 222 47% 11%;
+    --sidebar-fg: 214 32% 85%;
+    --sidebar-muted: 215 20% 65%;
     color-scheme: dark;
   }
 
@@ -92,7 +94,7 @@
   }
 
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background font-sans text-sm text-foreground antialiased;
   }
 
   h1,
@@ -101,10 +103,19 @@
     @apply tracking-tight;
   }
 
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='tab'],
+  [role='menuitem'],
+  summary,
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+
   /* Native <select> chevron (slate-500 reads on both themes) */
   select.sg-select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.6rem center;
     padding-right: 2rem;
