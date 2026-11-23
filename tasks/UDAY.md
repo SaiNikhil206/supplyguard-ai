@@ -72,7 +72,7 @@
 - **Notes:** -
 
 ### U-05: Audit service + correlation-id middleware
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S1 (24-26 Nov) | **Est:** 1d | **Depends:** U-03
 - **Branch:** `uday/U-05-audit`
 - **Model hint:** sonnet / medium
@@ -81,7 +81,7 @@
   - [ ] Correlation id visible in response headers and in audit rows
   - [ ] Audit rows are append-only (no update/delete API)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** STARTED 2026-11-23 on branch uday/U-05-audit cut from `uday/U-03-core-models` (AuditEvent exists only there). DEPENDENCY CATCH: do NOT set this task to `review` before U-03 is approved/merged - auto-merge would drag the unapproved U-03 branch (incl. CONTRACTS section 10 draft) into collaboration. PLAN (piece | runs as | model/effort | branch): audit service `record()` + correlation-id middleware + log filter + JSON 404/500 handlers + `GET /audit` + tests | implementer | sonnet/medium | `uday/U-05-audit--audit`; review (tenant scoping, secrets in logs/audit data, append-only) | subagent reviewer | opus/high | -; verification | subagent test-runner | haiku/low | -. DESIGN: `record(actor, action, entity, correlation_id=None, data=None, tenant=None)`: actor = User -> `USR-<n>` (apps.accounts.ids) | 'SYSTEM' | string; entity = model instance (type = class name, id = erp_id or pk) or (type, id) tuple; tenant from the entity or the actor; correlation id defaults to the request's (ContextVar set by the middleware); `data` is redacted (keys like password/token/secret/api_key/authorization) before storing. Middleware: accepts a valid UUID in `X-Correlation-ID` (any version, normalised), else generates a v4; sets request.correlation_id + the ContextVar, echoes the header on EVERY response incl. errors; log filter adds it to every log line. Handlers: JSON 404/500 with the CONTRACTS s1 body for /api/ paths (agenda D-1.6, Uday's section). `GET /api/v1/audit?entity_type=&action=&from=&to=&correlation_id=` tenant-scoped from the authenticated user's tenant (never from the query), null-tenant rows never returned, paginated, newest first; read-only (no write routes); role gating is a placeholder (any authenticated user with a tenant) until U-04's permission matrix (agenda D-2.6 suggests ADMIN + PROCUREMENT_MANAGER, not yet approved).
 
 ### U-06: Event intake + Boomi client (Django `apps/integrations`)
 - **Status:** todo
