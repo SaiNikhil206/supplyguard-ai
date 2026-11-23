@@ -45,7 +45,7 @@
 - **Notes:** Verified with Docker (Postgres 16): `/api/health` -> `{"status":"ok","db":"ok"}`, `/api/schema/` -> 200; pytest (17 tests) + ruff green. Review follow-ups done: compose passes `.env` through (`env_file`, optional); no compose default for `SECRET_KEY` and an empty value counts as unset (refuses to start with DEBUG=False); compose uses runserver (dev) and the image runs as non-root; `apps.core.exceptions.contract_exception_handler` returns the CONTRACTS section 1 error body (reads `request.correlation_id` once U-05 middleware sets it; Django's own HTML 404 for unknown URLs is not covered); custom `accounts.User` + migration 0001 exist now. If host port 8000 is taken, run `BACKEND_PORT=8001 docker compose up --build backend db`. Tests default to in-memory SQLite (`D:DATABASE_URL` in pyproject); set `DATABASE_URL` to Postgres in CI. AUTH_USER_MODEL is `accounts.User` (U-03 adds tenant FK + role as migration 0002). Anyone who ran the earlier scaffold must run `docker compose down -v` once to recreate the Postgres volume. Health endpoint is `/api/health` (no trailing slash, no tenant data).
 
 ### U-03: Core data model + seed loader
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S0 (21-23 Nov) | **Est:** 2d | **Depends:** U-02, S-01
 - **Branch:** `uday/U-03-core-models`
 - **Model hint:** opus / high for model design review, sonnet / medium implement
@@ -56,7 +56,7 @@
   - [ ] Admin registered for all models
   - [ ] Field names match CONTRACTS / LLD 16.1
 - **Done in:** -
-- **Notes:** Highest-priority task in the team - unblocks R-02, N-04, N-07, N-10, U-06.
+- **Notes:** Highest-priority task in the team - unblocks R-02, N-04, N-07, N-10, U-06. STARTED 2026-11-23 on the 'minimum for U-03' approvals from Roop and Nikhil (docs/CONTRACTS_V1_AGENDA.md section 10, branch uday/S-01-contracts); S-01 full freeze still pending the call, so this task is not blocked on it. PLAN (piece | runs as | model/effort | branch): inventory of field sources per entity (LLD 16.1, frontend types.ts, CONTRACTS, seed JSON, ai schemas) | subagent investigator | haiku/low | -; entity field table = new CONTRACTS section 'Entities' (D-10.1) | advisor, docs only | - | this branch; table review (tenancy, names, indexes) | subagent reviewer | opus/high | -; models + migrations + admin + tests in apps tenants/accounts/core/audit | implementer | sonnet/medium | `uday/U-03-core-models--models`; `manage.py load_seed` idempotent + tests | implementer | sonnet/medium | `uday/U-03-core-models--seed` (after models); Postgres migrate + load_seed twice | subagent test-runner | haiku/low | -; final review | subagent reviewer | opus/high | -. Decisions from the approvals: login body {username, password}; /me flat {id,email,name,role,tenant:{id,name}}; Execution has status PENDING|RUNNING|SUCCEEDED|FAILED + retry_count + error (API derives retryable); Recommendation status PENDING|APPROVED|REJECTED|CHANGES_REQUESTED; no stored supplier disruption_history (UI joins DisruptionEvent to RiskCase); CHANGES_REQUESTED -> case back to ANALYZING is Nikhil's transition().
 
 ### U-04: Auth, tenant isolation, RBAC, users + settings APIs
 - **Status:** todo
