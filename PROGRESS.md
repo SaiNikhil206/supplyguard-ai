@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | R-02 |
-| Nikhil | 0 | 0 | 8 | 0 | 6 | 2 | 0% | N-10 |
+| Nikhil | 0 | 0 | 9 | 0 | 5 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 4 | 0 | 7 | 2 | 8% | U-06 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
 
@@ -41,7 +41,7 @@
 | R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 0/2 | - |
 | U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | todo | 0/2 | - |
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
-| N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | todo | 0/3 | - |
+| N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
 | R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | todo | 0/2 | - |
 | R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | todo | 0/2 | - |
@@ -89,14 +89,17 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-24 | f5f572d | nikhil | N-10 | review | Merge origin/nikhil/N-10-state-machine into N-10 impl |
+| 2026-11-24 | cd78e6b | nikhil | N-10 | review | fix(workflow): N-10 review fixes |
 | 2026-11-24 | 1df1767 | nikhil | N-11 | review | merge: N-11 What-if simulator backend (auto-merge) |
+| 2026-11-24 | f744c2f | nikhil | N-10 | review | merge: N-10 design + impl into task branch |
 | 2026-11-24 | dccc95d | nikhil | N-11 | review | merge: N-11 review fixes into task branch |
 | 2026-11-24 | 71a7db1 | nikhil | N-11 | review | fix(intelligence): N-11 review fixes |
 | 2026-11-24 | 24c8b61 | nikhil | N-10 | review | chore(workflow): package markers for management command |
 | 2026-11-24 | 920213b | nikhil | N-10 | review | feat(workflow): RiskCase state machine, decision API, execution services |
 | 2026-11-24 | 1154c4b | nikhil | N-11 | review | merge: N-11 what-if piece into task branch |
-| 2026-11-24 | 7448ba3 | nikhil | N-04 | review | merge: N-04 Deterministic impact + risk scoring engine (auto-merge) |
 | 2026-11-24 | 5fe6e58 | nikhil | N-04 | review | merge: N-04 service review fixes into task branch |
+| 2026-11-24 | 7448ba3 | nikhil | N-04 | review | merge: N-04 Deterministic impact + risk scoring engine (auto-merge) |
 | 2026-11-23 | 59e328b | roop | R-10 | in-progress | fix(frontend): accurate exposure chart aria-label |
 | 2026-11-23 | a149d51 | roop | R-10 | in-progress | chore: untrack stray .claude/launch.json from v2-insight |
 | 2026-11-23 | 1627a37 | roop | R-10 | in-progress | Merge origin/roop/R-10-polish--v2-risk into roop/R-10-polish |
@@ -106,6 +109,3 @@
 | 2026-11-23 | 937d5fa | roop | R-10 | in-progress | feat(frontend): v2 restyle of risk, recommendations and approvals screens |
 | 2026-11-23 | 3b636de | nikhil | N-11 | review | feat(intelligence): what-if simulator endpoints (POST /what-if, /risk-cases/{id}/what-if) |
 | 2026-11-23 | e63045b | roop | R-10 | in-progress | style(frontend): v2 restyle of what-if, integrations, audit, settings, 404 |
-| 2026-11-23 | d642a35 | nikhil | N-10 | in-progress | docs(workflow): N-10 state machine + decision API design spec |
-| 2026-11-23 | 0c82129 | nikhil | N-04 | review | fix(intelligence): N-04 service review fixes |
-| 2026-11-23 | aefd47c | uday | U-04 | review | merge: U-04 Auth, tenant isolation, RBAC, users + settings APIs (auto-merge) |

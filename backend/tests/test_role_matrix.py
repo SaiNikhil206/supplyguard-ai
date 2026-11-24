@@ -65,7 +65,16 @@ ROUTES = {
     "users.write": (API + "users", _user_body),
     "audit.read": (API + "audit", None),
     # An id that does not exist: wrong roles get 403 before the lookup, the allowed role reaches
-    # the lookup and gets 404 (see }
+    # the lookup and gets 404 (see EXTRA_OK). Real decision flows: test_workflow_decision_api.py.
+    "recommendations.decision": (
+        API + "recommendations/REC-NONE/decision",
+        lambda: {"decision": "APPROVE"},
+    ),
+    "what-if": (
+        API + "what-if",
+        lambda: {"supplier_id": "SUP-1008", "duration_days": 2, "event_type": "FACTORY_OUTAGE"},
+    ),
+}
 EXTRA_OK = {"recommendations.decision": {404}}  # allowed role + unknown id
 
 
