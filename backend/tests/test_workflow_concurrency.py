@@ -1,9 +1,11 @@
 """Concurrency (WORKFLOW_DESIGN.md s5.5). Needs real row locks, so Postgres only:
     DATABASE_URL=postgres://... python -m pytest tests/test_workflow_concurrency.py
 Skipped on SQLite."""
+import importlib
 import threading
 
 import pytest
+from django.apps import apps as django_apps
 from django.db import connection, connections
 
 from apps.audit.models import AuditEvent
@@ -19,6 +21,14 @@ pytestmark = [
     pytest.mark.usefixtures("fake_triggers"),
     pytest.mark.skipif(connection.vendor != "postgresql", reason="needs Postgres row locks"),
 ]
+
+
+@pytest.fixture(autouse=True)
+def _reseed_id_sequences(transactional_db):
+    """transaction=True tests flush the DB, which wipes the IdSequence rows that data migration
+    core/0002 creates; recreate them with the migration's own function before each test."""
+    migration = importlib.import_module("apps.core.migrations.0002_seed_id_sequences")
+    migration.create_sequences(django_apps, None)
 
 
 def run_parallel(*jobs):
