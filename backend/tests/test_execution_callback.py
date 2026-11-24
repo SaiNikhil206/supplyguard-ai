@@ -56,15 +56,26 @@ def send(client, execution_id, body):
 
 
 # --- success / failure rules -------------------------------------------------------------------
-def test_succeeded_requires_verified_true(key, execution):
-    for body in (
-        {"status": "SUCCEEDED", "attempt": 1},
-        {"status": "SUCCEEDED", "attempt": 1, "verified": False},
-        {"status": "SUCCEEDED", "attempt": 1, "response_status": 200},
-    ):
-        assert send(key, execution.id, body).status_code == 400, body
+@pytest.mark.parametrize(
+    "extra", [{}, {"verified": False}, {"response_status": 200}], ids=["missing", "false", "status"]
+)
+def test_unverified_success_is_converted_to_a_business_failure(key, execution, extra):
+    """Not a 400 (that would strand the execution RUNNING): N-10's rule, FAILED / BUSINESS."""
+    response = send(key, execution.id, {"status": "SUCCEEDED", "attempt": 1, **extra})
+    assert response.status_code == 200, response.content
+    body = response.json()
+    assert body["status"] == "FAILED" and body["error_class"] == "BUSINESS"
+    assert body["case_status"] == "EXECUTION_FAILED" and body["retryable"] is False
     execution.refresh_from_db()
-    assert execution.status == "RUNNING" and case_status(execution) == S.EXECUTING
+    assert execution.status == "FAILED" and execution.error == "ERP change not verified"
+    assert case_status(execution) == S.EXECUTION_FAILED
+    # the same callback again is an identical repeat
+    again = send(key, execution.id, {"status": "SUCCEEDED", "attempt": 1, **extra})
+    assert again.status_code == 200
+
+
+def test_verified_must_be_a_boolean(key, execution):
+    assert send(key, execution.id, {**VERIFIED_OK, "verified": "maybe"}).status_code == 400
 
 
 def test_attempt_is_required_and_positive(key, execution):

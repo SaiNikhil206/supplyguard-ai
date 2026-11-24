@@ -239,7 +239,6 @@ class RiskCaseCallbackView(APIView):
             _tenant(request),
             serializer.validated_data["event_id"],
             data["snapshot"],  # as received (money strings unchanged)
-            serializer.validated_data["snapshot"]["captured_at"],
             actor=request.user,
         )
         return Response(result.body, status=result.http_status)

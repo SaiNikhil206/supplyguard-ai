@@ -36,6 +36,12 @@ class SnapshotSerializer(serializers.Serializer):
     shipments = _row_list()
     supplier_history = _row_list()
 
+    def validate_purchase_orders(self, rows):
+        ids = [r.get("po_id") for r in rows if isinstance(r.get("po_id"), str)]
+        if len(ids) != len(set(ids)):
+            raise serializers.ValidationError("Duplicate po_id in purchase_orders.")
+        return rows
+
     def to_internal_value(self, data):
         if isinstance(data, dict):
             unknown = sorted(set(data) - SNAPSHOT_KEYS)
@@ -66,6 +72,7 @@ class RiskCaseCreatedSerializer(serializers.Serializer):
     data_quality_flags = serializers.ListField(child=serializers.CharField(), required=False)
     correlation_id = serializers.UUIDField(required=False)
     flagged = serializers.BooleanField(required=False)
+    no_impact = serializers.BooleanField(required=False)
 
 
 class ExecutionResultRequestSerializer(serializers.Serializer):
@@ -82,12 +89,9 @@ class ExecutionResultRequestSerializer(serializers.Serializer):
     error_class = serializers.ChoiceField(choices=ERROR_CLASSES, required=False, allow_null=True)
 
     def validate(self, attrs):
-        if attrs["status"] == "SUCCEEDED":
-            if attrs.get("verified") is not True:
-                raise serializers.ValidationError(
-                    {"verified": ["SUCCEEDED requires verified=true (the ERP re-read)."]}
-                )
-        else:
+        # SUCCEEDED without verified=true is NOT an error here: the service turns it into
+        # FAILED / BUSINESS so the execution is never stranded (see executions.py).
+        if attrs["status"] == "FAILED":
             errors = {}
             if not attrs.get("error_class"):
                 errors["error_class"] = ["FAILED requires error_class."]
