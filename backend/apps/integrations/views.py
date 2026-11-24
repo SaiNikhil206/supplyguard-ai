@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from apps.accounts.models import User
 from apps.accounts.permissions import NO_TENANT_MESSAGE
 from apps.core.models import DisruptionEvent
-from apps.core.models.sequences import next_id
+from apps.core.models.sequences import IdSequence, next_id
 
 from . import boomi
 from .callback_serializers import (
@@ -32,6 +32,7 @@ from .serializers import (
     SimulateResponseSerializer,
 )
 from .services import intake_event
+from .throttles import CredentialScopedThrottle
 
 HEALTH_CACHE_SECONDS = 10
 
@@ -56,6 +57,8 @@ class EventIntakeView(APIView):
     """Disruption events from Boomi (API key) or an ADMIN. The tenant is the credential's."""
 
     permission_key = "events.create"
+    throttle_classes = [CredentialScopedThrottle]
+    throttle_scope = "events"
 
     @extend_schema(
         summary="Receive a canonical disruption event (idempotent on event_id)",
@@ -72,6 +75,17 @@ class EventIntakeView(APIView):
             request_correlation_id=_request_correlation_id(request),
         )
         return Response(result.body, status=result.http_status)
+
+
+def fresh_simulated_event_id(tenant) -> str:
+    """Next EVT-9xxxxx id (reserved for simulation) this tenant does not have yet. The sequence
+    row is recreated at 900000 if it is missing."""
+    IdSequence.objects.get_or_create(prefix="EVT", defaults={"last_value": 900000})
+    for _ in range(1000):
+        candidate = next_id("EVT", 6)
+        if not DisruptionEvent.objects.filter(tenant=tenant, event_id=candidate).exists():
+            return candidate
+    raise RuntimeError("could not find a free simulation event id")
 
 
 def load_scenario(name: str) -> dict:
@@ -94,6 +108,8 @@ class SimulateDisruptionView(APIView):
     """ADMIN demo trigger: replays a scenario file through the same intake as the endpoint."""
 
     permission_key = "demo.simulate"
+    throttle_classes = [CredentialScopedThrottle]
+    throttle_scope = "simulate"
 
     @extend_schema(
         summary="Replay a demo scenario as a disruption event for the caller's tenant",
@@ -112,7 +128,7 @@ class SimulateDisruptionView(APIView):
         if override:
             event["event_time"] = override.isoformat()
         if params.validated_data.get("fresh_event_id", True):
-            event["event_id"] = next_id("EVT", 6)
+            event["event_id"] = fresh_simulated_event_id(tenant)
             event.pop("correlation_id", None)  # every simulated run is its own flow
 
         try:
@@ -223,7 +239,6 @@ class RiskCaseCallbackView(APIView):
             _tenant(request),
             serializer.validated_data["event_id"],
             data["snapshot"],  # as received (money strings unchanged)
-            serializer.validated_data["snapshot"]["captured_at"],
             actor=request.user,
         )
         return Response(result.body, status=result.http_status)

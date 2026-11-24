@@ -54,7 +54,7 @@ def test_transient_status_retried_up_to_cap_then_transient_error(status):
 def test_timeouts_and_connection_errors_are_retried(exc):
     rec = Recorder([exc])
     with pytest.raises(BoomiError) as err:
-        make_client(rec).publish_event(EVENT, CID)
+        make_client(rec, max_retries=2).publish_event(EVENT, CID)
     assert rec.calls == 3
     assert err.value.kind == boomi.TRANSIENT and err.value.status is None
 
@@ -100,10 +100,20 @@ def test_other_5xx_is_downstream_and_not_retried(status):
 
 
 def test_redirect_is_not_followed():
-    rec = Recorder([302])
+    seen = []
+
+    def handler(request):
+        seen.append(request)
+        return httpx.Response(302, headers={"Location": "https://evil.example/steal"})
+
+    client = BoomiClient(
+        base_url=BASE, api_key=SECRET, transport=httpx.MockTransport(handler), sleep=lambda s: None
+    )
     with pytest.raises(BoomiError) as err:
-        make_client(rec).publish_event(EVENT, CID)
-    assert rec.calls == 1 and err.value.kind == boomi.DOWNSTREAM
+        client.publish_event(EVENT, CID)
+    assert err.value.kind == boomi.DOWNSTREAM
+    assert len(seen) == 1  # exactly one request in total
+    assert all(r.url.host != "evil.example" for r in seen)  # the key never left
 
 
 def test_not_configured():

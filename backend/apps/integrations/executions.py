@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 PAYLOAD_MAX_BYTES = 20 * 1024
 PREVIEW_CHARS = 16 * 1024
 ERROR_MAX_CHARS = 2000
+UNVERIFIED_ERROR = "ERP change not verified"
 _SECRET_IN_TEXT = re.compile(
     r"(?i)\b(password|passwd|secret|token|api[_-]?key|authorization)\b(\s*[=:]\s*)\S+"
 )
@@ -85,15 +86,20 @@ def apply_execution_result(tenant, execution_id, data, actor="SYSTEM") -> CaseRe
     Execution update and the case move (RECOVERED / EXECUTION_FAILED) in one transaction."""
     from apps.workflow.services import record_execution_result
 
-    failed = data["status"] == "FAILED"
+    outcome, error_class, error = data["status"], data.get("error_class"), data.get("error")
+    if outcome == "SUCCEEDED" and data.get("verified") is not True:
+        # The ERP re-read did not confirm the change: N-10 treats an unverified success as
+        # FAILED / BUSINESS (not retryable). A 400 here would leave the execution RUNNING.
+        outcome, error_class, error = "FAILED", "BUSINESS", UNVERIFIED_ERROR
+    failed = outcome == "FAILED"
     # outside any transaction: the cross-tenant audit row must survive the 404
     execution = _find_execution(tenant, execution_id)
     record_execution_result(
         execution,
-        outcome=data["status"],
+        outcome=outcome,
         attempt=data["attempt"],
-        error_class=data.get("error_class") if failed else None,
-        error=sanitize_error(data.get("error")) if failed else None,
+        error_class=error_class if failed else None,
+        error=sanitize_error(error) if failed else None,
         response_status=data.get("response_status"),
         response_payload=sanitize_payload(data.get("response_payload")),
         actor=actor,

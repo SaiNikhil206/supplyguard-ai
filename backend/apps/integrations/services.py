@@ -81,7 +81,7 @@ def _accepted_body(event: DisruptionEvent, risk_case_id=None) -> dict:
     }
 
 
-def _duplicate(tenant, event, actor, risk_case_id=None) -> IntakeResult:
+def _duplicate(tenant, event, actor, risk_case_id=None, republish=True) -> IntakeResult:
     record(
         actor,
         "event.duplicate",
@@ -89,6 +89,15 @@ def _duplicate(tenant, event, actor, risk_case_id=None) -> IntakeResult:
         correlation_id=event.correlation_id,
         tenant=tenant,
     )
+    # An event whose publish never succeeded is sent again (the Idempotency-Key makes that
+    # safe). A PUBLISHED event, or one with an unknown supplier (nothing to send), is not.
+    if (
+        republish
+        and event.supplier_id is not None
+        and not event.needs_data_correction
+        and event.publish_status != DisruptionEvent.PublishStatus.PUBLISHED
+    ):
+        _publish(tenant, actor, event)
     return IntakeResult(200, _accepted_body(event, risk_case_id or _risk_case_id(event)))
 
 
@@ -172,7 +181,7 @@ def intake_event(*, tenant, actor, payload, request_correlation_id) -> IntakeRes
         winner = DisruptionEvent.objects.filter(tenant=tenant, event_id=event_id).first()
         if winner is None:
             raise
-        return _duplicate(tenant, winner, actor)
+        return _duplicate(tenant, winner, actor, republish=False)
 
     body = _accepted_body(event)
 

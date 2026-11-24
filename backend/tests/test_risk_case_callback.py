@@ -108,10 +108,9 @@ def test_demo_scenario_end_to_end(key, acme):
     assert case.snapshot == snapshot  # as received, money strings unchanged
     assert case.snapshot["purchase_orders"][0]["lines"][0]["unit_price"]["amount"] == "75.60"
     assert case.snapshot_captured_at.isoformat() == "2026-12-02T10:16:00+00:00"
-    assert case.title == "FACTORY_OUTAGE at Shakti Components Pvt Ltd"
-    assert case.impact_summary == (
-        f"2 POs affected, exposure 491400.00 INR, risk {case.risk_level} ({case.risk_score})"
-    )
+    # title and summary are N-04's (apps.intelligence.services.create_risk_case)
+    assert case.title.startswith("Shakti Components Pvt Ltd: FACTORY_OUTAGE affects 2")
+    assert "491400.00" in case.impact_summary and "INR" in case.impact_summary
 
     # stored impact = the engine result, matches the scenario's expected block
     impact = case.impact
@@ -202,7 +201,7 @@ def test_second_identical_post_is_200_same_case_and_does_not_recompute(key):
     intake(key)
     first = post(key, DEMO["event"]["event_id"], demo_snapshot())
     assert first.status_code == 201
-    with mock.patch("apps.integrations.risk_cases.compute_impact") as engine:
+    with mock.patch("apps.intelligence.services.compute_impact") as engine:
         second = post(key, DEMO["event"]["event_id"], demo_snapshot())
     assert second.status_code == 200
     assert second.json() == first.json()
@@ -218,17 +217,19 @@ def test_lost_race_is_answered_as_the_existing_case(key, acme):
 
     intake(key)
     event = DisruptionEvent.objects.get(event_id=DEMO["event"]["event_id"])
-    real_compute = risk_cases.compute
+    real = risk_cases.create_risk_case
 
-    def compute_then_lose_the_race(tenant, ev, snapshot):
-        result = real_compute(tenant, ev, snapshot)
-        make_case(tenant, event=ev, risk_level="LOW", risk_score=1)  # the other request wins
-        return result
+    def create_after_the_other_request_won(**kw):
+        make_case(kw["tenant"], event=kw["event"], risk_level="LOW", risk_score=1)
+        return real(**kw)  # N-04 sees the winner's case and returns (winner, False)
 
-    with mock.patch.object(risk_cases, "compute", side_effect=compute_then_lose_the_race):
+    with mock.patch.object(
+        risk_cases, "create_risk_case", side_effect=create_after_the_other_request_won
+    ):
         response = post(key, event.event_id, demo_snapshot())
     assert response.status_code == 200
     assert response.json()["risk_score"] == 1  # the winner's case, not ours
+    assert response.json()["status"] == "ANALYZING"  # and it is moved on
     assert RiskCase.objects.count() == 1
     assert AffectedPO.objects.count() == 0 and not audits("risk_case.created").exists()
 
@@ -312,7 +313,7 @@ def test_supplier_omitted_is_also_flagged(key):
 
 
 # --- bad snapshots -----------------------------------------------------------------------------
-def _po(po_id="PO-1", qty=10, currency="INR", tenant_id=None, price="10.00"):
+def _po(po_id="PO-1", qty=10, currency="INR", tenant_id="TEN-ACME", price="10.00"):
     po = {
         "po_id": po_id,
         "supplier_id": "SUP-1008",
@@ -419,3 +420,172 @@ def test_unconfigured_supplier_is_not_needed_for_other_tenant_isolation(acme):
     foreign = api_key_client(other)
     intake(api_key_client(acme))
     assert post(foreign, DEMO["event"]["event_id"], demo_snapshot()).status_code == 404
+
+
+# --- N-04 checks (review M1) -------------------------------------------------------------------
+def _expect_400_and_nothing_written(key, snapshot, *, echo=()):
+    response = post(key, DEMO["event"]["event_id"], snapshot)
+    assert response.status_code == 400, response.content
+    text = response.content.decode()
+    for value in echo:
+        assert value not in text
+    assert RiskCase.objects.count() == 0 and AffectedPO.objects.count() == 0
+    assert not DisruptionEvent.objects.get().needs_data_correction
+    return response
+
+
+def test_snapshot_rows_without_tenant_id_are_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    del snapshot["purchase_orders"][0]["tenant_id"]
+    _expect_400_and_nothing_written(key, snapshot)
+    snapshot = demo_snapshot()
+    del snapshot["inventory"][0]["tenant_id"]
+    _expect_400_and_nothing_written(key, snapshot)
+    snapshot = demo_snapshot()
+    del snapshot["supplier"]["tenant_id"]
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+def test_snapshot_supplier_must_be_the_events_supplier(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["supplier"]["supplier_id"] = "SUP-1015"
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+@pytest.mark.parametrize("field", ["shipments", "supplier_history"])
+def test_foreign_or_missing_tenant_in_shipments_and_history_is_400(key, field):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot[field] = [{"tenant_id": "TEN-OTHER", "id": "X-1"}]
+    _expect_400_and_nothing_written(key, snapshot, echo=("TEN-OTHER",))
+    snapshot[field] = [{"id": "X-1"}]
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+def test_shipments_and_history_of_this_tenant_are_stored_with_the_snapshot(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["shipments"] = [{"tenant_id": "TEN-ACME", "shipment_id": "SHP-1"}]
+    snapshot["supplier_history"] = [{"tenant_id": "TEN-ACME", "kind": "x"}]
+    assert post(key, DEMO["event"]["event_id"], snapshot).status_code == 201
+    assert RiskCase.objects.get().snapshot["shipments"][0]["shipment_id"] == "SHP-1"
+
+
+def test_no_affected_pos_is_200_without_case_and_event_not_flagged(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["purchase_orders"] = []
+    response = post(key, DEMO["event"]["event_id"], snapshot)
+    assert response.status_code == 200
+    assert response.json() == {"risk_case_id": None, "no_impact": True}
+    assert RiskCase.objects.count() == 0
+    assert not DisruptionEvent.objects.get().needs_data_correction
+    assert not audits("event.flagged_data_correction").exists()
+    # a later, complete snapshot still creates the case
+    assert post(key, DEMO["event"]["event_id"], demo_snapshot()).status_code == 201
+
+
+def test_duplicate_po_id_in_purchase_orders_is_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["purchase_orders"] = [snapshot["purchase_orders"][0]] * 2
+    response = post(key, DEMO["event"]["event_id"], snapshot)
+    assert response.status_code == 400
+    assert "po_id" in json.dumps(response.json()["error"]["details"])
+
+
+# --- out-of-range input is a 400, never a 500 (review M2) --------------------------------------
+def _mutate_price(snapshot, amount, qty=4000):
+    line = snapshot["purchase_orders"][0]["lines"][0]
+    line["unit_price"]["amount"] = amount
+    line["qty"] = qty
+
+
+def test_huge_unit_price_is_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    _mutate_price(snapshot, "9999999999999.99")
+    _expect_400_and_nothing_written(key, snapshot, echo=("9999999999999.99",))
+
+
+def test_exposure_that_overflows_the_column_is_400_not_500(key):
+    """Every input is in range but unit_price x qty does not fit Decimal(14, 2)."""
+    intake(key)
+    snapshot = demo_snapshot()
+    _mutate_price(snapshot, "999999999999.99", qty=4000)
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+def test_overlong_po_id_is_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["purchase_orders"][0]["po_id"] = "PO-" + "9" * 41
+    _expect_400_and_nothing_written(key, snapshot, echo=("9" * 41,))
+
+
+def test_overlong_item_id_and_item_name_are_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["purchase_orders"][0]["lines"][0]["item_name"] = "n" * 201
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+def test_bad_currency_is_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["purchase_orders"][0]["lines"][0]["unit_price"]["currency"] = "RUPEES"
+    _expect_400_and_nothing_written(key, snapshot, echo=("RUPEES",))
+    snapshot["purchase_orders"][0]["lines"][0]["unit_price"]["currency"] = "inr"
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+def test_huge_inventory_quantity_is_400(key):
+    intake(key)
+    snapshot = demo_snapshot()
+    snapshot["inventory"][0]["on_hand"] = 10**12
+    _expect_400_and_nothing_written(key, snapshot)
+
+
+def test_database_errors_on_write_become_a_generic_400(key):
+    from django.db import DataError
+
+    intake(key)
+    with mock.patch(
+        "apps.integrations.risk_cases.create_risk_case", side_effect=DataError("numeric overflow")
+    ):
+        response = post(key, DEMO["event"]["event_id"], demo_snapshot())
+    assert response.status_code == 400
+    assert "numeric overflow" not in response.content.decode()
+    assert RiskCase.objects.count() == 0
+
+
+# --- the event row decides (review m13) --------------------------------------------------------
+def test_flag_state_is_read_from_the_locked_row_not_a_stale_lookup(key, acme):
+    """Another callback flagged the event after this request's first lookup: the decision must
+    use the locked, fresh row (409), never create a case on a flagged event."""
+    from apps.integrations import risk_cases
+
+    intake(key)
+    event = DisruptionEvent.objects.get(event_id=DEMO["event"]["event_id"])
+    stale = DisruptionEvent.objects.get(pk=event.pk)  # needs_data_correction False
+    DisruptionEvent.objects.filter(pk=event.pk).update(needs_data_correction=True)
+    with mock.patch.object(risk_cases, "_find_event", return_value=stale):
+        response = post(key, event.event_id, demo_snapshot())
+    assert response.status_code == 409
+    assert RiskCase.objects.count() == 0
+
+
+def test_existing_case_is_read_after_the_lock(key, acme):
+    from apps.integrations import risk_cases
+    from tests.factories import make_case
+
+    intake(key)
+    event = DisruptionEvent.objects.get(event_id=DEMO["event"]["event_id"])
+    stale = DisruptionEvent.objects.get(pk=event.pk)
+    make_case(acme, event=event)  # created by a concurrent callback
+    with mock.patch.object(risk_cases, "_find_event", return_value=stale):
+        response = post(key, event.event_id, {"captured_at": "2026-12-02T10:16:00Z"})
+    assert response.status_code == 200 and response.json()["risk_case_id"] is not None
+    assert not DisruptionEvent.objects.get(pk=event.pk).needs_data_correction
