@@ -1,6 +1,7 @@
 # N-10 Workflow design: RiskCase state machine + decision API
 
-Status: design spec (opus), for the Sonnet implementation session on `nikhil/N-10-state-machine--impl`.
+Status: implemented on `nikhil/N-10-state-machine--impl` (sonnet). Q1-Q3 are decided (section 6); the table below is the
+final 16-edge version (T16 added). `reopen_for_analysis` became `reanalyze_case`.
 Sources: `docs/CONTRACTS.md` s1, s2, s4, s7, s10 (v0.3/v0.4), `docs/BRD_HLD_LLD.md` 16.4, 16.6 to 16.8,
 `backend/apps/core/models/cases.py` (status guard), `apps/accounts/permissions.py` (U-04),
 `apps/core/tenancy.py`, `apps/audit/service.py` (U-05), `apps/core/exceptions.py`.
@@ -19,7 +20,7 @@ ERP-write step, and only after the approval is committed.
 |---|---|
 | `apps/workflow/states.py` | `S = RiskCase.Status` alias, `Trigger` enum, `Edge` dataclass, `TRANSITIONS` table (s1), `is_allowed(frm, to)` |
 | `apps/workflow/exceptions.py` | `WorkflowError` hierarchy (s2.4) |
-| `apps/workflow/services.py` | `transition()` (s2), `actionable_recommendations()`, `record_decision()` (s3), `start_execution()`, `dispatch_execution()`, `retry_execution()`, `record_execution_result()`, `close_case()`, `reopen_for_analysis()` (s4) |
+| `apps/workflow/services.py` | `transition()` (s2), `actionable_recommendations()`, `record_decision()` (s3), `start_execution()`, `dispatch_execution()`, `retry_execution()`, `record_execution_result()`, `close_case()`, `reanalyze_case()` (s4) |
 | `apps/workflow/hooks.py` | `ExecutionRequest`, `ExecutionTrigger` protocol, `AnalysisRequest`, `AnalysisTrigger` protocol, stub implementations, `get_execution_trigger()`, `get_analysis_trigger()` (s4.4) |
 | `apps/workflow/serializers.py` | `DecisionRequestSerializer`, `DecisionResponseSerializer` |
 | `apps/workflow/views.py` | `RecommendationDecisionView` |
@@ -44,12 +45,12 @@ additive and in his files):
 
 Every (from, to) pair listed here is allowed. **Every pair not listed is forbidden**
 (`InvalidTransition`, 409). A move to the current state is the idempotent no-op of s2.3, not an
-edge. 10 states -> 90 ordered pairs of distinct states: 15 allowed, 75 forbidden.
+edge. 10 states -> 90 ordered pairs of distinct states: 16 allowed, 74 forbidden (T16 added by Q3).
 
 Triggers: **SYS-IMPACT** (N-04 service, SYSTEM), **SYS-AGENT** (N-07 analysis persistence, SYSTEM),
 **USER-DECISION** (decision API, a PROCUREMENT_MANAGER user), **SYS-EXEC** (execution start /
 result, SYSTEM), **USER-RETRY** (U-11 retry endpoint, PROCUREMENT_MANAGER), **USER-CASE**
-(close / re-analyse a case, PROCUREMENT_MANAGER; see open question Q2).
+(close: PROCUREMENT_MANAGER or ADMIN; re-analyse a REJECTED case: PROCUREMENT_MANAGER only; Q2).
 
 "Round" below means `case.analysis_round`; "actionable" means a Recommendation of the case with
 `round == case.analysis_round`, `unsupported = False` and `status = PENDING`
@@ -65,13 +66,14 @@ result, SYSTEM), **USER-RETRY** (U-11 retry endpoint, PROCUREMENT_MANAGER), **US
 | T6 | PENDING_APPROVAL -> REJECTED | USER-DECISION / PROCUREMENT_MANAGER | ctx `approval` with `decision == REJECT`, same case and round; and `actionable_recommendations(case).count() == 0` (the rejected one was the last actionable option, see s3.4) | status; audit |
 | T7 | PENDING_APPROVAL -> ANALYZING | USER-DECISION / PROCUREMENT_MANAGER | ctx `approval` with `decision == REQUEST_CHANGES`, same case and round | status; **`analysis_round += 1`**; audit (`from_round`, `to_round`, `comments`); `on_commit`: `AnalysisTrigger.request_analysis(...)` |
 | T8 | REJECTED -> ANALYZING | USER-CASE / PROCUREMENT_MANAGER | none | status; **`analysis_round += 1`**; audit; `on_commit`: `AnalysisTrigger.request_analysis(...)` |
-| T9 | REJECTED -> CLOSED | USER-CASE / PROCUREMENT_MANAGER | `reason` non-blank | status; audit |
+| T9 | REJECTED -> CLOSED | USER-CASE / PROCUREMENT_MANAGER or ADMIN (Q2) | `reason` non-blank | status; audit |
 | T10 | APPROVED -> EXECUTING | SYS-EXEC / SYSTEM | ctx `execution`: `status == PENDING`, `execution.approval.decision == APPROVE`, `execution.approval.risk_case_id == case.pk`, `execution.approval.round == round` | status; audit (`execution_id`) |
 | T11 | EXECUTING -> RECOVERED | SYS-EXEC / SYSTEM | ctx `execution` of this case with `status == SUCCEEDED` (the result was verified by re-reading the PO, TC-07) | status; **`recovered_at = now()`**; audit |
 | T12 | EXECUTING -> EXECUTION_FAILED | SYS-EXEC / SYSTEM | ctx `execution` of this case with `status == FAILED` and `error_class` set | status; audit (`error_class`, `retryable`) |
 | T13 | EXECUTION_FAILED -> EXECUTING | USER-RETRY / PROCUREMENT_MANAGER | ctx `execution` of this case with `execution.retryable` True (FAILED, TRANSIENT/DOWNSTREAM, `retry_count < EXECUTION_MAX_RETRIES`), evaluated **before** `retry_count` is incremented | status; audit (`retry_count` after increment is written by `retry_execution`) |
-| T14 | EXECUTION_FAILED -> CLOSED | USER-CASE / PROCUREMENT_MANAGER | `reason` non-blank | status; audit |
-| T15 | RECOVERED -> CLOSED | USER-CASE / PROCUREMENT_MANAGER | none | status; audit |
+| T14 | EXECUTION_FAILED -> CLOSED | USER-CASE / PROCUREMENT_MANAGER or ADMIN (Q2) | `reason` non-blank | status; audit |
+| T15 | RECOVERED -> CLOSED | USER-CASE / PROCUREMENT_MANAGER or ADMIN | none | status; audit |
+| T16 | ANALYZING -> CLOSED | USER-CASE / PROCUREMENT_MANAGER or ADMIN (Q3) | `reason` non-blank | status; audit |
 
 Notes:
 - "Every APPROVED case has exactly one APPROVE approval in the current round" holds by T5 plus the
@@ -84,8 +86,8 @@ Notes:
   Recommendations are kept per round (history); N-07 overwrites `case.analysis` when the next round
   is validated. The UI filters recommendations by `round == analysis_round`.
 - CLOSED is terminal. RECOVERED is only left by T15.
-- ANALYZING has no exit other than T2: an invalid agent output leaves the case in ANALYZING with an
-  `AgentRun(valid=False)`, and Boomi / N-09 calls the agent again. See Q3.
+- ANALYZING exits are T2 (agents succeed) and T16 (a manual close, Q3). An invalid agent output leaves
+  the case in ANALYZING with an `AgentRun(valid=False)`; Boomi / N-09 calls the agent again.
 
 ### 1.1 Table encoding (`states.py`)
 
@@ -105,11 +107,11 @@ class Edge:
     sets_recovered_at: bool = False
     requests_analysis: bool = False     # on_commit AnalysisTrigger
 
-TRANSITIONS: dict[tuple[str, str], Edge] = {(e.frm, e.to): e for e in [...15 edges...]}
+TRANSITIONS: dict[tuple[str, str], Edge] = {(e.frm, e.to): e for e in [...16 edges...]}
 ```
 
 The table is data; `transition()` has no per-state `if` chains. The test suite imports
-`TRANSITIONS` only to assert it has exactly the 15 pairs of s1 (written out again by hand in the
+`TRANSITIONS` only to assert it has exactly the 16 pairs of s1 (written out again by hand in the
 test, so a change to one side fails).
 
 ---
@@ -480,9 +482,10 @@ class AnalysisTrigger(Protocol):
 
 ### 4.5 Case actions (T8, T9, T14, T15)
 
-`close_case(case, *, actor, reason)` and `reopen_for_analysis(case, *, actor, reason)` are thin
-wrappers over `transition()` (CLOSED / ANALYZING). No HTTP endpoint is defined in N-10 because
-CONTRACTS s4 has none; see Q2.
+`close_case(case, *, actor, reason)` and `reanalyze_case(case, *, actor, reason, comments="")` are
+thin wrappers over `transition()` (CLOSED / ANALYZING). `reanalyze_case` refuses any state but
+REJECTED (409). No HTTP endpoint is defined in N-10 because CONTRACTS s4 has none; see Q2 for the
+proposal.
 
 ### 4.6 Known gap: lost `on_commit`
 If the process dies between the APPROVE commit and `start_execution`, the case stays APPROVED with
@@ -502,15 +505,15 @@ Pytest, Django test DB, factories from `tests/factories.py`. Files `tests/test_w
 or `TestCase.captureOnCommitCallbacks`.
 
 ### 5.1 Table-driven transitions (acceptance item 1)
-- `ALLOWED` written out by hand in the test (15 pairs). Assert `set(TRANSITIONS) == ALLOWED`.
-- **Every allowed pair**: parametrize over the 15; a fixture builds a case in `frm` with the ctx
+- `ALLOWED` written out by hand in the test (16 pairs). Assert `set(TRANSITIONS) == ALLOWED`.
+- **Every allowed pair**: parametrize over the 16; a fixture builds a case in `frm` with the ctx
   the precondition needs (approval / execution / agent run / recommendations; built with
   factories, status set via a test helper that uses `status_change_allowed()`), calls
   `transition()` with the edge's actor; assert status, `changed=True`, one new
   `AuditEvent(action="risk_case.status_changed")` with `data.from/to/reason`, correct
   tenant and `correlation_id == case.correlation_id`; T7/T8 bump the round by exactly 1; T11 sets
   `recovered_at`; others leave round / `recovered_at` untouched.
-- **Every forbidden pair**: parametrize over all `(a, b)` with `a != b` not in `ALLOWED` (75);
+- **Every forbidden pair**: parametrize over all `(a, b)` with `a != b` not in `ALLOWED` (74);
   assert `InvalidTransition`, status unchanged in the DB, no audit row.
 - **Every self pair** (10): `changed=False`, no audit row, no hook scheduled.
 - **Preconditions**: each allowed edge with a precondition gets a failing variant
@@ -591,22 +594,23 @@ Coverage target: 95% lines on `apps/workflow/`.
 
 ---
 
-## 6. Open questions for Nikhil
+## 6. Decisions on the open questions (Q1-Q3, decided by Nikhil)
 
-- **Q1. Flow's caller identity (R-06).** `Approval.decided_by` is a User FK and only
-  PROCUREMENT_MANAGER may decide, so Flow must call the decision endpoint with the approving
-  user's JWT. A SYSTEM API key gets 403. Is that acceptable for R-06, or do you want a
-  SYSTEM-on-behalf-of-user variant (that would be a CONTRACTS change and a new ROLE_MATRIX row)?
-  Default in this spec: user JWT only.
-- **Q2. Case actions endpoint.** T8 (REJECTED -> ANALYZING), T9/T14/T15 (-> CLOSED) need a user
-  trigger, and CONTRACTS s4 has no endpoint for them. Proposal: `POST /risk-cases/{id}/close
-  {reason}` and `POST /risk-cases/{id}/reanalyze {comments}`, PROCUREMENT_MANAGER only, as a
-  CONTRACTS addition at the S-01 freeze. Until then N-10 ships only the service functions
-  (`close_case`, `reopen_for_analysis`). Also: may ADMIN close a case? (Default: no, PM only,
-  consistent with ADMIN not deciding.)
-- **Q3. Stuck in ANALYZING.** There is no exit when the agents keep failing validation. Accept
-  that for v1 (Boomi / N-09 re-invokes), or add `ANALYZING -> CLOSED` (PM, reason required) as a
-  16th edge in CONTRACTS s7?
+- **Q1 (decided: yes). Flow's caller identity (R-06).** The decision API requires a human
+  PROCUREMENT_MANAGER JWT. A SYSTEM API key gets 403. Roop's Flow app (R-06) must call it with the
+  approving user's token. No SYSTEM-on-behalf-of-user variant.
+- **Q2 (decided). Case actions.** N-10 ships the service functions `close_case()` and
+  `reanalyze_case()` only, no HTTP endpoints. PROCUREMENT_MANAGER and ADMIN may close; re-analysing
+  a REJECTED case is PROCUREMENT_MANAGER only. **Proposal for the CONTRACTS freeze (S-01):**
+  - `POST /risk-cases/{id}/close` body `{"reason": "text"}` -> 200 with the case summary;
+    PROCUREMENT_MANAGER, ADMIN; calls `close_case()`; 409 `INVALID_TRANSITION` from a state with no
+    CLOSED edge; 422 `PRECONDITION_FAILED` for a blank reason (T9, T14, T16).
+  - `POST /risk-cases/{id}/reanalyze` body `{"comments": "text"}` -> 200; PROCUREMENT_MANAGER only;
+    calls `reanalyze_case()`; 409 unless the case is REJECTED. Bumps `analysis_round`.
+  - Each needs a ROLE_MATRIX row (`risk-cases.close`, `risk-cases.reanalyze`) and a role-matrix
+    test row; Uday owns those files.
+- **Q3 (decided: yes). Stuck in ANALYZING.** `ANALYZING -> CLOSED` is the 16th allowed transition
+  (T16): manual, PROCUREMENT_MANAGER or ADMIN, `reason` required. It is in the table-driven test.
 
 Decided in this spec without asking (change them here if you disagree): comments required on
 REJECT / REQUEST_CHANGES; REJECT of a non-last option keeps the case in PENDING_APPROVAL; N-10
