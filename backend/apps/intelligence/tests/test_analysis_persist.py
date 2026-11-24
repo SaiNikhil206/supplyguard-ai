@@ -74,7 +74,8 @@ def system(seeded):  # noqa: F811
 
 
 def post(client, case, kind, payload, **extra):
-    return client.post(url(case), {"kind": kind, "payload": payload, **extra}, format="json")
+    body = {"kind": kind, "payload": payload, "round": 1, **extra}
+    return client.post(url(case), body, format="json")
 
 
 # ------------------------------------------------------------------------------ service

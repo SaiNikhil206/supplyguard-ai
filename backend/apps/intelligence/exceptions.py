@@ -23,11 +23,38 @@ class AnalysisInvalid(WorkflowError):
     default_code = "business_rule"
     reason = "AGENT_OUTPUT_INVALID"
 
-    def __init__(self, result):
+    def __init__(self, result, limit=50):
+        errors = result.validation_errors
         super().__init__(
             "The agent output failed validation and was not applied.",
             agent_run_id=result.agent_run.pk,
             valid=False,
-            errors=result.validation_errors,
+            errors=errors[:limit],
+            error_count=len(errors),
+            errors_truncated=len(errors) > limit,
             case_status=result.status,
         )
+
+
+class AnalysisApplyFailed(WorkflowError):
+    """422: the output validated but could not be stored (data error). The AgentRun was kept."""
+
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    default_code = "business_rule"
+    reason = "AGENT_OUTPUT_NOT_APPLIED"
+
+    def __init__(self, agent_run_id, exc):
+        super().__init__(
+            "The agent output could not be stored and was not applied.",
+            agent_run_id=agent_run_id,
+            valid=True,
+            error=type(exc).__name__,
+        )
+
+
+class PayloadTooLarge(WorkflowError):
+    """413: the request body is over the endpoint limit (nothing is stored)."""
+
+    status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
+    default_code = "payload_too_large"
+    reason = "PAYLOAD_TOO_LARGE"

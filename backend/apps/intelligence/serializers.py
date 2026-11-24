@@ -17,11 +17,13 @@ class CaseWhatIfRequestSerializer(serializers.Serializer):
 
 class AnalysisRequestSerializer(serializers.Serializer):
     """POST /internal/risk-cases/{id}/analysis. `payload` is the agent output as received (any
-    JSON, stored raw even when it is garbage); `round` is an optional stale-round guard."""
+    JSON, stored raw even when it is garbage); `round` is the
+    case's analysis_round the agent worked on (required)."""
 
     kind = serializers.ChoiceField(choices=["RISK_ANALYSIS", "RECOVERY_PLAN"])
     payload = serializers.JSONField()
-    round = serializers.IntegerField(min_value=1, required=False)
+    # required: a delayed round-1 plan must never be applied as round 2
+    round = serializers.IntegerField(min_value=1)
 
 
 class AnalysisResponseSerializer(serializers.Serializer):
