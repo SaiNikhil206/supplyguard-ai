@@ -95,6 +95,7 @@ EXPECTED_ROUTED = {
     "me.read", "settings.read", "settings.write", "users.read", "users.write", "audit.read",
     "events.create", "demo.simulate", "integrations.status",
     "internal.risk-cases", "internal.execution-result",
+    "recommendations.decision", "what-if",
 }
 
 # permission_key -> (path, body factory or None). One entry per ROUTED matrix row.
@@ -111,7 +112,36 @@ ROUTES = {
     "internal.risk-cases": (API + "internal/risk-cases", _risk_case_body),
     # callable path: a fresh PENDING execution per request
     "internal.execution-result": (_execution_path, _execution_body),
+    # An id that does not exist: wrong roles get 403 before the lookup, the allowed role reaches
+    # the lookup and gets 404 (see EXTRA_OK). Real decision flows: test_workflow_decision_api.py.
+    "recommendations.decision": (
+        API + "recommendations/REC-NONE/decision",
+        lambda: {"decision": "APPROVE"},
+    ),
+    "what-if": (
+        API + "what-if",
+        lambda: {"supplier_id": "SUP-1008", "duration_days": 2, "event_type": "FACTORY_OUTAGE"},
+    ),
 }
+EXTRA_OK = {"recommendations.decision": {404}}  # allowed role + unknown id
+
+
+@pytest.fixture(autouse=True)
+def _stub_erp_for_what_if(monkeypatch):
+    """The what-if route reads the ERP; the matrix tests only care about roles, not ERP data."""
+    from apps.intelligence import whatif
+
+    monkeypatch.setattr(
+        whatif,
+        "fetch_snapshot",
+        lambda client, supplier_id, tenant_id, *a, **k: {
+            "supplier": {"supplier_id": supplier_id, "name": "S", "tenant_id": tenant_id},
+            "purchase_orders": [],
+            "inventory": [],
+            "alternate_suppliers": [],
+        },
+    )
+    monkeypatch.setattr("apps.intelligence.views._client", lambda: None)
 OK = {200, 201, 202}
 
 
@@ -187,7 +217,8 @@ def test_matrix_every_routed_row_for_every_principal(principal):
         allowed = principal in EXPECTED[key][method]
         where = f"{principal} {method} {key}"
         if allowed:
-            assert response.status_code in OK, f"{where}: {response.status_code}"
+            ok = OK | EXTRA_OK.get(key, set())
+            assert response.status_code in ok, f"{where}: {response.status_code}"
         else:
             assert response.status_code == 403, f"{where}: {response.status_code}"
             assert response.json()["error"]["code"] == "FORBIDDEN"
