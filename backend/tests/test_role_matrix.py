@@ -56,13 +56,13 @@ def _risk_case_body():
 
 
 def _execution_path():
-    from tests.factories import make_execution
+    from tests.test_execution_callback import running_execution
 
-    return f"{API}internal/executions/{make_execution(_matrix_tenant()).id}/result"
+    return f"{API}internal/executions/{running_execution(_matrix_tenant()).id}/result"
 
 
 def _execution_body():
-    return {"status": "FAILED", "error_class": "TRANSIENT", "error": "ERP timeout"}
+    return {"status": "FAILED", "attempt": 1, "error_class": "TRANSIENT", "error": "ERP timeout"}
 
 
 # The expected permissions, written out by hand from docs/CONTRACTS.md s2 + s4 and the DESIGN

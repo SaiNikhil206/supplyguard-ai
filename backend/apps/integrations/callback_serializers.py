@@ -70,6 +70,7 @@ class RiskCaseCreatedSerializer(serializers.Serializer):
 
 class ExecutionResultRequestSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=EXECUTION_TERMINAL)
+    attempt = serializers.IntegerField(min_value=1)  # ExecutionRequest.attempt, echoed by Boomi
     verified = serializers.BooleanField(required=False, default=False)
     response_status = serializers.IntegerField(
         required=False, allow_null=True, min_value=100, max_value=599
@@ -103,3 +104,4 @@ class ExecutionResultResponseSerializer(serializers.Serializer):
     error_class = serializers.CharField(allow_null=True)
     finished_at = serializers.DateTimeField(allow_null=True)
     case_status = serializers.CharField()
+    retryable = serializers.BooleanField()

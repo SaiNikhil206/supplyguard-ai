@@ -1,4 +1,5 @@
-"""POST /api/v1/internal/executions/<id>/result (U-06 piece 2)."""
+"""POST /api/v1/internal/executions/<id>/result: validation + sanitising here, the Execution update
+and the case move are N-10's record_execution_result (U-06 round 3)."""
 import json
 from unittest import mock
 
@@ -6,18 +7,33 @@ import pytest
 from rest_framework.test import APIClient
 
 from apps.audit.models import AuditEvent
-from apps.core.models import Execution
-from apps.integrations import executions, hooks
-from tests.factories import make_execution, make_tenant, make_user
+from apps.core.models import Execution, RiskCase
+from apps.integrations import executions
+from tests.factories import make_approval, make_execution, make_rec, make_tenant, make_user
 from tests.helpers import api_key_client, jwt_client, strip_cid
+from tests.workflow_support import case_in
 
 pytestmark = pytest.mark.django_db
-VERIFIED_OK = {"status": "SUCCEEDED", "verified": True, "response_status": 200}
-FAILED = {"status": "FAILED", "error_class": "TRANSIENT", "error": "ERP timeout"}
+S = RiskCase.Status
+VERIFIED_OK = {"status": "SUCCEEDED", "attempt": 1, "verified": True, "response_status": 200}
+FAILED = {"status": "FAILED", "attempt": 1, "error_class": "TRANSIENT", "error": "ERP timeout"}
+
+
+def running_execution(tenant, **kw):
+    """APPROVED decision, case EXECUTING, execution RUNNING (attempt 1)."""
+    case = case_in(tenant, S.EXECUTING)
+    pm = make_user(tenant, role="PROCUREMENT_MANAGER")
+    approval = make_approval(tenant, make_rec(tenant, case), pm)
+    kw.setdefault("status", "RUNNING")
+    return make_execution(tenant, approval, **kw)
 
 
 def url(execution_id):
     return f"/api/v1/internal/executions/{execution_id}/result"
+
+
+def case_status(execution):
+    return RiskCase.objects.get(pk=execution.approval.risk_case_id).status
 
 
 @pytest.fixture
@@ -32,14 +48,7 @@ def key(acme):
 
 @pytest.fixture
 def execution(acme):
-    return make_execution(acme)
-
-
-@pytest.fixture(autouse=True)
-def hook(monkeypatch):
-    spy = mock.MagicMock()
-    monkeypatch.setattr(hooks, "on_execution_result", spy)
-    return spy
+    return running_execution(acme)
 
 
 def send(client, execution_id, body):
@@ -49,18 +58,25 @@ def send(client, execution_id, body):
 # --- success / failure rules -------------------------------------------------------------------
 def test_succeeded_requires_verified_true(key, execution):
     for body in (
-        {"status": "SUCCEEDED"},
-        {"status": "SUCCEEDED", "verified": False},
-        {"status": "SUCCEEDED", "response_status": 200},
+        {"status": "SUCCEEDED", "attempt": 1},
+        {"status": "SUCCEEDED", "attempt": 1, "verified": False},
+        {"status": "SUCCEEDED", "attempt": 1, "response_status": 200},
     ):
-        response = send(key, execution.id, body)
-        assert response.status_code == 400, body
+        assert send(key, execution.id, body).status_code == 400, body
     execution.refresh_from_db()
-    assert execution.status == "PENDING" and execution.finished_at is None
+    assert execution.status == "RUNNING" and case_status(execution) == S.EXECUTING
 
 
-def test_verified_success_is_stored(key, execution, hook):
-    case_status = execution.approval.risk_case.status
+def test_attempt_is_required_and_positive(key, execution):
+    for body in (
+        {"status": "SUCCEEDED", "verified": True},
+        {**VERIFIED_OK, "attempt": 0},
+        {**VERIFIED_OK, "attempt": "x"},
+    ):
+        assert send(key, execution.id, body).status_code == 400, body
+
+
+def test_verified_success_recovers_the_case(key, execution):
     response = send(
         key,
         execution.id,
@@ -70,21 +86,36 @@ def test_verified_success_is_stored(key, execution, hook):
     body = response.json()
     assert body["execution_id"] == execution.id and body["status"] == "SUCCEEDED"
     assert body["error_class"] is None and body["finished_at"]
-    assert body["case_status"] == case_status  # this callback never moves the case
+    assert body["case_status"] == "RECOVERED" and body["retryable"] is False
     execution.refresh_from_db()
     assert execution.status == "SUCCEEDED" and execution.response_status == 200
-    assert execution.finished_at is not None and execution.started_at is not None
+    assert execution.finished_at is not None
     assert execution.response_payload == {"po_id": "PO-1001", "new_due_date": "2026-12-09"}
     assert execution.error is None and execution.error_class is None
-    execution.approval.risk_case.refresh_from_db()
-    assert execution.approval.risk_case.status == case_status
-    hook.assert_called_once()
-    assert hook.call_args.args[0].pk == execution.pk
-
-    (row,) = AuditEvent.objects.filter(action="execution.result")
+    case = execution.approval.risk_case
+    case.refresh_from_db()
+    assert case.status == S.RECOVERED and case.recovered_at
+    (row,) = AuditEvent.objects.filter(action="risk_case.status_changed")
     assert row.actor == "SYSTEM" and row.tenant_id == "TEN-ACME"
-    assert (row.entity_type, row.entity_id) == ("Execution", execution.id)
-    assert row.data == {"status": "SUCCEEDED", "error_class": None, "response_status": 200}
+    assert row.data["from"] == "EXECUTING" and row.data["to"] == "RECOVERED"
+
+
+def test_transient_failure_moves_case_to_execution_failed_and_is_retryable(key, execution):
+    response = send(key, execution.id, {**FAILED, "response_status": 504})
+    assert response.status_code == 200, response.content
+    body = response.json()
+    assert body["status"] == "FAILED" and body["error_class"] == "TRANSIENT"
+    assert body["case_status"] == "EXECUTION_FAILED" and body["retryable"] is True
+    execution.refresh_from_db()
+    assert (execution.status, execution.error_class, execution.error) == (
+        "FAILED", "TRANSIENT", "ERP timeout",
+    )
+    assert execution.response_status == 504 and execution.retryable
+
+
+def test_business_failure_is_not_retryable(key, execution):
+    body = send(key, execution.id, {**FAILED, "error_class": "BUSINESS"}).json()
+    assert body["case_status"] == "EXECUTION_FAILED" and body["retryable"] is False
 
 
 def test_response_payload_and_error_are_redacted(key, execution):
@@ -104,10 +135,10 @@ def test_response_payload_and_error_are_redacted(key, execution):
     assert "hunter2" not in json.dumps(stored)
 
 
-def test_error_text_is_sanitised_and_capped(key, execution):
+def test_error_text_is_sanitised_and_capped(acme, key):
     err = "upstream said password=hunter2 and token: abc123 " + "x" * 1900
-    response = send(key, execution.id, {**FAILED, "error": err})
-    assert response.status_code == 200
+    execution = running_execution(acme)
+    assert send(key, execution.id, {**FAILED, "error": err}).status_code == 200
     stored = Execution.objects.get(pk=execution.pk).error
     assert "hunter2" not in stored and "abc123" not in stored
     assert len(stored) <= 2000
@@ -118,30 +149,13 @@ def test_error_longer_than_2000_is_400(key, execution):
 
 
 def test_failed_needs_error_class_and_error(key, execution):
-    assert send(key, execution.id, {"status": "FAILED", "error": "boom"}).status_code == 400
-    assert send(key, execution.id, {"status": "FAILED", "error_class": "AUTH"}).status_code == 400
-    assert (
-        send(key, execution.id, {"status": "FAILED", "error_class": "NOPE", "error": "x"}
-             ).status_code == 400
-    )
-    assert Execution.objects.get(pk=execution.pk).status == "PENDING"
-
-
-def test_failed_result_is_stored(key, execution, hook):
-    response = send(key, execution.id, {**FAILED, "response_status": 504})
-    assert response.status_code == 200
-    assert response.json()["status"] == "FAILED" and response.json()["error_class"] == "TRANSIENT"
-    execution.refresh_from_db()
-    assert (execution.status, execution.error_class, execution.error) == (
-        "FAILED", "TRANSIENT", "ERP timeout",
-    )
-    assert execution.response_status == 504 and execution.retryable
-    hook.assert_called_once()
-
-
-def test_running_execution_can_finish(key, acme):
-    running = make_execution(acme, status="RUNNING")
-    assert send(key, running.id, VERIFIED_OK).status_code == 200
+    assert send(key, execution.id, {"status": "FAILED", "attempt": 1, "error": "b"}
+                ).status_code == 400
+    assert send(key, execution.id, {"status": "FAILED", "attempt": 1, "error_class": "AUTH"}
+                ).status_code == 400
+    bad = {"status": "FAILED", "attempt": 1, "error_class": "NOPE", "error": "x"}
+    assert send(key, execution.id, bad).status_code == 400
+    assert Execution.objects.get(pk=execution.pk).status == "RUNNING"
 
 
 @pytest.mark.parametrize("status", [99, 600, "x"])
@@ -150,38 +164,51 @@ def test_response_status_range(key, execution, status):
 
 
 def test_non_terminal_status_is_400(key, execution):
-    assert send(key, execution.id, {"status": "RUNNING"}).status_code == 400
+    assert send(key, execution.id, {"status": "RUNNING", "attempt": 1}).status_code == 400
 
 
 def test_payload_must_be_an_object(key, execution):
     assert send(key, execution.id, {**VERIFIED_OK, "response_payload": [1]}).status_code == 400
 
 
-# --- idempotency / conflict --------------------------------------------------------------------
-def test_identical_repeat_is_200_without_change(key, execution, hook):
+# --- N-10 rules surfaced as contract errors ----------------------------------------------------
+def test_stale_attempt_is_409(key, acme):
+    execution = running_execution(acme, retry_count=1)  # attempt 2 is the current one
+    response = send(key, execution.id, FAILED)  # a late callback of attempt 1
+    assert response.status_code == 409
+    error = response.json()["error"]
+    assert error["code"] == "CONFLICT"
+    assert error["details"]["reason"] == "STALE_EXECUTION_RESULT"
+    assert error["details"]["current_attempt"] == 2
+    assert Execution.objects.get(pk=execution.pk).status == "RUNNING"
+    assert send(key, execution.id, {**VERIFIED_OK, "attempt": 2}).status_code == 200
+
+
+def test_not_running_execution_is_409(key, acme):
+    pending = running_execution(acme, status="PENDING")
+    response = send(key, pending.id, VERIFIED_OK)
+    assert response.status_code == 409
+    assert response.json()["error"]["details"]["reason"] == "EXECUTION_NOT_RUNNING"
+    assert Execution.objects.get(pk=pending.pk).status == "PENDING"
+
+
+def test_identical_repeat_is_200_without_change(key, execution):
     first = send(key, execution.id, VERIFIED_OK)
     stamp = Execution.objects.get(pk=execution.pk).finished_at
     second = send(key, execution.id, VERIFIED_OK)
     assert second.status_code == 200
     assert second.json() == first.json()
     assert Execution.objects.get(pk=execution.pk).finished_at == stamp
-    hook.assert_called_once()
-    assert AuditEvent.objects.filter(action="execution.result").count() == 1
+    assert AuditEvent.objects.filter(action="risk_case.status_changed").count() == 1
 
 
-def test_conflicting_terminal_result_is_409(key, execution, hook):
+def test_conflicting_terminal_result_is_409(key, execution):
     send(key, execution.id, VERIFIED_OK)
-    for body in (FAILED, {**VERIFIED_OK, "response_status": 201}):
-        response = send(key, execution.id, body)
-        assert response.status_code == 409
-        assert response.json()["error"]["code"] == "CONFLICT"
+    response = send(key, execution.id, FAILED)
+    assert response.status_code == 409
+    assert response.json()["error"]["code"] == "CONFLICT"
     assert Execution.objects.get(pk=execution.pk).status == "SUCCEEDED"
-    hook.assert_called_once()
-
-
-def test_failed_then_success_is_409(key, execution):
-    send(key, execution.id, FAILED)
-    assert send(key, execution.id, VERIFIED_OK).status_code == 409
+    assert case_status(execution) == S.RECOVERED
 
 
 # --- tenancy / roles ---------------------------------------------------------------------------
@@ -192,7 +219,7 @@ def test_foreign_execution_is_the_same_404_as_missing_and_audited(execution):
     miss = send(foreign, "EXE-999999", VERIFIED_OK)
     assert hit.status_code == miss.status_code == 404
     assert strip_cid(hit) == strip_cid(miss)
-    assert Execution.objects.get(pk=execution.pk).status == "PENDING"
+    assert Execution.objects.get(pk=execution.pk).status == "RUNNING"
     (row,) = AuditEvent.objects.filter(action="security.cross_tenant_denied")
     assert row.tenant_id == "TEN-OTHER" and row.actor == "SYSTEM"
     assert (row.entity_type, row.entity_id) == ("Execution", execution.id)
@@ -200,16 +227,16 @@ def test_foreign_execution_is_the_same_404_as_missing_and_audited(execution):
 
 def test_tenant_in_body_is_ignored(key, acme):
     other = make_tenant("TEN-OTHER")
-    foreign = make_execution(other)
+    foreign = running_execution(other)
     assert send(key, foreign.id, {**VERIFIED_OK, "tenant_id": "TEN-OTHER"}).status_code == 404
-    assert Execution.objects.get(pk=foreign.pk).status == "PENDING"
+    assert Execution.objects.get(pk=foreign.pk).status == "RUNNING"
 
 
 @pytest.mark.parametrize("role", ["ADMIN", "PROCUREMENT_MANAGER", "OPS_MANAGER", "VIEWER"])
 def test_user_tokens_are_403(acme, execution, role):
     client = jwt_client(make_user(acme, role=role))
     assert send(client, execution.id, VERIFIED_OK).status_code == 403
-    assert Execution.objects.get(pk=execution.pk).status == "PENDING"
+    assert Execution.objects.get(pk=execution.pk).status == "RUNNING"
 
 
 def test_anonymous_is_401(execution):
@@ -234,30 +261,15 @@ def test_payload_just_under_the_cap_is_kept(key, execution):
     assert Execution.objects.get(pk=execution.pk).response_payload == payload
 
 
-# --- hook --------------------------------------------------------------------------------------
-def test_hook_failure_does_not_lose_the_result(key, execution, hook):
-    hook.side_effect = RuntimeError("workflow down")
-    response = send(key, execution.id, VERIFIED_OK)
-    assert response.status_code == 200
-    assert Execution.objects.get(pk=execution.pk).status == "SUCCEEDED"
+# --- delegation --------------------------------------------------------------------------------
+def test_delegates_to_record_execution_result_with_attempt(key, execution):
+    from apps.workflow import services
 
-
-def test_missing_workflow_service_is_logged_not_fatal(monkeypatch, caplog, execution):
-    monkeypatch.undo()  # use the real hook (the autouse spy is removed)
-    import logging
-
-    with caplog.at_level(logging.INFO, logger="apps.integrations.hooks"):
-        hooks.on_execution_result(execution)
-    assert "workflow service not available" in caplog.text
-
-
-def test_hook_delegates_to_the_workflow_service_when_present(monkeypatch, execution):
-    import sys
-    import types
-
-    monkeypatch.undo()
-    fake = types.ModuleType("apps.workflow.services")
-    fake.on_execution_result = mock.MagicMock()
-    monkeypatch.setitem(sys.modules, "apps.workflow.services", fake)
-    hooks.on_execution_result(execution)
-    fake.on_execution_result.assert_called_once_with(execution)
+    with mock.patch.object(
+        services, "record_execution_result", wraps=services.record_execution_result
+    ) as spy:
+        assert send(key, execution.id, {**VERIFIED_OK, "attempt": 1}).status_code == 200
+    spy.assert_called_once()
+    kwargs = spy.call_args.kwargs
+    assert kwargs["attempt"] == 1 and kwargs["outcome"] == "SUCCEEDED"
+    assert kwargs["correlation_id"] == execution.approval.risk_case.correlation_id
