@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | R-02 |
-| Nikhil | 0 | 0 | 9 | 0 | 5 | 2 | 0% | N-12 |
+| Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 5 | 0 | 6 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
 
@@ -50,7 +50,7 @@
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
 | R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | todo | 0/1 | - |
 | R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | todo | 0/1 | - |
-| N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | todo | 0/2 | - |
+| N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | todo | 0/1 | - |
 | R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | todo | 0/1 | - |
@@ -89,8 +89,16 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
-| 2026-11-24 | 5bf25fa | nikhil | N-07 | review | merge: N-07 persistence + /analysis endpoint into task branch |
+| 2026-11-24 | 0caa295 | nikhil | N-13 | review | merge: N-13 governance tests into task branch |
+| 2026-11-24 | 2cfa029 | nikhil | N-13 | review | merge: N-13 AI governance + approval tests (auto-merge) |
+| 2026-11-24 | b8f5ca2 | nikhil | N-13 | review | test(governance): N-13 AI governance + approval tests, TEST_REPORT, AC-03 evidence |
+| 2026-11-24 | 64711eb | uday | U-08 | in-progress | chore(tasks): U-08 build log - profiles, connection and 3 operations built in Boomi |
+| 2026-11-24 | d369f37 | uday | U-08 | in-progress | chore(tasks): U-08 build log - topics, subscription, token, first profile done in Boomi |
+| 2026-11-24 | 4ce4ee8 | uday | U-08 | in-progress | merge: U-08 specs piece (Event Streams build specs, profiles, fallback, test plan) |
+| 2026-11-24 | 7b32187 | uday | U-08 | in-progress | docs(boomi): U-08 Event Streams build specs, profiles, samples, fallback, test plan |
+| 2026-11-24 | 0e88972 | uday | U-08 | in-progress | chore(tasks): U-08 started - plan table and open decisions |
 | 2026-11-24 | 8c73e15 | nikhil | N-07 | review | merge: N-07 Agent output validator + persistence (auto-merge) |
+| 2026-11-24 | 5bf25fa | nikhil | N-07 | review | merge: N-07 persistence + /analysis endpoint into task branch |
 | 2026-11-24 | 82d5b6b | nikhil | N-07 | review | merge: origin/nikhil/N-07-validator (U-06) into N-07 persist |
 | 2026-11-24 | 1393dd8 | nikhil | N-07 | review | fix(intelligence): N-07 parser hardening |
 | 2026-11-24 | 15d2b93 | uday | S-01 | blocked | docs(contracts): drop stale 'needs Nikhil's agreement', fix TC-02 wording, add freeze follow-ups (section 11) |
@@ -101,11 +109,3 @@
 | 2026-11-24 | 3714322 | uday | U-06 | review | chore(tasks): U-06 to review - acceptance ticked, evidence and the unreviewed-round-4 caveat |
 | 2026-11-24 | c4bd65b | nikhil | N-07 | review | feat(intelligence): persist validated agent output + analysis endpoint (N-07) |
 | 2026-11-24 | d7958dd | uday | U-06 | in-progress | merge: U-06 round 4 (delegate to N-04 create_risk_case, bounded publish, URL/log hardening, review fixes) |
-| 2026-11-24 | 9aade85 | uday | U-06 | in-progress | fix(integrations): risk-cases delegates to N-04, range checks, unverified success, README |
-| 2026-11-24 | 0a2efc0 | uday | U-06 | in-progress | fix(integrations): time range, deep JSON, duplicate re-publish, intake throttle, simulation ids |
-| 2026-11-24 | a94b806 | uday | U-06 | in-progress | fix(integrations): bound the Boomi publish, refuse secrets in URLs, quiet httpx logs |
-| 2026-11-24 | c95af0e | uday | U-06 | in-progress | chore(tasks): U-06 notes - delegation to N-04/N-10, review status, contracts follow-ups |
-| 2026-11-24 | 6a105be | uday | U-06 | in-progress | merge: U-06 round 3 (delegate to N-10 workflow: ANALYZING transition, record_execution_result) |
-| 2026-11-24 | c5c2b36 | uday | U-06 | in-progress | feat(integrations): callbacks use N-10 transition and record_execution_result |
-| 2026-11-24 | 35afaba | uday | U-06 | in-progress | merge: collaboration (N-10 workflow, N-11 what-if) into uday/U-06-event-intake |
-| 2026-11-24 | 0e17ad7 | uday | U-06 | in-progress | merge: U-06 callbacks piece (internal risk-cases and execution-result) into uday/U-06-event-intake |
