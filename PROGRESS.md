@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-24 | 49b5c7c | uday | U-08 | review | merge: U-08 Event Streams topics + disruption subscriber (auto-merge) |
 | 2026-11-24 | ed13483 | uday | U-08 | review | merge: U-08 Event Streams topics + disruption subscriber (auto-merge) |
 | 2026-11-24 | 52a2c71 | uday | U-08 | review | chore(tasks): U-08 set to review |
 | 2026-11-24 | ba7fa94 | uday | U-08 | in-progress | docs(boomi): U-08 BOOMI_ENV update, dedupe and response body descoped, timing 2-3 s |
@@ -108,4 +109,3 @@
 | 2026-11-24 | 2cfa029 | nikhil | N-13 | review | merge: N-13 AI governance + approval tests (auto-merge) |
 | 2026-11-24 | b8f5ca2 | nikhil | N-13 | review | test(governance): N-13 AI governance + approval tests, TEST_REPORT, AC-03 evidence |
 | 2026-11-24 | 64711eb | uday | U-08 | in-progress | chore(tasks): U-08 build log - profiles, connection and 3 operations built in Boomi |
-| 2026-11-24 | d369f37 | uday | U-08 | in-progress | chore(tasks): U-08 build log - topics, subscription, token, first profile done in Boomi |
