@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import RequestDataTooBig
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -16,6 +17,14 @@ from apps.core.models import DisruptionEvent
 from apps.core.models.sequences import next_id
 
 from . import boomi
+from .callback_serializers import (
+    ExecutionResultRequestSerializer,
+    ExecutionResultResponseSerializer,
+    RiskCaseCreatedSerializer,
+    RiskCaseRequestSerializer,
+)
+from .executions import apply_execution_result
+from .risk_cases import create_risk_case_from_snapshot
 from .serializers import (
     EventAcceptedSerializer,
     IntegrationStatusSerializer,
@@ -182,3 +191,59 @@ class IntegrationStatusView(APIView):
             "PUBLISH_FAILED": events.filter(publish_status=by_status.PUBLISH_FAILED).count(),
             "needs_data_correction": events.filter(needs_data_correction=True).count(),
         }
+
+
+def _json_object(request):
+    """The JSON body as a dict. Django's request-size limit (DATA_UPLOAD_MAX_MEMORY_SIZE) is
+    enforced here because DRF's JSON parser streams the body and would bypass it."""
+    try:
+        request._request.body  # noqa: B018 - reads and size-checks the body
+    except RequestDataTooBig:
+        raise ValidationError({"non_field_errors": ["Request body is too large."]}) from None
+    if not isinstance(request.data, dict):
+        raise ValidationError({"non_field_errors": ["Expected a JSON object."]})
+    return request.data
+
+
+class RiskCaseCallbackView(APIView):
+    """Boomi sends the ERP snapshot for an event; Django computes impact and creates the case."""
+
+    permission_key = "internal.risk-cases"
+
+    @extend_schema(
+        summary="Create the RiskCase for an event from a Boomi ERP snapshot (idempotent)",
+        request=RiskCaseRequestSerializer,
+        responses={200: RiskCaseCreatedSerializer, 201: RiskCaseCreatedSerializer},
+    )
+    def post(self, request):
+        data = _json_object(request)
+        serializer = RiskCaseRequestSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        result = create_risk_case_from_snapshot(
+            _tenant(request),
+            serializer.validated_data["event_id"],
+            data["snapshot"],  # as received (money strings unchanged)
+            serializer.validated_data["snapshot"]["captured_at"],
+            actor="SYSTEM",
+        )
+        return Response(result.body, status=result.http_status)
+
+
+class ExecutionResultView(APIView):
+    """Boomi reports the outcome of an approved ERP change."""
+
+    permission_key = "internal.execution-result"
+
+    @extend_schema(
+        summary="Store the ERP execution result sent by Boomi (idempotent, 409 on conflict)",
+        request=ExecutionResultRequestSerializer,
+        responses={200: ExecutionResultResponseSerializer},
+    )
+    def post(self, request, execution_id):
+        data = _json_object(request)
+        serializer = ExecutionResultRequestSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        result = apply_execution_result(
+            _tenant(request), execution_id, serializer.validated_data, actor="SYSTEM"
+        )
+        return Response(result.body, status=result.http_status)
