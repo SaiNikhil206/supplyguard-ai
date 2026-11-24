@@ -54,8 +54,7 @@ EXPECTED = {
     "integrations.status": {"GET": {"ADMIN"}},
 }
 EXPECTED_ROUTED = {"me.read", "settings.read", "settings.write", "users.read", "users.write",
-                   "audit.read",
-                   "recommendations.decision"}  # keys that have a real endpoint today
+                   "audit.read", "recommendations.decision", "what-if"}  # real endpoints today
 
 # permission_key -> (path, body factory or None). One entry per ROUTED matrix row.
 ROUTES = {
@@ -66,13 +65,27 @@ ROUTES = {
     "users.write": (API + "users", _user_body),
     "audit.read": (API + "audit", None),
     # An id that does not exist: wrong roles get 403 before the lookup, the allowed role reaches
-    # the lookup and gets 404 (see EXTRA_OK). Real decision flows: test_workflow_decision_api.py.
-    "recommendations.decision": (
-        API + "recommendations/REC-NONE/decision",
-        lambda: {"decision": "APPROVE"},
-    ),
-}
+    # the lookup and gets 404 (see }
 EXTRA_OK = {"recommendations.decision": {404}}  # allowed role + unknown id
+
+
+
+@pytest.fixture(autouse=True)
+def _stub_erp_for_what_if(monkeypatch):
+    """The what-if route reads the ERP; the matrix tests only care about roles, not ERP data."""
+    from apps.intelligence import whatif
+
+    monkeypatch.setattr(
+        whatif,
+        "fetch_snapshot",
+        lambda client, supplier_id, tenant_id, *a, **k: {
+            "supplier": {"supplier_id": supplier_id, "name": "S", "tenant_id": tenant_id},
+            "purchase_orders": [],
+            "inventory": [],
+            "alternate_suppliers": [],
+        },
+    )
+    monkeypatch.setattr("apps.intelligence.views._client", lambda: None)
 OK = {200, 201}
 
 
