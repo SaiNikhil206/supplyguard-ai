@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | R-02 |
-| Nikhil | 0 | 0 | 9 | 0 | 5 | 2 | 0% | N-12 |
+| Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
 
@@ -50,7 +50,7 @@
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
 | R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | todo | 0/1 | - |
 | R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | todo | 0/1 | - |
-| N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | todo | 0/2 | - |
+| N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | todo | 0/1 | - |
 | R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | todo | 0/1 | - |
@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-24 | 52a2c71 | uday | U-08 | review | chore(tasks): U-08 set to review |
 | 2026-11-24 | ba7fa94 | uday | U-08 | in-progress | docs(boomi): U-08 BOOMI_ENV update, dedupe and response body descoped, timing 2-3 s |
 | 2026-11-24 | cfd6a31 | uday | U-08 | in-progress | docs(boomi): U-08 header/tenant validation cannot live in the WSS listener |
 | 2026-11-24 | 43675cc | uday | U-08 | in-progress | test(boomi): U-08 validation v6.0 failed, rolled back to v5.0 |
@@ -108,4 +109,3 @@
 | 2026-11-24 | 64711eb | uday | U-08 | in-progress | chore(tasks): U-08 build log - profiles, connection and 3 operations built in Boomi |
 | 2026-11-24 | d369f37 | uday | U-08 | in-progress | chore(tasks): U-08 build log - topics, subscription, token, first profile done in Boomi |
 | 2026-11-24 | 4ce4ee8 | uday | U-08 | in-progress | merge: U-08 specs piece (Event Streams build specs, profiles, fallback, test plan) |
-| 2026-11-24 | 7b32187 | uday | U-08 | in-progress | docs(boomi): U-08 Event Streams build specs, profiles, samples, fallback, test plan |
