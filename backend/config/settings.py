@@ -136,6 +136,9 @@ REST_FRAMEWORK = {
         "auth": env("AUTH_THROTTLE_RATE", default="10/min"),  # /auth/token per client IP
         "auth_username": env("AUTH_USERNAME_THROTTLE_RATE", default="10/min"),  # per username
         "auth_refresh": env("AUTH_REFRESH_THROTTLE_RATE", default="60/min"),  # /auth/refresh
+        # Event intake and the demo trigger, per credential (apps/integrations/throttles.py).
+        "events": env("EVENTS_THROTTLE_RATE", default="300/min"),
+        "simulate": env("SIMULATE_THROTTLE_RATE", default="10/min"),
     },
     # Number of trusted reverse proxies in front of Django (0 = none, 1 = behind the U-12
     # proxy). The client IP for throttles and failed-credential counters is read from
@@ -144,6 +147,12 @@ REST_FRAMEWORK = {
     # Secure by default: a view without `permission_key` is refused (403). Views that are
     # meant to be public (login, health, schema) say so explicitly.
     "DEFAULT_PERMISSION_CLASSES": ["apps.accounts.permissions.RolePermission"],
+    # JSON that is nested absurdly deep is a 400, not a RecursionError (500).
+    "DEFAULT_PARSER_CLASSES": [
+        "apps.core.parsers.SafeJSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 25,

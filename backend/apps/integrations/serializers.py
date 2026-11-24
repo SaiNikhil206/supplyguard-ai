@@ -1,4 +1,6 @@
 """Request validation for the event intake (docs/CONTRACTS.md s3 canonical event)."""
+from datetime import UTC
+
 from django.utils.dateparse import parse_datetime
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
@@ -7,6 +9,7 @@ from apps.core.models import DisruptionEvent
 
 EVENT_ID_PATTERN = r"^EVT-[0-9]+$"
 SCENARIO_PATTERN = r"^[a-z0-9_]+$"
+MIN_YEAR, MAX_YEAR = 2000, 2100  # event/snapshot times outside are a 400
 DESCRIPTION_MAX = 4000  # the model column is unbounded text; capped here
 
 
@@ -18,6 +21,7 @@ class AwareDateTimeField(serializers.Field):
     default_error_messages = {
         "invalid": "Enter an ISO 8601 date and time with a time zone, e.g. 2026-12-02T10:15:00Z.",
         "naive": "The time must include a time zone (Z or +hh:mm).",
+        "range": f"The year must be between {MIN_YEAR} and {MAX_YEAR}.",
     }
 
     def to_internal_value(self, data):
@@ -31,6 +35,12 @@ class AwareDateTimeField(serializers.Field):
             self.fail("invalid")
         if value.tzinfo is None or value.utcoffset() is None:
             self.fail("naive")
+        if not MIN_YEAR <= value.year <= MAX_YEAR:
+            self.fail("range")
+        try:
+            value.astimezone(UTC)  # can overflow near year 1 / 9999
+        except (OverflowError, ValueError):
+            self.fail("range")
         return value
 
     def to_representation(self, value):
