@@ -8,13 +8,22 @@ default (RECEIVED) and later moves only through `apps.workflow.services.transiti
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
 
-from apps.core.models import AffectedPO, DisruptionEvent, RiskCase
+from apps.core.models import (
+    AffectedPO,
+    AgentRun,
+    DisruptionEvent,
+    Recommendation,
+    RiskCase,
+)
+from apps.workflow.exceptions import CaseNotFound
 
+from .exceptions import AnalysisConflict
 from .impact import (
     SnapshotError,
     TenantThresholds,
@@ -22,6 +31,7 @@ from .impact import (
     rows,
     thresholds_from_tenant,
 )
+from .validation import RECOVERY_PLAN, RISK_ANALYSIS, validate_agent_output
 
 COVERAGE_MAX = Decimal("9999999.99")  # AffectedPO.inventory_coverage_days is Decimal(9, 2)
 COVERAGE_OUT_OF_RANGE = "COVERAGE_OUT_OF_RANGE"
@@ -242,3 +252,197 @@ def create_risk_case(
             raise
         return winner, False
     return case, True
+
+
+# ---------------------------------------------------------------------------------- N-07
+_AGENT_BY_KIND = {
+    RISK_ANALYSIS: AgentRun.Agent.RISK_ANALYST,
+    RECOVERY_PLAN: AgentRun.Agent.RECOVERY_PLANNER,
+}
+
+
+@dataclass(frozen=True)
+class AnalysisResult:
+    agent_run: AgentRun
+    valid: bool
+    validation_errors: list
+    actionable_count: int
+    status: str  # the case's status after the call
+    recommendations: list = field(default_factory=list)
+
+
+def _lock_case(case: RiskCase, tenant) -> RiskCase:
+    try:
+        return (
+            RiskCase.objects.select_for_update(of=("self",))
+            .select_related("event")
+            .get(pk=case.pk, tenant=tenant)
+        )
+    except RiskCase.DoesNotExist:
+        raise CaseNotFound() from None
+
+
+def _check_open(locked: RiskCase, kind: str, round_) -> None:
+    """409 unless the case is waiting for this output (nothing is written)."""
+    if locked.status != RiskCase.Status.ANALYZING:
+        raise AnalysisConflict(
+            "CASE_NOT_ANALYZING",
+            f"The case is {locked.status}, not ANALYZING; the agent output was not applied.",
+            case_status=locked.status,
+        )
+    if round_ is not None and round_ != locked.analysis_round:
+        raise AnalysisConflict(
+            "STALE_ROUND",
+            f"The output is for round {round_}; the case is on round {locked.analysis_round}.",
+            round=round_,
+            current_round=locked.analysis_round,
+        )
+    if kind == RECOVERY_PLAN:
+        done = Recommendation.objects.filter(risk_case=locked, round=locked.analysis_round)
+    else:
+        done = AgentRun.objects.filter(
+            risk_case=locked,
+            agent=_AGENT_BY_KIND[kind],
+            round=locked.analysis_round,
+            valid=True,
+        )
+    if done.exists():
+        raise AnalysisConflict(
+            "ALREADY_RECORDED",
+            f"A valid {kind} was already recorded for round {locked.analysis_round}.",
+            round=locked.analysis_round,
+        )
+
+
+def _money(value):
+    if not value:
+        return None, ""
+    return Decimal(str(value["amount"])), value.get("currency") or ""
+
+
+def _recommendation_fields(option: dict, verdict: dict) -> dict:
+    cost, currency = _money(option.get("estimated_cost_delta"))
+    lead = option.get("estimated_lead_time_days")
+    return {
+        "rank": option["rank"],
+        "option_type": option["option_type"],
+        "proposed_action": option.get("proposed_action") or {},
+        "action_steps": option.get("action_steps") or [],
+        "trade_offs": option.get("trade_offs") or [],
+        "evidence": option.get("evidence") or [],
+        "assumptions": option.get("assumptions") or [],
+        "data_gaps": option.get("data_gaps") or [],
+        "estimated_lead_time_days": None if lead is None else Decimal(str(lead)),
+        "estimated_cost_delta": cost,
+        "currency": currency,
+        "unsupported": bool(verdict["unsupported"]),
+        "unsupported_reasons": verdict["unsupported_reasons"],
+        "status": Recommendation.Status.PENDING,
+    }
+
+
+def record_analysis(
+    *, tenant, case: RiskCase, kind: str, payload, actor, correlation_id=None, round=None
+) -> AnalysisResult:
+    """Validate one agent output, store it, and move the case on (N-07, AC-07).
+
+    Phase 1 (own transaction, committed even if phase 2 fails): lock the case, 409 if it is not
+    ANALYZING / the round is stale / this output was already recorded (nothing is written), else
+    insert ONE append-only AgentRun with the payload exactly as received.
+    Phase 2 (one transaction, valid output only): RISK_ANALYSIS -> `case.analysis`;
+    RECOVERY_PLAN -> Recommendation rows + `no_viable_option_reason`, then through
+    `transition()` only: ANALYZING -> RECOMMENDATION_READY -> PENDING_APPROVAL, or CLOSED when no
+    option is actionable (TC-05). An invalid output changes no status (case stays ANALYZING).
+    `round` is the caller's optional round check. `actor` is the SystemPrincipal (or "SYSTEM").
+    """
+    from apps.workflow import services as workflow  # lazy: avoid an import cycle
+    from apps.workflow.states import actionable_recommendations
+
+    if kind not in _AGENT_BY_KIND:
+        raise ValueError(f"unknown kind {kind!r}")
+
+    with transaction.atomic():
+        locked = _lock_case(case, tenant)
+        _check_open(locked, kind, round)
+        result = validate_agent_output(
+            kind,
+            payload,
+            locked.snapshot,
+            locked.impact,
+            event=_event_dict(locked.event),
+            risk_case_id=locked.id,
+        )
+        errors = [*result["schema_errors"], *result["fact_errors"]]
+        run = AgentRun.objects.create(
+            tenant=tenant,
+            risk_case=locked,
+            agent=_AGENT_BY_KIND[kind],
+            round=locked.analysis_round,
+            raw=payload,
+            valid=result["valid"],
+            validation_errors=errors,
+        )
+        analysis_round = locked.analysis_round
+
+    if not result["valid"]:
+        case.refresh_from_db(fields=["status", "analysis_round", "updated_at"])
+        return AnalysisResult(run, False, errors, 0, case.status)
+
+    with transaction.atomic():
+        locked = _lock_case(case, tenant)
+        if locked.status != RiskCase.Status.ANALYZING or locked.analysis_round != analysis_round:
+            raise AnalysisConflict(
+                "STALE_ROUND",
+                "The case moved on while the output was validated; it was not applied.",
+                case_status=locked.status,
+            )
+        recs: list[Recommendation] = []
+        if kind == RISK_ANALYSIS:
+            locked.analysis = payload
+            locked.save(update_fields=["analysis", "updated_at"])
+        else:
+            verdicts = {o["rank"]: o for o in result["options"]}
+            for option in payload["options"]:
+                recs.append(
+                    Recommendation.objects.create(
+                        tenant=tenant,
+                        risk_case=locked,
+                        round=analysis_round,
+                        **_recommendation_fields(option, verdicts[option["rank"]]),
+                    )
+                )
+            no_viable = payload.get("no_viable_option_reason")
+            if not no_viable and not result["actionable_count"]:
+                no_viable = f"All {len(recs)} option(s) failed the fact check (unsupported)."
+            locked.no_viable_option_reason = no_viable
+            locked.save(update_fields=["no_viable_option_reason", "updated_at"])
+
+            cid = correlation_id or locked.correlation_id
+            workflow.transition(
+                locked,
+                RiskCase.Status.RECOMMENDATION_READY,
+                actor=actor,
+                reason="analysis validated",
+                correlation_id=cid,
+                actionable_count=result["actionable_count"],
+                agent_run=run,
+            )
+            if actionable_recommendations(locked).exists():
+                workflow.transition(
+                    locked,
+                    RiskCase.Status.PENDING_APPROVAL,
+                    actor=actor,
+                    reason="options ready for approval",
+                    correlation_id=cid,
+                )
+            else:
+                workflow.transition(
+                    locked,
+                    RiskCase.Status.CLOSED,
+                    actor=actor,
+                    reason=f"no viable option: {no_viable}",
+                    correlation_id=cid,
+                )
+        final_status = locked.status
+    case.refresh_from_db(fields=["status", "analysis_round", "updated_at"])
+    return AnalysisResult(run, True, [], result["actionable_count"], final_status, recs)

@@ -13,9 +13,16 @@ from apps.accounts.permissions import RolePermission
 from apps.audit import record
 from apps.core.models import RiskCase, Supplier
 from apps.core.tenancy import CROSS_TENANT_ACTION, TenantScopedMixin
+from apps.workflow.exceptions import WorkflowError
 
-from . import impact, whatif
-from .serializers import CaseWhatIfRequestSerializer, WhatIfRequestSerializer
+from . import impact, services, whatif
+from .exceptions import AnalysisInvalid
+from .serializers import (
+    AnalysisRequestSerializer,
+    AnalysisResponseSerializer,
+    CaseWhatIfRequestSerializer,
+    WhatIfRequestSerializer,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -204,3 +211,72 @@ class CaseWhatIfView(TenantScopedMixin, generics.GenericAPIView):
         )
         _audit(request, request.tenant, case, body)
         return Response(body)
+
+
+@extend_schema(
+    request=AnalysisRequestSerializer,
+    responses={201: AnalysisResponseSerializer},
+    summary="Store and validate one agent output (SYSTEM only)",
+)
+class AnalysisView(TenantScopedMixin, generics.GenericAPIView):
+    """POST /internal/risk-cases/{id}/analysis (N-07). SYSTEM API key only; tenant from the key."""
+
+    permission_classes = [RolePermission]
+    permission_key = "internal.analysis"
+    serializer_class = AnalysisRequestSerializer
+    pagination_class = None
+    queryset = RiskCase.objects.select_related("event")
+    lookup_field = "id"
+    lookup_url_kwarg = "case_id"
+
+    def post(self, request, case_id):
+        case = self.get_object()  # tenant-scoped: foreign or missing -> 404
+        data = self.get_serializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        v = data.validated_data
+        audit = {"kind": v["kind"], "round": v.get("round")}
+        try:
+            result = services.record_analysis(
+                tenant=request.tenant,
+                case=case,
+                kind=v["kind"],
+                payload=v["payload"],
+                actor=request.user,
+                correlation_id=getattr(request, "correlation_id", None),
+                round=v.get("round"),
+            )
+        except WorkflowError as exc:
+            record(
+                request.user,
+                "analysis.rejected",
+                case,
+                tenant=request.tenant,
+                data={**audit, "status_code": exc.status_code, **exc.details},
+            )
+            raise
+        record(
+            request.user,
+            "analysis.recorded" if result.valid else "analysis.invalid",
+            case,
+            tenant=request.tenant,
+            data={
+                **audit,
+                "agent_run_id": result.agent_run.pk,
+                "valid": result.valid,
+                "actionable_count": result.actionable_count,
+                "case_status": result.status,
+                "error_count": len(result.validation_errors),
+            },
+        )
+        if not result.valid:
+            raise AnalysisInvalid(result)
+        body = {
+            "agent_run_id": result.agent_run.pk,
+            "valid": True,
+            "actionable_count": result.actionable_count,
+            "risk_case_id": case.pk,
+            "case_status": result.status,
+            "analysis_round": case.analysis_round,
+            "recommendation_ids": [r.pk for r in result.recommendations],
+        }
+        return Response(AnalysisResponseSerializer(body).data, status=201)

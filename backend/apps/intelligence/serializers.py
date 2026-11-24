@@ -13,3 +13,22 @@ class WhatIfRequestSerializer(serializers.Serializer):
 class CaseWhatIfRequestSerializer(serializers.Serializer):
     duration_days = serializers.IntegerField(min_value=MIN_DAYS, max_value=MAX_DAYS, required=False)
     start = serializers.DateTimeField(required=False)  # default: the case event's time
+
+
+class AnalysisRequestSerializer(serializers.Serializer):
+    """POST /internal/risk-cases/{id}/analysis. `payload` is the agent output as received (any
+    JSON, stored raw even when it is garbage); `round` is an optional stale-round guard."""
+
+    kind = serializers.ChoiceField(choices=["RISK_ANALYSIS", "RECOVERY_PLAN"])
+    payload = serializers.JSONField()
+    round = serializers.IntegerField(min_value=1, required=False)
+
+
+class AnalysisResponseSerializer(serializers.Serializer):
+    agent_run_id = serializers.CharField()
+    valid = serializers.BooleanField()
+    actionable_count = serializers.IntegerField()
+    risk_case_id = serializers.CharField()
+    case_status = serializers.CharField()
+    analysis_round = serializers.IntegerField()
+    recommendation_ids = serializers.ListField(child=serializers.CharField())

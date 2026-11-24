@@ -57,7 +57,7 @@ ROLE_MATRIX: dict[str, Rule] = {
     "events.create": _rule({"POST": (SYSTEM, ADMIN)}, routed=False),
     "demo.simulate": _rule({"POST": (ADMIN,)}, routed=False),
     "internal.risk-cases": _rule({"POST": (SYSTEM,)}, routed=False),
-    "internal.analysis": _rule({"POST": (SYSTEM,)}, routed=False),
+    "internal.analysis": _rule({"POST": (SYSTEM,)}),
     "internal.execution-result": _rule({"POST": (SYSTEM,)}, routed=False),
     "integrations.status": _rule({"GET": (ADMIN,)}, routed=False),
 }
