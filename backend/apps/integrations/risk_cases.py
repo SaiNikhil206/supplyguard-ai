@@ -7,8 +7,9 @@ Order (each step is a security or idempotency rule):
   c. a case already exists for the event -> 200 with it, nothing recomputed
   d. snapshot.supplier null -> flag the event, no case
   e. compute with the pure impact engine (bad snapshot -> 400, never echoed)
-  f. one transaction: RiskCase + AffectedPO rows + audit; a lost race is answered as (c)
-The case starts in the model default status (RECEIVED); only workflow transition() moves it.
+  f. one transaction: RiskCase + AffectedPO rows + RECEIVED -> ANALYZING via
+     apps.workflow.services.transition() + audit; a lost race is answered as (c)
+The case is created in the model default status (RECEIVED) and moved only by transition().
 """
 import json
 import logging
@@ -64,6 +65,27 @@ def case_body(case: RiskCase, affected_po_count: int | None = None) -> dict:
         "data_quality_flags": list(case.data_quality_flags or []),
         "correlation_id": str(case.correlation_id),
     }
+
+
+def move_to_analyzing(case: RiskCase, event: DisruptionEvent, actor) -> None:
+    """RECEIVED -> ANALYZING (Trigger SYS_IMPACT) through the workflow state machine."""
+    from apps.workflow.services import transition
+
+    transition(
+        case,
+        RiskCase.Status.ANALYZING,
+        actor=actor,
+        reason="impact computed",
+        correlation_id=event.correlation_id,
+    )
+
+
+def _heal(case: RiskCase, event: DisruptionEvent, actor) -> RiskCase:
+    """An existing case still in RECEIVED (the move failed earlier) is moved on now; transition
+    is idempotent for a case that is already ANALYZING."""
+    if case.status == RiskCase.Status.RECEIVED:
+        move_to_analyzing(case, event, actor)
+    return case
 
 
 def _find_event(tenant, event_id) -> DisruptionEvent:
@@ -136,7 +158,7 @@ def create_risk_case_from_snapshot(
 
     existing = RiskCase.objects.filter(tenant=tenant, event=event).first()  # (c)
     if existing is not None:
-        return CaseResult(200, case_body(existing))
+        return CaseResult(200, case_body(_heal(existing, event, actor)))
 
     if snapshot.get("supplier") is None:  # (d)
         DisruptionEvent.objects.filter(pk=event.pk).update(needs_data_correction=True)
@@ -195,6 +217,7 @@ def create_risk_case_from_snapshot(
                     inventory_coverage_days=_decimal(row["inventory_coverage_days"], "coverage"),
                     shortage=bool(row["shortage"]),
                 )
+            move_to_analyzing(case, event, actor)
             record(
                 actor,
                 "risk_case.created",
@@ -211,5 +234,5 @@ def create_risk_case_from_snapshot(
         winner = RiskCase.objects.filter(tenant=tenant, event=event).first()
         if winner is None:
             raise
-        return CaseResult(200, case_body(winner))
+        return CaseResult(200, case_body(_heal(winner, event, actor)))
     return CaseResult(201, case_body(case, len(rows)))

@@ -91,7 +91,7 @@ def test_demo_scenario_end_to_end(key, acme):
     case = RiskCase.objects.get(pk=body["risk_case_id"])
     assert body["risk_case_id"].startswith("RC-")
     assert body["exposure"] == expected["exposure"] == {"amount": "491400.00", "currency": "INR"}
-    assert body["status"] == "RECEIVED" == case.status
+    assert body["status"] == "ANALYZING" == case.status
     assert body["correlation_id"] == DEMO["event"]["correlation_id"]
     assert body["affected_po_count"] == 2
     assert body["risk_level"] == case.risk_level
@@ -145,6 +145,45 @@ def test_demo_scenario_end_to_end(key, acme):
         "affected_po_count": 2,
     }
     assert "Shakti" not in json.dumps(row.data)
+
+    # RECEIVED -> ANALYZING went through workflow transition() (SYS_IMPACT, actor SYSTEM)
+    (move,) = audits("risk_case.status_changed")
+    assert move.actor == "SYSTEM" and move.tenant_id == "TEN-ACME"
+    assert (move.entity_type, move.entity_id) == ("RiskCase", case.id)
+    assert move.data["from"] == "RECEIVED" and move.data["to"] == "ANALYZING"
+    assert move.data["trigger"] == "SYS_IMPACT" and move.data["reason"] == "impact computed"
+    assert str(move.correlation_id) == DEMO["event"]["correlation_id"]
+
+
+def test_transition_failure_rolls_the_whole_case_back(key):
+    from apps.workflow.exceptions import InvalidTransition
+
+    intake(key)
+    with mock.patch(
+        "apps.workflow.services.transition", side_effect=InvalidTransition("RECEIVED", "ANALYZING")
+    ):
+        response = post(key, DEMO["event"]["event_id"], demo_snapshot())
+    assert response.status_code == 409
+    assert RiskCase.objects.count() == 0 and AffectedPO.objects.count() == 0
+    assert not audits("risk_case.created").exists()
+
+
+def test_existing_case_still_in_received_is_healed_to_analyzing(key, acme):
+    from tests.factories import make_case
+
+    intake(key)
+    event = DisruptionEvent.objects.get(event_id=DEMO["event"]["event_id"])
+    case = make_case(acme, event=event)
+    assert case.status == "RECEIVED"
+    response = post(key, event.event_id, demo_snapshot())
+    assert response.status_code == 200
+    assert response.json()["status"] == "ANALYZING"
+    case.refresh_from_db()
+    assert case.status == "ANALYZING"
+    assert audits("risk_case.status_changed").count() == 1
+    # and a further call changes nothing
+    assert post(key, event.event_id, demo_snapshot()).json()["status"] == "ANALYZING"
+    assert audits("risk_case.status_changed").count() == 1
 
 
 def test_tc09_duplicate_intake_now_returns_the_case_id_and_one_case(key):

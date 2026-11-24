@@ -224,7 +224,7 @@ class RiskCaseCallbackView(APIView):
             serializer.validated_data["event_id"],
             data["snapshot"],  # as received (money strings unchanged)
             serializer.validated_data["snapshot"]["captured_at"],
-            actor="SYSTEM",
+            actor=request.user,
         )
         return Response(result.body, status=result.http_status)
 
@@ -244,6 +244,6 @@ class ExecutionResultView(APIView):
         serializer = ExecutionResultRequestSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         result = apply_execution_result(
-            _tenant(request), execution_id, serializer.validated_data, actor="SYSTEM"
+            _tenant(request), execution_id, serializer.validated_data, actor=request.user
         )
         return Response(result.body, status=result.http_status)
