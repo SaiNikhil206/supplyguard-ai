@@ -112,7 +112,7 @@
 - **Notes:** Needs the mock ERP reachable from Boomi - tunnel from U-12.
 
 ### U-08: Event Streams topics + disruption subscriber
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S2 (1-3 Dec) | **Est:** 2d | **Depends:** U-01, U-07
 - **Branch:** `uday/U-08-event-streams`
 - **Model hint:** sonnet / medium via `boomi-builder`
@@ -121,7 +121,7 @@
   - [ ] Publishing a canonical event triggers the subscriber within 2 s
   - [ ] `correlation_id` preserved end to end
 - **Done in:** -
-- **Notes:** -
+- **Notes:** 2026-11-24 started on the user's instruction although U-07 is still `in-progress` (its Boomi UI build is the user's hands-on work): U-08 specs do not need U-07 built, but the subscriber can only be tested once the `SG_Get_*` processes exist. Plan: | piece | runs as | model / effort | branch | = | topics + publisher + subscriber specs, profiles, fallback, TEST_LOG rows (boomi/processes/event_streams/) | nested session | sonnet / medium | `uday/U-08-event-streams--specs` |. Open decisions for the user: (1) separate Boomi accounts - topics live in Uday's account, N-08 runs in Nikhil's, so 'subscriber starts N-08' needs a cross-account hand-off (docs/BOOMI_ENV.md section 9); (2) 'subscriber within 2 s' is only measurable once the topic exists.
 
 ### U-09: Boomi API Management
 - **Status:** todo
