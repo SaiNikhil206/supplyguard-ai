@@ -189,16 +189,16 @@
 - **Notes:** -
 
 ### N-13: AI governance + approval tests
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S5 (21-24 Dec) | **Est:** 1.5d | **Depends:** N-07, N-10
 - **Branch:** `nikhil/N-13-ai-tests`
 - **Model hint:** sonnet / medium write, haiku / low run
 - **Deliverables:** tests for TC-04, TC-05, TC-06, hallucination/guardrail suite, unauthorized approval attempts; results in `docs/TEST_REPORT.md`.
 - **Acceptance:**
-  - [ ] All listed TCs pass and are in the report
-  - [ ] AC-03 evidence: JSON or screenshot showing facts vs estimates vs missing data
-- **Done in:** -
-- **Notes:** -
+  - [x] All listed TCs pass and are in the report
+  - [x] AC-03 evidence: JSON or screenshot showing facts vs estimates vs missing data
+- **Done in:** nikhil/N-13-ai-tests--tests
+- **Notes:** `backend/tests/governance/` (52 pass, 1 Postgres-only skip, 2 strict xfail) drives the real HTTP API: TC-04/05/06, 14-row recovery-plan + 6-row risk-analysis guardrail tables on the saved v1.3.0 runs, unauthorized/stale/double approval, AC-03 evidence `docs/evidence/AC-03_demo.json`, AC-07 trail; report `docs/TEST_REPORT.md`. Also fixed WORKFLOW_DESIGN s4.1 (RECEIVED->ANALYZING is in U-06 wrapper). FINDINGS (validator unchanged): F-01 capacity figures in recovery-option free text are not fact-checked; F-02 alternate supplier for a PO with shortage=false is not flagged (TC-04b). Both are xfail(strict).
 
 ### N-14: End-to-end integration tests
 - **Status:** todo
