@@ -167,3 +167,48 @@ def test_concurrent_duplicate_plan_one_winner(reseed_ids, seeded, case, plan):  
     assert loser.details["reason"] in {"CASE_NOT_ANALYZING", "ALREADY_RECORDED"}
     assert AgentRun.objects.filter(risk_case=case).count() == 1
     assert Recommendation.objects.filter(risk_case=case).count() == 4
+
+
+# ---------------------------------------------------------------- parser hardening
+def _raw(client, case, body: bytes):
+    return client.post(url(case), data=body, content_type="application/json")
+
+
+def test_deeply_nested_json_is_400_with_audit(system, case):
+    deep = b"[" * 50000 + b"]" * 50000
+    body = b'{"kind": "RECOVERY_PLAN", "round": 1, "payload": ' + deep + b"}"
+    r = _raw(system, case, body)
+    assert r.status_code == 400, r.content[:200]
+    assert r.json()["error"]["details"]["reason"] == "INVALID_JSON"
+    assert not AgentRun.objects.exists()
+    assert AuditEvent.objects.filter(entity_id=case.id, action="analysis.rejected").count() == 1
+
+
+def test_moderately_nested_json_over_limit_is_400(system, case):
+    deep = b"[" * 100 + b"]" * 100
+    r = _raw(system, case, b'{"kind": "RECOVERY_PLAN", "round": 1, "payload": ' + deep + b"}")
+    assert r.status_code == 400
+    assert r.json()["error"]["details"]["reason"] == "INVALID_JSON"
+
+
+def test_malformed_json_is_400_invalid_json(system, case):
+    r = _raw(system, case, b'{"kind": ')
+    assert r.status_code == 400
+    assert r.json()["error"]["details"]["reason"] == "INVALID_JSON"
+
+
+def test_nul_character_is_422_and_stored_sanitised(system, case, plan):
+    plan["options"][0]["action_steps"] = ["step\u0000one"]
+    plan["bad\u0000key"] = 1
+    r = post(system, case, "RECOVERY_PLAN", plan)
+    assert r.status_code == 422, r.content
+    d = r.json()["error"]["details"]
+    assert d["reason"] == "AGENT_OUTPUT_INVALID"
+    assert d["errors"][0]["code"] == "NUL_CHARACTER"
+    run = AgentRun.objects.get(risk_case=case)
+    assert run.valid is False and run.validation_errors[0]["code"] == "NUL_CHARACTER"
+    assert run.raw["options"][0]["action_steps"] == ["step\ufffdone"]
+    assert "bad\ufffdkey" in run.raw and "\x00" not in str(run.raw)
+    assert not Recommendation.objects.exists()
+    case.refresh_from_db()
+    assert case.status == S.ANALYZING

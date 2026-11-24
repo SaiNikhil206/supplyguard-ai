@@ -320,6 +320,35 @@ def _check_open(locked: RiskCase, kind: str, round_) -> None:
         )
 
 
+def has_nul(value) -> bool:
+    """True if any string or dict key anywhere in the JSON value holds U+0000 (no recursion)."""
+    stack = [value]
+    while stack:
+        item = stack.pop()
+        if isinstance(item, str):
+            if "\x00" in item:
+                return True
+        elif isinstance(item, dict):
+            for k, v in item.items():
+                if isinstance(k, str) and "\x00" in k:
+                    return True
+                stack.append(v)
+        elif isinstance(item, list):
+            stack.extend(item)
+    return False
+
+
+def strip_nul(value):
+    """Copy of the JSON value with U+0000 replaced by U+FFFD (depth is capped by the parser)."""
+    if isinstance(value, str):
+        return value.replace("\x00", "�")
+    if isinstance(value, dict):
+        return {strip_nul(k): strip_nul(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [strip_nul(v) for v in value]
+    return value
+
+
 def _money(value):
     """-> (amount quantised to 2 dp or None when missing / out of range, currency)."""
     if not isinstance(value, dict):
@@ -446,15 +475,27 @@ def record_analysis(
     with transaction.atomic():
         locked = _lock_case(case, tenant)
         _check_open(locked, kind, round)
-        result = validate_agent_output(
-            kind,
-            payload,
-            locked.snapshot,
-            locked.impact,
-            event=_event_dict(locked.event),
-            risk_case_id=locked.id,
-        )
-        errors = [*result["schema_errors"], *result["fact_errors"]]
+        if has_nul(payload):
+            # Postgres jsonb cannot hold U+0000: keep a sanitised copy so the call is still on
+            # record (AC-07), and never validate or apply it.
+            payload = strip_nul(payload)
+            result = {"valid": False, "schema_errors": [], "fact_errors": [], "options": [],
+                      "actionable_count": 0}
+            errors = [{
+                "code": "NUL_CHARACTER",
+                "message": "The payload contained NUL (U+0000) characters; they were replaced "
+                "with U+FFFD in the stored copy and the output was not applied.",
+            }]
+        else:
+            result = validate_agent_output(
+                kind,
+                payload,
+                locked.snapshot,
+                locked.impact,
+                event=_event_dict(locked.event),
+                risk_case_id=locked.id,
+            )
+            errors = [*result["schema_errors"], *result["fact_errors"]]
         run = AgentRun.objects.create(
             tenant=tenant,
             risk_case=locked,

@@ -16,6 +16,7 @@ from apps.core.tenancy import CROSS_TENANT_ACTION, TenantScopedMixin
 
 from . import impact, services, whatif
 from .exceptions import AnalysisInvalid, PayloadTooLarge
+from .parsers import StrictJSONParser
 from .serializers import (
     AnalysisRequestSerializer,
     AnalysisResponseSerializer,
@@ -236,6 +237,7 @@ class AnalysisView(TenantScopedMixin, generics.GenericAPIView):
     lookup_url_kwarg = "case_id"
     max_body_bytes = 1024 * 1024
     max_errors_echoed = 50
+    parser_classes = [StrictJSONParser]
     _audited = False
 
     def initial(self, request, *args, **kwargs):

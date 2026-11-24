@@ -58,3 +58,14 @@ class PayloadTooLarge(WorkflowError):
     status_code = status.HTTP_413_REQUEST_ENTITY_TOO_LARGE
     default_code = "payload_too_large"
     reason = "PAYLOAD_TOO_LARGE"
+
+
+class InvalidJSON(WorkflowError):
+    """400: the body is not parseable JSON (or is nested absurdly deep). Nothing is stored."""
+
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_code = "parse_error"
+    reason = "INVALID_JSON"
+
+    def __init__(self, message):
+        super().__init__(message)
