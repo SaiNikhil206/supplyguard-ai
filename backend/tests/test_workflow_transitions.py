@@ -146,7 +146,9 @@ def test_every_forbidden_pair_is_invalid(tenant_a, frm, to):
 @pytest.mark.parametrize("state", ALL)
 def test_self_transition_is_a_noop(tenant_a, state):
     case = case_in(tenant_a, state)
-    result = transition(case, state, actor="SYSTEM", reason="again")
+    actors = {a for e in TRANSITIONS.values() if e.to == state for a in e.actors} or {"SYSTEM"}
+    actor = "SYSTEM" if "SYSTEM" in actors else make_user(tenant_a, role=sorted(actors)[0])
+    result = transition(case, state, actor=actor, reason="again")
     assert result.changed is False and result.audit_event is None
     assert not AuditEvent.objects.filter(action="risk_case.status_changed").exists()
     assert not ws.ANALYSIS_REQUESTS
@@ -398,3 +400,12 @@ def test_nested_in_outer_atomic_rolls_back_with_it(tenant_a):
             raise RuntimeError("outer failure")
     assert RiskCase.objects.get(pk=case.pk).status == S.RECEIVED
     assert not AuditEvent.objects.filter(action="risk_case.status_changed").exists()
+
+
+def test_self_transition_still_checks_the_actor(tenant_a):
+    case = case_in(tenant_a, S.APPROVED)  # only a PM may move a case into APPROVED
+    for actor in ("SYSTEM", make_user(tenant_a, role="VIEWER")):
+        with pytest.raises(TransitionNotPermitted) as exc:
+            transition(case, S.APPROVED, actor=actor, reason="again")
+        assert exc.value.status_code == 403
+    assert transition(case, S.APPROVED, actor=_pm(tenant_a), reason="again").changed is False

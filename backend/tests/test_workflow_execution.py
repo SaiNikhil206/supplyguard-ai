@@ -116,7 +116,7 @@ def running_case(tenant):
 def test_result_succeeded_recovers_and_sets_recovered_at(tenant_a):
     case, exe = running_case(tenant_a)
     result = services.record_execution_result(
-        exe, outcome="SUCCEEDED", response_status=200, response_payload={"ok": True},
+        exe, outcome="SUCCEEDED", attempt=1, response_status=200, response_payload={"ok": True},
         actor="SYSTEM",
     )
     case.refresh_from_db()
@@ -128,7 +128,8 @@ def test_result_succeeded_recovers_and_sets_recovered_at(tenant_a):
 def test_result_failed_moves_to_execution_failed(tenant_a):
     case, exe = running_case(tenant_a)
     services.record_execution_result(
-        exe, outcome="FAILED", error_class="BUSINESS", error="unverified", actor="SYSTEM"
+        exe, outcome="FAILED", attempt=1, error_class="BUSINESS", error="unverified",
+        actor="SYSTEM",
     )
     case.refresh_from_db()
     exe.refresh_from_db()
@@ -138,8 +139,8 @@ def test_result_failed_moves_to_execution_failed(tenant_a):
 
 def test_same_result_twice_is_a_noop(tenant_a):
     case, exe = running_case(tenant_a)
-    services.record_execution_result(exe, outcome="SUCCEEDED", actor="SYSTEM")
-    again = services.record_execution_result(exe, outcome="SUCCEEDED", actor="SYSTEM")
+    services.record_execution_result(exe, outcome="SUCCEEDED", attempt=1, actor="SYSTEM")
+    again = services.record_execution_result(exe, outcome="SUCCEEDED", attempt=1, actor="SYSTEM")
     assert again.changed is False and again.audit_event is None
     assert AuditEvent.objects.filter(action="risk_case.status_changed").count() == 1
 
@@ -147,7 +148,7 @@ def test_same_result_twice_is_a_noop(tenant_a):
 def test_result_for_non_running_execution_is_409(tenant_a):
     case, _, exe = approved(tenant_a)  # PENDING
     with pytest.raises(DecisionConflict) as e:
-        services.record_execution_result(exe, outcome="SUCCEEDED", actor="SYSTEM")
+        services.record_execution_result(exe, outcome="SUCCEEDED", attempt=1, actor="SYSTEM")
     assert e.value.details["reason"] == "EXECUTION_NOT_RUNNING"
     assert e.value.status_code == 409
 
@@ -155,7 +156,7 @@ def test_result_for_non_running_execution_is_409(tenant_a):
 def test_failed_result_without_error_class_changes_nothing(tenant_a):
     case, exe = running_case(tenant_a)
     with pytest.raises(PreconditionFailed):
-        services.record_execution_result(exe, outcome="FAILED", actor="SYSTEM")
+        services.record_execution_result(exe, outcome="FAILED", attempt=1, actor="SYSTEM")
     exe.refresh_from_db()
     assert exe.status == "RUNNING"
 
@@ -163,7 +164,7 @@ def test_failed_result_without_error_class_changes_nothing(tenant_a):
 def test_bad_outcome_is_value_error(tenant_a):
     case, exe = running_case(tenant_a)
     with pytest.raises(ValueError):
-        services.record_execution_result(exe, outcome="MAYBE", actor="SYSTEM")
+        services.record_execution_result(exe, outcome="MAYBE", attempt=1, actor="SYSTEM")
 
 
 # --- stubs -------------------------------------------------------------------------------------
@@ -196,3 +197,38 @@ def test_resume_pending_picks_up_old_pending_executions(tenant_a):
     exe.refresh_from_db()
     case.refresh_from_db()
     assert exe.status == "RUNNING" and case.status == S.EXECUTING
+
+
+def test_late_callback_of_attempt_1_cannot_fail_attempt_2(
+    tenant_a, django_capture_on_commit_callbacks
+):
+    case, pm, exe = failed_case(tenant_a)
+    with django_capture_on_commit_callbacks(execute=True):
+        services.retry_execution(exe, actor=pm)  # attempt 2 is now RUNNING
+    with pytest.raises(DecisionConflict) as e:
+        services.record_execution_result(
+            exe, outcome="FAILED", attempt=1, error_class="TRANSIENT", error="late",
+            actor="SYSTEM",
+        )
+    assert e.value.status_code == 409
+    assert e.value.details["reason"] == "STALE_EXECUTION_RESULT"
+    assert e.value.details["current_attempt"] == 2
+    case.refresh_from_db()
+    exe.refresh_from_db()
+    assert case.status == S.EXECUTING and exe.status == "RUNNING"
+    services.record_execution_result(exe, outcome="SUCCEEDED", attempt=2, actor="SYSTEM")
+    case.refresh_from_db()
+    assert case.status == S.RECOVERED
+
+
+def test_dispatch_skips_when_execution_is_not_running(tenant_a):
+    case, _, exe = approved(tenant_a)  # PENDING, case APPROVED
+    services.dispatch_execution(exe.pk, tenant_a.id, case.correlation_id)
+    assert not ws.EXEC_REQUESTS
+    case2, exe2 = running_case(tenant_a)
+    services.dispatch_execution(exe2.pk, tenant_a.id, case2.correlation_id)
+    assert len(ws.EXEC_REQUESTS) == 1
+    ws.EXEC_REQUESTS.clear()
+    services.record_execution_result(exe2, outcome="SUCCEEDED", attempt=1, actor="SYSTEM")
+    services.dispatch_execution(exe2.pk, tenant_a.id, case2.correlation_id)  # case RECOVERED
+    assert not ws.EXEC_REQUESTS

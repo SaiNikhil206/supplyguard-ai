@@ -199,6 +199,12 @@ WORKFLOW_ANALYSIS_TRIGGER = env(
     "WORKFLOW_ANALYSIS_TRIGGER", default="apps.workflow.hooks.StubAnalysisTrigger"
 )
 
+for _name in ("WORKFLOW_EXECUTION_TRIGGER", "WORKFLOW_ANALYSIS_TRIGGER"):
+    if not globals()[_name].startswith("apps."):
+        from django.core.exceptions import ImproperlyConfigured
+
+        raise ImproperlyConfigured(f"{_name} must be a dotted path inside 'apps.'")
+
 # --- Seed data (manage.py load_seed, docs/CONTRACTS.md section 10) ---------------------------
 # Folder with tenants.json, suppliers.json, ...; default is <repo>/data/seed.
 SEED_DATA_DIR = Path(env("SEED_DATA_DIR", default=str(BASE_DIR.parent / "data" / "seed")))

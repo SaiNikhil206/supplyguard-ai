@@ -10,7 +10,11 @@ class WorkflowError(APIException):
 
     def __init__(self, message=None, *, reason=None, **details):
         super().__init__(detail=message or self.default_detail)
-        self.details = {"reason": reason or self.reason, **details}
+        self.contract_details = {"reason": reason or self.reason, **details}
+
+    @property
+    def details(self):
+        return self.contract_details
 
 
 class CaseNotFound(WorkflowError):
@@ -58,6 +62,15 @@ class DecisionConflict(WorkflowError):
         super().__init__(
             message or reason.replace("_", " ").capitalize() + ".", reason=reason, **details
         )
+
+
+class DecisionNotPermitted(WorkflowError):
+    status_code = status.HTTP_403_FORBIDDEN
+    default_code = "forbidden"
+    reason = "ACTOR_NOT_PERMITTED"
+
+    def __init__(self, role):
+        super().__init__(f"{role} may not decide on a recommendation.", actor_role=role)
 
 
 class DecisionRejected(WorkflowError):

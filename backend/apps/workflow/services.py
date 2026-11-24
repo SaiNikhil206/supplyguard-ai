@@ -9,7 +9,6 @@ the new status and its audit row in ONE transaction, or changes nothing.
 """
 import logging
 from dataclasses import dataclass
-from functools import partial
 from typing import Literal
 
 from django.db import IntegrityError, transaction
@@ -27,6 +26,7 @@ from . import hooks
 from .exceptions import (
     CaseNotFound,
     DecisionConflict,
+    DecisionNotPermitted,
     DecisionRejected,
     InvalidTransition,
     PreconditionFailed,
@@ -79,6 +79,20 @@ def _refresh_caller(case, locked):
         case.refresh_from_db(fields=_CASE_FIELDS)
 
 
+def _after_commit(fn, *args):
+    """Run `fn(*args)` after the outermost commit. A failure is logged, never raised: the
+    decision / transition is already saved (a PENDING execution is picked up later by
+    `workflow_resume_pending`)."""
+
+    def callback():
+        try:
+            fn(*args)
+        except Exception:
+            logger.exception("after-commit step %s failed", getattr(fn, "__name__", fn))
+
+    transaction.on_commit(callback)
+
+
 def _request_analysis(case_id, tenant_id, round_, reason, feedback, correlation_id):
     """on_commit: ask the AnalysisTrigger for a new analysis round. Never raises."""
     request = hooks.AnalysisRequest(
@@ -127,6 +141,9 @@ def transition(
 
         frm = locked.status
         if frm == to_state:  # idempotent repeat: no audit, no precondition, no hook
+            allowed = {a for e in TRANSITIONS.values() if e.to == to_state for a in e.actors}
+            if role not in (allowed or {SYSTEM}):
+                raise TransitionNotPermitted(frm, to_state, role)
             _refresh_caller(case, locked)
             return TransitionResult(locked, frm, to_state, False, None)
 
@@ -171,16 +188,14 @@ def transition(
         )
 
         if edge.requests_analysis:
-            transaction.on_commit(
-                partial(
-                    _request_analysis,
-                    locked.pk,
-                    locked.tenant_id,
-                    locked.analysis_round,
-                    reason,
-                    ctx.get("comments", "") if isinstance(ctx.get("comments", ""), str) else "",
-                    cid,
-                )
+            _after_commit(
+                _request_analysis,
+                locked.pk,
+                locked.tenant_id,
+                locked.analysis_round,
+                reason,
+                ctx.get("comments", "") if isinstance(ctx.get("comments", ""), str) else "",
+                cid,
             )
 
     _refresh_caller(case, locked)
@@ -223,6 +238,8 @@ _REC_STATUS = {
 def record_decision(recommendation, decision, comments, *, user) -> DecisionResult:
     """The human approval gate. Lock order: RiskCase first, then Recommendation."""
     comments = (comments or "").strip()
+    if not isinstance(user, User) or user.role != "PROCUREMENT_MANAGER":
+        raise DecisionNotPermitted(getattr(user, "role", "UNKNOWN"))
     with transaction.atomic():
         try:
             case = RiskCase.objects.select_for_update().get(
@@ -292,9 +309,7 @@ def record_decision(recommendation, decision, comments, *, user) -> DecisionResu
                 target_system="mock-erp",
                 request_payload=rec.proposed_action,
             )
-            transaction.on_commit(
-                partial(start_execution, execution.pk, case.tenant_id, case.correlation_id)
-            )
+            _after_commit(start_execution, execution.pk, case.tenant_id, case.correlation_id)
         elif decision == Approval.Decision.REJECT:
             if not actionable_recommendations(case).exists():
                 transition(
@@ -342,7 +357,7 @@ def start_execution(execution_id: str, tenant_id: str, correlation_id) -> None:
         exe.status = Execution.Status.RUNNING
         exe.started_at = timezone.now()
         exe.save(update_fields=["status", "started_at"])
-        transaction.on_commit(partial(dispatch_execution, execution_id, tenant_id, correlation_id))
+        _after_commit(dispatch_execution, execution_id, tenant_id, correlation_id)
 
 
 def _error_text(exc) -> str:
@@ -354,6 +369,12 @@ def dispatch_execution(execution_id: str, tenant_id: str, correlation_id) -> Non
     exe = Execution.objects.select_related("approval__recommendation").get(
         pk=execution_id, tenant_id=tenant_id
     )
+    case_status = RiskCase.objects.filter(pk=exe.approval.risk_case_id).values_list(
+        "status", flat=True
+    ).first()
+    if exe.status != Execution.Status.RUNNING or case_status != S.EXECUTING:
+        logger.info("dispatch_execution: %s is not running, skipped", execution_id)
+        return
     approval = exe.approval
     request = hooks.ExecutionRequest(
         execution_id=exe.pk,
@@ -373,6 +394,7 @@ def dispatch_execution(execution_id: str, tenant_id: str, correlation_id) -> Non
         record_execution_result(
             exe, outcome="FAILED", error_class=Execution.ErrorClass.DOWNSTREAM,
             error=_error_text(exc), actor=SYSTEM, correlation_id=correlation_id,
+            attempt=request.attempt,
         )
 
 
@@ -399,10 +421,8 @@ def retry_execution(execution, *, actor, correlation_id=None) -> TransitionResul
         exe.save(update_fields=[
             "retry_count", "status", "error_class", "error", "started_at", "finished_at"
         ])
-        transaction.on_commit(
-            partial(
-                dispatch_execution, exe.pk, exe.tenant_id, correlation_id or case.correlation_id
-            )
+        _after_commit(
+            dispatch_execution, exe.pk, exe.tenant_id, correlation_id or case.correlation_id
         )
     return result
 
@@ -411,6 +431,7 @@ def record_execution_result(
     execution,
     *,
     outcome: Literal["SUCCEEDED", "FAILED"],
+    attempt: int,
     error_class=None,
     error=None,
     response_status=None,
@@ -419,7 +440,9 @@ def record_execution_result(
     correlation_id=None,
 ) -> TransitionResult:
     """For U-10's result endpoint. SUCCEEDED means the ERP write was verified by re-reading the
-    PO (TC-07); an unverified success is reported as FAILED / BUSINESS."""
+    PO (TC-07); an unverified success is reported as FAILED / BUSINESS. `attempt` is the
+    `ExecutionRequest.attempt` the result belongs to; anything but retry_count + 1 is a stale
+    callback (409 STALE_EXECUTION_RESULT)."""
     if outcome not in ("SUCCEEDED", "FAILED"):
         raise ValueError(f"outcome must be SUCCEEDED or FAILED, not {outcome!r}")
     with transaction.atomic():
@@ -427,6 +450,10 @@ def record_execution_result(
             case, exe = _lock_case_and_execution(execution.pk, execution.tenant_id)
         except (Execution.DoesNotExist, RiskCase.DoesNotExist):
             raise CaseNotFound() from None
+        if attempt != exe.retry_count + 1:  # a late callback of an earlier attempt
+            raise DecisionConflict(
+                "STALE_EXECUTION_RESULT", attempt=attempt, current_attempt=exe.retry_count + 1
+            )
         if exe.status == outcome:  # idempotent repeat (Boomi callback retry)
             return TransitionResult(case, case.status, case.status, False, None)
         if exe.status != Execution.Status.RUNNING:

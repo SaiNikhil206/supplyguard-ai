@@ -315,3 +315,28 @@ def test_error_body_has_contract_shape(tenant_a, pm):
     err = post(jwt_client(pm), rec).json()["error"]
     assert set(err) == {"code", "message", "details", "correlation_id"}
     assert case_in  # keep import used
+
+
+@pytest.mark.parametrize("role", ["OPS_MANAGER", "VIEWER", "ADMIN"])
+def test_service_itself_refuses_non_pm_even_for_a_non_final_reject(tenant_a, role):
+    case, (a, b) = pending_case(tenant_a, 2)  # REJECT of a would not call transition()
+    with pytest.raises(services.DecisionNotPermitted) as exc:
+        services.record_decision(a, "REJECT", "no", user=make_user(tenant_a, role=role))
+    assert exc.value.status_code == 403
+    with pytest.raises(services.DecisionNotPermitted):
+        services.record_decision(a, "APPROVE", "", user="SYSTEM")
+    no_side_effects(case, a)
+    assert not AuditEvent.objects.filter(action="recommendation.decided").exists()
+
+
+def test_failure_after_commit_does_not_turn_a_saved_approval_into_a_500(
+    tenant_a, pm, django_capture_on_commit_callbacks
+):
+    case, (rec,) = pending_case(tenant_a)
+    with mock.patch.object(services, "start_execution", side_effect=RuntimeError("late")):
+        with django_capture_on_commit_callbacks(execute=True):
+            r = post(jwt_client(pm), rec)
+    assert r.status_code == 201
+    assert Approval.objects.count() == 1
+    execution = Execution.objects.get()
+    assert execution.status == "PENDING"  # left for workflow_resume_pending
