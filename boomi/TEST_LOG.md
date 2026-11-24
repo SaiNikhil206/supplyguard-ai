@@ -23,3 +23,21 @@
 | 2026-11-20 | Nikhil | Agentstudio agent SG Recovery Planner (b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) | RP-ADV-02 (prompt v1.3.0) | PASS: all checks (33/33) | Structured, Sonnet 4.5 |
 | 2026-11-20 | Nikhil | Agentstudio agent SG Recovery Planner (b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) | RP-ADV-03 (prompt v1.3.0) | PASS: all checks (34/34) | Structured, Sonnet 4.5 |
 | 2026-11-20 | Nikhil | Agentstudio agent SG Recovery Planner (b5f2f51a-0b4e-41e6-998d-e04031f2a9d0) | RP-ADV-04 (prompt v1.3.0) | FAIL: assumptions_qualitative only (33/34, same SUP-2002 item) | Structured, Sonnet 4.5; reply rebuilt from live reply by advisor |
+
+## U-08 TEST PLAN - Event Streams publisher/subscriber (Uday; Claude cannot run Boomi, so every row starts as NOT RUN)
+
+Specs: `boomi/processes/event_streams/README.md` and `SG_Disruption_Direct.md`. Samples in `boomi/processes/event_streams/samples/`. Replace `NOT RUN` with `date / PASS|FAIL / note` when run, and add a normal dated row to the main table above.
+
+| Process | Scenario | Input | Expected | Result |
+|---|---|---|---|---|
+| SG_Publish_Event -> SG_Subscribe_Disruption | Publish -> subscriber within 2 s | POST `samples/disruption.factory_outage.json` to the listener with `X-Correlation-ID`, `Idempotency-Key: TEN-ACME:EVT-000123`, key | HTTP 200 `PUBLISHED`; message visible on `supplier.disruption`; `SG_Subscribe_Disruption` starts <= 2 s after the 200 (compare Process Reporting start time with the publish time) | NOT RUN |
+| SG_Publish_Event -> SG_Subscribe_Disruption | correlation_id preserved | header `X-Correlation-ID: 6f1c0a52-3b8e-4d7a-9c1e-2a5f7b9d4e10`, same value in the body | same id in the publisher log line, the topic message (body and property), the subscriber log line and the N-08 / placeholder log line | NOT RUN |
+| SG_Publish_Event | Duplicate event_id not published twice | send the same request twice (same `Idempotency-Key`) | 2nd answer HTTP 200 `DUPLICATE`; exactly one message on the topic; exactly one subscriber run | NOT RUN |
+| SG_Subscribe_Disruption | Duplicate message not processed twice | redeliver / re-publish the same message to the topic (Event Streams UI) | 2nd run logs `skipped duplicate`; no second call to `SG_Disruption_Correlate` | NOT RUN |
+| SG_Subscribe_Disruption | Subscriber failure goes to the dead-letter path | make the N-08 call fail (placeholder returns an error, or stop the target) | failure logged with `cid`, no secret/body in the error, message not recorded as processed, handed to the U-11 dead-letter path (before U-11: exception visible, message redelivered or flagged); a later success processes it once | NOT RUN |
+| SG_Publish_Event | Unauthorised publish rejected | POST without `X-Api-Key` / wrong key / wrong Basic credential | HTTP 401 `UNAUTHENTICATED` (`samples/error.unauthorized.401.json`); no message on any topic; key not in logs | NOT RUN |
+| SG_Publish_Event | Invalid tenant or key mismatch | `tenant_id` `acme`, or `Idempotency-Key` not equal to `tenant_id:event_id` | HTTP 400 `VALIDATION_ERROR`; nothing published | NOT RUN |
+| SG_Publish_Event | shipment.delay routing | POST `samples/shipment_delay.json` | message on `shipment.delay`, not on `supplier.disruption` | NOT RUN |
+| SG_Publish_Event | Event Streams down / produce fails | disable the token in the extension | HTTP 502 `DOWNSTREAM_ERROR`; idempotency key NOT recorded; Django marks `PUBLISH_FAILED`; a re-send after fixing it is published | NOT RUN |
+| Django -> SG_Publish_Event | End to end from Django | `POST /api/v1/demo/simulate-disruption` with `BOOMI_BASE_URL`/`BOOMI_EVENT_PATH` pointing at the listener | event `publish_status` becomes `PUBLISHED`; same correlation_id in the Boomi log | NOT RUN |
+| SG_Disruption_Direct | Fallback path | deploy `SG_Disruption_Direct` on `/ws/simple/createDisruptionEvent` (Event Streams process undeployed), POST `samples/disruption.factory_outage.json` | HTTP 200 immediately (< 5 s); correlation started with the unchanged event and same correlation_id; duplicate key not processed twice; unauthorised call 401 | NOT RUN |
