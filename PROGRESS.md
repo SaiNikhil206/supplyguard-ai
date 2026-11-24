@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|---|---|
 | Roop | 1 | 0 | 3 | 0 | 8 | 0 | 8% | R-02 |
 | Nikhil | 0 | 0 | 9 | 0 | 5 | 2 | 0% | N-12 |
-| Uday | 1 | 0 | 5 | 0 | 6 | 2 | 8% | U-07 |
+| Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
 
 ## Task board
@@ -39,7 +39,7 @@
 | N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
 | R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | review | 0/1 | - |
 | R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 0/2 | - |
-| U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | todo | 0/2 | - |
+| U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | review | 1/2 | review 2026-11-24 on `uday/U-08-event-streams`: topics, subscription, publisher (shipment routing), subscriber (placeholder for N-08), Basic auth, Django end to end. Known gaps: no Boomi-side duplicate/header/tenant checks (see Notes), failure path / Event Streams down / SG_Disruption_Direct fallback not run, subscriber does not yet start N-08 (cross-account decision open). |
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
@@ -89,23 +89,23 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
-| 2026-11-24 | 5bf25fa | nikhil | N-07 | review | merge: N-07 persistence + /analysis endpoint into task branch |
-| 2026-11-24 | 8c73e15 | nikhil | N-07 | review | merge: N-07 Agent output validator + persistence (auto-merge) |
-| 2026-11-24 | 82d5b6b | nikhil | N-07 | review | merge: origin/nikhil/N-07-validator (U-06) into N-07 persist |
-| 2026-11-24 | 1393dd8 | nikhil | N-07 | review | fix(intelligence): N-07 parser hardening |
-| 2026-11-24 | 15d2b93 | uday | S-01 | blocked | docs(contracts): drop stale 'needs Nikhil's agreement', fix TC-02 wording, add freeze follow-ups (section 11) |
-| 2026-11-24 | 9faffaa | uday | U-12 | in-progress | chore(tasks): U-12 - merged collaboration, compose re-verified, render.yaml follow-up recorded |
-| 2026-11-24 | 90fae5f | nikhil | N-07 | review | fix(intelligence): N-07 persist review fixes |
-| 2026-11-24 | bd2285d | uday | U-12 | in-progress | merge: collaboration (U-03..U-06, N-04..N-11, root-context backend build) into uday/U-12-deploy |
-| 2026-11-24 | f90aba0 | uday | U-06 | review | merge: U-06 Event intake + Boomi client (Django `apps/integrations`) (auto-merge) |
-| 2026-11-24 | 3714322 | uday | U-06 | review | chore(tasks): U-06 to review - acceptance ticked, evidence and the unreviewed-round-4 caveat |
-| 2026-11-24 | c4bd65b | nikhil | N-07 | review | feat(intelligence): persist validated agent output + analysis endpoint (N-07) |
-| 2026-11-24 | d7958dd | uday | U-06 | in-progress | merge: U-06 round 4 (delegate to N-04 create_risk_case, bounded publish, URL/log hardening, review fixes) |
-| 2026-11-24 | 9aade85 | uday | U-06 | in-progress | fix(integrations): risk-cases delegates to N-04, range checks, unverified success, README |
-| 2026-11-24 | 0a2efc0 | uday | U-06 | in-progress | fix(integrations): time range, deep JSON, duplicate re-publish, intake throttle, simulation ids |
-| 2026-11-24 | a94b806 | uday | U-06 | in-progress | fix(integrations): bound the Boomi publish, refuse secrets in URLs, quiet httpx logs |
-| 2026-11-24 | c95af0e | uday | U-06 | in-progress | chore(tasks): U-06 notes - delegation to N-04/N-10, review status, contracts follow-ups |
-| 2026-11-24 | 6a105be | uday | U-06 | in-progress | merge: U-06 round 3 (delegate to N-10 workflow: ANALYZING transition, record_execution_result) |
-| 2026-11-24 | c5c2b36 | uday | U-06 | in-progress | feat(integrations): callbacks use N-10 transition and record_execution_result |
-| 2026-11-24 | 35afaba | uday | U-06 | in-progress | merge: collaboration (N-10 workflow, N-11 what-if) into uday/U-06-event-intake |
-| 2026-11-24 | 0e17ad7 | uday | U-06 | in-progress | merge: U-06 callbacks piece (internal risk-cases and execution-result) into uday/U-06-event-intake |
+| 2026-11-24 | ba7fa94 | uday | U-08 | in-progress | docs(boomi): U-08 BOOMI_ENV update, dedupe and response body descoped, timing 2-3 s |
+| 2026-11-24 | cfd6a31 | uday | U-08 | in-progress | docs(boomi): U-08 header/tenant validation cannot live in the WSS listener |
+| 2026-11-24 | 43675cc | uday | U-08 | in-progress | test(boomi): U-08 validation v6.0 failed, rolled back to v5.0 |
+| 2026-11-24 | 2baa1ed | uday | U-08 | in-progress | test(boomi): U-08 shipment.delay routing deployed (v5.0) and verified |
+| 2026-11-24 | 3662de6 | uday | U-08 | in-progress | test(boomi): U-08 Django end-to-end passes (simulate -> publisher -> topic -> subscriber) |
+| 2026-11-24 | 695903b | uday | U-08 | in-progress | test(boomi): U-08 Basic auth works with the full username and token (HTTP 200) |
+| 2026-11-24 | 8817f5a | uday | U-08 | in-progress | test(boomi): U-08 wrong Basic credentials rejected with 401 |
+| 2026-11-24 | 6d6d584 | uday | U-08 | in-progress | feat(boomi): U-08 runtime web server switched to Basic auth; unauthenticated call gets 401 |
+| 2026-11-24 | 1c2bdbe | uday | U-08 | in-progress | feat(boomi): U-08 correlation_id logged and traced end to end (v4.0) |
+| 2026-11-24 | 088a63a | uday | U-08 | in-progress | test(boomi): U-08 first end-to-end run - publisher and subscriber round trip works |
+| 2026-11-24 | ce53fa9 | uday | U-08 | in-progress | chore(tasks): U-08 redeployed v2.0 - subscriber still failing on the token value |
+| 2026-11-24 | db0f871 | uday | U-08 | in-progress | chore(tasks): U-08 deployed to ESI-PC28 - publisher running, subscriber needs the token |
+| 2026-11-24 | cb2c3fb | uday | U-08 | in-progress | chore(tasks): U-08 build log - WSS operation and both processes built (minimal) in Boomi |
+| 2026-11-24 | 2cfa029 | nikhil | N-13 | review | merge: N-13 AI governance + approval tests (auto-merge) |
+| 2026-11-24 | 0caa295 | nikhil | N-13 | review | merge: N-13 governance tests into task branch |
+| 2026-11-24 | b8f5ca2 | nikhil | N-13 | review | test(governance): N-13 AI governance + approval tests, TEST_REPORT, AC-03 evidence |
+| 2026-11-24 | 64711eb | uday | U-08 | in-progress | chore(tasks): U-08 build log - profiles, connection and 3 operations built in Boomi |
+| 2026-11-24 | d369f37 | uday | U-08 | in-progress | chore(tasks): U-08 build log - topics, subscription, token, first profile done in Boomi |
+| 2026-11-24 | 4ce4ee8 | uday | U-08 | in-progress | merge: U-08 specs piece (Event Streams build specs, profiles, fallback, test plan) |
+| 2026-11-24 | 7b32187 | uday | U-08 | in-progress | docs(boomi): U-08 Event Streams build specs, profiles, samples, fallback, test plan |
