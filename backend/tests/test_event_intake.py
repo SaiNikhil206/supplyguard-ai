@@ -359,7 +359,7 @@ def test_offset_timestamp_is_stored_as_the_same_instant(key, acme, monkeypatch):
 # --- Boomi failure / not configured ------------------------------------------------------------
 def test_boomi_down_event_kept_publish_failed_still_202(key, acme, monkeypatch):
     rec = Recorder([httpx.ReadTimeout("t"), 503, 503])
-    sleeps = patch_boomi(monkeypatch, rec)
+    sleeps = patch_boomi(monkeypatch, rec, max_retries=2)
     r = post(key, payload())
     assert r.status_code == 202 and r.json()["status"] == "RECEIVED"
     assert rec.calls == 3 and len(sleeps) == 2

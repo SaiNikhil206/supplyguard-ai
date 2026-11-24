@@ -186,6 +186,11 @@ LOGGING = {
         }
     },
     "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
+    # httpx logs every request URL at INFO; keep them (and any credential in a URL) out.
+    "loggers": {
+        "httpx": {"level": "WARNING"},
+        "httpcore": {"level": "WARNING"},
+    },
 }
 
 # --- Execution retries (docs/CONTRACTS.md section 10, Execution.retryable) -------------------
@@ -218,8 +223,10 @@ BOOMI_AUTH_MODE = env("BOOMI_AUTH_MODE", default="apikey").strip().lower()
 # PLACEHOLDER path until U-08/U-09 define the real Boomi listener / gateway route.
 BOOMI_EVENT_PATH = env("BOOMI_EVENT_PATH", default="/ws/simple/createDisruptionEvent")
 BOOMI_TIMEOUT_CONNECT = env.float("BOOMI_TIMEOUT_CONNECT", default=3)
-BOOMI_TIMEOUT_READ = env.float("BOOMI_TIMEOUT_READ", default=10)
-BOOMI_MAX_RETRIES = env.int("BOOMI_MAX_RETRIES", default=2)
+BOOMI_TIMEOUT_READ = env.float("BOOMI_TIMEOUT_READ", default=5)
+BOOMI_MAX_RETRIES = env.int("BOOMI_MAX_RETRIES", default=1)
+# Budget for ALL attempts and backoffs of one publish (it runs inside the intake request).
+BOOMI_TOTAL_TIMEOUT_SECONDS = env.float("BOOMI_TOTAL_TIMEOUT_SECONDS", default=8)
 BOOMI_BACKOFF_SECONDS = env.float("BOOMI_BACKOFF_SECONDS", default=0.5)
 
 # Folder with the demo scenarios (data/scenarios); /data/scenarios inside Docker.

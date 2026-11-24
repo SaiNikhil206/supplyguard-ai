@@ -185,10 +185,10 @@ def test_status_not_configured(admin, settings):
 
 
 def test_status_configured_and_reachable_with_cache(admin, settings, monkeypatch):
-    settings.BOOMI_BASE_URL = BASE + "/some/path?x=1"
+    settings.BOOMI_BASE_URL = BASE + "/some/path"
     settings.BOOMI_API_KEY = SECRET
     rec = Recorder([200])
-    patch_boomi(monkeypatch, rec, base_url=BASE + "/some/path?x=1")
+    patch_boomi(monkeypatch, rec, base_url=BASE + "/some/path")
     body = admin.get(STATUS).json()["boomi"]
     assert body["configured"] is True and body["reachable"] is True
     assert body["host"] == "boomi.example.test"  # hostname only
