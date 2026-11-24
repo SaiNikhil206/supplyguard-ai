@@ -200,3 +200,5 @@ SEED_DATA_DIR = Path(env("SEED_DATA_DIR", default=str(BASE_DIR.parent / "data" /
 ERP_BASE_URL = env("ERP_BASE_URL", default="http://localhost:8081")
 ERP_API_KEY = env("ERP_API_KEY", default="")
 ERP_TIMEOUT_SECONDS = env.float("ERP_TIMEOUT_SECONDS", default=2.0)
+# Total budget for all (sequential) ERP calls of one what-if; when used up the answer is 504.
+ERP_TOTAL_TIMEOUT_SECONDS = env.float("ERP_TOTAL_TIMEOUT_SECONDS", default=2.5)

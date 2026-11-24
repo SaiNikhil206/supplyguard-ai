@@ -79,8 +79,8 @@ def _stub_erp_for_what_if(monkeypatch):
     monkeypatch.setattr(
         whatif,
         "fetch_snapshot",
-        lambda *a, **k: {
-            "supplier": {"supplier_id": "SUP-1008", "name": "S"},
+        lambda client, supplier_id, tenant_id, *a, **k: {
+            "supplier": {"supplier_id": supplier_id, "name": "S", "tenant_id": tenant_id},
             "purchase_orders": [],
             "inventory": [],
             "alternate_suppliers": [],

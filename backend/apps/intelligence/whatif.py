@@ -8,6 +8,7 @@ add auth, tenant scoping and the one audit row. Every number is an estimate (AC-
 from __future__ import annotations
 
 import logging
+import time
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -47,6 +48,10 @@ class ErpUnavailable(ErpError):
     pass
 
 
+class ForeignSupplier(ErpError):
+    """The snapshot's supplier row belongs to another tenant (an ERP that ignored X-Tenant-ID)."""
+
+
 # --------------------------------------------------------------------------- ERP snapshot
 
 
@@ -55,12 +60,27 @@ def make_http_client(base_url: str, api_key: str, timeout: float) -> httpx.Clien
     return httpx.Client(base_url=base_url, headers=headers, timeout=timeout)
 
 
-def _get(client, path: str, tenant_id: str, correlation_id: str | None, params=None):
+class _Budget:
+    """Total time allowed for all sequential ERP calls (clock injectable for tests)."""
+
+    def __init__(self, per_call: float, total: float, clock=time.monotonic):
+        self.per_call = per_call
+        self.clock = clock
+        self.deadline = clock() + total
+
+    def next_timeout(self) -> float:
+        left = self.deadline - self.clock()
+        if left <= 0:
+            raise ErpTimeout("ERP time budget used up")
+        return min(self.per_call, left)
+
+
+def _get(client, path, tenant_id, correlation_id, budget: _Budget, params=None):
     headers = {"X-Tenant-ID": tenant_id}
     if correlation_id:
         headers["X-Correlation-ID"] = correlation_id
     try:
-        resp = client.get(path, params=params, headers=headers)
+        resp = client.get(path, params=params, headers=headers, timeout=budget.next_timeout())
     except httpx.TimeoutException as exc:
         raise ErpTimeout("ERP did not answer in time") from exc
     except httpx.HTTPError as exc:
@@ -76,34 +96,68 @@ def _get(client, path: str, tenant_id: str, correlation_id: str | None, params=N
         raise ErpUnavailable("ERP returned invalid JSON") from exc
 
 
-def fetch_snapshot(client, supplier_id: str, tenant_id: str, correlation_id: str | None) -> dict:
-    """Fresh read-only snapshot: supplier, its OPEN POs, inventory + alternates for their items."""
-    supplier = _get(client, f"/erp/suppliers/{supplier_id}", tenant_id, correlation_id)
-    pos = _get(
-        client,
-        "/erp/purchase-orders",
-        tenant_id,
-        correlation_id,
-        {"supplier_id": supplier_id, "status": "OPEN"},
-    )
-    item_ids = sorted(
-        {ln["item_id"] for po in impact.rows(pos) for ln in po.get("lines") or []}
-    )
+def fetch_snapshot(
+    client,
+    supplier_id: str,
+    tenant_id: str,
+    correlation_id: str | None,
+    *,
+    per_call_timeout: float = 2.0,
+    total_timeout: float = 2.5,
+    clock=time.monotonic,
+) -> dict:
+    """Fresh read-only snapshot: supplier, its OPEN POs, inventory + alternates for their items.
+
+    Only a 404 on the supplier means "supplier not found". A 404 on the PO list is a broken ERP
+    (502); a 404 on inventory / alternates becomes an empty list plus a `fetch_gaps` entry.
+    """
+    budget = _Budget(per_call_timeout, total_timeout, clock)
+    supplier = _get(client, f"/erp/suppliers/{supplier_id}", tenant_id, correlation_id, budget)
+    try:
+        pos = _get(
+            client,
+            "/erp/purchase-orders",
+            tenant_id,
+            correlation_id,
+            budget,
+            {"supplier_id": supplier_id, "status": "OPEN"},
+        )
+    except ErpNotFound as exc:
+        raise ErpUnavailable("ERP purchase-order list not found") from exc
+    item_ids = sorted({ln["item_id"] for po in impact.rows(pos) for ln in po.get("lines") or []})
     inventory: list[dict] = []
     alternates: list[dict] = []
+    fetch_gaps: list[str] = []
     for item in item_ids:
-        inventory += impact.rows(
-            _get(client, "/erp/inventory", tenant_id, correlation_id, {"item_id": item})
-        )
-        alternates += impact.rows(
-            _get(client, "/erp/alternate-suppliers", tenant_id, correlation_id, {"item_id": item})
-        )
+        for path, bucket, label in (
+            ("/erp/inventory", inventory, "inventory"),
+            ("/erp/alternate-suppliers", alternates, "alternate suppliers"),
+        ):
+            try:
+                bucket += impact.rows(
+                    _get(client, path, tenant_id, correlation_id, budget, {"item_id": item})
+                )
+            except ErpNotFound:
+                fetch_gaps.append(f"ERP returned 404 for {label} of {item}; treated as none")
     return {
         "supplier": supplier,
         "purchase_orders": impact.rows(pos),
         "inventory": inventory,
         "alternate_suppliers": alternates,
+        "fetch_gaps": fetch_gaps,
     }
+
+
+def check_snapshot_tenant(snapshot: dict, tenant_id: str) -> None:
+    """Every row must carry this tenant's id. Foreign supplier -> ForeignSupplier (404 upstream);
+    any other missing / foreign row -> SnapshotError (502): the ERP data cannot be trusted."""
+    supplier = snapshot.get("supplier") or {}
+    if supplier.get("tenant_id") != tenant_id:
+        raise ForeignSupplier()
+    for key in ("purchase_orders", "inventory", "alternate_suppliers"):
+        for row in snapshot.get(key) or []:
+            if row.get("tenant_id") != tenant_id:
+                raise impact.SnapshotError(f"{key} row without this tenant's tenant_id")
 
 
 # --------------------------------------------------------------------------- scenario
@@ -126,9 +180,10 @@ def build_event(
     event_type: str,
     duration_hours: Decimal,
     severity: str | None,
-    now: datetime | None = None,
+    start: datetime,
 ) -> dict:
-    start = (now or datetime.now(UTC)).astimezone(UTC).replace(microsecond=0)
+    """`start` is always passed in (request value, case event time or the injected clock)."""
+    start = start.astimezone(UTC).replace(microsecond=0)
     return {
         "event_id": "WHATIF",
         "tenant_id": tenant_id,
@@ -149,9 +204,11 @@ def _money(amount: Decimal, currency: str) -> dict:
     return impact.money(amount, currency)
 
 
-def _avg_price(snapshot: dict, supplier_id: str, item_id: str) -> Decimal | None:
+def _current_price(snapshot: dict, supplier_id: str, item_id: str):
+    """(weighted avg open-PO unit price, currency) of the disrupted supplier, else (None, None)."""
     total = Decimal(0)
     qty = 0
+    currency = None
     for po in snapshot["purchase_orders"]:
         if po.get("supplier_id") != supplier_id or po.get("status") != "OPEN":
             continue
@@ -160,12 +217,21 @@ def _avg_price(snapshot: dict, supplier_id: str, item_id: str) -> Decimal | None
                 q = ln.get("qty") or 0
                 total += Decimal(str(ln["unit_price"]["amount"])) * q
                 qty += q
-    return total / qty if qty else None
+                currency = currency or ln["unit_price"].get("currency")
+    return (total / qty, currency) if qty else (None, None)
 
 
 def _item_option(item: dict, snapshot: dict, result: dict, t, supplier_id, currency) -> dict:
     item_id, qty = item["item_id"], item["affected_qty"]
-    current = _avg_price(snapshot, supplier_id, item_id)
+    out = {"item_id": item_id, "affected_qty": qty, "recommended": None, "data_gap": None}
+    if not item["shortage"] and item["min_coverage_days"] is not None:
+        return {
+            **out,
+            "status": "COVERED_BY_STOCK",
+            "note": "Existing stock covers the estimated outage; no action modelled.",
+        }
+    current, current_ccy = _current_price(snapshot, supplier_id, item_id)
+    gap = None
     candidates = []
     for c in impact._candidates(
         item_id, snapshot["alternate_suppliers"], t.require_qualified_alternates, supplier_id
@@ -174,13 +240,23 @@ def _item_option(item: dict, snapshot: dict, result: dict, t, supplier_id, curre
         if cap is not None and cap < qty:
             continue
         price = Decimal(str(c["unit_price"]["amount"]))
-        delta = (price - current) * qty if current is not None else None
+        alt_ccy = c["unit_price"].get("currency") or currency
+        delta = None
+        if current is None:
+            gap = gap or f"current unit price unknown for {item_id}"
+        elif current_ccy and alt_ccy != current_ccy:
+            gap = (
+                f"currency mismatch for {item_id}: alternate {c['supplier_id']} is in {alt_ccy}, "
+                f"open PO in {current_ccy}; no cost delta"
+            )
+        else:
+            delta = (price - current) * qty
         candidates.append(
             {
                 "option_type": "ALTERNATE_SUPPLIER",
                 "supplier_id": c["supplier_id"],
                 "qty": qty,
-                "unit_price": _money(price, c["unit_price"].get("currency") or currency),
+                "unit_price": _money(price, alt_ccy),
                 "lead_time_days": c.get("lead_time_days"),
                 "capacity_known": cap is not None,
                 "estimated_cost_delta": _money(delta, currency) if delta is not None else None,
@@ -188,37 +264,28 @@ def _item_option(item: dict, snapshot: dict, result: dict, t, supplier_id, curre
             }
         )
     candidates.sort(key=lambda c: c["_sort"])
-    best_alt = candidates[0] if candidates else None
 
-    transfer = None
-    for r in result["inventory_coverage"]:
+    chosen = None
+    for r in result["inventory_coverage"]:  # sorted by location_id: deterministic
         if r["item_id"] == item_id and (r["transfer_surplus_qty"] or 0) >= qty:
-            transfer = {
+            chosen = {
                 "option_type": "INVENTORY_TRANSFER",
                 "from_location_id": r["location_id"],
                 "qty": qty,
                 "lead_time_days": None,
                 "estimated_cost_delta": _money(Decimal(0), currency),
             }
-            break  # coverage rows are sorted by location_id: deterministic
-
-    if not item["shortage"] and item["min_coverage_days"] is not None:
-        return {
-            "item_id": item_id,
-            "affected_qty": qty,
-            "recommended": None,
-            "note": "Existing stock covers the estimated outage; no action modelled.",
-        }
-    chosen = transfer or best_alt
+            break
+    if chosen is None and candidates:
+        chosen = {k: v for k, v in candidates[0].items() if not k.startswith("_")}
+        out["data_gap"] = gap
     if chosen is None:
         return {
-            "item_id": item_id,
-            "affected_qty": qty,
-            "recommended": None,
+            **out,
+            "status": "NO_OPTION",
             "note": "No qualified alternate with enough capacity and no transferable stock.",
         }
-    chosen = {k: v for k, v in chosen.items() if not k.startswith("_")}
-    return {"item_id": item_id, "affected_qty": qty, "recommended": chosen, "note": None}
+    return {**out, "status": "RECOMMENDED", "recommended": chosen, "note": None}
 
 
 def best_option_estimate(result: dict, snapshot: dict, t, supplier_id: str) -> dict | None:
@@ -240,9 +307,9 @@ def best_option_estimate(result: dict, snapshot: dict, t, supplier_id: str) -> d
             "cheapest qualified alternate whose capacity is enough or unknown."
         ),
         "items": per_item,
-        "uncovered_item_ids": [p["item_id"] for p in per_item if p["note"] and not p["recommended"]
-                               and "covers" not in p["note"]],
+        "uncovered_item_ids": [p["item_id"] for p in per_item if p["status"] == "NO_OPTION"],
         "total_estimated_cost_delta": _money(sum(deltas, Decimal(0)), currency),
+        "cost_delta_complete": len(deltas) == len(chosen),
         "max_lead_time_days": max(leads) if leads else None,
     }
 
@@ -259,7 +326,7 @@ def run_what_if(
     assumptions_extra: list[str] | None = None,
 ) -> dict:
     """`tenant` = {"tenant_id", "currency", "settings"}; returns the API response body."""
-    gaps: list[str] = []
+    gaps: list[str] = list(snapshot.get("fetch_gaps") or [])
     try:
         t = impact.thresholds_from_tenant(tenant)
     except (ValueError, TypeError, ArithmeticError):
@@ -278,9 +345,14 @@ def run_what_if(
         "Open POs with a line due on or before the end of the outage are treated as late.",
         "Stock coverage = (on hand - reserved - safety stock) / daily demand per location.",
         f"Severity input to the risk score: {event['severity']}.",
-        "Alternate supplier capacity and lead times are taken from the ERP as-is; "
-        + ("only qualified alternates are used." if t.require_qualified_alternates
-           else "unqualified alternates are allowed (tenant setting)."),
+        "Alternate supplier capacity is units per week; like the N-04 engine it is compared "
+        "with the whole affected quantity (weekly pacing of the delivery is not modelled).",
+        "Alternate lead times and prices are taken from the ERP as-is; "
+        + (
+            "only qualified alternates are used."
+            if t.require_qualified_alternates
+            else "unqualified alternates are allowed (tenant setting)."
+        ),
         "Inventory transfers are assumed free and instant (no cost or lead time modelled).",
         "Nothing was written to the ERP or saved as a risk case.",
     ]
@@ -291,15 +363,14 @@ def run_what_if(
     option = best_option_estimate(result, snapshot, t, supplier_id)
     if option:
         for item in option["items"]:
+            if item["data_gap"]:
+                gaps.append(item["data_gap"])
             rec = item["recommended"]
-            if rec and rec["option_type"] == "ALTERNATE_SUPPLIER":
-                if not rec["capacity_known"]:
-                    gaps.append(
-                        f"capacity unknown for recommended alternate {rec['supplier_id']} "
-                        f"({item['item_id']})"
-                    )
-                if rec["estimated_cost_delta"] is None:
-                    gaps.append(f"current unit price unknown for {item['item_id']}")
+            if rec and rec["option_type"] == "ALTERNATE_SUPPLIER" and not rec["capacity_known"]:
+                gaps.append(
+                    f"capacity unknown for recommended alternate {rec['supplier_id']} "
+                    f"({item['item_id']})"
+                )
     gaps = list(dict.fromkeys(gaps))
 
     items = result["items"]
