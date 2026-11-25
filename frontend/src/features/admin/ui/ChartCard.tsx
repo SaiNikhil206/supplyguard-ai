@@ -39,7 +39,7 @@ export function ChartCard({
     </div>
   );
   return ring ? (
-    <div className="rounded-2xl bg-gradient-to-br from-primary/40 via-border to-transparent p-px">
+    <div className="rounded-2xl bg-border p-px">
       {body}
     </div>
   ) : (

@@ -28,7 +28,7 @@ export function HealthHero({
   const allUp = healthy === total;
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-primary/40 via-border to-transparent p-px">
+    <div className="rounded-2xl bg-border p-px">
       <div className="flex flex-wrap items-center gap-8 rounded-2xl bg-card p-6">
         <div className="relative h-32 w-32 shrink-0" aria-hidden="true">
           <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">

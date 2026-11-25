@@ -105,7 +105,7 @@ export function HistoryTable({
           const ex = latestExecution(c);
           return (
             <TR key={a.id} className={clsx(selectedId === c.id && selectedRow)} onClick={() => onSelect(c.id)}>
-              <TD>
+              <TD className="whitespace-nowrap">
                 <button
                   type="button"
                   aria-pressed={selectedId === c.id}
@@ -127,8 +127,8 @@ export function HistoryTable({
               <TD className="max-w-xs truncate" title={a.comments}>
                 {a.comments || '-'}
               </TD>
-              <TD>{formatTime(a.decided_at)}</TD>
-              <TD>{ex ? EXECUTION_LABEL[ex.status] : '-'}</TD>
+              <TD className="whitespace-nowrap text-xs">{formatTime(a.decided_at)}</TD>
+              <TD className="whitespace-nowrap">{ex ? EXECUTION_LABEL[ex.status] : '-'}</TD>
             </TR>
           );
         })}

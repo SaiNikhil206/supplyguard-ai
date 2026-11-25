@@ -63,7 +63,7 @@ export function OptionCard({ rec }: { rec: Recommendation }) {
     <div
       className={cn(
         'rounded-2xl p-px transition',
-        top ? 'bg-gradient-to-br from-primary via-violet-500 to-fuchsia-500 shadow-lg shadow-primary/20' : 'bg-border/60',
+        top ? 'bg-primary' : 'bg-border/60',
         unsupported && 'opacity-60 saturate-50 hover:opacity-90',
       )}
     >
@@ -88,7 +88,7 @@ export function OptionCard({ rec }: { rec: Recommendation }) {
           </div>
           <div className="flex items-center gap-2">
             {top && (
-              <span className="rounded-full bg-gradient-to-r from-primary to-violet-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+              <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
                 Recommended
               </span>
             )}

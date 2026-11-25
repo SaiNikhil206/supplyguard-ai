@@ -64,7 +64,7 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
         </Badge>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-primary/40 via-border to-transparent p-px">
+      <div className="rounded-2xl bg-border p-px">
         <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-card p-6">
           <div className="space-y-1">
             <p className="text-sm text-muted">Estimated exposure</p>
@@ -141,7 +141,7 @@ export function WhatIfResults({ result }: { result: WhatIfResult }) {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-emerald-500/40 via-border to-transparent p-px">
+      <div className="rounded-2xl bg-border p-px">
         <div className="space-y-3 rounded-2xl bg-card p-5">
           <div className="flex items-center gap-3">
             <IconTile tint={best ? "emerald" : "rose"}>

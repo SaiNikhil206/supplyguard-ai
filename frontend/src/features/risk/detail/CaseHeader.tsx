@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 import clsx from 'clsx';
 import type { RiskCaseDetail } from '@/api/types';
 import { Money, SeverityBadge, StatusBadge } from '@/components/ui';
-import { EVENT_ICON, Monogram, SEV_META } from '../ui';
+import { EVENT_ICON, Monogram } from '../ui';
 import { CopyButton } from './CopyButton';
 import { eventTypeLabel, formatDateTime, STATE_LABELS, stepperSteps } from './format';
 
@@ -14,52 +14,49 @@ function HeroStepper({ status }: { status: RiskCaseDetail['status'] }) {
   const steps = stepperSteps(status);
   const current = steps.indexOf(status);
   return (
-    <div aria-hidden="true" className="overflow-x-auto pb-1">
-      <div className="flex min-w-max items-center">
-        {steps.map((s, i) => {
-          const done = i < current;
-          const isCurrent = i === current;
-          return (
-            <div key={s} className="flex items-center">
-              <div className="flex flex-col items-center gap-1.5">
-                <span
-                  className={clsx(
-                    'flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition',
-                    done && 'bg-success text-white',
-                    isCurrent && !isDanger(s) && 'bg-primary text-primary-foreground ring-4 ring-primary/25',
-                    isCurrent && isDanger(s) && 'bg-danger text-white ring-4 ring-danger/25',
-                    !done && !isCurrent && 'border border-border bg-card text-muted',
-                  )}
-                >
-                  {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                </span>
-                <span
-                  className={clsx(
-                    'w-24 text-center text-[11px] leading-tight',
-                    isCurrent ? 'font-semibold text-foreground' : 'text-muted',
-                  )}
-                >
-                  {STATE_LABELS[s]}
-                </span>
-              </div>
-              {i < steps.length - 1 && (
-                <span className={clsx('mb-5 h-0.5 w-6 shrink-0 rounded-full', done ? 'bg-success' : 'bg-border')} />
+    <ol aria-hidden="true" className="flex w-full items-start">
+      {steps.map((s, i) => {
+        const done = i < current;
+        const isCurrent = i === current;
+        return (
+          <li key={s} className="relative flex min-w-0 flex-1 flex-col items-center gap-1.5">
+            {i > 0 && (
+              <span className={clsx('absolute left-0 right-1/2 top-3 h-0.5', i <= current ? 'bg-success' : 'bg-border')} />
+            )}
+            {i < steps.length - 1 && (
+              <span className={clsx('absolute left-1/2 right-0 top-3 h-0.5', done ? 'bg-success' : 'bg-border')} />
+            )}
+            <span
+              className={clsx(
+                'relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold',
+                done && 'bg-success text-white',
+                isCurrent && !isDanger(s) && 'bg-primary text-primary-foreground ring-4 ring-primary/20',
+                isCurrent && isDanger(s) && 'bg-danger text-white ring-4 ring-danger/20',
+                !done && !isCurrent && 'border border-border bg-card text-muted',
               )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+            >
+              {done ? <Check className="h-3.5 w-3.5" /> : i + 1}
+            </span>
+            <span
+              className={clsx(
+                'px-0.5 text-center text-[11px] leading-tight',
+                isCurrent ? 'font-semibold text-foreground' : 'text-muted',
+              )}
+            >
+              {STATE_LABELS[s]}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
 export function CaseHeader({ detail }: { detail: RiskCaseDetail }) {
   const cid = detail.event.correlation_id;
   const Icon = EVENT_ICON[detail.event_type];
-  const m = SEV_META[detail.severity];
   return (
     <div className="animate-in fade-in-0 slide-in-from-bottom-2 overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur duration-300">
-      <div className={clsx('h-1', m.bar)} aria-hidden="true" />
       <div className="space-y-6 p-5 lg:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <header className="min-w-0 space-y-2">

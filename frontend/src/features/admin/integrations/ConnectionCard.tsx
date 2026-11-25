@@ -55,8 +55,7 @@ export function ConnectionCard({ connection: c }: { connection: Connection }) {
             <span
               aria-hidden="true"
               className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-sm font-bold text-white shadow-sm",
-                kind.gradient,
+                "flex h-11 w-11 items-center justify-center rounded-xl bg-foreground/5 text-sm font-bold text-muted ring-1 ring-border",
               )}
             >
               {kind.mono}
