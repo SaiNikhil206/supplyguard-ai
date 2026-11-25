@@ -39,7 +39,7 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
                   <Money value={p.value} />
                 </TD>
                 <TD className="text-right tabular-nums">{p.days_late_estimate > 0 ? `${p.days_late_estimate} d` : 'On time'}</TD>
-                <TD className="text-right tabular-nums">{p.stock_cover_days} d</TD>
+                <TD className="text-right tabular-nums">{p.stock_cover_days === null ? 'n/a' : `${p.stock_cover_days} d`}</TD>
               </TR>
             ))
           )}

@@ -29,7 +29,7 @@ describe('RC-000045 fixture vs ai/schemas', () => {
       risk_case_id: riskCaseDetail45.id,
       options: riskCaseDetail45.recommendations.map((rec) => {
         const opt: Record<string, unknown> = { ...rec };
-        delete opt.id;
+        for (const k of ['id', 'round', 'status', 'unsupported', 'unsupported_reasons']) delete opt[k];
         return opt;
       }),
       no_viable_option_reason: riskCaseDetail45.no_viable_option_reason,

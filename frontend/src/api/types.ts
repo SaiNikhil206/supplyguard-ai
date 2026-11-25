@@ -54,22 +54,27 @@ export interface Me {
 export type SupplierStatus = 'ACTIVE' | 'ON_HOLD' | 'INACTIVE';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
+/** R-02: `id` = Supplier.erp_id (tenant-scoped business key, e.g. SUP-1001). */
 export interface Supplier {
   id: string;
   name: string;
-  country: string;
+  country: string; // ISO-2, e.g. "IN"
+  city: string;
   category: string;
   status: SupplierStatus;
   risk_level: RiskLevel;
-  risk_score: number; // 0-100
-  open_po_count: number;
-  on_time_delivery_pct: number;
+  /** 0-100; null until N-04 defines a supplier score (no Django source yet). */
+  risk_score: number | null;
+  open_po_count: number; // computed: OPEN purchase orders
+  on_time_delivery_pct: number; // 0-100
 }
 
 export interface SupplierKpis {
   on_time_delivery_pct: number;
-  quality_pass_pct: number;
-  avg_lead_time_days: number;
+  /** Supplier.quality_score, scale 0-5 (was `quality_pass_pct`: the seed has no pass rate). */
+  quality_score: number;
+  /** null: no Django source (nothing invented). */
+  avg_lead_time_days: number | null;
   open_po_value: Money;
   disruptions_last_12m: number;
 }
@@ -85,6 +90,7 @@ export interface SupplierDisruption {
 
 export interface SupplierDetail extends Supplier {
   contact_email: string;
+  capacity_per_week: number | null; // null = unknown
   kpis: SupplierKpis;
   disruption_history: SupplierDisruption[];
 }
@@ -140,14 +146,16 @@ export type RiskCaseState =
 export interface DisruptionEvent {
   event_id: string;
   tenant_id: string;
-  supplier_id: string;
+  supplier_id: string; // supplier_erp_id as received
   event_type: EventType;
   severity: Severity;
   event_time: string;
-  expected_duration_hours: number;
+  expected_duration_hours: number | null;
   description: string;
   source_system: string;
   correlation_id: string;
+  shipment_id?: string | null;
+  po_id?: string | null;
 }
 
 /** PROVISIONAL list item. */
@@ -155,8 +163,9 @@ export interface RiskCaseListItem {
   id: string;
   status: RiskCaseState;
   severity: Severity;
-  supplier_id: string;
-  supplier_name: string;
+  /** null when the case has no supplier (RiskCase.supplier is nullable). */
+  supplier_id: string | null;
+  supplier_name: string | null;
   event_type: EventType;
   title: string;
   risk_score: number;
@@ -183,7 +192,9 @@ export interface AffectedPO {
   value: Money;
   due_date: string;
   days_late_estimate: number;
-  stock_cover_days: number;
+  /** null when no inventory data (inventory_coverage_days is nullable). */
+  stock_cover_days: number | null;
+  shortage?: boolean;
 }
 
 export type EvidenceSource = 'ERP' | 'EVENT' | 'IMPACT';
@@ -232,8 +243,15 @@ export type OptionType =
   | 'SPLIT_ORDER';
 
 /** CONTRACTS section 6: Recovery option, plus `id` (REC-...) added by Django. */
+export type RecommendationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CHANGES_REQUESTED';
+
 export interface Recommendation {
   id: string;
+  round?: number;
+  status?: RecommendationStatus;
+  /** true when N-07 rejected it as unsupported by ERP data; cannot be approved. */
+  unsupported?: boolean;
+  unsupported_reasons?: string[];
   rank: number;
   option_type: OptionType;
   proposed_action: { po_id: string; change: ProposedChange };
@@ -252,6 +270,7 @@ export type ApprovalDecision = 'APPROVE' | 'REJECT' | 'REQUEST_CHANGES';
 /** PROVISIONAL. */
 export interface Approval {
   id: string; // APR-...
+  round?: number;
   recommendation_id: string;
   decision: ApprovalDecision;
   comments: string;
@@ -266,7 +285,9 @@ export interface Execution {
   id: string; // EXE-...
   recommendation_id: string;
   status: ExecutionStatus;
-  started_at: string;
+  started_at: string | null;
+  error_class?: 'VALIDATION' | 'AUTH' | 'BUSINESS' | 'TRANSIENT' | 'DOWNSTREAM' | null;
+  retry_count?: number;
   finished_at: string | null;
   error: string | null;
   retryable: boolean;

@@ -29,7 +29,7 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
               </TR>
             ))
           : [...(suppliers ?? [])]
-              .sort((a, b) => b.risk_score - a.risk_score)
+              .sort((a, b) => (b.risk_score ?? -1) - (a.risk_score ?? -1))
               .map((s) => (
                 <TR key={s.id}>
                   <TD>
@@ -48,7 +48,7 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
                   <TD>
                     <div className="flex items-center gap-2">
                       <SeverityBadge severity={s.risk_level} />
-                      <span className="tabular-nums text-muted">{s.risk_score}</span>
+                      <span className="tabular-nums text-muted">{s.risk_score ?? '-'}</span>
                     </div>
                   </TD>
                   <TD className="text-right tabular-nums">{s.open_po_count}</TD>

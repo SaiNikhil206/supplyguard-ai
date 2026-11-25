@@ -16,9 +16,13 @@ export function CaseHeader({ detail }: { detail: RiskCaseDetail }) {
       <p className="text-sm text-text">{detail.title}</p>
       <p className="text-sm text-muted">
         Supplier:{' '}
-        <Link className="font-medium text-primary hover:underline" to={`/suppliers/${detail.supplier_id}`}>
-          {detail.supplier_name}
-        </Link>
+        {detail.supplier_id ? (
+          <Link className="font-medium text-primary hover:underline" to={`/suppliers/${detail.supplier_id}`}>
+            {detail.supplier_name}
+          </Link>
+        ) : (
+          <span className="font-medium">Unknown supplier</span>
+        )}
         {' · '}Created <time dateTime={detail.created_at}>{formatDateTime(detail.created_at)}</time>
         {' · '}Updated <time dateTime={detail.updated_at}>{formatDateTime(detail.updated_at)}</time>
       </p>

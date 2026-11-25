@@ -39,7 +39,7 @@ describe('Risk case detail /risk/:id', () => {
 
   it('links to the supplier page', async () => {
     renderWithProviders({ path: '/risk/RC-000045' });
-    const link = await screen.findByRole('link', { name: riskCaseDetail45.supplier_name });
+    const link = await screen.findByRole('link', { name: riskCaseDetail45.supplier_name ?? '' });
     expect(link).toHaveAttribute('href', '/suppliers/SUP-1008');
   });
 

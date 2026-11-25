@@ -40,7 +40,7 @@ export function CaseTable({ items, fresh, now }: Props) {
                   </span>
                 )}
               </TD>
-              <TD>{c.supplier_name}</TD>
+              <TD>{c.supplier_name ?? '-'}</TD>
               <TD>{eventTypeLabel(c.event_type)}</TD>
               <TD>
                 <SeverityBadge severity={c.severity} />

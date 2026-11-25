@@ -120,6 +120,32 @@ function protectedRoute(
 
 const API = '*/api/v1';
 
+const SUPPLIER_STATUSES = ['ACTIVE', 'ON_HOLD', 'INACTIVE'];
+const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+const RISK_CASE_STATES = [
+  'RECEIVED', 'ANALYZING', 'RECOMMENDATION_READY', 'PENDING_APPROVAL', 'APPROVED',
+  'REJECTED', 'EXECUTING', 'EXECUTION_FAILED', 'RECOVERED', 'CLOSED',
+];
+
+/** 400 VALIDATION_ERROR when a filter value is not a known enum member (like a DRF ChoiceFilter). */
+function badEnum(request: Request, field: string, value: string | null, allowed: string[]) {
+  if (value === null || value === '' || allowed.includes(value)) return null;
+  return errorResponse(400, 'VALIDATION_ERROR', `Invalid ${field}.`, request, {
+    [field]: [`Select a valid choice. "${value}" is not one of ${allowed.join(', ')}.`],
+  });
+}
+
+/** `from`/`to`: YYYY-MM-DD (whole day, UTC) or an ISO datetime. null = not given. */
+function parseBound(v: string | null, edge: 'start' | 'end'): number | null | 'invalid' {
+  if (!v) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+    const t = Date.parse(`${v}T00:00:00Z`);
+    return Number.isNaN(t) ? 'invalid' : edge === 'start' ? t : t + 86_400_000 - 1;
+  }
+  const t = Date.parse(v);
+  return Number.isNaN(t) ? 'invalid' : t;
+}
+
 export const handlers: HttpHandler[] = [
   http.post(`${API}/auth/token`, async ({ request }) => {
     const body = (await request.json().catch(() => ({}))) as { username?: string; password?: string };
@@ -149,16 +175,22 @@ export const handlers: HttpHandler[] = [
 
   http.get(
     `${API}/suppliers`,
-    protectedRoute(({ url }) => {
+    protectedRoute(({ url, request }) => {
       const status = url.searchParams.get('status');
       const risk = url.searchParams.get('risk_level');
-      const search = url.searchParams.get('search')?.toLowerCase();
-      const filtered = suppliers.filter(
-        (s) =>
-          (!status || s.status === status) &&
-          (!risk || s.risk_level === risk) &&
-          (!search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search)),
-      );
+      const search = url.searchParams.get('search')?.trim().toLowerCase();
+      const bad =
+        badEnum(request, 'status', status, SUPPLIER_STATUSES) ?? badEnum(request, 'risk_level', risk, SEVERITIES);
+      if (bad) return bad;
+      // Backend order: Supplier.Meta.ordering = erp_id.
+      const filtered = suppliers
+        .filter(
+          (s) =>
+            (!status || s.status === status) &&
+            (!risk || s.risk_level === risk) &&
+            (!search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search)),
+        )
+        .sort((a, b) => a.id.localeCompare(b.id));
       return HttpResponse.json(paginate(filtered, url));
     }),
   ),
@@ -176,18 +208,29 @@ export const handlers: HttpHandler[] = [
 
   http.get(
     `${API}/risk-cases`,
-    protectedRoute(({ url }) => {
+    protectedRoute(({ url, request }) => {
       const status = url.searchParams.get('status');
       const severity = url.searchParams.get('severity');
-      const from = url.searchParams.get('from');
-      const to = url.searchParams.get('to');
-      const filtered = riskCaseList.filter(
-        (c) =>
-          (!status || c.status === status) &&
-          (!severity || c.severity === severity) &&
-          (!from || c.created_at >= from) &&
-          (!to || c.created_at <= to),
-      );
+      const from = parseBound(url.searchParams.get('from'), 'start');
+      const to = parseBound(url.searchParams.get('to'), 'end');
+      const bad =
+        badEnum(request, 'status', status, RISK_CASE_STATES) ??
+        badEnum(request, 'severity', severity, SEVERITIES) ??
+        (from === 'invalid' ? errorResponse(400, 'VALIDATION_ERROR', 'Invalid from.', request, { from: ['Enter a valid date or datetime.'] }) : null) ??
+        (to === 'invalid' ? errorResponse(400, 'VALIDATION_ERROR', 'Invalid to.', request, { to: ['Enter a valid date or datetime.'] }) : null);
+      if (bad) return bad;
+      // Backend order: RiskCase.Meta.ordering = -created_at, -id. `severity` filters RiskCase.risk_level.
+      const filtered = riskCaseList
+        .filter((c) => {
+          const t = Date.parse(c.created_at);
+          return (
+            (!status || c.status === status) &&
+            (!severity || c.severity === severity) &&
+            (from === null || t >= (from as number)) &&
+            (to === null || t <= (to as number))
+          );
+        })
+        .sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id));
       return HttpResponse.json(paginate(filtered, url));
     }),
   ),

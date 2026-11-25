@@ -33,7 +33,7 @@ describe('SupplierDetail page', () => {
 
     for (const label of [
       'On-time delivery',
-      'Quality pass',
+      'Quality score',
       'Avg lead time',
       'Open PO value',
       'Disruptions (12 months)',
@@ -41,7 +41,7 @@ describe('SupplierDetail page', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(`${detail.kpis.on_time_delivery_pct}%`)).toBeInTheDocument();
-    expect(screen.getByText(`${detail.kpis.avg_lead_time_days} days`)).toBeInTheDocument();
+    expect(screen.getByText(`${detail.kpis.quality_score} / 5`)).toBeInTheDocument();
   });
 
   it('lists disruption history with a case link', async () => {

@@ -52,10 +52,12 @@ const sup = (
   risk_score: number,
   open_po_count: number,
   otd: number,
+  city = '',
 ): Supplier => ({
   id: `SUP-${1000 + n}`,
   name,
   country,
+  city,
   category,
   status,
   risk_level,
@@ -65,18 +67,18 @@ const sup = (
 });
 
 export const suppliers: Supplier[] = [
-  sup(1, 'Bharat Steelworks', 'India', 'Raw Materials', 'ACTIVE', 'LOW', 18, 4, 96),
-  sup(2, 'Shenzhen Microtech', 'China', 'Electronics', 'ACTIVE', 'MEDIUM', 44, 6, 89),
-  sup(3, 'Rhine Precision GmbH', 'Germany', 'Machined Parts', 'ACTIVE', 'LOW', 22, 3, 97),
-  sup(4, 'Gujarat Polymers', 'India', 'Plastics', 'ACTIVE', 'LOW', 25, 5, 94),
-  sup(5, 'Taipei Semiconductor', 'Taiwan', 'Electronics', 'ACTIVE', 'HIGH', 71, 7, 81),
-  sup(6, 'Chennai Castings', 'India', 'Castings', 'ACTIVE', 'MEDIUM', 38, 4, 90),
-  sup(7, 'Hanoi Textiles', 'Vietnam', 'Packaging', 'ON_HOLD', 'MEDIUM', 52, 2, 85),
-  sup(8, 'Pune Forge & Motors', 'India', 'Motors', 'ACTIVE', 'CRITICAL', 92, 9, 72),
-  sup(9, 'Lagos Logistics Co', 'Nigeria', 'Logistics', 'ACTIVE', 'HIGH', 66, 3, 78),
-  sup(10, 'Osaka Bearings', 'Japan', 'Bearings', 'ACTIVE', 'LOW', 15, 5, 98),
-  sup(11, 'Monterrey Wire & Cable', 'Mexico', 'Cabling', 'ACTIVE', 'MEDIUM', 41, 4, 91),
-  sup(12, 'Dhaka Fasteners', 'Bangladesh', 'Fasteners', 'INACTIVE', 'LOW', 20, 0, 93),
+  sup(1, 'Bharat Steelworks', 'IN', 'Raw Materials', 'ACTIVE', 'LOW', 18, 4, 96, 'Jamshedpur'),
+  sup(2, 'Shenzhen Microtech', 'CN', 'Electronics', 'ACTIVE', 'MEDIUM', 44, 6, 89, 'Shenzhen'),
+  sup(3, 'Rhine Precision GmbH', 'DE', 'Machined Parts', 'ACTIVE', 'LOW', 22, 3, 97, 'Stuttgart'),
+  sup(4, 'Gujarat Polymers', 'IN', 'Plastics', 'ACTIVE', 'LOW', 25, 5, 94, 'Vadodara'),
+  sup(5, 'Taipei Semiconductor', 'TW', 'Electronics', 'ACTIVE', 'HIGH', 71, 7, 81, 'Hsinchu'),
+  sup(6, 'Chennai Castings', 'IN', 'Castings', 'ACTIVE', 'MEDIUM', 38, 4, 90, 'Chennai'),
+  sup(7, 'Hanoi Textiles', 'VN', 'Packaging', 'ON_HOLD', 'MEDIUM', 52, 2, 85, 'Hanoi'),
+  sup(8, 'Pune Forge & Motors', 'IN', 'Motors', 'ACTIVE', 'CRITICAL', 92, 9, 72, 'Pune'),
+  sup(9, 'Lagos Logistics Co', 'NG', 'Logistics', 'ACTIVE', 'HIGH', 66, 3, 78, 'Lagos'),
+  sup(10, 'Osaka Bearings', 'JP', 'Bearings', 'ACTIVE', 'LOW', 15, 5, 98, 'Osaka'),
+  sup(11, 'Monterrey Wire & Cable', 'MX', 'Cabling', 'ACTIVE', 'MEDIUM', 41, 4, 91, 'Monterrey'),
+  sup(12, 'Dhaka Fasteners', 'BD', 'Fasteners', 'INACTIVE', 'LOW', 20, 0, 93, 'Dhaka'),
 ];
 
 export function supplierDetail(id: string): SupplierDetail | undefined {
@@ -95,12 +97,13 @@ export function supplierDetail(id: string): SupplierDetail | undefined {
   return {
     ...s,
     contact_email: `ops@${s.name.toLowerCase().replace(/[^a-z]+/g, '')}.example`,
+    capacity_per_week: 1000 + (Number(s.id.slice(4)) % 7) * 250,
     kpis: {
       on_time_delivery_pct: s.on_time_delivery_pct,
-      quality_pass_pct: Math.min(99.5, s.on_time_delivery_pct + 2),
-      avg_lead_time_days: 6 + (s.risk_score % 10),
+      quality_score: Math.round(((s.on_time_delivery_pct - 60) / 8) * 10) / 10,
+      avg_lead_time_days: null,
       open_po_value: inr(String(s.open_po_count * 1_250_000) + '.00'),
-      disruptions_last_12m: history.length + (s.risk_score > 60 ? 2 : 0),
+      disruptions_last_12m: history.length + ((s.risk_score ?? 0) > 60 ? 2 : 0),
     },
     disruption_history: history,
   };
@@ -173,6 +176,8 @@ const event45: DisruptionEvent = {
   severity: 'HIGH',
   event_time: '2026-12-02T10:15:00Z',
   expected_duration_hours: 48,
+  shipment_id: null,
+  po_id: null,
   description: 'Line 2 fire, production halted',
   source_system: 'supplier-portal',
   correlation_id: '6f1c2a54-8d3e-4b7a-9c10-5e2f7a1b3d90',
@@ -218,6 +223,10 @@ export const riskCaseDetail45: RiskCaseDetail = {
   recommendations: [
     {
       id: 'REC-000101',
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
+      unsupported_reasons: [],
       rank: 1,
       option_type: 'ALTERNATE_SUPPLIER',
       proposed_action: { po_id: 'PO-1001', change: { supplier_id: 'SUP-1003', qty: 400 } },
@@ -231,6 +240,10 @@ export const riskCaseDetail45: RiskCaseDetail = {
     },
     {
       id: 'REC-000102',
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
+      unsupported_reasons: [],
       rank: 2,
       option_type: 'INVENTORY_TRANSFER',
       proposed_action: { po_id: 'PO-1001', change: { item_id: 'ITM-501', from_location_id: 'WH-PUNE-2', to_location_id: 'WH-PUNE-1', qty: 120 } },
@@ -244,6 +257,10 @@ export const riskCaseDetail45: RiskCaseDetail = {
     },
     {
       id: 'REC-000103',
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
+      unsupported_reasons: [],
       rank: 3,
       option_type: 'REVISED_SCHEDULE',
       proposed_action: { po_id: 'PO-1001', change: { expected_date: '2026-12-07' } },
@@ -257,6 +274,10 @@ export const riskCaseDetail45: RiskCaseDetail = {
     },
     {
       id: 'REC-000104',
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
+      unsupported_reasons: [],
       rank: 4,
       option_type: 'SPLIT_ORDER',
       proposed_action: { po_id: 'PO-1002', change: { supplier_id: 'SUP-1003', qty: 300 } },
@@ -293,7 +314,7 @@ export function riskCaseDetail(id: string): RiskCaseDetail | undefined {
     event: {
       ...event45,
       event_id: `EVT-${id.slice(3)}`,
-      supplier_id: item.supplier_id,
+      supplier_id: item.supplier_id ?? '',
       event_type: item.event_type,
       severity: item.severity,
       event_time: item.created_at,
@@ -322,7 +343,9 @@ export function addSimulatedCase(scenario: SimulateScenarioOption): { caseId: st
   const n = nextCaseNumber++;
   const id = `RC-${String(n).padStart(6, '0')}`;
   const eventId = `EVT-${String(900000 + n)}`;
-  const now = new Date().toISOString();
+  // Newest first like the backend's -created_at ordering, even if the clock is behind the fixtures.
+  const newest = Math.max(...riskCaseList.map((c) => Date.parse(c.created_at)));
+  const now = new Date(Math.max(Date.now(), newest + 1000)).toISOString();
   const supplier = suppliers.find((s) => s.id === scenario.supplier_id) ?? suppliers[0];
   const item: RiskCaseListItem = {
     id,
