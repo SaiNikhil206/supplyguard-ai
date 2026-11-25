@@ -12,6 +12,7 @@ import type {
   Supplier,
   SupplierDetail,
 } from '@/api/types';
+import type { SimulateScenarioOption } from './scenarios';
 
 export const TENANT = { id: 'TEN-ACME', name: 'Acme Manufacturing' };
 export const DEMO_PASSWORD = 'demo123';
@@ -44,11 +45,10 @@ export function meFor(user: MockUser): Me {
 const sup = (
   n: number,
   name: string,
-  country: string,
+  country: string, // ISO-2
   category: string,
   status: Supplier['status'],
   risk_level: Supplier['risk_level'],
-  risk_score: number,
   open_po_count: number,
   otd: number,
 ): Supplier => ({
@@ -58,24 +58,23 @@ const sup = (
   category,
   status,
   risk_level,
-  risk_score,
   open_po_count,
   on_time_delivery_pct: otd,
 });
 
 export const suppliers: Supplier[] = [
-  sup(1, 'Bharat Steelworks', 'India', 'Raw Materials', 'ACTIVE', 'LOW', 18, 4, 96),
-  sup(2, 'Shenzhen Microtech', 'China', 'Electronics', 'ACTIVE', 'MEDIUM', 44, 6, 89),
-  sup(3, 'Rhine Precision GmbH', 'Germany', 'Machined Parts', 'ACTIVE', 'LOW', 22, 3, 97),
-  sup(4, 'Gujarat Polymers', 'India', 'Plastics', 'ACTIVE', 'LOW', 25, 5, 94),
-  sup(5, 'Taipei Semiconductor', 'Taiwan', 'Electronics', 'ACTIVE', 'HIGH', 71, 7, 81),
-  sup(6, 'Chennai Castings', 'India', 'Castings', 'ACTIVE', 'MEDIUM', 38, 4, 90),
-  sup(7, 'Hanoi Textiles', 'Vietnam', 'Packaging', 'ON_HOLD', 'MEDIUM', 52, 2, 85),
-  sup(8, 'Pune Forge & Motors', 'India', 'Motors', 'ACTIVE', 'CRITICAL', 92, 9, 72),
-  sup(9, 'Lagos Logistics Co', 'Nigeria', 'Logistics', 'ACTIVE', 'HIGH', 66, 3, 78),
-  sup(10, 'Osaka Bearings', 'Japan', 'Bearings', 'ACTIVE', 'LOW', 15, 5, 98),
-  sup(11, 'Monterrey Wire & Cable', 'Mexico', 'Cabling', 'ACTIVE', 'MEDIUM', 41, 4, 91),
-  sup(12, 'Dhaka Fasteners', 'Bangladesh', 'Fasteners', 'INACTIVE', 'LOW', 20, 0, 93),
+  sup(1, 'Bharat Steelworks', 'IN', 'Raw Materials', 'ACTIVE', 'LOW', 4, 96),
+  sup(2, 'Shenzhen Microtech', 'CN', 'Electronics', 'ACTIVE', 'MEDIUM', 6, 89),
+  sup(3, 'Rhine Precision GmbH', 'DE', 'Machined Parts', 'ACTIVE', 'LOW', 3, 97),
+  sup(4, 'Gujarat Polymers', 'IN', 'Plastics', 'ACTIVE', 'LOW', 5, 94),
+  sup(5, 'Taipei Semiconductor', 'TW', 'Electronics', 'ACTIVE', 'HIGH', 7, 81),
+  sup(6, 'Chennai Castings', 'IN', 'Castings', 'ACTIVE', 'MEDIUM', 4, 90),
+  sup(7, 'Hanoi Textiles', 'VN', 'Packaging', 'ON_HOLD', 'MEDIUM', 2, 85),
+  sup(8, 'Pune Forge & Motors', 'IN', 'Motors', 'ACTIVE', 'CRITICAL', 9, 72),
+  sup(9, 'Lagos Logistics Co', 'NG', 'Logistics', 'ACTIVE', 'HIGH', 3, 78),
+  sup(10, 'Osaka Bearings', 'JP', 'Bearings', 'ACTIVE', 'LOW', 5, 98),
+  sup(11, 'Monterrey Wire & Cable', 'MX', 'Cabling', 'ACTIVE', 'MEDIUM', 4, 91),
+  sup(12, 'Dhaka Fasteners', 'BD', 'Fasteners', 'INACTIVE', 'LOW', 0, 93),
 ];
 
 export function supplierDetail(id: string): SupplierDetail | undefined {
@@ -96,10 +95,11 @@ export function supplierDetail(id: string): SupplierDetail | undefined {
     contact_email: `ops@${s.name.toLowerCase().replace(/[^a-z]+/g, '')}.example`,
     kpis: {
       on_time_delivery_pct: s.on_time_delivery_pct,
-      quality_pass_pct: Math.min(99.5, s.on_time_delivery_pct + 2),
-      avg_lead_time_days: 6 + (s.risk_score % 10),
+      quality_pass_pct: null, // not returned by the API
+      // expected_date - order_date averaged over the supplier's POs; null when it has none
+      avg_lead_time_days: s.open_po_count === 0 ? null : 5 + (Number(s.id.slice(4)) % 9),
       open_po_value: inr(String(s.open_po_count * 1_250_000) + '.00'),
-      disruptions_last_12m: history.length + (s.risk_score > 60 ? 2 : 0),
+      disruptions_last_12m: history.length,
     },
     disruption_history: history,
   };
@@ -179,6 +179,7 @@ const event45: DisruptionEvent = {
 
 export const riskCaseDetail45: RiskCaseDetail = {
   ...riskCaseList[0],
+  data_quality_flags: ['Inventory record missing for ITM-503 at WH-PUNE-2'],
   event: event45,
   affected_pos: [
     { po_id: 'PO-1001', item_id: 'ITM-501', item_name: 'BLDC Motor 24V', qty: 400, value: inr('560000.00'), due_date: '2026-12-03', days_late_estimate: 4, stock_cover_days: 2 },
@@ -218,6 +219,9 @@ export const riskCaseDetail45: RiskCaseDetail = {
     {
       id: 'REC-000101',
       rank: 1,
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
       option_type: 'ALTERNATE_SUPPLIER',
       proposed_action: { po_id: 'PO-1001', change: { supplier_id: 'SUP-1003', qty: 400 } },
       action_steps: ['Raise replacement PO with Rhine Precision GmbH', 'Cancel PO-1001 at SUP-1008', 'Notify production planning'],
@@ -231,6 +235,9 @@ export const riskCaseDetail45: RiskCaseDetail = {
     {
       id: 'REC-000102',
       rank: 2,
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
       option_type: 'INVENTORY_TRANSFER',
       proposed_action: { po_id: 'PO-1001', change: { item_id: 'ITM-501', from_location_id: 'WH-PUNE-2', to_location_id: 'WH-PUNE-1', qty: 120 } },
       action_steps: ['Transfer 120 units from WH-PUNE-2', 'Re-plan remaining 280 units'],
@@ -244,6 +251,9 @@ export const riskCaseDetail45: RiskCaseDetail = {
     {
       id: 'REC-000103',
       rank: 3,
+      round: 1,
+      status: 'PENDING',
+      unsupported: false,
       option_type: 'REVISED_SCHEDULE',
       proposed_action: { po_id: 'PO-1001', change: { expected_date: '2026-12-07' } },
       action_steps: ['Agree revised delivery date with supplier'],
@@ -257,6 +267,12 @@ export const riskCaseDetail45: RiskCaseDetail = {
     {
       id: 'REC-000104',
       rank: 4,
+      round: 1,
+      status: 'PENDING',
+      unsupported: true,
+      unsupported_reasons: [
+        { code: 'MISSING_DATA', message: 'Alternate supplier lead time and unit price for ITM-502 are not in the ERP data.' },
+      ],
       option_type: 'SPLIT_ORDER',
       proposed_action: { po_id: 'PO-1002', change: { supplier_id: 'SUP-1003', qty: 300 } },
       action_steps: ['Move 300 units of PO-1002 to Rhine Precision GmbH'],
@@ -272,16 +288,18 @@ export const riskCaseDetail45: RiskCaseDetail = {
   approvals: [],
   executions: [],
   timeline: [
-    { at: '2026-12-02T10:15:00Z', actor: 'supplier-portal', action: 'EVENT_RECEIVED', detail: 'EVT-000123 received' },
-    { at: '2026-12-02T10:15:20Z', actor: 'system', action: 'STATE_CHANGED', detail: 'RECEIVED -> ANALYZING' },
-    { at: '2026-12-02T10:16:05Z', actor: 'risk-analysis-agent', action: 'ANALYSIS_STORED', detail: 'Risk score 92' },
-    { at: '2026-12-02T10:16:40Z', actor: 'recovery-planning-agent', action: 'RECOMMENDATIONS_STORED', detail: '3 options' },
-    { at: '2026-12-02T10:16:41Z', actor: 'system', action: 'STATE_CHANGED', detail: 'RECOMMENDATION_READY -> PENDING_APPROVAL' },
+    { at: '2026-12-02T10:15:00Z', actor: 'SYSTEM', action: 'event.received', detail: '' },
+    { at: '2026-12-02T10:15:01Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECEIVED -> ANALYZING' },
+    { at: '2026-12-02T10:15:02Z', actor: 'SYSTEM', action: 'risk_case.created', detail: '' },
+    { at: '2026-12-02T10:16:05Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'ANALYZING -> RECOMMENDATION_READY' },
+    { at: '2026-12-02T10:16:41Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECOMMENDATION_READY -> PENDING_APPROVAL' },
   ],
 };
 
 /** Detail for any case id: RC-000045 is the full one, others are derived stubs. */
 export function riskCaseDetail(id: string): RiskCaseDetail | undefined {
+  const simulated = simulatedDetails.get(id);
+  if (simulated) return simulated;
   if (id === 'RC-000045') return riskCaseDetail45;
   const item = riskCaseList.find((c) => c.id === id);
   if (!item) return undefined;
@@ -302,6 +320,84 @@ export function riskCaseDetail(id: string): RiskCaseDetail | undefined {
     recommendations: [],
     approvals: [],
     executions: [],
-    timeline: [{ at: item.created_at, actor: 'system', action: 'CASE_CREATED', detail: item.title }],
+    timeline: [{ at: item.created_at, actor: 'SYSTEM', action: 'risk_case.created', detail: '' }],
   };
+}
+
+// ---- Stateful simulate-disruption (R-04) ----
+const initialCases = [...riskCaseList];
+const simulatedDetails = new Map<string, RiskCaseDetail>();
+const simTimers = new Set<ReturnType<typeof setTimeout>>();
+let nextCaseNumber = 46;
+
+export const ANALYZING_DELAY_MS = 1500;
+
+/** Adds a RECEIVED case (newest first) for the scenario and moves it to ANALYZING shortly after. */
+export function addSimulatedCase(scenario: SimulateScenarioOption): { caseId: string; eventId: string } {
+  const n = nextCaseNumber++;
+  const id = `RC-${String(n).padStart(6, '0')}`;
+  const eventId = `EVT-${String(900000 + n)}`;
+  const now = new Date().toISOString();
+  const supplier = suppliers.find((s) => s.id === scenario.supplier_id) ?? suppliers[0];
+  const item: RiskCaseListItem = {
+    id,
+    status: 'RECEIVED',
+    severity: scenario.severity,
+    supplier_id: supplier.id,
+    supplier_name: supplier.name,
+    event_type: scenario.event_type,
+    title: `${scenario.label}`,
+    risk_score: 0,
+    affected_po_count: scenario.affected_po_count,
+    exposure: inr(scenario.exposure),
+    created_at: now,
+    updated_at: now,
+  };
+  riskCaseList.unshift(item);
+  const detail: RiskCaseDetail = {
+    ...item,
+    event: {
+      ...event45,
+      event_id: eventId,
+      supplier_id: supplier.id,
+      event_type: scenario.event_type,
+      severity: scenario.severity,
+      event_time: now,
+      description: item.title,
+    },
+    affected_pos: [],
+    analysis: null,
+    recommendations: [],
+    no_viable_option_reason: null,
+    approvals: [],
+    executions: [],
+    timeline: [{ at: now, actor: 'SYSTEM', action: 'event.received', detail: '' }],
+  };
+  simulatedDetails.set(id, detail);
+  const timer = setTimeout(() => {
+    simTimers.delete(timer);
+    const at = new Date().toISOString();
+    item.status = 'ANALYZING';
+    item.updated_at = at;
+    const current = simulatedDetails.get(id);
+    if (current) {
+      simulatedDetails.set(id, {
+        ...current,
+        status: 'ANALYZING',
+        updated_at: at,
+        timeline: [...current.timeline, { at, actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECEIVED -> ANALYZING' }],
+      });
+    }
+  }, ANALYZING_DELAY_MS);
+  simTimers.add(timer);
+  return { caseId: id, eventId };
+}
+
+/** Restores the fixture list and drops simulated cases/timers (called after every test). */
+export function resetMockState(): void {
+  simTimers.forEach(clearTimeout);
+  simTimers.clear();
+  simulatedDetails.clear();
+  riskCaseList.splice(0, riskCaseList.length, ...initialCases.map((c) => ({ ...c })));
+  nextCaseNumber = 46;
 }

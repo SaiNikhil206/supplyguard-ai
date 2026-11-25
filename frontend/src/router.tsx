@@ -4,6 +4,7 @@ import ExecutiveOverview from '@/pages/ExecutiveOverview';
 import SupplierIntelligence from '@/pages/SupplierIntelligence';
 import SupplierDetail from '@/pages/SupplierDetail';
 import RiskCommandCenter from '@/pages/RiskCommandCenter';
+import RiskCaseDetail from '@/pages/RiskCaseDetail';
 import AiRecommendations from '@/pages/AiRecommendations';
 import ApprovalCenter from '@/pages/ApprovalCenter';
 import WhatIfSimulator from '@/pages/WhatIfSimulator';
@@ -28,12 +29,20 @@ export const routes: RouteObject[] = [
       { path: 'suppliers', element: <SupplierIntelligence /> },
       { path: 'suppliers/:id', element: <SupplierDetail /> },
       { path: 'risk', element: <RiskCommandCenter /> },
+      { path: 'risk/:id', element: <RiskCaseDetail /> },
       { path: 'recommendations', element: <AiRecommendations /> },
       { path: 'approvals', element: <ApprovalCenter /> },
       { path: 'what-if', element: <WhatIfSimulator /> },
       { path: 'integrations', element: <IntegrationCenter /> },
       { path: 'audit', element: <AuditCenter /> },
-      { path: 'settings', element: <TenantSettings /> },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRoute roles={['ADMIN']}>
+            <TenantSettings />
+          </ProtectedRoute>
+        ),
+      },
       { path: '*', element: <NotFound /> },
     ],
   },

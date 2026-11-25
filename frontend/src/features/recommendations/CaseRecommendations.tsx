@@ -1,51 +1,64 @@
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, CardTitle, EmptyState, ErrorState, Spinner } from '@/components/ui';
+import { ArrowRight, TriangleAlert } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle, Button, EmptyState, ErrorState, Skeleton } from '@/components/ui';
 import { useRiskCase } from '@/api/queries';
+import { ComparisonChart } from './ComparisonChart';
 import { ComparisonTable } from './ComparisonTable';
 import { OptionCard } from './OptionCard';
 
+const panel = 'rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur';
+
 export function CaseRecommendations({ caseId }: { caseId: string }) {
   const q = useRiskCase(caseId);
-  if (q.isPending) return <Spinner label="Loading recommendations" />;
+  if (q.isPending)
+    return (
+      <div role="status" aria-label="Loading recommendations" className="space-y-4">
+        <Skeleton className="h-56 rounded-2xl" />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Skeleton className="h-80 rounded-2xl" />
+          <Skeleton className="h-80 rounded-2xl" />
+        </div>
+      </div>
+    );
   if (q.isError) return <ErrorState message={q.error.message} onRetry={() => void q.refetch()} />;
   const c = q.data;
   const recs = [...c.recommendations].sort((a, b) => a.rank - b.rank);
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold">{c.title}</h2>
           <p className="text-xs text-muted">
-            {c.id} · {c.supplier_name}
+            {c.id} · {c.supplier_name ?? c.supplier_id}
           </p>
         </div>
-        <Link
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-primary underline"
-          to={`/approvals?case=${encodeURIComponent(c.id)}`}
-        >
-          Go to approval
-        </Link>
+        <Button asChild>
+          <Link to={`/approvals?case=${encodeURIComponent(c.id)}`}>
+            Go to approval
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          </Link>
+        </Button>
       </div>
       {recs.length === 0 ? (
         c.no_viable_option_reason ? (
-          <div role="alert" className="rounded border-2 border-warning p-4">
-            <h3 className="font-semibold">No viable recovery option</h3>
-            <p className="mt-1 text-sm">{c.no_viable_option_reason}</p>
-          </div>
+          <Alert variant="warning">
+            <TriangleAlert aria-hidden="true" />
+            <AlertTitle>No viable recovery option</AlertTitle>
+            <AlertDescription>{c.no_viable_option_reason}</AlertDescription>
+          </Alert>
         ) : (
           <EmptyState title="No recommendations yet" description="The AI has not produced recovery options for this case." />
         )
       ) : (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Compare options</CardTitle>
-            </CardHeader>
-            <CardBody>
+          <section aria-label="Compare options" className={panel}>
+            <h3 className="mb-4 text-base font-semibold">Compare options</h3>
+            <ComparisonChart recs={recs} />
+            <div className="mt-6 overflow-hidden rounded-xl border border-border/60">
               <ComparisonTable recs={recs} />
-            </CardBody>
-          </Card>
-          <div className="grid gap-4 lg:grid-cols-2">
+            </div>
+          </section>
+          <div className="grid items-start gap-5 lg:grid-cols-2">
             {recs.map((r) => (
               <OptionCard key={r.id} rec={r} />
             ))}
