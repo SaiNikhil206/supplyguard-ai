@@ -1,6 +1,7 @@
+import { LogoMark } from '@/components/Logo';
 import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, ShieldCheck, Sparkles, UserCheck } from 'lucide-react';
+import { Activity, Sparkles, UserCheck } from 'lucide-react';
 import { Button, Card, CardBody, Field, Input } from '@/components/ui';
 import { ApiError } from '@/api/client';
 import { config } from '@/config';
@@ -71,9 +72,7 @@ export default function Login() {
           className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl"
         />
         <div className="relative flex items-center gap-2.5 text-lg font-semibold">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
-            <ShieldCheck aria-hidden="true" className="h-5 w-5" />
-          </span>
+          <LogoMark className="h-9 w-9 text-white" />
           SupplyGuard AI
         </div>
         <div className="relative max-w-md space-y-8">
@@ -102,7 +101,7 @@ export default function Login() {
           <CardBody className="space-y-5 p-7">
             <div className="space-y-1.5">
               <h1 className="flex items-center gap-2 text-2xl font-semibold">
-                <ShieldCheck aria-hidden="true" className="h-6 w-6 text-primary lg:hidden" />
+                <LogoMark className="h-7 w-7 text-primary lg:hidden" />
                 SupplyGuard AI
               </h1>
               <p className="text-sm text-muted">Sign in to your workspace</p>

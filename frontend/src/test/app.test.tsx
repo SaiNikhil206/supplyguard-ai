@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { loginAs } from '@/test/loginAs';
@@ -26,14 +26,12 @@ describe('app shell (authenticated)', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Supplier Intelligence' })).toBeInTheDocument();
   });
 
-  it('toggles dark class on <html>', async () => {
+  it('is light only: no theme toggle and no dark class on <html>', async () => {
+    document.documentElement.classList.add('dark');
     renderWithProviders({ path: '/' });
-    const btn = await screen.findByRole('button', { name: /Dark|Light/ });
-    expect(document.documentElement).not.toHaveClass('dark');
-    await userEvent.click(btn);
-    expect(document.documentElement).toHaveClass('dark');
-    await userEvent.click(btn);
-    expect(document.documentElement).not.toHaveClass('dark');
+    await screen.findByRole('button', { name: 'Toggle menu' });
+    expect(screen.queryByRole('button', { name: /Dark mode|Light mode/ })).not.toBeInTheDocument();
+    await waitFor(() => expect(document.documentElement).not.toHaveClass('dark'));
   });
 
   it('mobile nav opens in a sheet, Escape closes it, and a skip link targets main', async () => {

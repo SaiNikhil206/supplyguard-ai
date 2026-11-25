@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Menu, Moon, PanelLeftClose, PanelLeftOpen, ShieldCheck, Sun, FlaskConical } from 'lucide-react';
-import { Badge, Button, Sheet, SheetContent, SheetDescription, SheetTitle, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
+import { Menu, PanelLeftClose, PanelLeftOpen, FlaskConical } from 'lucide-react';
+import { Badge, Button, Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui';
+import { LogoMark, Wordmark } from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { config } from '@/config';
 import { useAuth } from '@/auth/AuthProvider';
-import { useTheme } from '@/theme/ThemeProvider';
 import { navItems } from './nav';
 import { SidebarNav } from './SidebarNav';
 import { Breadcrumbs } from './Breadcrumbs';
@@ -25,10 +25,8 @@ function readCollapsed(): boolean {
 function Brand({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <div className={cn('flex h-14 items-center gap-2.5 px-5 text-foreground', collapsed && 'justify-center px-0')}>
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <ShieldCheck aria-hidden="true" className="h-4.5 w-4.5" />
-      </span>
-      <span className={cn('text-base font-semibold tracking-tight', collapsed && 'sr-only')}>SupplyGuard AI</span>
+      <LogoMark className="text-primary" />
+      <Wordmark className={cn(collapsed && 'sr-only')} />
     </div>
   );
 }
@@ -36,7 +34,6 @@ function Brand({ collapsed = false }: { collapsed?: boolean }) {
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(readCollapsed);
-  const { theme, toggleTheme } = useTheme();
   const { hasRole } = useAuth();
   const items = navItems.filter((item) => !item.roles || hasRole(...item.roles));
 
@@ -117,20 +114,6 @@ export function AppShell() {
               </Badge>
             )}
             <CommandPalette />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={toggleTheme}
-                  aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-                >
-                  {theme === 'dark' ? <Sun aria-hidden="true" className="h-4 w-4" /> : <Moon aria-hidden="true" className="h-4 w-4" />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{theme === 'dark' ? 'Switch to light' : 'Switch to dark'}</TooltipContent>
-            </Tooltip>
             <UserMenu />
           </div>
         </header>
