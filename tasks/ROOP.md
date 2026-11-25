@@ -67,16 +67,16 @@
 - **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. Landed in collaboration on mocks (status review). 2026-11-25 wired to the real API (`--wire`; read APIs + auth run live against seeded Django; contract tests in `realContract.test.ts`; test flake fixed in `--stability`: asyncUtilTimeout 5 s, vitest maxWorkers 4). Stays `review`: "new case within 5 s of simulate click" not tried live yet. `POST /demo/simulate-disruption` exists (apps/integrations, U-06) but it only creates an event; the case appears after correlation + analysis (N-08/N-09, waiting on U-07), so tick it once that chain works end to end.
 
 ### R-05: AI Recommendations + Approval Center
-- **Status:** in-progress
+- **Status:** done
 - **Sprint:** S3 (8-12 Dec) | **Est:** 2d | **Depends:** R-04, N-10
 - **Branch:** `roop/R-05-approvals`
 - **Model hint:** sonnet / medium
 - **Deliverables:** ranked option cards with cost / lead-time comparison, trade-offs, evidence; pending approvals queue; Approve / Reject / Request changes with comment (role-gated); execution status + retry button (U-11).
 - **Acceptance:**
-  - [ ] Buttons hidden/disabled for roles that cannot decide
-  - [ ] UNSUPPORTED options shown but not approvable
-- **Done in:** -
-- **Notes:** Started early on MSW mocks (N-10 not done). Pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
+  - [x] Buttons hidden/disabled for roles that cannot decide
+  - [x] UNSUPPORTED options shown but not approvable
+- **Done in:** `roop/R-05-approvals` (`--wire` d3f96ee merged; reviewer-lite APPROVE on combined diff, 2026-11-25)
+- **Notes:** 2026-11-25 wired to the real API: flat decision response (`POST /recommendations/{id}/decision` 201), `canDecide` = PROCUREMENT_MANAGER only (ADMIN excluded, as backend), unsupported or null cost/lead-time options not approvable. Checked by reading serializers/views + contract tests, NOT yet run live against Django. Backend gaps (not mine, tell Nikhil/Uday): no `POST /executions/{id}/retry` route (`workflow.services.retry_execution` exists without an endpoint; UI degrades with a clear message on 404/405), no approvals-queue endpoint (queue derives from GET /risk-cases). Confirm retry should be manager-only once the endpoint exists. Earlier pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
 
 ### R-06: Boomi Flow approval workflow
 - **Status:** todo
