@@ -9,13 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-19 (R-03 screens built on mocks)
-- **Current task:** R-03 Executive Overview + Supplier Intelligence - `in-progress` (waits on R-02 for real data); R-09 in `review`
-- **Branch:** `roop/R-03-overview-suppliers` (nested `--overview`, `--supplier-list`, `--supplier-detail` merged, kept on GitHub)
-- **Where I left off:** All 3 screens done against MSW mocks; review nits fixed in `--polish` and merged; 101 tests, lint, typecheck, build green.
-- **Next step:** When Uday's U-03/U-04 land start R-02, then switch R-03 to real API and mark it review.
-- **Blockers:** R-02 waits on Uday U-03/U-04. R-09 needs team decision: `ci-ok` required on `main` only. Uday: pin ruff, `ruff format backend`, short refresh lifetime + rotation off, `/me` shape provisional. Team: drop `[skip ci]` from bot commits.
-
+- **Last updated:** 2026-11-25 (R-02 read APIs done and merged)
+- **Current task:** - (R-02 `done`; R-03, R-04, R-09 in `review`; R-05, R-07, R-08, R-10 `in-progress`)
+- **Branch:** `roop/R-02-read-apis` (pieces `--backend2` and `--mocks2` merged; `--backend` and `--mocks` are superseded duplicates, not merged)
+- **Where I left off:** 5 portal endpoints live in `backend/apps/portal/` (tenant-scoped, 21 tests); MSW mocks + TS types match them; Opus review APPROVE; backend 1233, frontend 129 tests, run_checks all PASS.
+- **Next step:** R-05 AI Recommendations + Approval Center. Also switch R-03/R-04 screens from mocks to the real API (set `VITE_API_MOCK=false` and check).
+- **Blockers:** Uday to confirm R-02 edits in his files (`apps/accounts/permissions.py` routed=True for suppliers/dashboard/risk-cases.read, `tests/test_role_matrix.py`, `config/urls.py` include). Team to confirm: case timeline visible to all reader roles; REJECTED cases count as open; `recovered_value` = exposure of RECOVERED cases. Nested sessions first failed with "organization has disabled Claude subscription access" - used subagent fallback. R-09: `ci-ok` on `main` only; drop `[skip ci]` from bot commits.
 ---
 
 ### R-01: Frontend scaffold + design system
@@ -41,7 +40,7 @@
   - [x] Every endpoint tenant-scoped (uses U-04 mixin) and tested - `TenantScopedViewSet`/`TenantScopedMixin` in `backend/apps/portal/views.py`; tests `test_suppliers_only_own_tenant`, `test_supplier_foreign_id_404`, `test_risk_case_foreign_id_404_and_list_scoped`, `test_dashboard_only_own_tenant`
   - [x] `/risk-cases/{id}` returns event, affected POs, analysis, recommendations, approvals, executions, timeline in one call - `test_risk_case_detail_has_all_sections`, `test_detail_query_count_is_bounded`
   - [x] MSW mocks in `frontend/` updated to match the real responses - `frontend/src/mocks/README.md` "R-02 response shapes"; Opus reviewer APPROVE at 9912148; frontend 129 tests
-- **Done in:** -
+- **Done in:** 3ffed0f
 - **Notes:** Plan (2026-11-25, deps U-03/U-04 in review): piece | runs as | model / effort | branch -- backend 5 endpoints + tests | nested session | sonnet / medium | `roop/R-02-read-apis--backend` ; MSW mocks + TS types to real shape | nested session | sonnet / medium | `roop/R-02-read-apis--mocks` ; run suites | subagent test-runner | haiku / low ; review | subagent reviewer-lite | sonnet / medium. Fallback: nested sessions hit an org auth error at first, so the backend was built by an implementer subagent on `--backend2` (merged); the duplicate `--backend` from the late-starting nested session is superseded (only its role-matrix lines were taken). Touched Uday-owned files (agreed with Roop 2026-11-25, Uday to confirm): `apps/accounts/permissions.py` routed=True for suppliers.read, dashboard.read, risk-cases.read; `tests/test_role_matrix.py` ROUTES + EXPECTED_ROUTED; `config/urls.py` one include line for `apps.portal`. Team to confirm: case timeline (audit rows) visible to all reader roles per CONTRACTS s4, though `GET /audit` is ADMIN/PM only; REJECTED cases count as open (can return to ANALYZING). Open question: dashboard `recovered_value` = exposure sum of RECOVERED cases.
 
 ### R-03: Executive Overview + Supplier Intelligence screens
