@@ -6,9 +6,10 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
   const currency = pos[0]?.value.currency ?? 'INR';
   const total = pos.reduce((a, p) => a + Number(p.value.amount), 0);
   return (
-    <Card role="region" aria-labelledby="pos-heading">
+    <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="pos-heading">
       <CardHeader>
         <CardTitle id="pos-heading">Affected purchase orders ({pos.length})</CardTitle>
+        <span className="text-sm font-semibold tabular-nums"><Money amount={total.toFixed(2)} currency={currency} /></span>
       </CardHeader>
       <Table aria-labelledby="pos-heading">
         <THead>
@@ -27,7 +28,7 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
             <TableEmptyRow colSpan={7}>No affected purchase orders</TableEmptyRow>
           ) : (
             pos.map((p) => (
-              <TR key={p.po_id}>
+              <TR key={`${p.po_id}-${p.item_id}`}>
                 <TD className="font-mono text-xs">{p.po_id}</TD>
                 <TD>
                   {p.item_name}
@@ -39,14 +40,14 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
                   <Money value={p.value} />
                 </TD>
                 <TD className="text-right tabular-nums">{p.days_late_estimate > 0 ? `${p.days_late_estimate} d` : 'On time'}</TD>
-                <TD className="text-right tabular-nums">{p.stock_cover_days} d</TD>
+                <TD className="text-right tabular-nums">{p.stock_cover_days == null ? 'Unknown' : `${p.stock_cover_days} d`}</TD>
               </TR>
             ))
           )}
         </TBody>
         {pos.length > 0 && (
           <tfoot>
-            <tr className="border-t border-border bg-surface-2 font-semibold">
+            <tr className="border-t-2 border-border bg-primary/5 font-semibold">
               <th scope="row" colSpan={4} className="px-3 py-2 text-left text-sm">
                 Total exposure
               </th>

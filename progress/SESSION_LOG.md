@@ -230,3 +230,12 @@ Template:
 - Next: send Uday the point-7 OK + `jsonschema>=4.18` and schema-folder asks; N-07 persistence after U-03 merges and N-10 `transition()`
 - Blockers: U-03 not yet in collaboration; U-07 tools not built
 - Models used: docs session haiku (no advisor)
+
+## 2026-11-25 - roop - R-02 read APIs done
+- Branch: roop/R-02-read-apis @ 9912148 (+ task-file commits)
+- Did: pulled latest; found R-02 unblocked (U-03/U-04 in review). Built `backend/apps/portal/` GET /suppliers, /suppliers/{id}, /dashboard/summary, /risk-cases, /risk-cases/{id} (tenant-scoped, filters, pagination, bounded queries); aligned MSW mocks + TS types, added `useClampPage` for 404 on page past end, data-quality note on case detail. Two Opus review rounds, all findings fixed, APPROVE. Edited Uday-owned role matrix + urls include with Roop OK.
+- Tests: backend 1233 passed; frontend 129 passed; run_checks.py all PASS
+- Status now: done
+- Next: R-05 AI Recommendations + Approval Center; switch R-03/R-04 to real API
+- Blockers: Uday to confirm role-matrix/urls edits; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning
+- Models used: advisor opus; implementer sonnet subagents (nested sessions hit org auth error, then started late as duplicates); reviewer opus; test-runner haiku

@@ -149,6 +149,20 @@ describe('Risk Command Center inbox', () => {
       await waitFor(() => expect(within(screen.getByRole('link', { name: 'RC-000046' }).closest('tr') as HTMLElement).getByText('Analyzing')).toBeInTheDocument());
     });
 
+    it('opens the scenario dialog with a card per scenario, selects one and closes on cancel', async () => {
+      open();
+      await userEvent.click(await screen.findByRole('button', { name: 'Simulate Supplier Disruption' }));
+      const dialog = await screen.findByRole('dialog', { name: 'Simulate a supplier disruption' });
+      const radios = within(dialog).getAllByRole('radio');
+      expect(radios).toHaveLength(SCENARIOS.length);
+      for (const sc of SCENARIOS) expect(within(dialog).getByRole('radio', { name: new RegExp(sc.label) })).toBeInTheDocument();
+      expect(radios[0]).toBeChecked();
+      await userEvent.click(within(dialog).getByRole('radio', { name: /Logistics blockade/ }));
+      expect(within(dialog).getByRole('radio', { name: /Logistics blockade/ })).toBeChecked();
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
     it.each([
       [403, 'FORBIDDEN', 'Admin role required.'],
       [400, 'VALIDATION_ERROR', 'scenario is not valid.'],

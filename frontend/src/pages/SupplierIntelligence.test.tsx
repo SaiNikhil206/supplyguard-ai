@@ -58,8 +58,15 @@ describe('SupplierIntelligence list', () => {
   });
 
   it('clamps an out-of-range page to the last page', async () => {
+    let errorShown = false;
+    const watch = new MutationObserver(() => {
+      if (document.querySelector('[role="alert"]')) errorShown = true;
+    });
+    watch.observe(document.body, { childList: true, subtree: true });
     const r = renderWithProviders({ path: '/suppliers?page=9' });
     await screen.findByText('Page 2 of 2');
+    watch.disconnect();
+    expect(errorShown).toBe(false); // the 404 never flashes an error screen
     expect(query(r).get('page')).toBe('2');
     await waitFor(() => expect(rowsOf()).toHaveLength(2));
   });

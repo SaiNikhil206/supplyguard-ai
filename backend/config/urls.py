@@ -18,6 +18,7 @@ urlpatterns = [
 
     path("api/v1/", include("apps.workflow.urls")),
     path("api/v1/", include("apps.intelligence.urls")),
+    path("api/v1/", include("apps.portal.urls")),
 ]
 
 # JSON error body (CONTRACTS s1) for /api/ paths; other paths keep Django's pages.
