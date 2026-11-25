@@ -91,7 +91,7 @@
 - **Notes:** -
 
 ### R-07: What-if Simulator UI
-- **Status:** in-progress
+- **Status:** review
 - **Sprint:** S4 (15-17 Dec) | **Est:** 1.5d | **Depends:** N-11, R-01
 - **Branch:** `roop/R-07-what-if-ui`
 - **Model hint:** sonnet / medium
@@ -99,7 +99,7 @@
 - **Acceptance:**
   - [ ] "Supplier A out 7 days" renders in < 3 s
 - **Done in:** -
-- **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
+- **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to real N-11 (`POST /what-if`: scenario, affected_pos, inventory gaps/items/coverage, best_option_estimate, data_gaps); request sends supplier_id, event_type, duration_days, optional start; chart renamed InventoryCoverageChart; reviewer-lite APPROVE. Stays `review`: "Supplier A out 7 days in < 3 s" not timed live against Django yet - tick after a live run on the seeded backend.
 
 ### R-08: Integration Center, Audit Center, Tenant Settings
 - **Status:** in-progress
