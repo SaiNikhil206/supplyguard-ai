@@ -25,7 +25,7 @@ import { riskCaseDetail, riskCaseList, users } from './fixtures';
 
 export const DEFAULT_EXECUTION_DELAY_MS = 400;
 export const FAILING_DEMO_RECOMMENDATION = 'REC-000102';
-const DECIDERS = ['ADMIN', 'PROCUREMENT_MANAGER'];
+const DECIDERS = ['PROCUREMENT_MANAGER']; // backend record_decision allows only this role
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 const CASE_STATES: string[] = [
   'RECEIVED', 'ANALYZING', 'RECOMMENDATION_READY', 'PENDING_APPROVAL', 'APPROVED',
@@ -319,7 +319,7 @@ export const approvalHandlers: HttpHandler[] = [
         approval_id: approval.id,
         recommendation_id: recId,
         decision: body.decision,
-        recommendation_status: body.decision === 'APPROVE' ? 'APPROVED' : body.decision === 'REJECT' ? 'REJECTED' : 'SUPERSEDED',
+        recommendation_status: body.decision === 'APPROVE' ? 'APPROVED' : body.decision === 'REJECT' ? 'REJECTED' : 'CHANGES_REQUESTED',
         risk_case_id: found.caseId,
         case_status: s.status,
         execution_id: execution?.id ?? null,
