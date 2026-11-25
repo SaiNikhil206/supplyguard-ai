@@ -239,3 +239,12 @@ Template:
 - Next: R-05 AI Recommendations + Approval Center; switch R-03/R-04 to real API
 - Blockers: Uday to confirm role-matrix/urls edits; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning
 - Models used: advisor opus; implementer sonnet subagents (nested sessions hit org auth error, then started late as duplicates); reviewer opus; test-runner haiku
+
+## 2026-11-25 - roop - real-API wiring of R-03/04/05/07/08, R-06 docs
+- Branch: roop/R-08-admin-screens @ handoff commit (also R-04, R-05, R-07 task branches, roop/R-06-flow-approval @ 5408f6e)
+- Did: 4 visible sessions wired screens to real backend shapes (--wire); stopped subagent WIP preserved; R-06 spec fixed to flat decision API; flaky Vitest fixed (--stability); reviewer-lite APPROVE on combined diff; R-03 and R-05 marked done, R-04/R-07/R-08 review
+- Tests: combined branch tsc/lint/build pass, backend 1233 + portal 38 pass, Vitest 200 green x5 after fix (flaky before); not run live: R-05 decision, R-07 <3 s, R-08 trace
+- Status now: R-03 done, R-05 done, R-04/R-07/R-08 review, R-06 in-progress (docs)
+- Next: confirm auto-merge of R-05/R-07/R-08; live checks; R-06 Flow build in Boomi UI
+- Blockers: backend gaps (executions retry, approvals queue, roles, user update) for Nikhil/Uday; U-07 chain for R-04 simulate AC
+- Models used: advisor opus; 4 nested sessions + R-06 session sonnet/medium; implementer subagents; test-runner haiku; reviewer-lite sonnet

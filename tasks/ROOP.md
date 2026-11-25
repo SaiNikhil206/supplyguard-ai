@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-25 (R-02 read APIs done and merged)
-- **Current task:** - (R-02 `done`; R-03, R-04, R-09 in `review`; R-05, R-07, R-08, R-10 `in-progress`)
-- **Branch:** `roop/R-02-read-apis` (pieces `--backend2` and `--mocks2` merged; `--backend` and `--mocks` are superseded duplicates, not merged)
-- **Where I left off:** 5 portal endpoints live in `backend/apps/portal/` (tenant-scoped, 21 tests); MSW mocks + TS types match them; Opus review APPROVE; backend 1233, frontend 129 tests, run_checks all PASS.
-- **Next step:** R-05 AI Recommendations + Approval Center. Also switch R-03/R-04 screens from mocks to the real API (set `VITE_API_MOCK=false` and check).
-- **Blockers:** Uday to confirm R-02 edits in his files (`apps/accounts/permissions.py` routed=True for suppliers/dashboard/risk-cases.read, `tests/test_role_matrix.py`, `config/urls.py` include). Team to confirm: case timeline visible to all reader roles; REJECTED cases count as open; `recovered_value` = exposure of RECOVERED cases. Nested sessions first failed with "organization has disabled Claude subscription access" - used subagent fallback. R-09: `ci-ok` on `main` only; drop `[skip ci]` from bot commits.
+- **Last updated:** 2026-11-25 (real-API wiring of R-03/04/05/07/08 done; R-06 docs aligned)
+- **Current task:** - (R-01, R-02, R-03, R-05 `done`; R-04, R-07, R-08, R-09, R-10 `review`; R-06 docs done, Flow build manual, still `todo` on collaboration)
+- **Branch:** `roop/R-08-admin-screens` (task branches R-04, R-05, R-07, R-08 pushed; R-04 already in collaboration; `roop/R-06-flow-approval` `5408f6e` pushed; `--wire` and `--stability` sub branches merged)
+- **Where I left off:** Screens run against real API shapes (decision flat 201, what-if, audit, settings/users, portal); R-03 + R-04 auth/read checked live on seeded Django (VITE_API_MOCK=false). Combined branch check: tsc, lint, build, backend 1233 + portal 38 pass; Vitest was flaky (CPU contention), fixed in `--stability` (asyncUtilTimeout 5 s, maxWorkers 4; 5 green runs of 200). reviewer-lite APPROVE. NOT run live: R-05 decision, R-07 <3 s, R-08 AC-07 trace. R-05/R-07/R-08 pushes await auto-merge (gh not logged in here, Actions not checked).
+- **Next step:** check Actions / `/merge-prs` so R-05, R-07, R-08 land in collaboration; set R-06 to `in-progress` on its own branch; live-run what-if, decision and audit trace on seeded Django; then R-06 Boomi Flow build (manual in Boomi UI). R-11/R-12 wait on S-03, U-10, N-09. Delete `tmp/roop-integ-check` + worktree `D:/hackathon/sg-integ`.
+- **Blockers:** Backend gaps (Nikhil/Uday): no `POST /executions/{id}/retry` (`workflow.services.retry_execution` has no route), no approvals-queue endpoint, no tenant-roles endpoint, no user-update route, `/integrations/status` lacks per-service health. R-04 simulate-to-case 5 s needs U-07 -> N-08/N-09 chain. Uday still to confirm R-02 edits in his files; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning. Nested sessions refused on automated turns (visible ones worked on user request).
 ---
 
 ### R-01: Frontend scaffold + design system
@@ -102,7 +102,7 @@
 - **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-08: Integration Center, Audit Center, Tenant Settings
-- **Status:** in-progress
+- **Status:** review
 - **Sprint:** S4 (16-20 Dec) | **Est:** 2d | **Depends:** U-04, U-05, U-06
 - **Branch:** `roop/R-08-admin-screens`
 - **Model hint:** sonnet / medium
@@ -110,7 +110,7 @@
 - **Acceptance:**
   - [ ] Searching a correlation id shows event -> analysis -> approval -> execution in order (AC-07)
 - **Done in:** -
-- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
+- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to the real backend shapes (`GET /integrations/status`, `GET /audit?correlation_id=`, `GET/PATCH /settings`, `GET/POST /users`, `GET /me`); reviewer-lite APPROVE; 205 tests green. Stays `review`: AC-07 correlation trace not tried live (client orders `/audit` events by timestamp; no dedicated trace endpoint). Backend gaps for Uday: no tenant-roles endpoint, no user-update/role-change route (UI shows roles read-only, controls disabled with a note), per-service health missing from `/integrations/status`, `listUsers` shows first page (25) only.
 
 ### R-09: CI pipeline
 - **Status:** review

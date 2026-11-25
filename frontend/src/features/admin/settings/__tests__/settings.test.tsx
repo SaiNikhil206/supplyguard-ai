@@ -53,12 +53,42 @@ describe("Tenant Settings (admin)", () => {
       screen.getByRole("button", { name: "Save thresholds" }),
     );
     expect(
-      await screen.findByText("Must be greater than the high threshold."),
+      await screen.findByText("Thresholds must satisfy medium < high < critical."),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Critical score/)).toHaveAttribute(
       "aria-invalid",
       "true",
     );
+  });
+
+  it("saves the recovery policy (real field names)", async () => {
+    renderWithProviders({ path: "/settings" });
+    await userEvent.click(
+      await screen.findByRole("tab", { name: "Recovery policy" }),
+    );
+    const pct = await screen.findByLabelText(/Max cost increase/);
+    expect(pct).toHaveValue(15);
+    await userEvent.clear(pct);
+    await userEvent.type(pct, "25");
+    await userEvent.click(screen.getByRole("button", { name: "Save policy" }));
+    expect(await screen.findByText("Settings saved.")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Max cost increase/)).toHaveValue(25);
+  });
+
+  it("shows roles read-only with a note and rejects a short password", async () => {
+    renderWithProviders({ path: "/settings" });
+    await userEvent.click(
+      await screen.findByRole("tab", { name: "Users & roles" }),
+    );
+    await screen.findByText("Olivia Ops");
+    expect(screen.getByTestId("roles-note")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Add user" }));
+    await userEvent.type(await screen.findByLabelText("Username"), "short");
+    await userEvent.type(screen.getByLabelText("Password"), "abc");
+    await userEvent.click(screen.getByRole("button", { name: "Create user" }));
+    expect(
+      await screen.findByText(/This password is too short/),
+    ).toBeInTheDocument();
   });
 
   it("adds a user and appends a row", async () => {
@@ -73,6 +103,7 @@ describe("Tenant Settings (admin)", () => {
     await userEvent.type(screen.getByLabelText("Username"), "newbie");
     await userEvent.type(screen.getByLabelText("Full name"), "Nina Newbie");
     await userEvent.type(screen.getByLabelText("Email"), "nina@acme.example");
+    await userEvent.type(screen.getByLabelText("Password"), "S3cure-pass-42");
     await userEvent.selectOptions(role, "OPS_MANAGER");
     await userEvent.click(screen.getByRole("button", { name: "Create user" }));
     expect(await screen.findByText("Nina Newbie")).toBeInTheDocument();
@@ -88,9 +119,10 @@ describe("Tenant Settings (admin)", () => {
     await userEvent.type(await screen.findByLabelText("Username"), "admin");
     await userEvent.type(screen.getByLabelText("Full name"), "Dup");
     await userEvent.type(screen.getByLabelText("Email"), "dup@acme.example");
+    await userEvent.type(screen.getByLabelText("Password"), "S3cure-pass-42");
     await userEvent.click(screen.getByRole("button", { name: "Create user" }));
     expect(
-      await screen.findByText("A user with this username already exists."),
+      await screen.findByText("This username is not available."),
     ).toBeInTheDocument();
   });
 });

@@ -62,7 +62,7 @@ export function ActorCell({ actor }: { actor: AuditEvent["actor"] }) {
 export function EntityCell({ e }: { e: AuditEvent }) {
   const chip =
     "rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted";
-  if (e.entity_type === "RISK_CASE") {
+  if (e.entity_type === "RiskCase") {
     return (
       <span className="inline-flex flex-wrap items-center gap-1">
         <span className={chip} aria-hidden="true">
@@ -204,7 +204,11 @@ export function AuditTable({
                 <StateChange from={e.from_state} to={e.to_state} />
               </TD>
               <TD>
-                <CopyId id={e.correlation_id} onTrace={onTrace} />
+                {e.correlation_id ? (
+                  <CopyId id={e.correlation_id} onTrace={onTrace} />
+                ) : (
+                  <span className="text-muted">-</span>
+                )}
               </TD>
             </TR>
           ))}
