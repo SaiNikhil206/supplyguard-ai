@@ -11,7 +11,7 @@ export function CasePicker() {
   const q = useRiskCases();
   if (q.isPending)
     return (
-      <div role="status" aria-label="Loading cases" className="grid gap-4 md:grid-cols-2">
+      <div role="status" aria-label="Loading cases" className="grid gap-3">
         <Skeleton className="h-28 rounded-2xl" />
         <Skeleton className="h-28 rounded-2xl" />
       </div>
@@ -29,7 +29,7 @@ export function CasePicker() {
   return (
     <section aria-label="Choose a case">
       <h2 className="mb-3 text-sm font-semibold">Choose a case</h2>
-      <ul className="grid gap-4 md:grid-cols-2">
+      <ul className="grid gap-3">
         {cases.map((c) => (
           <li key={c.id}>
             <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur transition hover:shadow-md">
@@ -37,7 +37,7 @@ export function CasePicker() {
               <div className="flex min-w-0 items-center gap-3">
                 <Monogram name={c.supplier_name ?? c.supplier_id} className="h-10 w-10" />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{c.title}</p>
+                  <p className="text-sm font-medium">{c.title}</p>
                   <p className="text-xs text-muted">
                     {c.id} · {c.supplier_name ?? c.supplier_id} · {c.status.replace(/_/g, ' ').toLowerCase()}
                   </p>
@@ -50,8 +50,9 @@ export function CasePicker() {
               <Link
                 className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-primary hover:underline"
                 to={`?case=${encodeURIComponent(c.id)}`}
+                aria-label={`View options for ${c.id}`}
               >
-                View options for {c.id}
+                View options
                 <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </Link>
             </div>
