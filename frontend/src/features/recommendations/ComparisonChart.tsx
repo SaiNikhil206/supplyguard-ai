@@ -4,6 +4,7 @@ import { OPTION_TYPE_LABEL, isUnsupported, moneyNumber } from './format';
 
 interface Row {
   name: string;
+  short: string;
   cost: number | null;
   lead: number | null;
   muted: boolean;
@@ -34,7 +35,7 @@ function Mini({ title, rows, field, unit, color }: { title: string; rows: Row[];
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={rows} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid vertical={false} className="stroke-border/50" strokeDasharray="3 3" />
-              <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} interval={0} />
+              <XAxis dataKey="short" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} interval={0} />
               <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} width={48} />
               <Tooltip cursor={{ fill: 'hsl(var(--surface-2) / 0.5)' }} content={<Tip unit={unit} />} />
               <Bar dataKey={field} radius={[8, 8, 0, 0]} maxBarSize={44}>
@@ -54,6 +55,7 @@ function Mini({ title, rows, field, unit, color }: { title: string; rows: Row[];
 export function ComparisonChart({ recs }: { recs: Recommendation[] }) {
   const rows: Row[] = recs.map((r) => ({
     name: `#${r.rank} ${OPTION_TYPE_LABEL[r.option_type]}`,
+    short: `#${r.rank}`,
     cost: moneyNumber(r.estimated_cost_delta),
     lead: r.estimated_lead_time_days,
     muted: isUnsupported(r),
@@ -66,7 +68,7 @@ export function ComparisonChart({ recs }: { recs: Recommendation[] }) {
       className="grid gap-6 md:grid-cols-2"
     >
       <Mini title={`Cost delta (${currency || 'n/a'})`} rows={rows} field="cost" unit={currency} color="hsl(var(--primary))" />
-      <Mini title="Lead time (days)" rows={rows} field="lead" unit="days" color="#8b5cf6" />
+      <Mini title="Lead time (days)" rows={rows} field="lead" unit="days" color="hsl(var(--primary))" />
     </div>
   );
 }

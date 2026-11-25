@@ -24,15 +24,15 @@ import { cn } from "@/lib/utils";
 import { formatTime } from "./stages";
 
 const ACTOR = {
-  USER: { icon: User, cls: "bg-primary/10 text-primary", label: "User" },
+  USER: { icon: User, cls: "bg-foreground/5 text-muted", label: "User" },
   SYSTEM: {
     icon: Cpu,
-    cls: "bg-slate-500/10 text-slate-600 dark:text-slate-300",
+    cls: "bg-foreground/5 text-muted",
     label: "System",
   },
   AGENT: {
     icon: Bot,
-    cls: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+    cls: "bg-foreground/5 text-muted",
     label: "AI agent",
   },
 } as const;
@@ -64,7 +64,7 @@ export function EntityCell({ e }: { e: AuditEvent }) {
     "rounded-md bg-surface-2 px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted";
   if (e.entity_type === "RISK_CASE") {
     return (
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex flex-wrap items-center gap-1">
         <span className={chip} aria-hidden="true">
           Case
         </span>
@@ -78,7 +78,7 @@ export function EntityCell({ e }: { e: AuditEvent }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5">
+    <span className="inline-flex flex-wrap items-center gap-1">
       <span className={chip}>{e.entity_type}</span>
       <span className="font-mono text-xs">{e.entity_id}</span>
     </span>
@@ -97,13 +97,13 @@ export function StateChange({
     "rounded-md border border-border/60 bg-surface-2 px-1.5 py-0.5 text-xs font-medium";
   return (
     <span
-      className="inline-flex items-center gap-1.5"
+      className="inline-flex flex-wrap items-center gap-1"
       aria-label={`${from ?? "-"} to ${to ?? "-"}`}
     >
       <span className={chip}>{from ?? "-"}</span>
       <ArrowRight className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
       <span
-        className={cn(chip, "border-primary/30 bg-primary/10 text-primary")}
+        className={cn(chip, "bg-foreground/5 text-foreground")}
       >
         {to ?? "-"}
       </span>
@@ -168,46 +168,48 @@ export function AuditTable({
   onTrace: (correlationId: string) => void;
 }) {
   return (
-    <Table aria-label="Audit events">
-      <THead>
-        <TR>
-          <TH>Time</TH>
-          <TH>Actor</TH>
-          <TH>Entity</TH>
-          <TH>Action</TH>
-          <TH>State change</TH>
-          <TH>Correlation ID</TH>
-        </TR>
-      </THead>
-      <TBody>
-        {events.length === 0 && (
-          <TableEmptyRow colSpan={6}>No audit events match</TableEmptyRow>
-        )}
-        {events.map((e) => (
-          <TR key={e.id} className="h-14">
-            <TD className="whitespace-nowrap font-mono text-xs">
-              {formatTime(e.at)}
-            </TD>
-            <TD>
-              <ActorCell actor={e.actor} />
-            </TD>
-            <TD>
-              <EntityCell e={e} />
-            </TD>
-            <TD>
-              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                {e.action}
-              </span>
-            </TD>
-            <TD>
-              <StateChange from={e.from_state} to={e.to_state} />
-            </TD>
-            <TD>
-              <CopyId id={e.correlation_id} onTrace={onTrace} />
-            </TD>
+    <div className="[&_td]:px-3 [&_th]:px-3">
+      <Table aria-label="Audit events">
+        <THead>
+          <TR>
+            <TH>Time</TH>
+            <TH>Actor</TH>
+            <TH>Entity</TH>
+            <TH>Action</TH>
+            <TH>State change</TH>
+            <TH>Correlation ID</TH>
           </TR>
-        ))}
-      </TBody>
-    </Table>
+        </THead>
+        <TBody>
+          {events.length === 0 && (
+            <TableEmptyRow colSpan={6}>No audit events match</TableEmptyRow>
+          )}
+          {events.map((e) => (
+            <TR key={e.id} className="h-14">
+              <TD className="whitespace-nowrap font-mono text-xs">
+                {formatTime(e.at)}
+              </TD>
+              <TD>
+                <ActorCell actor={e.actor} />
+              </TD>
+              <TD>
+                <EntityCell e={e} />
+              </TD>
+              <TD>
+                <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-xs font-medium text-foreground ring-1 ring-border">
+                  {e.action}
+                </span>
+              </TD>
+              <TD>
+                <StateChange from={e.from_state} to={e.to_state} />
+              </TD>
+              <TD>
+                <CopyId id={e.correlation_id} onTrace={onTrace} />
+              </TD>
+            </TR>
+          ))}
+        </TBody>
+      </Table>
+    </div>
   );
 }
