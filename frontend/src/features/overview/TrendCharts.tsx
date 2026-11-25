@@ -35,7 +35,7 @@ export function ExposureTrendChart({ data }: { data: TrendPoint[] }) {
       <p className="sr-only">{summarize(data, "Exposure", compactInr)}</p>
       <div
         role="img"
-        aria-label="Area chart of exposure over time"
+        aria-label="Line chart of exposure over time"
         className="h-72 w-full"
       >
         <ResponsiveContainer width="100%" height="100%">
