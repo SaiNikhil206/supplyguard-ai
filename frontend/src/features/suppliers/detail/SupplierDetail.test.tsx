@@ -24,8 +24,7 @@ describe('SupplierDetail page', () => {
     expect(screen.getByText('SUP-1008')).toBeInTheDocument();
     expect(screen.getByText(`${detail.country} · ${detail.category}`)).toBeInTheDocument();
     expect(screen.getByText('Active')).toBeInTheDocument();
-    const meter = screen.getByRole('meter', { name: 'Risk score' });
-    expect(meter).toHaveAttribute('aria-valuenow', String(detail.risk_score));
+    expect(screen.queryByRole('meter', { name: 'Risk score' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: detail.contact_email })).toHaveAttribute(
       'href',
       `mailto:${detail.contact_email}`,
@@ -33,15 +32,13 @@ describe('SupplierDetail page', () => {
 
     for (const label of [
       'On-time delivery',
-      'Quality score',
-      'Avg lead time',
+            'Avg lead time',
       'Open PO value',
       'Disruptions (12 months)',
     ]) {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(`${detail.kpis.on_time_delivery_pct}%`)).toBeInTheDocument();
-    expect(screen.getByText(`${detail.kpis.quality_score} / 5`)).toBeInTheDocument();
   });
 
   it('lists disruption history with a case link', async () => {

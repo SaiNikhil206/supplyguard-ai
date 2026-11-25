@@ -135,14 +135,10 @@ function badEnum(request: Request, field: string, value: string | null, allowed:
   });
 }
 
-/** `from`/`to`: YYYY-MM-DD (whole day, UTC) or an ISO datetime. null = not given. */
-function parseBound(v: string | null, edge: 'start' | 'end'): number | null | 'invalid' {
+/** `from` (inclusive) / `to` (exclusive): YYYY-MM-DD = midnight UTC, or an ISO datetime. null = not given. */
+function parseBound(v: string | null): number | null | 'invalid' {
   if (!v) return null;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
-    const t = Date.parse(`${v}T00:00:00Z`);
-    return Number.isNaN(t) ? 'invalid' : edge === 'start' ? t : t + 86_400_000 - 1;
-  }
-  const t = Date.parse(v);
+  const t = Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(v) ? `${v}T00:00:00Z` : v);
   return Number.isNaN(t) ? 'invalid' : t;
 }
 
@@ -211,8 +207,8 @@ export const handlers: HttpHandler[] = [
     protectedRoute(({ url, request }) => {
       const status = url.searchParams.get('status');
       const severity = url.searchParams.get('severity');
-      const from = parseBound(url.searchParams.get('from'), 'start');
-      const to = parseBound(url.searchParams.get('to'), 'end');
+      const from = parseBound(url.searchParams.get('from'));
+      const to = parseBound(url.searchParams.get('to'));
       const bad =
         badEnum(request, 'status', status, RISK_CASE_STATES) ??
         badEnum(request, 'severity', severity, SEVERITIES) ??
@@ -227,7 +223,7 @@ export const handlers: HttpHandler[] = [
             (!status || c.status === status) &&
             (!severity || c.severity === severity) &&
             (from === null || t >= (from as number)) &&
-            (to === null || t <= (to as number))
+            (to === null || t < (to as number))
           );
         })
         .sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id));

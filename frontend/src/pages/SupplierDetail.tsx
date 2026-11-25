@@ -51,7 +51,7 @@ const METER_TINT = {
 
 function Header({ s }: { s: SupplierDetailData }) {
   const status = SUPPLIER_STATUS[s.status];
-  const score = s.risk_score === null ? null : Math.max(0, Math.min(100, s.risk_score));
+  const score = s.risk_score == null ? null : Math.max(0, Math.min(100, s.risk_score));
   return (
     <header className="space-y-2">
       <h1 className="text-2xl font-semibold">{s.name}</h1>
@@ -62,20 +62,22 @@ function Header({ s }: { s: SupplierDetailData }) {
         </span>
         <Badge tone={status.tone}>{status.label}</Badge>
         <SeverityBadge severity={s.risk_level} />
+        {score !== null && (
         <span className="flex items-center gap-2">
           <span
             role="meter"
             aria-label="Risk score"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={score ?? undefined}
-            aria-valuetext={score === null ? 'not scored' : `${score} out of 100`}
+            aria-valuenow={score}
+            aria-valuetext={`${score} out of 100`}
             className="h-2 w-28 overflow-hidden rounded-full bg-surface-2"
           >
-            <span className={`block h-full ${METER_TINT[s.risk_level]}`} style={{ width: `${score ?? 0}%` }} />
+            <span className={`block h-full ${METER_TINT[s.risk_level]}`} style={{ width: `${score}%` }} />
           </span>
-          <span className="tabular-nums text-muted">{score === null ? 'Not scored' : `${score}/100`}</span>
+          <span className="tabular-nums text-muted">{`${score}/100`}</span>
         </span>
+        )}
         <a className="text-info hover:underline" href={`mailto:${s.contact_email}`}>
           {s.contact_email}
         </a>
@@ -136,7 +138,7 @@ export default function SupplierDetail() {
       <Header s={s} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KpiTile label="On-time delivery" value={`${k.on_time_delivery_pct}%`} />
-        <KpiTile label="Quality score" value={`${k.quality_score} / 5`} />
+        {k.quality_pass_pct !== undefined && <KpiTile label="Quality pass" value={`${k.quality_pass_pct}%`} />}
         <KpiTile label="Avg lead time" value={k.avg_lead_time_days === null ? 'n/a' : `${k.avg_lead_time_days} days`} />
         <KpiTile label="Open PO value" value={<Money value={k.open_po_value} />} />
         <KpiTile label="Disruptions (12 months)" value={k.disruptions_last_12m} />

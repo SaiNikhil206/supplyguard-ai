@@ -59,20 +59,19 @@ export interface Supplier {
   id: string;
   name: string;
   country: string; // ISO-2, e.g. "IN"
-  city: string;
   category: string;
   status: SupplierStatus;
   risk_level: RiskLevel;
-  /** 0-100; null until N-04 defines a supplier score (no Django source yet). */
-  risk_score: number | null;
+  /** 0-100; the backend omits it until N-04 defines a supplier score. */
+  risk_score?: number | null;
   open_po_count: number; // computed: OPEN purchase orders
   on_time_delivery_pct: number; // 0-100
 }
 
 export interface SupplierKpis {
   on_time_delivery_pct: number;
-  /** Supplier.quality_score, scale 0-5 (was `quality_pass_pct`: the seed has no pass rate). */
-  quality_score: number;
+  /** No Django source (model has only a 0-5 quality_score); backend omits it. */
+  quality_pass_pct?: number;
   /** null: no Django source (nothing invented). */
   avg_lead_time_days: number | null;
   open_po_value: Money;
@@ -90,7 +89,6 @@ export interface SupplierDisruption {
 
 export interface SupplierDetail extends Supplier {
   contact_email: string;
-  capacity_per_week: number | null; // null = unknown
   kpis: SupplierKpis;
   disruption_history: SupplierDisruption[];
 }
@@ -154,8 +152,6 @@ export interface DisruptionEvent {
   description: string;
   source_system: string;
   correlation_id: string;
-  shipment_id?: string | null;
-  po_id?: string | null;
 }
 
 /** PROVISIONAL list item. */
@@ -251,7 +247,6 @@ export interface Recommendation {
   status?: RecommendationStatus;
   /** true when N-07 rejected it as unsupported by ERP data; cannot be approved. */
   unsupported?: boolean;
-  unsupported_reasons?: string[];
   rank: number;
   option_type: OptionType;
   proposed_action: { po_id: string; change: ProposedChange };
@@ -270,7 +265,6 @@ export type ApprovalDecision = 'APPROVE' | 'REJECT' | 'REQUEST_CHANGES';
 /** PROVISIONAL. */
 export interface Approval {
   id: string; // APR-...
-  round?: number;
   recommendation_id: string;
   decision: ApprovalDecision;
   comments: string;
@@ -286,8 +280,6 @@ export interface Execution {
   recommendation_id: string;
   status: ExecutionStatus;
   started_at: string | null;
-  error_class?: 'VALIDATION' | 'AUTH' | 'BUSINESS' | 'TRANSIENT' | 'DOWNSTREAM' | null;
-  retry_count?: number;
   finished_at: string | null;
   error: string | null;
   retryable: boolean;

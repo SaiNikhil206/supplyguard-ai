@@ -4,6 +4,7 @@ import { Badge, SeverityBadge, TBody, TD, TH, THead, TR, Table } from '@/compone
 import { SUPPLIER_STATUS } from '../status';
 
 const HEADERS = ['Supplier', 'Country', 'Category', 'Status', 'Risk', 'Open POs', 'On-time %'];
+const RISK_ORDER = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 
 export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; loading?: boolean }) {
   return (
@@ -29,7 +30,7 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
               </TR>
             ))
           : [...(suppliers ?? [])]
-              .sort((a, b) => (b.risk_score ?? -1) - (a.risk_score ?? -1))
+              .sort((a, b) => RISK_ORDER.indexOf(b.risk_level) - RISK_ORDER.indexOf(a.risk_level) || a.id.localeCompare(b.id))
               .map((s) => (
                 <TR key={s.id}>
                   <TD>
@@ -48,7 +49,7 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
                   <TD>
                     <div className="flex items-center gap-2">
                       <SeverityBadge severity={s.risk_level} />
-                      <span className="tabular-nums text-muted">{s.risk_score ?? '-'}</span>
+                      {s.risk_score != null && <span className="tabular-nums text-muted">{s.risk_score}</span>}
                     </div>
                   </TD>
                   <TD className="text-right tabular-nums">{s.open_po_count}</TD>
