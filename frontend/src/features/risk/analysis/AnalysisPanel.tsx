@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import type { AffectedEntityType, EvidenceRef, RiskAnalysis, RiskCaseState } from '../../../api/types';
-import { Badge, EvidenceTag, SeverityBadge, Spinner } from '../../../components/ui';
+import { Database, TriangleAlert } from 'lucide-react';
+import { Alert, Badge, EvidenceTag, SeverityBadge, Spinner } from '../../../components/ui';
 
 export interface AnalysisPanelProps {
   analysis: RiskAnalysis | null;
@@ -19,7 +20,7 @@ const ENTITY_LABEL: Record<AffectedEntityType, string> = {
 const ENTITY_ORDER: AffectedEntityType[] = ['PO', 'SUPPLIER', 'ITEM', 'SHIPMENT', 'LOCATION'];
 
 const chipCls =
-  'inline-flex items-center rounded border border-border bg-surface-2 px-2 py-0.5 font-mono text-xs text-fg';
+  'inline-flex items-center rounded-md border border-violet-500/20 bg-violet-500/5 px-2 py-0.5 font-mono text-xs text-fg';
 
 function EntityRef({ id, link }: { id: string; link: boolean }) {
   return link ? (
@@ -33,12 +34,12 @@ function EntityRef({ id, link }: { id: string; link: boolean }) {
 
 function ScoreMeter({ score }: { score: number }) {
   const pct = Math.max(0, Math.min(100, score));
+  const R = 40;
+  const C = 2 * Math.PI * R;
+  const arc = C * 0.75; // 270 degree gauge
+  const color = pct >= 80 ? 'stroke-sev-critical' : pct >= 60 ? 'stroke-sev-high' : pct >= 35 ? 'stroke-sev-medium' : 'stroke-sev-low';
   return (
-    <div className="min-w-40">
-      <div className="flex items-baseline justify-between text-xs text-muted">
-        <span id="risk-score-label">Risk score</span>
-        <span className="font-mono text-sm font-semibold text-fg">{score}/100</span>
-      </div>
+    <div className="flex items-center gap-3">
       <div
         role="meter"
         aria-labelledby="risk-score-label"
@@ -46,10 +47,29 @@ function ScoreMeter({ score }: { score: number }) {
         aria-valuemax={100}
         aria-valuenow={pct}
         aria-valuetext={`${pct} out of 100`}
-        className="mt-1 h-2 w-full overflow-hidden rounded-full bg-surface-2"
+        className="relative h-28 w-28 shrink-0"
       >
-        <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+        <svg viewBox="0 0 100 100" className="h-full w-full -rotate-[225deg]" aria-hidden="true">
+          <circle cx="50" cy="50" r={R} fill="none" strokeWidth="9" strokeLinecap="round" className="stroke-border" strokeDasharray={`${arc} ${C}`} />
+          <circle
+            cx="50"
+            cy="50"
+            r={R}
+            fill="none"
+            strokeWidth="9"
+            strokeLinecap="round"
+            className={clsx(color, 'transition-all duration-700 ease-out motion-reduce:transition-none')}
+            strokeDasharray={`${(arc * pct) / 100} ${C}`}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-semibold tabular-nums leading-none">{score}</span>
+          <span className="text-[10px] uppercase tracking-wide text-muted">/ 100</span>
+        </div>
       </div>
+      <span id="risk-score-label" className="text-xs font-medium uppercase tracking-wide text-muted">
+        Risk score
+      </span>
     </div>
   );
 }
@@ -66,8 +86,8 @@ function Group({
   className?: string;
 }) {
   return (
-    <section aria-label={title} className={clsx('rounded-lg border border-border p-3', className)}>
-      <h3 className="mb-2 text-sm font-semibold text-fg">
+    <section aria-label={title} className={clsx('rounded-xl border border-border/60 bg-card/60 p-4', className)}>
+      <h3 className="mb-3 text-sm font-semibold text-fg">
         {title} <span className="font-normal text-muted">({count})</span>
       </h3>
       {children}
@@ -80,7 +100,7 @@ function EvidenceRow({ e }: { e: EvidenceRef }) {
   return (
     <tr className="border-t border-border align-top">
       <td className="px-2 py-1.5">
-        <Badge>{e.source}</Badge>
+        <span className="inline-flex items-center gap-1.5"><Database aria-hidden="true" className="h-3.5 w-3.5 text-violet-500" /><Badge>{e.source}</Badge></span>
       </td>
       <td className="px-2 py-1.5 font-mono text-xs">
         <EntityRef id={e.entity} link={e.entity.startsWith('SUP-')} />
@@ -110,7 +130,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
   if (!analysis) {
     if (status === 'RECEIVED' || status === 'ANALYZING') {
       return (
-        <div className="flex items-center gap-2 text-sm text-muted">
+        <div className="flex items-center gap-3 rounded-xl border border-dashed border-violet-500/40 bg-violet-500/5 p-4 text-sm text-muted">
           <Spinner size="sm" label="Analysis in progress" />
           <span>AI analysis in progress…</span>
         </div>
@@ -127,7 +147,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-3 rounded-lg border border-border bg-surface p-3">
+      <div className="space-y-3 rounded-xl bg-gradient-to-br from-violet-500/10 via-transparent to-primary/5 p-4 ring-1 ring-violet-500/20">
         <div className="flex flex-wrap items-center gap-4">
           <SeverityBadge severity={a.risk_level} />
           <ScoreMeter score={a.risk_score} />
@@ -188,12 +208,13 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
           )}
         </Group>
 
-        <Group title="Missing data" count={a.missing_data.length} className="border-2 border-warning/60 bg-warning/10">
+        <Group title="Missing data" count={a.missing_data.length} className="border-2 border-danger/40 bg-danger/5 md:col-span-2">
           {a.missing_data.length === 0 ? (
             <p className="text-sm text-muted">No data gaps reported</p>
           ) : (
-            <div>
-              <p className="mb-2 text-sm font-semibold text-warning">The AI did not have:</p>
+            <Alert variant="destructive">
+              <TriangleAlert aria-hidden="true" />
+              <p className="mb-2 text-sm font-semibold text-danger">The AI did not have:</p>
               <ul className="space-y-2">
                 {a.missing_data.map((m, i) => (
                   <li key={i} className="flex flex-wrap items-start gap-2 text-sm">
@@ -202,7 +223,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Alert>
           )}
         </Group>
       </div>

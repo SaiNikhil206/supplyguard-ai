@@ -67,7 +67,7 @@
 - **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. Landed in collaboration on mocks (status review); real-data acceptance items stay unticked until backend APIs exist.
 
 ### R-05: AI Recommendations + Approval Center
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S3 (8-12 Dec) | **Est:** 2d | **Depends:** R-04, N-10
 - **Branch:** `roop/R-05-approvals`
 - **Model hint:** sonnet / medium
@@ -76,7 +76,7 @@
   - [ ] Buttons hidden/disabled for roles that cannot decide
   - [ ] UNSUPPORTED options shown but not approvable
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (N-10 not done). Pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
 
 ### R-06: Boomi Flow approval workflow
 - **Status:** todo
@@ -91,7 +91,7 @@
 - **Notes:** -
 
 ### R-07: What-if Simulator UI
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S4 (15-17 Dec) | **Est:** 1.5d | **Depends:** N-11, R-01
 - **Branch:** `roop/R-07-what-if-ui`
 - **Model hint:** sonnet / medium
@@ -99,10 +99,10 @@
 - **Acceptance:**
   - [ ] "Supplier A out 7 days" renders in < 3 s
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-08: Integration Center, Audit Center, Tenant Settings
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S4 (16-20 Dec) | **Est:** 2d | **Depends:** U-04, U-05, U-06
 - **Branch:** `roop/R-08-admin-screens`
 - **Model hint:** sonnet / medium
@@ -110,7 +110,7 @@
 - **Acceptance:**
   - [ ] Searching a correlation id shows event -> analysis -> approval -> execution in order (AC-07)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -.
 
 ### R-09: CI pipeline
 - **Status:** review
@@ -124,7 +124,7 @@
 - **Notes:** Built on nested branches `--lint`, `--workflow`, `--gate` (subagents). `ci.yml` jobs: backend (ruff + pytest on Postgres 16), frontend (lint/typecheck/test/build, Node from `.nvmrc`), python-suites matrix (ai, data, mock-erp), `ci-ok` aggregate. Triggers: task-branch pushes, PRs + pushes to collaboration/main, nightly 02:00 UTC, manual. ESLint 9 flat config added (`npm run lint`, 0 warnings). Auto-merge gate (`scripts/run_checks.py`) now also runs frontend lint + backend ruff. Opus review x2: CHANGES REQUIRED -> APPROVE WITH NITS (nits fixed). Local `run_checks.py`: all 5 suites PASS. Why `review` not `done`: acceptance "required check on both protected branches" conflicts with bots pushing directly to collaboration (GITHUB_TOKEN cannot bypass) -> proposed SHARED change: require `ci-ok` on `main` only; prove collaboration green via nightly/manual run. Deferred: bot `[skip ci]` in `scripts/gitflow.py` + `progress.yml` blocks milestone PR checks (team); ruff unpinned in `backend/requirements-dev.txt` (Uday).
 
 ### R-10: UX polish + demo mode
-- **Status:** todo
+- **Status:** review
 - **Sprint:** S5 (21-26 Dec) | **Est:** 1.5d | **Depends:** R-03, R-04, R-05, R-07, R-08
 - **Branch:** `roop/R-10-polish`
 - **Model hint:** sonnet / medium; opus / high for a final UI review
@@ -132,7 +132,7 @@
 - **Acceptance:**
   - [ ] Full demo path clicked through with zero console errors
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Redesign with shadcn/ui on Tailwind (user request). Base = collaboration + R-05/R-07/R-08 merged. Plan: shadcn foundation (theme, `src/components/ui` rebuilt on shadcn with same exports, app shell + command palette) | nested session | sonnet/medium | `roop/R-10-polish--foundation`; then in parallel: overview+suppliers screens | session | sonnet/medium | `--screens-insight`; risk+recommendations+approvals | session | sonnet/medium | `--screens-risk`; what-if+integrations+audit+settings+login | session | sonnet/medium | `--screens-admin`; final UI review | reviewer | opus/high | -. v2 pass (2026-11-23, user: "whole UI unprofessional"): foundation-v2 merged; screens restyled to docs/DESIGN_DIRECTION.md v2 | overview+suppliers+shared patterns | session | sonnet/medium | `--v2-insight`; risk+recommendations+approvals | session | sonnet/medium | `--v2-risk`; what-if+integrations+audit+settings | session | sonnet/medium | `--v2-admin`; test-runner haiku/low; reviewer-lite sonnet/medium. 2026-11-25: v2 restyle reverted at owner request (prefers colorful v1, branch `--restore-v1`); set to review to land the v1 UI (and the R-05/R-07/R-08 screens it carries) in collaboration; still open: demo reset button (ADMIN), Marketplace screenshots, zero-console-error click-through (401 on reload from token refresh).
 
 ### R-11: Demo script, deck, video storyboard
 - **Status:** todo

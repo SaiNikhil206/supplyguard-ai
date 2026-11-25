@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 2 | 0 | 3 | 0 | 7 | 0 | 17% | R-05 |
+| Roop | 2 | 3 | 4 | 0 | 3 | 0 | 17% | R-05 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -43,16 +43,16 @@
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
-| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | todo | 0/2 | - |
+| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | in-progress | 0/2 | - |
 | R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
-| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | todo | 0/1 | - |
-| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | todo | 0/1 | - |
+| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | in-progress | 0/1 | - |
+| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | in-progress | 0/1 | - |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
-| R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | todo | 0/1 | - |
+| R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | review | 0/1 | - |
 | R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | todo | 0/1 | - |
 | S-03 | End-to-end demo dry run | Shared | S5 (24 Dec) | todo | 0/1 | - |
 | S-04 | Security review | Shared | S5 (22-23 Dec) | todo | 0/1 | - |
@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | 1e4f4a4 | roop | R-10 | review | docs(tasks): R-10 note v2 revert |
+| 2026-11-25 | a2d8b23 | roop | R-10 | review | docs(tasks): R-10 to review to land v2 UI in collaboration |
 | 2026-11-25 | 8e13a2e | roop | R-02 | done | merge: R-02 Read APIs for the UI (Django `apps/portal`) (auto-merge) |
 | 2026-11-25 | bb1160c | roop | R-02 | done | chore(progress): R-02 done - handoff, session log, PROGRESS.md |
 | 2026-11-25 | 3ffed0f | roop | R-02 | done | chore(tasks): R-02 done - acceptance met with evidence |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 3aac6fb | roop | R-02 | in-progress | feat(frontend): align R-02 mock shapes and types with Django models |
 | 2026-11-25 | 4377a93 | roop | R-02 | in-progress | feat(frontend): align R-02 mocks and types with backend models |
 | 2026-11-25 | 995ea0b | roop | R-02 | in-progress | fix(accounts): mark R-02 read permissions as routed |
-| 2026-11-25 | 3d6627d | roop | R-02 | in-progress | feat(portal): read APIs for suppliers, dashboard summary and risk cases |
-| 2026-11-25 | 4c5f067 | roop | R-02 | in-progress | merge: R-02 backend read APIs (--backend2) |

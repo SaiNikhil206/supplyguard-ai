@@ -65,14 +65,14 @@ export default function RiskCaseDetail() {
 
   const d = q.data;
   return (
-    <div className="min-w-0 space-y-6">
-      <div>
+    <div className="min-w-0 animate-in fade-in-0 space-y-6 duration-300">
+      <div className="space-y-4">
         {crumb}
         <CaseHeader detail={d} />
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="min-w-0 space-y-6 lg:col-span-2">
-          <EventCard event={d.event} />
+          <AnalysisSlot caseId={d.id} status={d.status} analysis={d.analysis} />
           <AffectedPosTable pos={d.affected_pos} />
           {d.data_quality_flags && d.data_quality_flags.length > 0 && (
             <div role="note" aria-label="Data quality flags" className="rounded-md border border-warning/40 bg-warning/10 p-3 text-sm">
@@ -84,10 +84,10 @@ export default function RiskCaseDetail() {
               </ul>
             </div>
           )}
-          <AnalysisSlot caseId={d.id} status={d.status} analysis={d.analysis} />
+          <EventCard event={d.event} />
           <RecommendationsSummary detail={d} />
         </div>
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-6 lg:sticky lg:top-4 lg:self-start">
           <StatusTimeline status={d.status} timeline={d.timeline} />
           <ApprovalsExecutions approvals={d.approvals} executions={d.executions} />
         </div>

@@ -1,0 +1,66 @@
+import { NavLink } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
+import { navGroups, navItems, type NavItem } from './nav';
+
+export interface SidebarNavProps {
+  items?: NavItem[];
+  collapsed?: boolean;
+  label?: string;
+  onNavigate?: () => void;
+}
+
+/** Grouped nav links. `collapsed` shows icons only, with tooltips. */
+export function SidebarNav({ items = navItems, collapsed = false, label = 'Main', onNavigate }: SidebarNavProps) {
+  return (
+    <nav aria-label={label} className="flex flex-col gap-5 px-3 py-4">
+      {navGroups.map((group) => {
+        const groupItems = items.filter((i) => i.group === group);
+        if (groupItems.length === 0) return null;
+        return (
+          <div key={group} className="flex flex-col gap-1">
+            <div
+              className={cn(
+                'px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted',
+                collapsed && 'sr-only',
+              )}
+            >
+              {group}
+            </div>
+            {groupItems.map((item) => {
+              const Icon = item.icon;
+              const link = (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === '/'}
+                  onClick={onNavigate}
+                  className={({ isActive }) =>
+                    cn(
+                      'group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      collapsed && 'justify-center px-2',
+                      isActive
+                        ? 'bg-primary text-primary-foreground shadow-soft'
+                        : 'text-sidebar-fg hover:bg-white/10 hover:text-white',
+                    )
+                  }
+                >
+                  <Icon aria-hidden="true" className="h-4 w-4 shrink-0" />
+                  <span className={cn(collapsed && 'sr-only')}>{item.label}</span>
+                </NavLink>
+              );
+              if (!collapsed) return link;
+              return (
+                <Tooltip key={item.path}>
+                  <TooltipTrigger asChild>{link}</TooltipTrigger>
+                  <TooltipContent side="right">{item.label}</TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+        );
+      })}
+    </nav>
+  );
+}
