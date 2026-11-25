@@ -31,7 +31,7 @@ function ExecutionStepper({ status }: { status: Execution['status'] }) {
             <div className="flex flex-col items-center gap-1">
               <span
                 className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors duration-200',
+                  'flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors duration-500',
                   done && 'border-success bg-success text-white',
                   bad && 'border-danger bg-danger text-white',
                   current && !bad && 'border-primary bg-primary/10 text-primary',
@@ -56,7 +56,7 @@ function ExecutionStepper({ status }: { status: Execution['status'] }) {
               <span className="mx-1 mt-4 h-0.5 flex-1 overflow-hidden rounded-full bg-border">
                 <span
                   className={cn(
-                    'block h-full bg-success transition-all duration-200 ease-out motion-reduce:transition-none',
+                    'block h-full bg-success transition-all duration-700 ease-out motion-reduce:transition-none',
                     i < idx ? 'w-full' : current && s === 'RUNNING' ? 'w-1/2 animate-pulse motion-reduce:animate-none' : 'w-0',
                   )}
                 />
@@ -80,7 +80,7 @@ export function ExecutionPanel({ execution, canRetry, onNotice }: ExecutionPanel
   const showRetry = execution.status === 'FAILED' && execution.retryable && canRetry;
 
   return (
-    <section aria-label="Execution status" className="space-y-4 rounded-md border border-border bg-card p-4">
+    <section aria-label="Execution status" className="space-y-4 rounded-xl border border-border/70 bg-card p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold">Execution {execution.id}</h3>
         <Badge tone={TONE[execution.status]} data-testid="execution-status">
@@ -94,10 +94,10 @@ export function ExecutionPanel({ execution, canRetry, onNotice }: ExecutionPanel
         {execution.finished_at ? `, finished ${formatTime(execution.finished_at)}` : ''}
       </p>
       {execution.status === 'SUCCEEDED' && (
-        <p className="rounded-md bg-success/10 p-2 text-sm font-medium text-success">The change was written to the ERP.</p>
+        <p className="rounded-lg bg-success/10 p-2 text-sm font-medium text-success">The change was written to the ERP.</p>
       )}
       {execution.error && (
-        <p role="alert" className="rounded-md bg-danger/10 p-2 text-sm text-danger">
+        <p role="alert" className="rounded-lg bg-danger/10 p-2 text-sm text-danger">
           {execution.error}
           {execution.status === 'FAILED' && !execution.retryable && ' This error cannot be retried.'}
         </p>

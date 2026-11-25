@@ -9,6 +9,7 @@ export default function AiRecommendations() {
   return (
     <section className="space-y-6">
       <PageHeader
+        eyebrow="AI decision support"
         title="AI Recommendations"
         description="Ranked recovery options with cost, lead time, trade-offs and the evidence behind them."
       />

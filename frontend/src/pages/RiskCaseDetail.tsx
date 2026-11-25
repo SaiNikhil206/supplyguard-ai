@@ -16,12 +16,12 @@ export default function RiskCaseDetail() {
   const q = useRiskCase(id);
 
   const crumb = (
-    <nav aria-label="Breadcrumb" className="mb-4 text-xs text-muted">
+    <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
       <Link className="hover:underline" to="/risk">
         Risk Command Center
       </Link>
       <span aria-hidden="true"> / </span>
-      <span aria-current="page" className="font-mono text-foreground">
+      <span aria-current="page" className="text-text">
         {id}
       </span>
     </nav>
@@ -65,7 +65,7 @@ export default function RiskCaseDetail() {
 
   const d = q.data;
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="min-w-0 animate-in fade-in-0 space-y-6 duration-300">
       <div className="space-y-4">
         {crumb}
         <CaseHeader detail={d} />

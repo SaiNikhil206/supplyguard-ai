@@ -21,7 +21,7 @@ export function StatusStepper({ status }: { status: RiskCaseState }) {
             className={clsx(
               'rounded-full border px-2 py-0.5',
               isCurrent && isDanger(s) && 'border-danger bg-danger/15 font-semibold text-danger',
-              isCurrent && !isDanger(s) && 'border-primary bg-primary/10 font-semibold text-foreground',
+              isCurrent && !isDanger(s) && 'border-primary bg-primary/15 font-semibold text-text',
               done && 'border-success/40 bg-success/10 text-success',
               !done && !isCurrent && 'border-border text-muted',
             )}
@@ -37,7 +37,7 @@ export function StatusStepper({ status }: { status: RiskCaseState }) {
 export function StatusTimeline({ status, timeline }: { status: RiskCaseState; timeline: TimelineEntry[] }) {
   const sorted = [...timeline].sort((a, b) => a.at.localeCompare(b.at));
   return (
-    <Card className="overflow-hidden" role="region" aria-labelledby="timeline-heading">
+    <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="timeline-heading">
       <CardHeader>
         <CardTitle id="timeline-heading">Status timeline</CardTitle>
       </CardHeader>
@@ -46,7 +46,7 @@ export function StatusTimeline({ status, timeline }: { status: RiskCaseState; ti
         {sorted.length === 0 ? (
           <p className="text-sm text-muted">No activity yet</p>
         ) : (
-          <ol aria-label="Timeline" className="relative space-y-5 border-l border-border pl-5">
+          <ol aria-label="Timeline" className="relative space-y-5 border-l-2 border-border/70 pl-5">
             {sorted.map((t, i) => {
               const current = i === sorted.length - 1;
               return (
@@ -54,14 +54,14 @@ export function StatusTimeline({ status, timeline }: { status: RiskCaseState; ti
                   <span
                     aria-hidden="true"
                     className={clsx(
-                      'absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-card',
-                      current ? (isDanger(status) ? 'bg-danger' : 'bg-primary') : 'bg-border',
+                      'absolute -left-[22px] top-1.5 h-3 w-3 rounded-full border-2 border-card',
+                      current ? (isDanger(status) ? 'bg-danger ring-4 ring-danger/20' : 'bg-primary ring-4 ring-primary/20') : 'bg-border',
                     )}
                   />
                   <time dateTime={t.at} className="block text-xs text-muted">
                     {formatDateTime(t.at)}
                   </time>
-                  <p className={clsx('font-medium', current ? 'text-foreground' : 'text-foreground/90')}>
+                  <p className={clsx('font-medium', current ? 'text-text' : 'text-text/90')}>
                     {t.action.replace(/_/g, ' ').toLowerCase()}
                     <span className="font-normal text-muted"> · {t.actor}</span>
                   </p>

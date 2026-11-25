@@ -64,14 +64,14 @@ export function RiskInbox() {
   if (isPending) {
     body = (
       <div
-        className="space-y-2 rounded-lg border border-border bg-card p-4"
+        className="space-y-2 rounded-2xl border border-border/60 bg-card/80 p-4"
         aria-busy="true"
         aria-label="Loading risk cases"
       >
         {Array.from({ length: 5 }, (_, i) => (
           <div key={i} className="flex items-center gap-3">
-            <Skeleton className="h-8 w-8 rounded-md" />
-            <Skeleton className="h-10 flex-1" />
+            <Skeleton className="h-9 w-9 rounded-xl" />
+            <Skeleton className="h-12 flex-1" />
           </div>
         ))}
       </div>
@@ -87,7 +87,7 @@ export function RiskInbox() {
     );
   } else if (data.count === 0) {
     body = (
-      <div className="rounded-lg border border-border bg-card">
+      <div className="rounded-2xl border border-dashed border-border bg-card/60">
         {filtered ? (
           <EmptyState
             title="No cases match these filters"
@@ -117,26 +117,28 @@ export function RiskInbox() {
     );
   } else {
     body = (
-      <CaseTable
-        items={data.results}
-        fresh={fresh}
-        now={now}
-        footer={<Pagination page={page} pageSize={PAGE_SIZE} count={data.count} onPage={setPage} />}
-      />
+      <div className="space-y-3">
+        <CaseTable items={data.results} fresh={fresh} now={now} />
+        <Pagination page={page} pageSize={PAGE_SIZE} count={data.count} onPage={setPage} />
+      </div>
     );
   }
 
   return (
     <section className="space-y-6">
       <PageHeader
+        eyebrow="Risk operations"
         title="Risk Command Center"
         description={
-          <span data-testid="live-indicator" className="inline-flex items-center gap-2">
+          <span data-testid="live-indicator" className="inline-flex items-center gap-2 text-sm">
             {isError && data ? (
               'Update failed - retrying'
             ) : (
               <>
-                <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-success" />
+                <span aria-hidden="true" className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75 motion-reduce:animate-none" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                </span>
                 Live · updated {dataUpdatedAt ? clockTime(dataUpdatedAt) : '--:--:--'}
               </>
             )}

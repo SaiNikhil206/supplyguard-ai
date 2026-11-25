@@ -13,8 +13,8 @@ function Tip({ active, payload, unit }: { active?: boolean; payload?: { payload:
   if (!active || !payload?.length) return null;
   const p = payload[0];
   return (
-    <div className="rounded-md border border-border bg-card px-3 py-2 text-xs">
-      <p className="font-medium text-foreground">{p.payload.name}</p>
+    <div className="rounded-xl border border-border/60 bg-card px-3 py-2 text-xs shadow-md">
+      <p className="font-semibold">{p.payload.name}</p>
       <p className="tabular-nums text-muted">
         {p.value.toLocaleString('en-IN')} {unit}
       </p>
@@ -26,20 +26,20 @@ function Mini({ title, rows, field, unit, color }: { title: string; rows: Row[];
   const empty = rows.every((r) => r[field] === null);
   return (
     <div>
-      <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">{title}</h4>
+      <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">{title}</h4>
       {empty ? (
         <p className="py-8 text-center text-sm text-muted">No data available for any option.</p>
       ) : (
         <div className="h-44 w-full">
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={rows} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-              <CartesianGrid vertical={false} stroke="hsl(var(--border))" />
-              <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-text))' }} interval={0} />
-              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-text))' }} width={48} />
+              <CartesianGrid vertical={false} className="stroke-border/50" strokeDasharray="3 3" />
+              <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} interval={0} />
+              <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} width={48} />
               <Tooltip cursor={{ fill: 'hsl(var(--surface-2) / 0.5)' }} content={<Tip unit={unit} />} />
-              <Bar dataKey={field} radius={[4, 4, 0, 0]} maxBarSize={36}>
+              <Bar dataKey={field} radius={[8, 8, 0, 0]} maxBarSize={44}>
                 {rows.map((r) => (
-                  <Cell key={r.name} fill={color} fillOpacity={r.muted ? 0.3 : 1} />
+                  <Cell key={r.name} fill={color} fillOpacity={r.muted ? 0.3 : 0.9} />
                 ))}
               </Bar>
             </BarChart>
@@ -66,7 +66,7 @@ export function ComparisonChart({ recs }: { recs: Recommendation[] }) {
       className="grid gap-6 md:grid-cols-2"
     >
       <Mini title={`Cost delta (${currency || 'n/a'})`} rows={rows} field="cost" unit={currency} color="hsl(var(--primary))" />
-      <Mini title="Lead time (days)" rows={rows} field="lead" unit="days" color="hsl(var(--muted-text))" />
+      <Mini title="Lead time (days)" rows={rows} field="lead" unit="days" color="#8b5cf6" />
     </div>
   );
 }

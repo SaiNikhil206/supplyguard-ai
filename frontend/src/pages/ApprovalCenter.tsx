@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { MousePointerClick } from 'lucide-react';
+import { Clock, MousePointerClick, ShieldCheck, Wallet } from 'lucide-react';
 import { useApprovalQueue } from '@/api/approvals';
 import { ApiError } from '@/api/client';
 import { useAuth } from '@/auth/AuthProvider';
@@ -9,7 +9,7 @@ import { waitingTime } from '@/features/approvals/format';
 import { HistoryTable, QueueTable } from '@/features/approvals/Tables';
 import { PageHeader, StatCard } from '@/features/risk/ui';
 
-const panel = 'rounded-lg border border-border bg-card';
+const panel = 'rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur';
 
 const notify = (message: string, tone: 'success' | 'error') =>
   tone === 'success' ? toast.success(message) : toast.error(message);
@@ -30,13 +30,15 @@ export default function ApprovalCenter() {
   return (
     <section className="space-y-6">
       <PageHeader
+        eyebrow="Human in the loop"
         title="Approval Center"
         description="Review AI recommendations, decide, and watch the approved change execute."
       >
         {!isLoading && !error && (
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Waiting for approval" dot="bg-warning" value={pending.length} />
+            <StatCard icon={ShieldCheck} label="Waiting for approval" value={pending.length} tone="bg-warning/10 text-warning" />
             <StatCard
+              icon={Wallet}
               label="Exposure waiting"
               value={new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
                 style: 'currency',
@@ -45,21 +47,23 @@ export default function ApprovalCenter() {
               }).format(total)}
             />
             <StatCard
+              icon={Clock}
               label="Longest wait"
               value={oldest ? waitingTime(oldest.updated_at) : '-'}
               hint={oldest ? oldest.id : 'Nothing waiting'}
+              tone="bg-info/10 text-info"
             />
           </div>
         )}
       </PageHeader>
 
       {isLoading ? (
-        <div role="status" aria-label="Loading approvals" className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+        <div role="status" aria-label="Loading approvals" className="grid gap-6 lg:grid-cols-[3fr_2fr]">
           <div className="space-y-3">
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
+            <Skeleton className="h-32 rounded-2xl" />
+            <Skeleton className="h-32 rounded-2xl" />
           </div>
-          <Skeleton className="h-96 rounded-lg" />
+          <Skeleton className="h-96 rounded-2xl" />
         </div>
       ) : error ? (
         <div className={panel}>
@@ -70,14 +74,14 @@ export default function ApprovalCenter() {
           />
         </div>
       ) : (
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
-          <div className="min-w-0 space-y-6">
+        <div className="grid items-start gap-6 lg:grid-cols-[3fr_2fr]">
+          <div className="space-y-6">
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold text-foreground">Waiting for approval ({pending.length})</h2>
+              <h2 className="text-sm font-semibold">Waiting for approval ({pending.length})</h2>
               <QueueTable items={pending} selectedId={selectedId} onSelect={select} />
             </div>
             <div className={`${panel} overflow-hidden`}>
-              <h2 className="border-b border-border px-5 py-4 text-sm font-semibold">Decision history</h2>
+              <h2 className="border-b border-border px-5 py-3.5 text-sm font-semibold">Decision history</h2>
               <HistoryTable rows={decided} selectedId={selectedId} onSelect={select} />
             </div>
           </div>
@@ -91,7 +95,9 @@ export default function ApprovalCenter() {
               />
             ) : (
               <div className={`${panel} flex flex-col items-center gap-2 px-6 py-12 text-center`}>
-                <MousePointerClick aria-hidden="true" className="h-10 w-10 text-muted" strokeWidth={1.5} />
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <MousePointerClick aria-hidden="true" className="h-6 w-6" />
+                </span>
                 <p className="text-sm text-muted">Select a case to review its recommendation.</p>
               </div>
             )}

@@ -11,7 +11,7 @@ interface Props {
 export function CaseFilters({ status, onStatus }: Props) {
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="risk-status-filter" className="text-xs font-medium text-muted">
+      <label htmlFor="risk-status-filter" className="text-sm font-medium">
         Status
       </label>
       <Select
