@@ -1,0 +1,75 @@
+{
+    "count": 4,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": "RC-000004",
+            "status": "RECEIVED",
+            "severity": "LOW",
+            "supplier_id": "SUP-1004",
+            "supplier_name": "Shakti Polymers Pvt Ltd",
+            "event_type": "CAPACITY_REDUCTION",
+            "title": "Capacity_Reduction - Shakti Polymers Pvt Ltd",
+            "risk_score": 20,
+            "affected_po_count": 1,
+            "exposure": {
+                "amount": "1250000.00",
+                "currency": "INR"
+            },
+            "created_at": "2026-11-25T10:58:34.961908Z",
+            "updated_at": "2026-11-25T10:58:34.983269Z"
+        },
+        {
+            "id": "RC-000003",
+            "status": "ANALYZING",
+            "severity": "MEDIUM",
+            "supplier_id": "SUP-1003",
+            "supplier_name": "Meridian Electronics Pvt Ltd",
+            "event_type": "QUALITY_HOLD",
+            "title": "Quality_Hold - Meridian Electronics Pvt Ltd",
+            "risk_score": 55,
+            "affected_po_count": 1,
+            "exposure": {
+                "amount": "1250000.00",
+                "currency": "INR"
+            },
+            "created_at": "2026-11-25T10:58:34.871214Z",
+            "updated_at": "2026-11-25T10:58:34.892641Z"
+        },
+        {
+            "id": "RC-000002",
+            "status": "RECOMMENDATION_READY",
+            "severity": "HIGH",
+            "supplier_id": "SUP-1002",
+            "supplier_name": "Orion Forgings Pvt Ltd",
+            "event_type": "SHIPMENT_DELAY",
+            "title": "Shipment_Delay - Orion Forgings Pvt Ltd",
+            "risk_score": 74,
+            "affected_po_count": 1,
+            "exposure": {
+                "amount": "1250000.00",
+                "currency": "INR"
+            },
+            "created_at": "2026-11-25T10:58:34.731820Z",
+            "updated_at": "2026-11-25T10:58:34.751398Z"
+        },
+        {
+            "id": "RC-000001",
+            "status": "PENDING_APPROVAL",
+            "severity": "CRITICAL",
+            "supplier_id": "SUP-1001",
+            "supplier_name": "Summit Bearings Pvt Ltd",
+            "event_type": "FACTORY_OUTAGE",
+            "title": "Factory_Outage - Summit Bearings Pvt Ltd",
+            "risk_score": 92,
+            "affected_po_count": 1,
+            "exposure": {
+                "amount": "1250000.00",
+                "currency": "INR"
+            },
+            "created_at": "2026-11-25T10:58:34.552674Z",
+            "updated_at": "2026-11-25T10:58:34.574691Z"
+        }
+    ]
+}
