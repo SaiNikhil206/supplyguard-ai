@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import type { RiskCaseListItem } from '@/api/types';
 import { Money, SeverityBadge, StatusBadge, Table, TBody, TD, TH, THead, TR } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { SEV_META } from '../ui';
 import { eventTypeLabel, relativeTime } from './format';
 
 interface Props {
@@ -38,11 +37,7 @@ export function CaseTable({ items, fresh, now }: Props) {
                   isNew && 'slide-in-from-left-4 bg-primary/10 ring-2 ring-inset ring-primary',
                 )}
               >
-                <TD className="relative whitespace-nowrap pl-6">
-                  <span
-                    aria-hidden="true"
-                    className={cn('absolute inset-y-2 left-0 w-1 rounded-r-full', SEV_META[c.severity].bar)}
-                  />
+                <TD className="whitespace-nowrap">
                   <Link to={`/risk/${c.id}`} className="font-mono font-medium text-primary hover:underline">
                     {c.id}
                   </Link>

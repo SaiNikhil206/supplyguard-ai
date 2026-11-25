@@ -9,40 +9,40 @@
  */
 @layer base {
   :root {
-    --background: 48 33% 97%;
-    --foreground: 40 4% 10%;
-    --card: 60 30% 99%;
-    --card-foreground: 40 4% 10%;
-    --popover: 60 30% 99%;
-    --popover-foreground: 40 4% 10%;
-    --primary: 15 52% 46%;
+    --background: 220 20% 97%;
+    --foreground: 224 40% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 40% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 40% 11%;
+    --primary: 243 75% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 48 22% 93%;
-    --secondary-foreground: 40 4% 16%;
-    --surface-2: 48 25% 94%;
-    --muted-text: 40 5% 38%;
-    --accent: 15 55% 94%;
-    --accent-foreground: 15 52% 32%;
-    --destructive: 0 62% 42%;
+    --secondary: 220 16% 93%;
+    --secondary-foreground: 224 30% 20%;
+    --surface-2: 220 18% 95%;
+    --muted-text: 220 9% 38%;
+    --accent: 243 100% 96%;
+    --accent-foreground: 243 55% 34%;
+    --destructive: 0 72% 42%;
     --destructive-foreground: 0 0% 100%;
-    --border: 45 16% 88%;
-    --input: 45 12% 78%;
-    --ring: 15 52% 46%;
+    --border: 220 14% 89%;
+    --input: 220 14% 80%;
+    --ring: 243 75% 55%;
     --radius: 0.75rem;
-    --shadow: 40 4% 10%;
+    --shadow: 224 40% 11%;
 
-    --success: 142 55% 26%;
-    --warning: 30 85% 30%;
-    --danger: 0 62% 40%;
-    --info: 210 45% 36%;
-    --sev-low: 142 55% 26%;
-    --sev-medium: 36 85% 28%;
-    --sev-high: 20 80% 34%;
-    --sev-critical: 0 62% 40%;
+    --success: 142 76% 24%;
+    --warning: 30 95% 29%;
+    --danger: 0 72% 40%;
+    --info: 201 96% 28%;
+    --sev-low: 142 76% 24%;
+    --sev-medium: 36 95% 27%;
+    --sev-high: 20 90% 34%;
+    --sev-critical: 0 72% 40%;
 
-    --sidebar: 48 25% 95%;
-    --sidebar-fg: 40 5% 24%;
-    --sidebar-muted: 40 5% 42%;
+    --sidebar: 0 0% 100%;
+    --sidebar-fg: 224 20% 28%;
+    --sidebar-muted: 220 10% 46%;
     color-scheme: light;
   }
 
@@ -101,11 +101,6 @@
     @apply tracking-tight;
   }
 
-  /* Page titles use a serif face for a calm, editorial feel. */
-  h1 {
-    font-family: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Georgia, Cambria, serif;
-    font-weight: 500;
-  }
 
   /* Native <select> chevron (slate-500 reads on both themes) */
   select.sg-select {

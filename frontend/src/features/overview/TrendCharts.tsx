@@ -7,7 +7,7 @@ import { compactInr, shortDate } from '@/lib/format';
 const hsl = (name: string) => `hsl(var(--${name}))`;
 const axisTick = { fill: hsl('muted-text'), fontSize: 12 };
 const PRIMARY = 'hsl(var(--primary))';
-const AMBER = 'hsl(var(--primary))';
+const AMBER = '#f59e0b';
 
 /** Screen-reader text alternative: latest value and min-max over the period. */
 function summarize(data: TrendPoint[], label: string, fmt: (n: number) => string): string {

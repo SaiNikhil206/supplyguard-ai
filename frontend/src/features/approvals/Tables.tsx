@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { CircleCheck, Clock } from 'lucide-react';
-import { Monogram, SEV_META } from '@/features/risk/ui';
+import { Monogram } from '@/features/risk/ui';
 import { latestExecution, type DecidedRow } from '@/api/approvals';
 import type { RiskCaseDetail } from '@/api/types';
 import { Badge, Money, Table, TableEmptyRow, TBody, TD, TH, THead, TR } from '@/components/ui';
@@ -42,7 +42,6 @@ export function QueueTable({
                 selected ? 'border-primary ring-2 ring-primary/30' : 'border-border/60',
               )}
             >
-              <span aria-hidden="true" className={clsx('absolute inset-y-0 left-0 w-1', SEV_META[c.severity].bar)} />
               <div className="flex items-start justify-between gap-2">
                 <button
                   type="button"
