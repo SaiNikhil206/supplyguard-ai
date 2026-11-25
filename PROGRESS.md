@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 4 | 1 | 4 | 0 | 3 | 0 | 33% | R-07 |
+| Roop | 4 | 0 | 5 | 0 | 3 | 0 | 33% | R-06 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -48,7 +48,7 @@
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
-| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | in-progress | 0/1 | - |
+| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | review | 0/1 | - |
 | R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | review | 0/1 | - |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | a818286 | roop | R-07 | review | merge: R-07 What-if Simulator UI (auto-merge) |
 | 2026-11-25 | ccaf1f2 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-25 | 9c91b0b | roop | R-08 | review | chore(tasks): handoff R-08 - wiring done, R-05/R-07/R-08 pushed |
 | 2026-11-25 | cd20334 | roop | R-08 | review | docs(tasks): R-08 review (admin screens on real API) |
@@ -108,4 +109,3 @@
 | 2026-11-25 | 843c9af | roop | R-05 | in-progress | wip(frontend): R-05 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | 16a3d2c | roop | R-08 | in-progress | wip(frontend): R-08 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | c99b0e8 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 350d493 | roop | R-10 | review | fix(frontend): full-width layout polish |
