@@ -256,7 +256,7 @@ export interface Recommendation {
   /** Recommendation.status; APPROVED never together with unsupported. */
   status?: RecommendationStatus;
   unsupported?: boolean;
-  unsupported_reasons?: string[];
+  unsupported_reasons?: { code: string; message: string }[];
   option_type: OptionType;
   proposed_action: { po_id: string; change: ProposedChange };
   action_steps: string[];

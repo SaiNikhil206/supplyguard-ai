@@ -44,7 +44,7 @@ export function RiskInbox() {
     { refetchInterval: POLL_MS, keepPrevious: true },
   );
 
-  useClampPage({
+  const clamping = useClampPage({
     error,
     page,
     pageSize: PAGE_SIZE,
@@ -62,7 +62,7 @@ export function RiskInbox() {
   const now = dataUpdatedAt; // relative times refresh with every poll
 
   let body;
-  if (isPending) {
+  if (isPending || clamping) {
     body = (
       <div className="space-y-2" aria-busy="true" aria-label="Loading risk cases">
         {Array.from({ length: 5 }, (_, i) => (

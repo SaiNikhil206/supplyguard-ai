@@ -35,6 +35,8 @@ const ACTION_LABELS: Record<string, string> = {
   'event.publish_failed': 'Event publish failed',
   'risk_case.created': 'Case created',
   'risk_case.status_changed': 'Status changed',
+  'analysis.recorded': 'AI analysis recorded',
+  'analysis.invalid': 'AI analysis failed validation',
   'analysis.rejected': 'AI analysis rejected',
   'analysis.request_failed': 'AI analysis request failed',
   'analysis.request_stubbed': 'AI analysis requested',
