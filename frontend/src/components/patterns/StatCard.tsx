@@ -6,12 +6,12 @@ import { Skeleton } from '@/components/ui/Spinner';
 export type StatTone = 'primary' | 'emerald' | 'amber' | 'orange' | 'rose' | 'violet' | 'sky';
 
 const TONE: Record<StatTone, { box: string; stroke: string }> = {
-  primary: { box: 'bg-foreground/5 text-muted', stroke: 'hsl(243 75% 60%)' },
+  primary: { box: 'bg-foreground/5 text-muted', stroke: 'hsl(var(--primary))' },
   emerald: { box: 'bg-foreground/5 text-muted', stroke: '#10b981' },
   amber: { box: 'bg-foreground/5 text-muted', stroke: '#f59e0b' },
   orange: { box: 'bg-foreground/5 text-muted', stroke: '#f97316' },
   rose: { box: 'bg-foreground/5 text-muted', stroke: '#f43f5e' },
-  violet: { box: 'bg-foreground/5 text-muted', stroke: '#8b5cf6' },
+  violet: { box: 'bg-foreground/5 text-muted', stroke: 'hsl(var(--primary))' },
   sky: { box: 'bg-foreground/5 text-muted', stroke: '#0ea5e9' },
 };
 

@@ -41,7 +41,7 @@ export function SidebarNav({ items = navItems, collapsed = false, label = 'Main'
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       collapsed && 'justify-center px-2',
                       isActive
-                        ? 'bg-primary text-primary-foreground shadow-soft'
+                        ? 'bg-foreground/[0.07] text-foreground'
                         : 'text-sidebar-fg hover:bg-primary/10 hover:text-primary',
                     )
                   }

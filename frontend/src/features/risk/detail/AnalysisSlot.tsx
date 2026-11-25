@@ -19,7 +19,7 @@ export function AnalysisSlot({ status, analysis }: AnalysisSlotProps) {
           <h2 id="analysis-heading" className="text-base font-semibold">
             AI risk analysis
           </h2>
-          <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-500 ring-1 ring-violet-500/20">
+          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary ring-1 ring-primary/20">
             AI
           </span>
         </div>

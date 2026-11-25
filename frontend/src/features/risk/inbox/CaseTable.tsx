@@ -19,7 +19,7 @@ export function CaseTable({ items, fresh, now }: Props) {
           <tr>
             <TH>Case</TH>
             <TH>Supplier</TH>
-            <TH>Event</TH>
+            <TH className="hidden xl:table-cell">Event</TH>
             <TH>Severity</TH>
             <TH>Status</TH>
             <TH className="whitespace-nowrap text-right">POs</TH>
@@ -53,7 +53,7 @@ export function CaseTable({ items, fresh, now }: Props) {
                   )}
                 </TD>
                 <TD className="font-medium">{c.supplier_name ?? c.supplier_id}</TD>
-                <TD className="whitespace-nowrap">{eventTypeLabel(c.event_type)}</TD>
+                <TD className="hidden whitespace-nowrap xl:table-cell">{eventTypeLabel(c.event_type)}</TD>
                 <TD className="whitespace-nowrap">
                   <SeverityBadge severity={c.severity} />
                 </TD>

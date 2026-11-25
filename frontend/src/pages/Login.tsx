@@ -61,16 +61,8 @@ export default function Login() {
   return (
     <div className="grid min-h-screen bg-background text-foreground lg:grid-cols-2">
       <aside
-        className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 p-12 text-white lg:flex"
+        className="relative hidden flex-col justify-between overflow-hidden bg-[hsl(40_4%_10%)] p-12 text-white lg:flex"
       >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/30 blur-3xl"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl"
-        />
         <div className="relative flex items-center gap-2.5 text-lg font-semibold">
           <LogoMark className="h-9 w-9 text-white" />
           SupplyGuard AI
@@ -87,13 +79,13 @@ export default function Login() {
                 </span>
                 <div>
                   <div className="text-sm font-semibold">{title}</div>
-                  <div className="text-sm text-indigo-100">{text}</div>
+                  <div className="text-sm text-primary">{text}</div>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-        <p className="relative text-xs text-indigo-200">Boomi World 2027 Hackathon</p>
+        <p className="relative text-xs text-primary">Boomi World 2027 Hackathon</p>
       </aside>
 
       <main className="flex items-center justify-center p-6">
