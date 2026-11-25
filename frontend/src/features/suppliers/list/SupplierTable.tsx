@@ -3,7 +3,9 @@ import type { Supplier } from '@/api/types';
 import { Badge, SeverityBadge, TBody, TD, TH, THead, TR, Table } from '@/components/ui';
 import { SUPPLIER_STATUS } from '../status';
 
-const HEADERS = ['Supplier', 'Country', 'Category', 'Status', 'Risk', 'Open POs', 'On-time %'];
+const LEVEL_RANK: Record<Supplier['risk_level'], number> = { LOW: 0, MEDIUM: 1, HIGH: 2, CRITICAL: 3 };
+
+const HEADERS =['Supplier', 'Country', 'Category', 'Status', 'Risk', 'Open POs', 'On-time %'];
 
 export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; loading?: boolean }) {
   return (
@@ -29,7 +31,12 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
               </TR>
             ))
           : [...(suppliers ?? [])]
-              .sort((a, b) => b.risk_score - a.risk_score)
+              .sort(
+                (a, b) =>
+                  LEVEL_RANK[b.risk_level] - LEVEL_RANK[a.risk_level] ||
+                  (b.risk_score ?? 0) - (a.risk_score ?? 0) ||
+                  a.name.localeCompare(b.name),
+              )
               .map((s) => (
                 <TR key={s.id}>
                   <TD>
@@ -48,7 +55,7 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
                   <TD>
                     <div className="flex items-center gap-2">
                       <SeverityBadge severity={s.risk_level} />
-                      <span className="tabular-nums text-muted">{s.risk_score}</span>
+                      {s.risk_score != null && <span className="tabular-nums text-muted">{s.risk_score}</span>}
                     </div>
                   </TD>
                   <TD className="text-right tabular-nums">{s.open_po_count}</TD>

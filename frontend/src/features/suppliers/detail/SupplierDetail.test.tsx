@@ -24,8 +24,8 @@ describe('SupplierDetail page', () => {
     expect(screen.getByText('SUP-1008')).toBeInTheDocument();
     expect(screen.getByText(`${detail.country} · ${detail.category}`)).toBeInTheDocument();
     expect(screen.getByText('Active')).toBeInTheDocument();
-    const meter = screen.getByRole('meter', { name: 'Risk score' });
-    expect(meter).toHaveAttribute('aria-valuenow', String(detail.risk_score));
+    // Supplier has no stored risk score: the meter is hidden, the risk level badge stays.
+    expect(screen.queryByRole('meter', { name: 'Risk score' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: detail.contact_email })).toHaveAttribute(
       'href',
       `mailto:${detail.contact_email}`,
@@ -41,7 +41,7 @@ describe('SupplierDetail page', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(`${detail.kpis.on_time_delivery_pct}%`)).toBeInTheDocument();
-    expect(screen.getByText(`${detail.kpis.avg_lead_time_days} days`)).toBeInTheDocument();
+    expect(screen.getAllByText('Not available')).toHaveLength(2); // quality pass + lead time
   });
 
   it('lists disruption history with a case link', async () => {

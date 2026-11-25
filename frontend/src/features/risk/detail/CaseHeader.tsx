@@ -17,7 +17,7 @@ export function CaseHeader({ detail }: { detail: RiskCaseDetail }) {
       <p className="text-sm text-muted">
         Supplier:{' '}
         <Link className="font-medium text-primary hover:underline" to={`/suppliers/${detail.supplier_id}`}>
-          {detail.supplier_name}
+          {detail.supplier_name ?? detail.supplier_id}
         </Link>
         {' · '}Created <time dateTime={detail.created_at}>{formatDateTime(detail.created_at)}</time>
         {' · '}Updated <time dateTime={detail.updated_at}>{formatDateTime(detail.updated_at)}</time>

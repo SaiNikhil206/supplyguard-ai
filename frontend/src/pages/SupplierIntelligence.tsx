@@ -13,8 +13,10 @@ const DEBOUNCE_MS = 300;
 
 export default function SupplierIntelligence() {
   const [params, setParams] = useSearchParams();
-  const filters = filtersFromParams(params);
-  const pageSize = filters.page_size ?? 10;
+  const parsed = filtersFromParams(params);
+  const pageSize = parsed.page_size ?? 10;
+  // Always send page_size: the backend default (25) differs from this page's 10.
+  const filters = { ...parsed, page_size: pageSize };
 
   const [searchText, setSearchText] = useState(params.get('search') ?? '');
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
