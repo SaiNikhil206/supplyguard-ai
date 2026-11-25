@@ -42,7 +42,7 @@ export function SidebarNav({ items = navItems, collapsed = false, label = 'Main'
                       collapsed && 'justify-center px-2',
                       isActive
                         ? 'bg-primary text-primary-foreground shadow-soft'
-                        : 'text-sidebar-fg hover:bg-white/10 hover:text-white',
+                        : 'text-sidebar-fg hover:bg-primary/10 hover:text-primary',
                     )
                   }
                 >

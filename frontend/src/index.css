@@ -40,9 +40,9 @@
     --sev-high: 20 90% 34%;
     --sev-critical: 0 72% 40%;
 
-    --sidebar: 224 40% 11%;
-    --sidebar-fg: 220 20% 86%;
-    --sidebar-muted: 220 14% 64%;
+    --sidebar: 0 0% 100%;
+    --sidebar-fg: 224 20% 28%;
+    --sidebar-muted: 220 10% 46%;
     color-scheme: light;
   }
 
