@@ -1,4 +1,4 @@
-import { ChevronsUpDown, LogOut, Moon, Sun } from 'lucide-react';
+import { ChevronsUpDown, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +10,9 @@ import {
 import { UserBadge } from './UserBadge';
 import { roleLabel } from './roleLabel';
 import { useAuth } from '@/auth/AuthProvider';
-import { useTheme } from '@/theme/ThemeProvider';
 
 export function UserMenu() {
   const { me, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const role = me ? roleLabel(me.role) : undefined;
   return (
     <DropdownMenu>
@@ -32,10 +30,6 @@ export function UserMenu() {
           <div className="mt-1 text-xs text-muted">{[me?.tenant.name, role].filter(Boolean).join(' · ')}</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={toggleTheme}>
-          {theme === 'dark' ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
-          {theme === 'dark' ? 'Light theme' : 'Dark theme'}
-        </DropdownMenuItem>
         <DropdownMenuItem destructive onSelect={signOut}>
           <LogOut aria-hidden="true" />
           Sign out
