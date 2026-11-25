@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | 563267b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 3c9b4e9 | roop | R-10 | review | style(frontend): remove sparklines from KPI cards |
 | 2026-11-25 | f3562f4 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 603a364 | roop | R-10 | review | style(frontend): light sidebar in light theme |
 | 2026-11-25 | 8e43044 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 7347b5b | roop | R-02 | in-progress | merge: R-02 mocks review fixes (--mocks2) |
 | 2026-11-25 | d8ec23c | roop | R-02 | in-progress | fix(frontend): R-02 review fixes for mocks |
 | 2026-11-25 | 5574e8e | roop | R-02 | in-progress | docs(tasks): R-02 notes for Uday-owned edits and open team questions |
-| 2026-11-25 | b4c6049 | roop | R-02 | in-progress | merge: R-02 MSW mocks aligned to backend (--mocks2) |
-| 2026-11-25 | 08e89fd | roop | R-02 | in-progress | fix(frontend): keep mock empty page past end, README note |
