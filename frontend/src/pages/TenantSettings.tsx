@@ -1,60 +1,83 @@
-import { useState } from 'react';
-import clsx from 'clsx';
-import { ErrorState, Spinner } from '@/components/ui';
-import { useSettings } from '@/features/admin/settings/hooks';
-import { ThresholdsForm } from '@/features/admin/settings/ThresholdsForm';
-import { ApprovalForm } from '@/features/admin/settings/ApprovalForm';
-import { UsersPanel } from '@/features/admin/settings/UsersPanel';
+import { useState } from "react";
+import { ShieldAlert, SlidersHorizontal, Users } from "lucide-react";
+import {
+  ErrorState,
+  Skeleton,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
+import { useSettings } from "@/features/admin/settings/hooks";
+import { ThresholdsForm } from "@/features/admin/settings/ThresholdsForm";
+import { ApprovalForm } from "@/features/admin/settings/ApprovalForm";
+import { UsersPanel } from "@/features/admin/settings/UsersPanel";
+import { PageHeader } from "@/features/admin/ui/PageHeader";
 
 const TABS = [
-  { id: 'thresholds', label: 'Risk thresholds' },
-  { id: 'approval', label: 'Approval' },
-  { id: 'users', label: 'Users & roles' },
+  { id: "thresholds", label: "Risk thresholds", icon: SlidersHorizontal },
+  { id: "approval", label: "Approval", icon: ShieldAlert },
+  { id: "users", label: "Users & roles", icon: Users },
 ] as const;
-type TabId = (typeof TABS)[number]['id'];
+type TabId = (typeof TABS)[number]["id"];
+
+function Loading() {
+  return (
+    <div role="status" aria-busy="true" className="space-y-4">
+      <span className="sr-only">Loading settings</span>
+      <Skeleton className="h-64 w-full rounded-2xl" />
+    </div>
+  );
+}
 
 export default function TenantSettings() {
-  const [tab, setTab] = useState<TabId>('thresholds');
+  const [tab, setTab] = useState<TabId>("thresholds");
   const settings = useSettings();
 
+  const body = (id: "thresholds" | "approval") =>
+    settings.isLoading ? (
+      <Loading />
+    ) : settings.isError || !settings.data ? (
+      <ErrorState
+        message={
+          settings.error instanceof Error
+            ? settings.error.message
+            : "Could not load settings."
+        }
+        onRetry={() => settings.refetch()}
+      />
+    ) : id === "thresholds" ? (
+      <ThresholdsForm settings={settings.data} />
+    ) : (
+      <ApprovalForm settings={settings.data} />
+    );
+
   return (
-    <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Tenant Settings</h1>
-      <div role="tablist" aria-label="Settings sections" className="flex gap-1 border-b border-border">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            id={`tab-${t.id}`}
-            aria-selected={tab === t.id}
-            aria-controls={`panel-${t.id}`}
-            onClick={() => setTab(t.id)}
-            className={clsx(
-              '-mb-px border-b-2 px-4 py-2 text-sm font-medium',
-              tab === t.id ? 'border-primary text-text' : 'border-transparent text-muted hover:text-text',
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="pt-2">
-        {tab === 'users' ? (
+    <section className="space-y-6">
+      <PageHeader
+        eyebrow="Administration"
+        title="Tenant Settings"
+        description="Tune risk bands, approval rules and who has access. Admin only."
+      />
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as TabId)}
+        className="space-y-6"
+      >
+        <TabsList aria-label="Settings sections">
+          {TABS.map((t) => (
+            <TabsTrigger key={t.id} value={t.id} className="gap-2">
+              <t.icon className="h-4 w-4" aria-hidden="true" />
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="thresholds">{body("thresholds")}</TabsContent>
+        <TabsContent value="approval">{body("approval")}</TabsContent>
+        <TabsContent value="users">
           <UsersPanel />
-        ) : settings.isLoading ? (
-          <Spinner label="Loading settings" />
-        ) : settings.isError || !settings.data ? (
-          <ErrorState
-            message={settings.error instanceof Error ? settings.error.message : 'Could not load settings.'}
-            onRetry={() => settings.refetch()}
-          />
-        ) : tab === 'thresholds' ? (
-          <ThresholdsForm settings={settings.data} />
-        ) : (
-          <ApprovalForm settings={settings.data} />
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
     </section>
   );
 }

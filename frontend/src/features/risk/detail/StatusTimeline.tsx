@@ -1,0 +1,77 @@
+import clsx from 'clsx';
+import type { RiskCaseState, TimelineEntry } from '@/api/types';
+import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui';
+import { actionLabel, formatDateTime, STATE_LABELS, stepperSteps } from './format';
+
+const isDanger = (s: RiskCaseState) => s === 'REJECTED' || s === 'EXECUTION_FAILED';
+
+export function StatusStepper({ status }: { status: RiskCaseState }) {
+  const steps = stepperSteps(status);
+  const current = steps.indexOf(status);
+  return (
+    <ol aria-label="Case state path" className="sr-only">
+      {steps.map((s, i) => {
+        const done = i < current;
+        const isCurrent = i === current;
+        return (
+          <li
+            key={s}
+            aria-current={isCurrent ? 'step' : undefined}
+            data-step-state={isCurrent ? 'current' : done ? 'done' : 'upcoming'}
+            className={clsx(
+              'rounded-full border px-2 py-0.5',
+              isCurrent && isDanger(s) && 'border-danger bg-danger/15 font-semibold text-danger',
+              isCurrent && !isDanger(s) && 'border-primary bg-primary/15 font-semibold text-text',
+              done && 'border-success/40 bg-success/10 text-success',
+              !done && !isCurrent && 'border-border text-muted',
+            )}
+          >
+            {STATE_LABELS[s]}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function StatusTimeline({ status, timeline }: { status: RiskCaseState; timeline: TimelineEntry[] }) {
+  const sorted = [...timeline].sort((a, b) => a.at.localeCompare(b.at));
+  return (
+    <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="timeline-heading">
+      <CardHeader>
+        <CardTitle id="timeline-heading">Status timeline</CardTitle>
+      </CardHeader>
+      <CardBody className="space-y-4">
+        <StatusStepper status={status} />
+        {sorted.length === 0 ? (
+          <p className="text-sm text-muted">No activity yet</p>
+        ) : (
+          <ol aria-label="Timeline" className="relative space-y-5 border-l-2 border-border/70 pl-5">
+            {sorted.map((t, i) => {
+              const current = i === sorted.length - 1;
+              return (
+                <li key={`${t.at}-${i}`} data-current={current || undefined} className="relative text-sm">
+                  <span
+                    aria-hidden="true"
+                    className={clsx(
+                      'absolute -left-[22px] top-1.5 h-3 w-3 rounded-full border-2 border-card',
+                      current ? (isDanger(status) ? 'bg-danger ring-4 ring-danger/20' : 'bg-primary ring-4 ring-primary/20') : 'bg-border',
+                    )}
+                  />
+                  <time dateTime={t.at} className="block text-xs text-muted">
+                    {formatDateTime(t.at)}
+                  </time>
+                  <p className={clsx('font-medium', current ? 'text-text' : 'text-text/90')}>
+                    {actionLabel(t.action)}
+                    <span className="font-normal text-muted"> · {t.actor}</span>
+                  </p>
+                  {t.detail && <p className="text-muted">{t.detail}</p>}
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </CardBody>
+    </Card>
+  );
+}

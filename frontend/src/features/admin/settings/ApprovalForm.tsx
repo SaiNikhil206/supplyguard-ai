@@ -1,8 +1,11 @@
-import { useState, type FormEvent } from 'react';
-import { ApiError } from '@/api/client';
-import type { TenantSettings } from '@/api/admin/settings';
-import { Button, Field, Input } from '@/components/ui';
-import { fieldErrors, useSaveSettings } from './hooks';
+import { useState, type FormEvent } from "react";
+import { MessageSquareWarning, Timer } from "lucide-react";
+import { ApiError } from "@/api/client";
+import type { TenantSettings } from "@/api/admin/settings";
+import { Field, Input, toast } from "@/components/ui";
+import { SaveBar } from "../ui/SaveBar";
+import { Switch } from "../ui/Switch";
+import { fieldErrors, useSaveSettings } from "./hooks";
 
 /** PROVISIONAL: approval settings and polling_seconds are not in docs/CONTRACTS.md yet. */
 export function ApprovalForm({ settings }: { settings: TenantSettings }) {
@@ -17,7 +20,14 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
   const [saved, setSaved] = useState(false);
   const save = useSaveSettings();
 
-  const dirty = form.comment !== initial.comment || form.hours !== initial.hours || form.polling !== initial.polling;
+  const dirty =
+    form.comment !== initial.comment ||
+    form.hours !== initial.hours ||
+    form.polling !== initial.polling;
+  const change = (patch: Partial<typeof initial>) => {
+    setForm((f) => ({ ...f, ...patch }));
+    setSaved(false);
+  };
 
   const onSubmit = (ev: FormEvent) => {
     ev.preventDefault();
@@ -26,56 +36,74 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
     setSaved(false);
     save.mutate(
       {
-        approval: { require_comment_on_reject: form.comment, auto_escalate_hours: Number(form.hours) },
+        approval: {
+          require_comment_on_reject: form.comment,
+          auto_escalate_hours: Number(form.hours),
+        },
         polling_seconds: Number(form.polling),
       },
       {
-        onSuccess: () => setSaved(true),
+        onSuccess: () => {
+          setSaved(true);
+          toast.success("Approval settings updated");
+        },
         onError: (err) => {
-          if (err instanceof ApiError && err.code === 'VALIDATION_ERROR') {
+          if (err instanceof ApiError && err.code === "VALIDATION_ERROR") {
             setErrors(fieldErrors(err.details));
-            setFormError('Please fix the highlighted fields.');
+            setFormError("Please fix the highlighted fields.");
           } else {
-            setFormError(err instanceof Error ? err.message : 'Could not save settings.');
+            setFormError(
+              err instanceof Error ? err.message : "Could not save settings.",
+            );
           }
+          toast.error("Settings were not saved");
         },
       },
     );
   };
 
   return (
-    <form onSubmit={onSubmit} noValidate className="max-w-md space-y-4" aria-label="Approval settings">
-      <label className="flex items-center gap-2 text-sm font-medium">
-        <input
-          type="checkbox"
-          checked={form.comment}
-          onChange={(e) => {
-            setForm((f) => ({ ...f, comment: e.target.checked }));
-            setSaved(false);
-          }}
-        />
-        Require a comment when rejecting
-      </label>
-      <Field label="Auto-escalate after (hours)" error={errors['approval.auto_escalate_hours']}>
-        <Input
-          type="number"
-          value={form.hours}
-          onChange={(e) => {
-            setForm((f) => ({ ...f, hours: e.target.value }));
-            setSaved(false);
-          }}
-        />
-      </Field>
-      <Field label="Polling interval (seconds)" error={errors['polling_seconds']}>
-        <Input
-          type="number"
-          value={form.polling}
-          onChange={(e) => {
-            setForm((f) => ({ ...f, polling: e.target.value }));
-            setSaved(false);
-          }}
-        />
-      </Field>
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="max-w-2xl space-y-5"
+      aria-label="Approval settings"
+    >
+      <Switch
+        checked={form.comment}
+        onChange={(v) => change({ comment: v })}
+        label="Require a comment when rejecting"
+        description="Approvers must explain why a recommendation was rejected. The comment is stored in the audit trail."
+        icon={<MessageSquareWarning aria-hidden="true" />}
+      />
+      <div className="grid gap-5 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm sm:grid-cols-2">
+        <Field
+          label="Auto-escalate after (hours)"
+          error={errors["approval.auto_escalate_hours"]}
+          hint="Pending approvals escalate to the next role."
+        >
+          <Input
+            type="number"
+            value={form.hours}
+            onChange={(e) => change({ hours: e.target.value })}
+          />
+        </Field>
+        <Field
+          label="Polling interval (seconds)"
+          error={errors["polling_seconds"]}
+          hint="How often screens refresh live data."
+        >
+          <Input
+            type="number"
+            value={form.polling}
+            onChange={(e) => change({ polling: e.target.value })}
+          />
+        </Field>
+        <p className="flex items-center gap-1.5 text-xs text-muted sm:col-span-2">
+          <Timer className="h-3.5 w-3.5" aria-hidden="true" /> Changes apply to
+          new approvals and refreshes only.
+        </p>
+      </div>
       {formError && (
         <p role="alert" className="text-sm font-medium text-danger">
           {formError}
@@ -86,9 +114,16 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
           Settings saved.
         </p>
       )}
-      <Button type="submit" disabled={!dirty} loading={save.isPending}>
-        Save approval settings
-      </Button>
+      <SaveBar
+        dirty={dirty}
+        saving={save.isPending}
+        label="Save approval settings"
+        onDiscard={() => {
+          setForm(initial);
+          setErrors({});
+          setFormError(null);
+        }}
+      />
     </form>
   );
 }

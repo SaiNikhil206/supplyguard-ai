@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/utils';
 
 export type EvidenceKind = 'FACT' | 'ESTIMATE' | 'ASSUMPTION' | 'MISSING_DATA';
 
@@ -8,19 +8,19 @@ const META: Record<EvidenceKind, { label: string; glyph: string; cls: string; hi
   FACT: {
     label: 'Fact',
     glyph: '✓',
-    cls: 'border-solid bg-success/15 text-success border-success/40',
+    cls: 'border-solid bg-success/10 text-success border-success/40',
     hint: 'Verified from source data',
   },
   ESTIMATE: {
     label: 'Estimate',
     glyph: '≈',
-    cls: 'border-dashed bg-info/15 text-info border-info/50',
+    cls: 'border-dashed bg-info/10 text-info border-info/50',
     hint: 'Calculated or predicted',
   },
   ASSUMPTION: {
     label: 'Assumption',
     glyph: '?',
-    cls: 'border-dotted bg-warning/15 text-warning border-warning/60',
+    cls: 'border-dotted bg-warning/10 text-warning border-warning/60',
     hint: 'Assumed, not verified',
   },
   MISSING_DATA: {
@@ -41,8 +41,8 @@ export function EvidenceTag({ kind, className, ...rest }: EvidenceTagProps) {
     <span
       data-evidence={kind}
       title={m.hint}
-      className={clsx(
-        'inline-flex items-center gap-1 whitespace-nowrap rounded border px-1.5 py-0.5 text-xs font-semibold',
+      className={cn(
+        'inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-1.5 py-0.5 text-xs font-semibold',
         m.cls,
         className,
       )}

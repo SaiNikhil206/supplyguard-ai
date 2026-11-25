@@ -96,6 +96,15 @@ Template:
 - Blockers: Uday U-02/U-03/U-04; backend asks in ROOP.md Handoff (refresh lifetime/rotation, /me shape)
 - Models used: advisor opus; implementer sonnet x5, reviewer opus x2, 2 visible sonnet sessions
 
+## 2026-11-19 - nikhil - N-05 (Boomi-free part)
+- Branch: nikhil/N-05-risk-analyst
+- Did: Supplier Risk Analyst prompt v1.1.0 + agent.json + tools.json (4 ERP lookups -> U-07 processes); 5 adversarial cases; reference answers (demo, TC-05); ai/eval/build_agent_input.py (schema-valid inputs from seed + scenarios, provisional impact until N-04) and ai/eval/grade.py (evidence resolution, claim-to-evidence link, dates, numeric support, shortage per PO, flags, case patterns). Reviewer (opus) found grader bypasses (dates, uncited claims, assumptions, UUID digits) and false failures - all fixed with regression tests.
+- Tests: `python -m pytest ai/tests -q` -> 133 passed
+- Status now: in-progress (acceptance needs real agent runs)
+- Next: U-01 -> create agent (Agentstudio or Claude fallback), grade demo + ADV-01..05
+- Blockers: U-01 not pushed; N-04 waits on U-03
+- Models used: advisor opus; reviewer (opus, general-purpose agent)
+
 ## 2026-11-19 - uday - U-02
 - Branch: uday/U-02-backend-scaffold
 - Did: Backend scaffold (Django 5 + DRF + JWT + OpenAPI, 8 app shells, /api/health, compose with Postgres 16). Review follow-ups: contract error body handler (CONTRACTS s1), custom `accounts.User` + 0001 migration, SECRET_KEY guard, compose env_file + dev runserver, non-root image.
@@ -167,3 +176,66 @@ Template:
 - Next: polish nits; R-02 when U-03/U-04 land
 - Blockers: Uday U-03/U-04
 - Models used: advisor opus; 3 sonnet/medium sessions, test-runner haiku, reviewer-lite sonnet
+
+## 2026-11-20 - nikhil - N-05
+- Branch: nikhil/N-05-risk-analyst
+- Did: Risk Analyst agent live in Agentstudio on prompt v1.3.0; 7 real runs saved and graded (DEMO v1.2.0 all pass, ADV-01..05 resisted on case_* checks); grader hardened after an Opus review (event-description digits, clock numbers, input texts passed explicitly); README/agent.json/runs index updated.
+- Tests: ai/tests 158 passed
+- Status now: in-progress (acceptance needs single-version v1.3.0 re-run)
+- Next: re-run DEMO + ADV-01..05 on v1.3.0 in Agentstudio, grade, then set N-05 to review
+- Blockers: U-07 tools not built (agent has no tools); U-03 for N-04
+- Models used: advisor opus; subagents/sessions sonnet + opus reviewer
+
+## 2026-11-20 - nikhil - N-05 (acceptance run)
+- Branch: nikhil/N-05-risk-analyst
+- Did: clean single-version acceptance set on prompt v1.3.0: DEMO + ADV-01..05 saved (replies verbatim from the Agentstudio Test Agent), graded - all checks pass incl. every `case_*`; pinning tests added; README, runs index, TEST_LOG updated; N-05 set to review.
+- Tests: ai/tests 173 passed
+- Status now: review
+- Next: prompt gap (false 'event description contained instructions' line in ADV-01/03/04/05; restart-leaning 'resume immediately' assumption in ADV-03/05); N-04
+- Blockers: U-07 tools not built; U-03 for N-04
+- Models used: advisor opus; run/doc session sonnet
+
+## 2026-11-20 - nikhil - N-06
+- Branch: nikhil/N-06-recovery-agent
+- Did: six live v1.3.0 runs (DEMO, TC05, RP-ADV-01..04) saved to eval/runs and re-graded: DEMO 30/31, TC05 31/31, ADV-01 35/35, ADV-02 33/33, ADV-03 34/34, ADV-04 33/34 (the one fail in DEMO and ADV-04 is assumptions_qualitative on SUP-2002, capacity unknown); agent README, runs index, agent.json, TEST_LOG and NIKHIL.md updated; N-06 set to review.
+- Tests: ai/tests 279 passed; run_checks.py all suites PASS (backend deps installed from backend/requirements-dev.txt)
+- Status now: review
+- Next: optional prompt tweak for capacity-unknown suppliers; deploy only after the team decides
+- Blockers: U-03 for N-04; U-07 tools not built
+- Models used: run/doc session haiku (no advisor)
+
+## 2026-11-20 - nikhil - N-06 deployment record
+- Branch: nikhil/N-06-recovery-agent
+- Did: agent "SG Recovery Planner" (b5f2f51a-0b4e-41e6-998d-e04031f2a9d0, prompt v1.3.0) deployed in Agentstudio via Review > Create > Package & Deploy: package "SG Recovery Planner" 1.0 (94004c6f-f9c7-4804-b5cc-fa8e8b4236ff), deployment 1142f95b-7b4a-466f-a895-89a2140068ac, environment Agent Garden Production, Boomi reports active. Deployed on Uday's training account with his agreement. Recorded in agent.json, agent README and NIKHIL.md. Not done: Agent Control Tower account and an Agent Step in an Integration process (Uday's stream).
+- Tests: ai/tests 279 passed; run_checks.py all suites PASS
+- Status now: review
+- Next: optional prompt tweak for capacity-unknown suppliers (needs a new deploy); Agent Control Tower + Agent Step with Uday; N-04 / N-07
+- Blockers: U-03 for N-04; U-07 tools not built; Agent Control Tower account for Integration use
+- Models used: deploy and doc session haiku (no advisor)
+
+## 2026-11-23 - nikhil - N-04 (design + engine built)
+- Branch: nikhil/N-04-impact-engine
+- Did: N-04 design spec and `backend/apps/intelligence/impact.py` pure functions built (68 tests, 100% line coverage, reviewer APPROVE at e0ab4a4); coverage made net of safety stock (data/README.md updated); exposure scale proposed as per-tenant `risk_thresholds.exposure_full_scale` for CONTRACTS s10; N-04 set to review with the four acceptance boxes ticked; service wiring left until U-03 merges; NIKHIL.md Handoff updated; PROGRESS.md regenerated.
+- Tests: 68 impact tests passing (per engine review)
+- Status now: review
+- Next: Uday OK on CONTRACTS s10 point 7; N-04 service wiring after U-03 merges; then N-07 / N-11
+- Blockers: U-03 not yet in collaboration (awaiting re-review + s10 approvals); U-07 tools not built
+- Models used: docs session haiku (no advisor)
+
+## 2026-11-23 - nikhil - N-07 validator built + reviewed
+- Branch: nikhil/N-07-validator @ e9ff488
+- Did: `backend/apps/intelligence/validation.py` pure validator (schema + fact check against snapshot/impact, per-option `unsupported` + reason codes, fail-closed `VALIDATOR_ERROR`); 163 tests, 98% coverage; Opus review APPROVE after 2 fix rounds; all 26 live agent runs pass. Acceptance boxes 1 and 3 ticked; persistence + endpoint left for after U-03 and N-10.
+- Tests: 163 validator tests passing (per engine review)
+- Status now: review
+- Next: send Uday the point-7 OK + `jsonschema>=4.18` and schema-folder asks; N-07 persistence after U-03 merges and N-10 `transition()`
+- Blockers: U-03 not yet in collaboration; U-07 tools not built
+- Models used: docs session haiku (no advisor)
+
+## 2026-11-25 - roop - R-02 read APIs done
+- Branch: roop/R-02-read-apis @ 9912148 (+ task-file commits)
+- Did: pulled latest; found R-02 unblocked (U-03/U-04 in review). Built `backend/apps/portal/` GET /suppliers, /suppliers/{id}, /dashboard/summary, /risk-cases, /risk-cases/{id} (tenant-scoped, filters, pagination, bounded queries); aligned MSW mocks + TS types, added `useClampPage` for 404 on page past end, data-quality note on case detail. Two Opus review rounds, all findings fixed, APPROVE. Edited Uday-owned role matrix + urls include with Roop OK.
+- Tests: backend 1233 passed; frontend 129 passed; run_checks.py all PASS
+- Status now: done
+- Next: R-05 AI Recommendations + Approval Center; switch R-03/R-04 to real API
+- Blockers: Uday to confirm role-matrix/urls edits; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning
+- Models used: advisor opus; implementer sonnet subagents (nested sessions hit org auth error, then started late as duplicates); reviewer opus; test-runner haiku
