@@ -88,7 +88,7 @@
   - [ ] Approve in Flow -> execution starts; Reject -> no execution
   - [ ] Decision visible in the SaaS Approval Center and audit within 5 s
 - **Done in:** -
-- **Notes:** Spec-first while N-07/N-10/U-01 are pending: boomi/flow/ README, approval-flow-spec, test-plan done; build in Flow once env + decision API exist. Piece: flow-spec | session | sonnet/medium | roop/R-06-flow-approval--flow-spec.
+- **Notes:** Docs delivered: boomi/flow/ README, approval-flow-spec, test-plan, values.example.json, now verified against the real N-10 endpoint (flat 201, user JWT only - API key/ADMIN get 403, per-option recommendation id, 409 reasons, 422 UNSUPPORTED_OPTION, Reject keeps case PENDING_APPROVAL while options remain). Acceptance boxes stay unchecked: they need the Flow built in Boomi. MANUAL Boomi steps: licence check (U-01), build app/service/pages/swimlane/escalation Wait, run test-plan. Open for Uday: how Boomi starts the Flow, how the manager JWT reaches Flow, API Mgmt forwarding Authorization. Open for Nikhil: escalation audit event (APPROVAL_ESCALATED) endpoint. Piece: flow-spec | session | sonnet/medium | roop/R-06-flow-approval--flow-spec.
 
 ### R-07: What-if Simulator UI
 - **Status:** in-progress
