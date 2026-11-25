@@ -1,11 +1,14 @@
 import '@testing-library/jest-dom/vitest';
 import { afterAll, afterEach, beforeAll } from 'vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { server } from '@/mocks/server';
 import { clearTokens } from '@/api/tokens';
 import { resetMockState } from '@/mocks/fixtures';
 import { resetApprovalsMock } from '@/mocks/approvals';
 import { resetAdminSettingsMock } from '@/mocks/admin/settings';
+
+// Default findBy*/waitFor timeout is 1 s; under CPU load (parallel jsdom workers) renders take 2+ s.
+configure({ asyncUtilTimeout: 5000 });
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterAll(() => server.close());

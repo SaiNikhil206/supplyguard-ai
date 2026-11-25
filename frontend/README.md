@@ -15,6 +15,20 @@ API types are hand-written from `docs/CONTRACTS.md` until U-02 lands, then gener
 
 Layout: src/app providers, src/theme light/dark, src/layout shell + nav, src/pages the 9 screens, src/router.tsx routes, src/test helpers. Design tokens are CSS variables in src/index.css, mapped in tailwind.config.js (bg-surface, text-muted, bg-sev-critical).
 
+## Run against the real backend (`VITE_API_MOCK=false`)
+
+    # 1. backend (repo root; Postgres via docker, or DATABASE_URL=sqlite:///dev.sqlite3 for a quick local run)
+    cd backend && python manage.py migrate
+    DEMO_USER_PASSWORD='<a strong password>' python manage.py load_seed --demo-users   # acme.admin / acme.procurement / acme.viewer
+    python manage.py runserver 8000
+    # 2. frontend
+    cd frontend && cp .env.example .env     # then set VITE_API_MOCK=false (optional: VITE_PROXY_TARGET=http://host:8000)
+    npm run dev                             # /api is proxied to the backend; sign in with the seeded user
+
+Tenant comes only from the JWT; there is no tenant field in any request. Tests always run in mock mode (MSW).
+`src/api/realContract.test.ts` replays JSON captured from the real backend (`src/api/__fixtures__/real-*.json`) to catch serializer drift.
+The seed has no risk cases; create some via the pipeline (or a dev script) to see the Risk Command Center populated.
+
 ## API layer and mocks
 
 - `src/api/`: typed client (`client.ts`: JWT bearer, single-flight 401 refresh, `ApiError`), `tokens.ts`, `endpoints.ts`, `queries.ts` (TanStack hooks + `queryKeys`), `types.ts` (hand-written from CONTRACTS; replaced by openapi-typescript output after U-02).

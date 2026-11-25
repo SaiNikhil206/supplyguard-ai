@@ -17,6 +17,7 @@ export type ErrorCode =
   | 'CONFLICT'
   | 'BUSINESS_RULE'
   | 'DOWNSTREAM_ERROR'
+  | 'RATE_LIMITED'
   | 'DOWNSTREAM_TIMEOUT'
   | 'NETWORK_ERROR'; // client-side only: fetch failed / non-JSON body
 
@@ -43,9 +44,18 @@ export interface TokenPair {
   refresh: string;
 }
 
-/** PROVISIONAL until U-02 ships `/me`. */
+/** Wire shape of `GET /me` (CONTRACTS s5 / accounts.MeSerializer): flat, no username. */
+export interface MeResponse {
+  id: string;
+  email: string;
+  name: string;
+  role: Role;
+  tenant: { id: string; name: string };
+}
+
+/** UI shape of the signed-in user, built from `MeResponse` by `getMe()`. */
 export interface Me {
-  user: { id: string; username: string; full_name: string; email: string };
+  user: { id: string; full_name: string; email: string };
   tenant: { id: string; name: string };
   role: Role;
 }

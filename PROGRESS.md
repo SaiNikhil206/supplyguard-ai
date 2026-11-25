@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 2 | 3 | 4 | 0 | 3 | 0 | 17% | R-05 |
+| Roop | 3 | 3 | 3 | 0 | 3 | 0 | 25% | R-05 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -37,8 +37,8 @@
 | N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | review | 3/3 | - |
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
-| R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | review | 0/1 | - |
-| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 0/2 | - |
+| R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | done | 1/1 | `roop/R-04-risk-center` (wire session, 2026-11-25; run against real Django, sqlite + `load_seed --demo-users`, `VITE_API_MOCK=false`) |
+| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 1/2 | - |
 | U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | review | 1/2 | review 2026-11-24 on `uday/U-08-event-streams`: topics, subscription, publisher (shipment routing), subscriber (placeholder for N-08), Basic auth, Django end to end. Known gaps: no Boomi-side duplicate/header/tenant checks (see Notes), failure path / Event Streams down / SG_Disruption_Direct fallback not run, subscriber does not yet start N-08 (cross-account decision open). |
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
@@ -89,6 +89,18 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
+| 2026-11-25 | 988f3f5 | roop | R-04 | review | docs(tasks): R-03 done, R-04 wired to real API (review) |
+| 2026-11-25 | 1f36254 | roop | R-04 | in-progress | test(frontend): stabilize Vitest under load (asyncUtilTimeout 5s, cap workers) |
+| 2026-11-25 | 5408f6e | roop | R-06 | in-progress | docs(flow): align R-06 spec and test plan with real decision API |
+| 2026-11-25 | e707608 | roop | R-04 | in-progress | feat(frontend): run against real backend (VITE_API_MOCK=false), real-API contract tests |
+| 2026-11-25 | 1d1cac8 | roop | R-08 | review | feat(frontend): R-08 wire admin screens to real backend shapes |
+| 2026-11-25 | 75f2cd4 | roop | R-07 | in-progress | fix(frontend): R-07 what-if test matches real heading |
+| 2026-11-25 | d3f96ee | roop | R-05 | in-progress | feat(frontend): R-05 real decision shape, decider role, retry degrade test |
+| 2026-11-25 | 87b3031 | roop | R-04 | in-progress | wip(frontend): R-04 real-API wiring (partial, subagent stopped) |
+| 2026-11-25 | feecf63 | roop | R-07 | in-progress | wip(frontend): R-07 real-API wiring (partial, subagent stopped) |
+| 2026-11-25 | 843c9af | roop | R-05 | in-progress | wip(frontend): R-05 real-API wiring (partial, subagent stopped) |
+| 2026-11-25 | 16a3d2c | roop | R-08 | in-progress | wip(frontend): R-08 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | c99b0e8 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 350d493 | roop | R-10 | review | fix(frontend): full-width layout polish |
 | 2026-11-25 | f999e54 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -97,15 +109,3 @@
 | 2026-11-25 | a0fed9c | roop | R-10 | review | style(frontend): warm neutral, editorial look; tables fit without side scroll |
 | 2026-11-25 | 349f00a | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 3e365a9 | roop | R-10 | review | test(frontend): app shell is light only |
-| 2026-11-25 | b282786 | roop | R-10 | review | feat(frontend): new logo mark, light theme only |
-| 2026-11-25 | 6a3bf8b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | e728e5c | roop | R-10 | review | style(frontend): tidy recommendations and audit pages |
-| 2026-11-25 | fbfb0b6 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 35bc232 | roop | R-10 | review | style(frontend): calm risk and approvals pages, remove gradients |
-| 2026-11-25 | ecdb7d7 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 87a9d29 | roop | R-10 | review | style(frontend): neutral icon tiles, ring and monograms |
-| 2026-11-25 | 563267b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 3c9b4e9 | roop | R-10 | review | style(frontend): remove sparklines from KPI cards |
-| 2026-11-25 | f3562f4 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 603a364 | roop | R-10 | review | style(frontend): light sidebar in light theme |
-| 2026-11-25 | 8e43044 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
