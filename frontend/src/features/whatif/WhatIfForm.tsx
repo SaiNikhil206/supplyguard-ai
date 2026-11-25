@@ -85,7 +85,7 @@ export function WhatIfForm({
       <div className="space-y-2">
         <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted">
           <Sparkles
-            className="h-3.5 w-3.5 text-violet-500"
+            className="h-3.5 w-3.5 text-primary"
             aria-hidden="true"
           />{" "}
           Quick scenarios

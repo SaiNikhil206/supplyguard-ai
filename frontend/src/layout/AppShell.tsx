@@ -15,6 +15,8 @@ import { UserMenu } from './UserMenu';
 const COLLAPSE_KEY = 'sg.sidebar.collapsed';
 
 function readCollapsed(): boolean {
+  // Narrow desktop windows start with the icon rail so data tables keep their full width.
+  if (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1200) return true;
   try {
     return localStorage.getItem(COLLAPSE_KEY) === '1';
   } catch {

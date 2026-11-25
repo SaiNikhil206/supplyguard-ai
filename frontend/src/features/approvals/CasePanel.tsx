@@ -59,7 +59,7 @@ export function CasePanel({ caseId, canDecide, actor, onNotice }: CasePanelProps
           Exposure <Money value={c.exposure} /> · {c.affected_po_count} affected POs
         </p>
         {c.analysis && (
-          <p className="mt-2 rounded-xl border border-violet-500/20 bg-violet-500/5 p-3 text-sm text-muted">
+          <p className="mt-2 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm text-muted">
             {c.analysis.summary}
           </p>
         )}

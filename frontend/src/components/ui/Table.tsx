@@ -25,14 +25,14 @@ export function TH({ className, scope = 'col', ...rest }: ThHTMLAttributes<HTMLT
   return (
     <th
       scope={scope}
-      className={cn('px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted', className)}
+      className={cn('px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted', className)}
       {...rest}
     />
   );
 }
 
 export function TD({ className, ...rest }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={cn('px-4 py-3 align-middle', className)} {...rest} />;
+  return <td className={cn('px-3 py-3 align-middle', className)} {...rest} />;
 }
 
 export interface TableEmptyRowProps {

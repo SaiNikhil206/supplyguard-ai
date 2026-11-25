@@ -8,7 +8,7 @@ import { OPTION_TYPE_LABEL, describeAction, isUnsupported } from './format';
 function EvidenceItem({ e }: { e: EvidenceRef }) {
   return (
     <li className="flex items-start gap-1.5 text-xs">
-      <Database aria-hidden="true" className="mt-0.5 h-3 w-3 shrink-0 text-violet-500" />
+      <Database aria-hidden="true" className="mt-0.5 h-3 w-3 shrink-0 text-primary" />
       <span>
         <span className="font-mono">
           {e.source} · {e.entity} · {e.field}

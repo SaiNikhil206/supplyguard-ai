@@ -20,7 +20,7 @@ const ENTITY_LABEL: Record<AffectedEntityType, string> = {
 const ENTITY_ORDER: AffectedEntityType[] = ['PO', 'SUPPLIER', 'ITEM', 'SHIPMENT', 'LOCATION'];
 
 const chipCls =
-  'inline-flex items-center rounded-md border border-violet-500/20 bg-violet-500/5 px-2 py-0.5 font-mono text-xs text-fg';
+  'inline-flex items-center rounded-md border border-primary/20 bg-primary/5 px-2 py-0.5 font-mono text-xs text-fg';
 
 function EntityRef({ id, link }: { id: string; link: boolean }) {
   return link ? (
@@ -100,7 +100,7 @@ function EvidenceRow({ e }: { e: EvidenceRef }) {
   return (
     <tr className="border-t border-border align-top">
       <td className="px-2 py-1.5">
-        <span className="inline-flex items-center gap-1.5"><Database aria-hidden="true" className="h-3.5 w-3.5 text-violet-500" /><Badge>{e.source}</Badge></span>
+        <span className="inline-flex items-center gap-1.5"><Database aria-hidden="true" className="h-3.5 w-3.5 text-primary" /><Badge>{e.source}</Badge></span>
       </td>
       <td className="px-2 py-1.5 font-mono text-xs">
         <EntityRef id={e.entity} link={e.entity.startsWith('SUP-')} />
@@ -130,7 +130,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
   if (!analysis) {
     if (status === 'RECEIVED' || status === 'ANALYZING') {
       return (
-        <div className="flex items-center gap-3 rounded-xl border border-dashed border-violet-500/40 bg-violet-500/5 p-4 text-sm text-muted">
+        <div className="flex items-center gap-3 rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-sm text-muted">
           <Spinner size="sm" label="Analysis in progress" />
           <span>AI analysis in progress…</span>
         </div>
