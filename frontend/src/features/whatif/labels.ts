@@ -1,4 +1,4 @@
-import type { EventType, OptionType, Severity } from "@/api/types";
+import type { EventType, OptionType } from "@/api/types";
 import type { WhatIfRequest } from "@/api/whatif";
 
 export const EVENT_LABELS: Record<EventType, string> = {
@@ -9,8 +9,6 @@ export const EVENT_LABELS: Record<EventType, string> = {
   LOGISTICS_DISRUPTION: "Logistics disruption",
 };
 
-export const SEVERITIES: Severity[] = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
-
 export const OPTION_LABELS: Record<OptionType, string> = {
   ALTERNATE_SUPPLIER: "Alternate supplier",
   INVENTORY_TRANSFER: "Inventory transfer",
@@ -20,9 +18,7 @@ export const OPTION_LABELS: Record<OptionType, string> = {
 
 export interface Preset {
   label: string;
-  patch: Pick<WhatIfRequest, "event_type" | "duration_days"> & {
-    severity?: Severity;
-  };
+  patch: Pick<WhatIfRequest, "event_type" | "duration_days">;
 }
 
 /** Preset scenarios; each applies to the first supplier in the list. The first keeps its original label. */
@@ -37,22 +33,13 @@ export const PRESETS: Preset[] = [
   },
   {
     label: "Quality hold 5 days",
-    patch: { event_type: "QUALITY_HOLD", duration_days: 5, severity: "HIGH" },
+    patch: { event_type: "QUALITY_HOLD", duration_days: 5 },
   },
   {
     label: "Capacity cut 21 days",
     patch: {
       event_type: "CAPACITY_REDUCTION",
-      duration_days: 21,
-      severity: "CRITICAL",
+      duration_days: 21
     },
   },
 ];
-
-export const SEVERITY_STYLE: Record<Severity, string> = {
-  LOW: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 ring-emerald-500/20",
-  MEDIUM:
-    "text-amber-600 dark:text-amber-400 bg-amber-500/10 ring-amber-500/20",
-  HIGH: "text-orange-600 dark:text-orange-400 bg-orange-500/10 ring-orange-500/20",
-  CRITICAL: "text-rose-600 dark:text-rose-400 bg-rose-500/10 ring-rose-500/20",
-};

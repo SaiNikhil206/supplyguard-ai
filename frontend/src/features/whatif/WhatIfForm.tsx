@@ -9,15 +9,13 @@ import {
   Sparkles,
   Truck,
 } from "lucide-react";
-import type { EventType, Severity, Supplier } from "@/api/types";
+import type { EventType, Supplier } from "@/api/types";
 import type { WhatIfRequest } from "@/api/whatif";
 import { Button, Field, Input, Select } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import {
   EVENT_LABELS,
   PRESETS,
-  SEVERITIES,
-  SEVERITY_STYLE,
   type Preset,
 } from "./labels";
 
@@ -198,39 +196,6 @@ export function WhatIfForm({
             <span key={t}>{t}d</span>
           ))}
         </div>
-      </div>
-
-      <div role="radiogroup" aria-label="Severity" className="space-y-2">
-        <p className="text-sm font-medium">
-          Severity <span className="font-normal text-muted">(optional)</span>
-        </p>
-        <div className="grid grid-cols-5 gap-1 rounded-xl bg-surface-2 p-1">
-          {([undefined, ...SEVERITIES] as (Severity | undefined)[]).map((s) => {
-            const on = values.severity === s;
-            return (
-              <button
-                key={s ?? "default"}
-                type="button"
-                role="radio"
-                aria-checked={on}
-                onClick={() => set({ severity: s })}
-                className={cn(
-                  "rounded-lg px-1 py-1.5 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  on
-                    ? s
-                      ? cn("shadow-sm ring-1", SEVERITY_STYLE[s])
-                      : "bg-card text-foreground shadow-sm"
-                    : "text-muted hover:text-foreground",
-                )}
-              >
-                {s ? s.charAt(0) + s.slice(1).toLowerCase() : "Default"}
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-xs text-muted">
-          Default uses the supplier&apos;s current risk level.
-        </p>
       </div>
 
       <Button
