@@ -1,16 +1,15 @@
 import type { RiskLevel } from '@/api/types';
 import { cn } from '@/lib/utils';
-import { LEVEL_BAR, gradFor, initials } from './risk';
+import { LEVEL_BAR, initials } from './risk';
 
-/** Gradient monogram avatar; decorative (name is always rendered beside it). */
+/** Neutral monogram avatar; decorative (name is always rendered beside it). */
 export function SupplierMonogram({ name, level, className }: { name: string; level?: RiskLevel; className?: string }) {
   return (
     <span
       aria-hidden="true"
       data-level={level}
       className={cn(
-        'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-xs font-semibold text-white shadow-sm',
-        gradFor(name),
+        'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-foreground/5 text-xs font-semibold text-muted ring-1 ring-border',
         className,
       )}
     >

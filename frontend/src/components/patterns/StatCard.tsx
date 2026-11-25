@@ -6,13 +6,13 @@ import { Skeleton } from '@/components/ui/Spinner';
 export type StatTone = 'primary' | 'emerald' | 'amber' | 'orange' | 'rose' | 'violet' | 'sky';
 
 const TONE: Record<StatTone, { box: string; stroke: string }> = {
-  primary: { box: 'bg-primary/10 text-primary', stroke: 'hsl(243 75% 60%)' },
-  emerald: { box: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400', stroke: '#10b981' },
-  amber: { box: 'bg-amber-500/10 text-amber-600 dark:text-amber-400', stroke: '#f59e0b' },
-  orange: { box: 'bg-orange-500/10 text-orange-600 dark:text-orange-400', stroke: '#f97316' },
-  rose: { box: 'bg-rose-500/10 text-rose-600 dark:text-rose-400', stroke: '#f43f5e' },
-  violet: { box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400', stroke: '#8b5cf6' },
-  sky: { box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400', stroke: '#0ea5e9' },
+  primary: { box: 'bg-foreground/5 text-muted', stroke: 'hsl(243 75% 60%)' },
+  emerald: { box: 'bg-foreground/5 text-muted', stroke: '#10b981' },
+  amber: { box: 'bg-foreground/5 text-muted', stroke: '#f59e0b' },
+  orange: { box: 'bg-foreground/5 text-muted', stroke: '#f97316' },
+  rose: { box: 'bg-foreground/5 text-muted', stroke: '#f43f5e' },
+  violet: { box: 'bg-foreground/5 text-muted', stroke: '#8b5cf6' },
+  sky: { box: 'bg-foreground/5 text-muted', stroke: '#0ea5e9' },
 };
 
 export interface StatDelta {
@@ -96,7 +96,7 @@ export function StatCard({ label, value, icon, tone = 'primary', delta, hint, lo
         </div>
       ) : (
         <>
-          <div className="mt-2 text-3xl font-semibold tabular-nums tracking-tight text-foreground">
+          <div className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-foreground">
             {typeof value === 'number' ? <CountUp value={value} /> : value}
           </div>
           {(delta || hint) && (

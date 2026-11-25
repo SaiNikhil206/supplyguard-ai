@@ -2,12 +2,12 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const TINT = {
-  primary: "bg-primary/10 text-primary",
-  emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  orange: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
-  violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+  primary: "bg-foreground/5 text-muted",
+  emerald: "bg-foreground/5 text-muted",
+  amber: "bg-foreground/5 text-muted",
+  orange: "bg-foreground/5 text-muted",
+  rose: "bg-foreground/5 text-muted",
+  violet: "bg-foreground/5 text-muted",
 } as const;
 export type Tint = keyof typeof TINT;
 

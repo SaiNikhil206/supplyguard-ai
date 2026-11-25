@@ -24,14 +24,13 @@ export function StatCard({
   label,
   value,
   hint,
-  tone = 'bg-primary/10 text-primary',
   active,
   onClick,
   ariaLabel,
 }: Props) {
   const body = (
     <>
-      <span className={cn('flex h-11 w-11 shrink-0 items-center justify-center rounded-xl', tone)}>
+      <span className={cn('flex h-11 w-11 shrink-0 items-center justify-center rounded-xl', 'bg-foreground/5 text-muted')}>
         <Icon aria-hidden="true" className="h-5 w-5" />
       </span>
       <span className="min-w-0">

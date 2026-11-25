@@ -16,7 +16,7 @@ export function SectionTitle({ title, description, icon, action, className }: Se
         {icon && (
           <span
             aria-hidden="true"
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary [&_svg]:h-4 [&_svg]:w-4"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-foreground/5 text-muted [&_svg]:h-4 [&_svg]:w-4"
           >
             {icon}
           </span>
