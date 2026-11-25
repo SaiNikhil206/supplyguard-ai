@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | fbfb0b6 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 35bc232 | roop | R-10 | review | style(frontend): calm risk and approvals pages, remove gradients |
 | 2026-11-25 | ecdb7d7 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 87a9d29 | roop | R-10 | review | style(frontend): neutral icon tiles, ring and monograms |
 | 2026-11-25 | 563267b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | d8d75e6 | roop | R-02 | in-progress | merge: R-02 hide raw error text in timeline (--backend2) |
 | 2026-11-25 | edb25a9 | roop | R-02 | in-progress | fix(portal): timeline shows only exception class for error rows |
 | 2026-11-25 | da7b673 | roop | R-02 | in-progress | merge: R-02 backend review fixes (--backend2) |
-| 2026-11-25 | a87be8b | roop | R-02 | in-progress | fix(portal): review fixes for read APIs |
-| 2026-11-25 | 7347b5b | roop | R-02 | in-progress | merge: R-02 mocks review fixes (--mocks2) |
