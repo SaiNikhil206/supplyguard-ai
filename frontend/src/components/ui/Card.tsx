@@ -6,12 +6,12 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(f
   ref,
 ) {
   return (
-    <div ref={ref} className={cn('rounded-lg border border-border bg-card text-card-foreground', className)} {...rest} />
+    <div ref={ref} className={cn('rounded-lg border border-border bg-card text-card-foreground shadow-soft', className)} {...rest} />
   );
 });
 
 export function CardHeader({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex items-center justify-between gap-2 border-b border-border px-5 py-4', className)} {...rest} />;
+  return <div className={cn('flex items-center justify-between gap-2 border-b border-border px-5 py-3.5', className)} {...rest} />;
 }
 
 export function CardTitle({ className, ...rest }: HTMLAttributes<HTMLHeadingElement>) {

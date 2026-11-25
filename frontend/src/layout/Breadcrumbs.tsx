@@ -1,56 +1,39 @@
 import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useSupplier } from '@/api/queries';
+import { ChevronRight } from 'lucide-react';
 import { navItems } from './nav';
 
-/** Supplier name for /suppliers/:id (shares the page's query cache); falls back to the id while loading. */
-function SupplierCrumb({ id }: { id: string }) {
-  const q = useSupplier(id);
-  return <>{q.data?.name ?? id}</>;
-}
-
-/** "Risk / RC-000045", "Suppliers / Pune Forge & Motors": real page names derived from the URL. */
+/** Workspace > Section > Details, derived from the URL. */
 export function Breadcrumbs() {
   const { pathname } = useLocation();
-  const segments = pathname.split('/').filter(Boolean).map(decodeURIComponent);
+  const segments = pathname.split('/').filter(Boolean);
   const section = navItems.find((i) => i.path !== '/' && i.path === `/${segments[0]}`);
-  const detailId = segments[1];
-
-  const crumbs: { key: string; to?: string; node: React.ReactNode }[] = [];
-  if (!segments.length) crumbs.push({ key: 'overview', node: 'Overview' });
+  const crumbs: { label: string; to?: string }[] = [{ label: 'Workspace', to: '/' }];
+  if (!segments.length) crumbs.push({ label: 'Overview' });
   else if (section) {
-    crumbs.push({ key: section.path, to: detailId ? section.path : undefined, node: section.short });
-    if (detailId) {
-      crumbs.push({
-        key: 'detail',
-        node: section.path === '/suppliers' ? <SupplierCrumb id={detailId} /> : detailId,
-      });
-    }
-  } else crumbs.push({ key: 'nf', node: 'Page not found' });
+    crumbs.push(segments.length > 1 ? { label: section.short, to: section.path } : { label: section.short });
+    if (segments.length > 1) crumbs.push({ label: 'Details' });
+  } else crumbs.push({ label: 'Not found' });
 
   return (
-    <nav aria-label="Location" className="hidden min-w-0 sm:block">
-      <ol className="flex items-center gap-2 text-sm text-muted">
+    <nav aria-label="Location" className="hidden min-w-0 md:block">
+      <ol className="flex items-center gap-1.5 text-sm text-muted">
         {crumbs.map((c, i) => {
           const last = i === crumbs.length - 1;
           return (
-            <Fragment key={c.key}>
-              {i > 0 && (
-                <li aria-hidden="true" className="text-border">
-                  /
-                </li>
-              )}
-              <li className="min-w-0 truncate">
+            <Fragment key={`${c.label}-${i}`}>
+              {i > 0 && <ChevronRight aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />}
+              <li className="truncate">
                 {c.to && !last ? (
                   <Link
                     to={c.to}
-                    className="rounded-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    {c.node}
+                    {c.label}
                   </Link>
                 ) : (
                   <span aria-current={last ? 'page' : undefined} className={last ? 'font-medium text-foreground' : undefined}>
-                    {c.node}
+                    {c.label}
                   </span>
                 )}
               </li>

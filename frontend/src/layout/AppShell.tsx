@@ -1,6 +1,6 @@
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { FlaskConical, Menu, Moon, PanelLeftClose, PanelLeftOpen, ShieldCheck, Sun } from 'lucide-react';
+import { Menu, Moon, PanelLeftClose, PanelLeftOpen, ShieldCheck, Sun, FlaskConical } from 'lucide-react';
 import { Badge, Button, Sheet, SheetContent, SheetDescription, SheetTitle, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { config } from '@/config';
@@ -11,7 +11,6 @@ import { SidebarNav } from './SidebarNav';
 import { Breadcrumbs } from './Breadcrumbs';
 import { CommandPalette } from './CommandPalette';
 import { UserMenu } from './UserMenu';
-import { PageSkeleton } from './PageSkeleton';
 
 const COLLAPSE_KEY = 'sg.sidebar.collapsed';
 
@@ -25,11 +24,11 @@ function readCollapsed(): boolean {
 
 function Brand({ collapsed = false }: { collapsed?: boolean }) {
   return (
-    <div className={cn('flex h-14 shrink-0 items-center gap-2.5 border-b border-border px-4', collapsed && 'justify-center px-0')}>
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
-        <ShieldCheck aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+    <div className={cn('flex h-14 items-center gap-2.5 px-5 text-white', collapsed && 'justify-center px-0')}>
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <ShieldCheck aria-hidden="true" className="h-4.5 w-4.5" />
       </span>
-      <span className={cn('text-sm font-semibold tracking-tight text-foreground', collapsed && 'sr-only')}>SupplyGuard AI</span>
+      <span className={cn('text-base font-semibold tracking-tight', collapsed && 'sr-only')}>SupplyGuard AI</span>
     </div>
   );
 }
@@ -58,40 +57,36 @@ export function AppShell() {
         Skip to main content
       </a>
 
-      {/* Desktop sidebar: 240px, collapses to 56px */}
+      {/* Desktop sidebar */}
       <aside
         aria-label="Sidebar"
         className={cn(
-          'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 ease-out lg:flex',
-          collapsed ? 'w-14' : 'w-60',
+          'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-white/5 bg-sidebar transition-[width] duration-200 md:flex',
+          collapsed ? 'w-[4.5rem]' : 'w-64',
         )}
       >
         <Brand collapsed={collapsed} />
         <div className="flex-1 overflow-y-auto">
           <SidebarNav items={items} collapsed={collapsed} />
         </div>
-        <div className="border-t border-border p-2">
+        <div className="border-t border-white/10 p-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setCollapsed((c) => !c)}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-pressed={collapsed}
-            className={cn('w-full justify-start text-sidebar-fg', collapsed && 'justify-center px-0')}
+            className={cn('w-full justify-start text-sidebar-fg hover:bg-white/10 hover:text-white', collapsed && 'justify-center px-0')}
           >
-            {collapsed ? (
-              <PanelLeftOpen aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
-            ) : (
-              <PanelLeftClose aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
-            )}
+            {collapsed ? <PanelLeftOpen aria-hidden="true" className="h-4 w-4" /> : <PanelLeftClose aria-hidden="true" className="h-4 w-4" />}
             {!collapsed && <span>Collapse</span>}
           </Button>
         </div>
       </aside>
 
-      {/* Navigation sheet below lg */}
+      {/* Mobile nav */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-72 gap-0 bg-sidebar p-0">
+        <SheetContent side="left" className="w-72 gap-0 border-white/10 bg-sidebar p-0 text-sidebar-fg [&>button]:text-sidebar-fg">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
           <Brand />
@@ -102,21 +97,21 @@ export function AppShell() {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card px-4 sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/85 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/70">
           <Button
             variant="ghost"
             size="icon"
-            className="-ml-2 lg:hidden"
+            className="h-9 w-9 md:hidden"
             aria-label="Toggle menu"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((o) => !o)}
           >
-            <Menu aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+            <Menu aria-hidden="true" className="h-5 w-5" />
           </Button>
           <Breadcrumbs />
           <div className="ml-auto flex items-center gap-2">
             {config.apiMock && (
-              <Badge tone="warning" className="hidden md:inline-flex" title="All figures are generated demo data">
+              <Badge tone="warning" className="hidden sm:inline-flex" title="All figures are generated demo data">
                 <FlaskConical aria-hidden="true" />
                 Illustrative synthetic data
               </Badge>
@@ -127,14 +122,11 @@ export function AppShell() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="h-9 w-9"
                   onClick={toggleTheme}
                   aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
                 >
-                  {theme === 'dark' ? (
-                    <Sun aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
-                  ) : (
-                    <Moon aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
-                  )}
+                  {theme === 'dark' ? <Sun aria-hidden="true" className="h-4 w-4" /> : <Moon aria-hidden="true" className="h-4 w-4" />}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{theme === 'dark' ? 'Switch to light' : 'Switch to dark'}</TooltipContent>
@@ -142,10 +134,8 @@ export function AppShell() {
             <UserMenu />
           </div>
         </header>
-        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-6 focus:outline-none sm:px-6">
-          <Suspense fallback={<PageSkeleton />}>
-            <Outlet />
-          </Suspense>
+        <main id="main" tabIndex={-1} className="flex-1 p-4 focus:outline-none sm:p-6 lg:p-8">
+          <Outlet />
         </main>
       </div>
     </div>

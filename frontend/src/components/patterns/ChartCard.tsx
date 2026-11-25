@@ -14,7 +14,7 @@ export function ChartCard({ title, description, legend, children, className }: C
   return (
     <section
       className={cn(
-        'rounded-lg border border-border bg-card p-5',
+        'rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur transition hover:shadow-md',
         className,
       )}
     >

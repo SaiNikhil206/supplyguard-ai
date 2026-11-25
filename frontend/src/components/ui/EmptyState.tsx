@@ -10,16 +10,18 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-/** 40px muted icon, title, one line, one action. */
 export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-1.5 px-4 py-12 text-center', className)}>
-      <div aria-hidden="true" className="mb-2 text-muted/70 [&_svg]:h-10 [&_svg]:w-10 [&_svg]:stroke-[1.25]">
+    <div className={cn('flex flex-col items-center justify-center gap-2 px-4 py-12 text-center', className)}>
+      <div
+        aria-hidden="true"
+        className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-accent-foreground ring-8 ring-accent/40 [&_svg]:h-6 [&_svg]:w-6"
+      >
         {icon ?? <Inbox />}
       </div>
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <h3 className="text-base font-semibold text-foreground">{title}</h3>
       {description && <p className="max-w-sm text-sm text-muted">{description}</p>}
-      {action && <div className="mt-3">{action}</div>}
+      {action && <div className="mt-2">{action}</div>}
     </div>
   );
 }

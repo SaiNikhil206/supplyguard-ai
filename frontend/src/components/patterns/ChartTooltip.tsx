@@ -13,7 +13,7 @@ export function ChartTooltip({ active, label, payload, labelFormatter, valueForm
   const fmtL = labelFormatter ?? String;
   const fmtV = valueFormatter ?? String;
   return (
-    <div className="rounded-md border border-border bg-popover px-3 py-2 text-xs shadow-sm">
+    <div className="rounded-xl border border-border/60 bg-card/95 px-3 py-2 text-xs shadow-lift backdrop-blur">
       <div className="mb-1 font-medium text-muted">{fmtL(String(label ?? ''))}</div>
       {payload.map((p, i) => (
         <div key={i} className="flex items-center gap-2">
