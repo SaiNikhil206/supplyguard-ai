@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | 8e13a2e | roop | R-02 | done | merge: R-02 Read APIs for the UI (Django `apps/portal`) (auto-merge) |
+| 2026-11-25 | bb1160c | roop | R-02 | done | chore(progress): R-02 done - handoff, session log, PROGRESS.md |
 | 2026-11-25 | 3ffed0f | roop | R-02 | done | chore(tasks): R-02 done - acceptance met with evidence |
 | 2026-11-25 | 9912148 | roop | R-02 | in-progress | merge: R-02 mocks re-review fixes (--mocks2) |
 | 2026-11-25 | d1924df | roop | R-02 | in-progress | fix(frontend): R-02 re-review fixes (unsupported reasons type, timeline order, clamp without error flash) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 995ea0b | roop | R-02 | in-progress | fix(accounts): mark R-02 read permissions as routed |
 | 2026-11-25 | 3d6627d | roop | R-02 | in-progress | feat(portal): read APIs for suppliers, dashboard summary and risk cases |
 | 2026-11-25 | 4c5f067 | roop | R-02 | in-progress | merge: R-02 backend read APIs (--backend2) |
-| 2026-11-25 | 1768571 | roop | R-02 | in-progress | feat(portal): read APIs for suppliers, dashboard, risk cases |
-| 2026-11-25 | ce39530 | uday | U-07 | in-progress | docs(tasks): U-07 progress - supplier read verified, query-parameter approach found |
