@@ -42,7 +42,7 @@
   - [ ] `/risk-cases/{id}` returns event, affected POs, analysis, recommendations, approvals, executions, timeline in one call
   - [ ] MSW mocks in `frontend/` updated to match the real responses
 - **Done in:** -
-- **Notes:** Plan (2026-11-25, deps U-03/U-04 in review): piece | runs as | model / effort | branch -- backend 5 endpoints + tests | nested session | sonnet / medium | `roop/R-02-read-apis--backend` ; MSW mocks + TS types to real shape | nested session | sonnet / medium | `roop/R-02-read-apis--mocks` ; run suites | subagent test-runner | haiku / low ; review | subagent reviewer-lite | sonnet / medium.
+- **Notes:** Plan (2026-11-25, deps U-03/U-04 in review): piece | runs as | model / effort | branch -- backend 5 endpoints + tests | nested session | sonnet / medium | `roop/R-02-read-apis--backend` ; MSW mocks + TS types to real shape | nested session | sonnet / medium | `roop/R-02-read-apis--mocks` ; run suites | subagent test-runner | haiku / low ; review | subagent reviewer-lite | sonnet / medium. Fallback: nested sessions hit an org auth error at first, so the backend was built by an implementer subagent on `--backend2` (merged); the duplicate `--backend` from the late-starting nested session is superseded (only its role-matrix lines were taken). Touched Uday-owned files (agreed with Roop 2026-11-25, Uday to confirm): `apps/accounts/permissions.py` routed=True for suppliers.read, dashboard.read, risk-cases.read; `tests/test_role_matrix.py` ROUTES + EXPECTED_ROUTED. Open question: dashboard `recovered_value` = exposure sum of RECOVERED cases.
 
 ### R-03: Executive Overview + Supplier Intelligence screens
 - **Status:** review

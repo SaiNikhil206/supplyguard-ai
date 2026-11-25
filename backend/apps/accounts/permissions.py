@@ -49,10 +49,10 @@ ROLE_MATRIX: dict[str, Rule] = {
     "audit.read": _rule({"GET": (ADMIN, PROCUREMENT_MANAGER)}),
     # --- routed by N-07 ---
     "internal.analysis": _rule({"POST": (SYSTEM,)}),  # routed by N-07
-    # --- declared for other tasks, not routed yet ---
-    "suppliers.read": _rule({"GET": _READERS}, routed=False),
-    "dashboard.read": _rule({"GET": _READERS}, routed=False),
-    "risk-cases.read": _rule({"GET": _READERS}, routed=False),
+    # --- routed by R-02 (suppliers, dashboard, risk-cases); the rest not routed yet ---
+    "suppliers.read": _rule({"GET": _READERS}),
+    "dashboard.read": _rule({"GET": _READERS}),
+    "risk-cases.read": _rule({"GET": _READERS}),
     "what-if": _rule({"POST": (ADMIN, PROCUREMENT_MANAGER, OPS_MANAGER)}),
     "recommendations.decision": _rule({"POST": (PROCUREMENT_MANAGER,)}),
     "executions.retry": _rule({"POST": (PROCUREMENT_MANAGER,)}, routed=False),
