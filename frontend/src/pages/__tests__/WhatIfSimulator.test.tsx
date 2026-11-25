@@ -46,7 +46,7 @@ describe("What-if Simulator", () => {
     await clickPreset();
     expect(await screen.findByText("Estimated exposure")).toBeInTheDocument();
     expect(screen.getAllByRole("table")).toHaveLength(2);
-    expect(screen.getByText("Best option")).toBeInTheDocument();
+    expect(screen.getByText("Best option (estimate)")).toBeInTheDocument();
     expect(screen.getByText(/Computed in \d+ ms/)).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Supplier" })).toHaveValue(
       "SUP-1001",
