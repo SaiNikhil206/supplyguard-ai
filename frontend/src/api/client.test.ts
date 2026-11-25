@@ -110,7 +110,7 @@ describe('401 refresh', () => {
     const c = countRefreshes();
     const me = await getMe();
     server.events.removeAllListeners();
-    expect(me.user.username).toBe('admin');
+    expect(me.user.id).toBe(admin.id);
     expect(c.n).toBe(1);
     expect(getAccessToken()).not.toBe(t.access);
   });
