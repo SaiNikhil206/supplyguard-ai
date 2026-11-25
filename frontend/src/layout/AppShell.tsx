@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Menu, PanelLeftClose, PanelLeftOpen, FlaskConical } from 'lucide-react';
 import { Badge, Button, Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui';
@@ -15,13 +15,14 @@ import { UserMenu } from './UserMenu';
 const COLLAPSE_KEY = 'sg.sidebar.collapsed';
 
 function readCollapsed(): boolean {
-  // Narrow desktop windows start with the icon rail so data tables keep their full width.
-  if (typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1200) return true;
   try {
-    return localStorage.getItem(COLLAPSE_KEY) === '1';
+    const stored = localStorage.getItem(COLLAPSE_KEY);
+    if (stored === '1' || stored === '0') return stored === '1';
   } catch {
-    return false;
+    /* storage unavailable */
   }
+  // No saved choice: narrow desktop windows start with the icon rail so data tables keep their width.
+  return typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1200;
 }
 
 function Brand({ collapsed = false }: { collapsed?: boolean }) {
@@ -39,13 +40,15 @@ export function AppShell() {
   const { hasRole } = useAuth();
   const items = navItems.filter((item) => !item.roles || hasRole(...item.roles));
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0');
-    } catch {
-      /* storage unavailable */
-    }
-  }, [collapsed]);
+  const toggleCollapsed = () =>
+    setCollapsed((c) => {
+      try {
+        localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1');
+      } catch {
+        /* storage unavailable */
+      }
+      return !c;
+    });
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -72,7 +75,7 @@ export function AppShell() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setCollapsed((c) => !c)}
+            onClick={toggleCollapsed}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-pressed={collapsed}
             className={cn('w-full justify-start text-sidebar-fg hover:bg-primary/10 hover:text-primary', collapsed && 'justify-center px-0')}

@@ -96,7 +96,7 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
                   <TD>
                     <div className="flex flex-col gap-1.5">
                       <SeverityBadge severity={s.risk_level} className="w-fit" />
-                      <RiskBar score={s.risk_score} level={s.risk_level} className="w-24" />
+                      {s.risk_score != null && <RiskBar score={s.risk_score} level={s.risk_level} className="w-24" />}
                     </div>
                   </TD>
                   <TD className="text-right tabular-nums">{s.open_po_count}</TD>
