@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | f3562f4 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 603a364 | roop | R-10 | review | style(frontend): light sidebar in light theme |
 | 2026-11-25 | 8e43044 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | ff96aa8 | roop | R-10 | review | chore(sync): merge collaboration (R-02 read APIs) into R-10 polish |
 | 2026-11-25 | 1e4f4a4 | roop | R-10 | review | docs(tasks): R-10 note v2 revert |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 5574e8e | roop | R-02 | in-progress | docs(tasks): R-02 notes for Uday-owned edits and open team questions |
 | 2026-11-25 | b4c6049 | roop | R-02 | in-progress | merge: R-02 MSW mocks aligned to backend (--mocks2) |
 | 2026-11-25 | 08e89fd | roop | R-02 | in-progress | fix(frontend): keep mock empty page past end, README note |
-| 2026-11-25 | 3aac6fb | roop | R-02 | in-progress | feat(frontend): align R-02 mock shapes and types with Django models |
-| 2026-11-25 | 995ea0b | roop | R-02 | in-progress | fix(accounts): mark R-02 read permissions as routed |
