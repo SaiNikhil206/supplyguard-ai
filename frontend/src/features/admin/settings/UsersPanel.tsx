@@ -25,7 +25,10 @@ import {
   toast,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { describeError } from "../ui/errors";
 import { fieldErrors, useAddUser, useTenantUsers } from "./hooks";
+
+const FORBIDDEN = "Only tenant admins can manage users.";
 
 const label = (r: string) =>
   r
@@ -53,9 +56,10 @@ const initials = (name: string) =>
 
 const blank: NewUser = {
   username: "",
-  full_name: "",
+  name: "",
   email: "",
   role: "VIEWER",
+  password: "",
 };
 
 export function UsersPanel() {
@@ -92,10 +96,10 @@ export function UsersPanel() {
       onError: (err) => {
         if (
           err instanceof ApiError &&
-          (err.code === "VALIDATION_ERROR" || err.code === "CONFLICT")
+          err.code === "VALIDATION_ERROR"
         ) {
           setErrors(fieldErrors(err.details));
-          setFormError(err.message);
+          setFormError("Please fix the highlighted fields.");
         } else {
           setFormError(
             err instanceof Error ? err.message : "Could not add user.",
@@ -112,6 +116,10 @@ export function UsersPanel() {
           <h2 className="text-base font-semibold">Users &amp; roles</h2>
           <p className="text-sm text-muted">
             Who can see, approve and administer this tenant.
+          </p>
+          <p className="text-xs text-muted" data-testid="roles-note">
+            Roles are set when a user is created and shown read-only: editing or
+            deactivating users is not supported by the API yet.
           </p>
         </div>
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,14 +150,26 @@ export function UsersPanel() {
                   autoComplete="off"
                 />
               </Field>
-              <Field label="Full name" error={errors.full_name}>
-                <Input value={form.full_name} onChange={set("full_name")} />
+              <Field label="Full name" error={errors.name}>
+                <Input value={form.name} onChange={set("name")} />
               </Field>
               <Field label="Email" error={errors.email}>
                 <Input
                   type="email"
                   value={form.email}
                   onChange={set("email")}
+                />
+              </Field>
+              <Field
+                label="Password"
+                error={errors.password}
+                hint="Shared with the user out of band; they sign in with it."
+              >
+                <Input
+                  type="password"
+                  value={form.password}
+                  onChange={set("password")}
+                  autoComplete="new-password"
                 />
               </Field>
               <Field label="Role" error={errors.role}>
@@ -189,12 +209,14 @@ export function UsersPanel() {
       )}
       {users.isError && (
         <ErrorState
-          message={
-            users.error instanceof Error
-              ? users.error.message
-              : "Could not load users."
+          title={describeError(users.error, FORBIDDEN).title}
+          message={describeError(users.error, FORBIDDEN).message}
+          correlationId={describeError(users.error, FORBIDDEN).correlationId}
+          onRetry={
+            describeError(users.error, FORBIDDEN).retryable
+              ? () => users.refetch()
+              : undefined
           }
-          onRetry={() => users.refetch()}
         />
       )}
       {users.data && users.data.length === 0 && (
@@ -228,10 +250,10 @@ export function UsersPanel() {
                         aria-hidden="true"
                         className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground/5 text-xs font-semibold text-muted ring-1 ring-border"
                       >
-                        {initials(u.full_name)}
+                        {initials(u.name || u.username)}
                       </span>
                       <div className="leading-tight">
-                        <div className="text-sm font-medium">{u.full_name}</div>
+                        <div className="text-sm font-medium">{u.name || u.username}</div>
                         <div className="font-mono text-xs text-muted">
                           {u.username}
                         </div>
@@ -255,10 +277,10 @@ export function UsersPanel() {
                         aria-hidden="true"
                         className={cn(
                           "h-2 w-2 rounded-full",
-                          u.active ? "bg-emerald-500" : "bg-slate-400",
+                          u.is_active ? "bg-emerald-500" : "bg-slate-400",
                         )}
                       />
-                      {u.active ? "Active" : "Inactive"}
+                      {u.is_active ? "Active" : "Inactive"}
                     </span>
                   </TD>
                 </TR>

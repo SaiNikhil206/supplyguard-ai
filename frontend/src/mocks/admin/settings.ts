@@ -1,28 +1,23 @@
 import { http, HttpResponse, type HttpHandler } from 'msw';
-import { USER_ROLES, type TenantSettings, type TenantUser } from '@/api/admin/settings';
+import { USER_ROLES, type SettingsPatch, type TenantSettings, type TenantUser } from '@/api/admin/settings';
 import { users as authUsers } from '../fixtures';
 
 const initialSettings = (): TenantSettings => ({
-  risk_thresholds: {
-    critical_score: 80,
-    high_score: 60,
-    medium_score: 30,
-    exposure_alert: { amount: '5000000.00', currency: 'INR' },
-  },
-  approval: { require_comment_on_reject: true, auto_escalate_hours: 24 },
-  polling_seconds: 30,
+  risk_thresholds: { medium: 30, high: 60, critical: 80, exposure_full_scale: 500000 },
+  max_cost_increase_pct: 15,
+  require_qualified_alternates: true,
 });
 
 const initialUsers = (): TenantUser[] => [
   ...authUsers.map((u) => ({
     id: u.id,
     username: u.username,
-    full_name: u.full_name,
     email: u.email,
-    role: u.role,
-    active: true,
+    name: u.full_name,
+    role: u.role as TenantUser['role'],
+    is_active: true,
   })),
-  { id: 'USR-4', username: 'ops', full_name: 'Olivia Ops', email: 'ops@acme.example', role: 'OPS_MANAGER', active: true },
+  { id: 'USR-4', username: 'ops', email: 'ops@acme.example', name: 'Olivia Ops', role: 'OPS_MANAGER', is_active: true },
 ];
 
 let settings = initialSettings();
@@ -45,40 +40,51 @@ function err(status: number, code: string, message: string, request: Request, de
 }
 
 /** Admin gate: returns an error Response, or null when the caller is an authenticated ADMIN. */
-function gate(request: Request): Response | null {
+export function gate(request: Request): Response | null {
   const header = request.headers.get('Authorization') ?? '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : '';
   try {
     const p = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
     const claims = JSON.parse(atob(p + '='.repeat((4 - (p.length % 4)) % 4))) as { exp: number; role: string };
     if (claims.exp <= Math.floor(Date.now() / 1000)) throw new Error('expired');
-    if (claims.role !== 'ADMIN') return err(403, 'FORBIDDEN', 'Admin role required.', request);
+    if (claims.role !== 'ADMIN') return err(403, 'FORBIDDEN', 'Permission denied.', request);
     return null;
   } catch {
     return err(401, 'UNAUTHENTICATED', 'Authentication credentials were not provided or are invalid.', request);
   }
 }
 
-const inRange = (n: unknown) => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 100;
+const isNum = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
 
-function validateSettings(next: TenantSettings): Record<string, string[]> {
-  const d: Record<string, string[]> = {};
-  const t = next.risk_thresholds;
-  const add = (k: string, m: string) => {
-    d[k] = [...(d[k] ?? []), m];
-  };
-  for (const k of ['critical_score', 'high_score', 'medium_score'] as const) {
-    if (!inRange(t[k])) add(`risk_thresholds.${k}`, 'Must be a number between 0 and 100.');
+/** Mirrors backend/apps/tenants/settings_schema.py error paths ({risk_thresholds: {high: [...]}}). */
+function validate(patch: Record<string, unknown>, merged: TenantSettings): Record<string, unknown> {
+  const d: Record<string, unknown> = {};
+  for (const k of Object.keys(patch)) {
+    if (!['risk_thresholds', 'max_cost_increase_pct', 'require_qualified_alternates'].includes(k)) d[k] = ['Unknown setting.'];
   }
-  if (!d['risk_thresholds.high_score'] && !d['risk_thresholds.critical_score'] && t.critical_score <= t.high_score) {
-    add('risk_thresholds.critical_score', 'Must be greater than the high threshold.');
+  const rt: Record<string, string[]> = {};
+  const sent = (patch.risk_thresholds ?? {}) as Record<string, unknown>;
+  for (const k of ['medium', 'high', 'critical'] as const) {
+    if (k in sent && !(isNum(sent[k]) && sent[k] >= 0 && sent[k] <= 100)) rt[k] = ['Must be between 0 and 100.'];
   }
-  if (!d['risk_thresholds.medium_score'] && !d['risk_thresholds.high_score'] && t.high_score <= t.medium_score) {
-    add('risk_thresholds.high_score', 'Must be greater than the medium threshold.');
+  if ('exposure_full_scale' in sent && !(isNum(sent.exposure_full_scale) && sent.exposure_full_scale > 0)) {
+    rt.exposure_full_scale = ['Must be greater than 0 and at most 1e+12.'];
   }
-  if (!(Number(t.exposure_alert?.amount) >= 0)) add('risk_thresholds.exposure_alert', 'Must be a non-negative amount.');
-  if (!(next.approval.auto_escalate_hours >= 1)) add('approval.auto_escalate_hours', 'Must be at least 1 hour.');
-  if (!(next.polling_seconds >= 5)) add('polling_seconds', 'Must be at least 5 seconds.');
+  const t = merged.risk_thresholds;
+  if (!Object.keys(rt).length) {
+    if (!(t.medium < t.high)) rt.high = ['Thresholds must satisfy medium < high < critical.'];
+    else if (!(t.high < t.critical)) rt.critical = ['Thresholds must satisfy medium < high < critical.'];
+  }
+  if (Object.keys(rt).length) d.risk_thresholds = rt;
+  if (
+    'max_cost_increase_pct' in patch &&
+    !(isNum(patch.max_cost_increase_pct) && patch.max_cost_increase_pct >= 0 && patch.max_cost_increase_pct <= 1000)
+  ) {
+    d.max_cost_increase_pct = ['Must be a number between 0 and 1000.'];
+  }
+  if ('require_qualified_alternates' in patch && typeof patch.require_qualified_alternates !== 'boolean') {
+    d.require_qualified_alternates = ['Must be true or false.'];
+  }
   return d;
 }
 
@@ -88,45 +94,46 @@ export const adminSettingsHandlers: HttpHandler[] = [
   http.patch(`${API}/settings`, async ({ request }) => {
     const denied = gate(request);
     if (denied) return denied;
-    const patch = (await request.json().catch(() => ({}))) as Partial<TenantSettings>;
+    const patch = (await request.json().catch(() => ({}))) as SettingsPatch & Record<string, unknown>;
     const next: TenantSettings = {
+      ...settings,
+      ...(patch as Partial<TenantSettings>),
       risk_thresholds: { ...settings.risk_thresholds, ...patch.risk_thresholds },
-      approval: { ...settings.approval, ...patch.approval },
-      polling_seconds: patch.polling_seconds ?? settings.polling_seconds,
     };
-    const details = validateSettings(next);
-    if (Object.keys(details).length) {
-      return err(400, 'VALIDATION_ERROR', 'Invalid settings.', request, details);
-    }
+    const details = validate(patch, next);
+    if (Object.keys(details).length) return err(400, 'VALIDATION_ERROR', 'Validation failed.', request, details);
     settings = next;
     return HttpResponse.json(settings);
   }),
 
-  http.get(`${API}/users`, ({ request }) => gate(request) ?? HttpResponse.json(tenantUsers)),
+  http.get(`${API}/users`, ({ request }) =>
+    gate(request) ?? HttpResponse.json({ count: tenantUsers.length, next: null, previous: null, results: tenantUsers }),
+  ),
 
   http.post(`${API}/users`, async ({ request }) => {
     const denied = gate(request);
     if (denied) return denied;
     const b = (await request.json().catch(() => ({}))) as Record<string, string>;
     const details: Record<string, string[]> = {};
-    for (const k of ['username', 'full_name', 'email', 'role']) {
+    for (const k of ['username', 'role', 'password']) {
       if (!b[k]?.trim()) details[k] = ['This field is required.'];
     }
     if (b.email && !/^\S+@\S+\.\S+$/.test(b.email)) details.email = ['Enter a valid email address.'];
-    if (b.role && !(USER_ROLES as string[]).includes(b.role)) details.role = ['Invalid role.'];
-    if (Object.keys(details).length) return err(400, 'VALIDATION_ERROR', 'Invalid user.', request, details);
-    if (tenantUsers.some((u) => u.username.toLowerCase() === b.username.trim().toLowerCase())) {
-      return err(409, 'CONFLICT', `Username "${b.username}" already exists.`, request, {
-        username: ['A user with this username already exists.'],
-      });
+    if (b.role && !(USER_ROLES as string[]).includes(b.role)) details.role = [`"${b.role}" is not a valid choice.`];
+    if (b.password && b.password.length < 8) {
+      details.password = ['This password is too short. It must contain at least 8 characters.'];
     }
+    if (b.username && tenantUsers.some((u) => u.username.toLowerCase() === b.username.trim().toLowerCase())) {
+      details.username = ['This username is not available.'];
+    }
+    if (Object.keys(details).length) return err(400, 'VALIDATION_ERROR', 'Validation failed.', request, details);
     const user: TenantUser = {
       id: `USR-${tenantUsers.length + 1}`,
       username: b.username.trim(),
-      full_name: b.full_name.trim(),
-      email: b.email.trim(),
+      name: (b.name ?? '').trim(),
+      email: (b.email ?? '').trim(),
       role: b.role as TenantUser['role'],
-      active: true,
+      is_active: true,
     };
     tenantUsers = [...tenantUsers, user];
     return HttpResponse.json(user, { status: 201 });
