@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | c99b0e8 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 350d493 | roop | R-10 | review | fix(frontend): full-width layout polish |
 | 2026-11-25 | f999e54 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 9529d38 | roop | R-10 | review | style(frontend): restore indigo palette, remove severity side strips |
 | 2026-11-25 | ef7b712 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | f3562f4 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 603a364 | roop | R-10 | review | style(frontend): light sidebar in light theme |
 | 2026-11-25 | 8e43044 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | ff96aa8 | roop | R-10 | review | chore(sync): merge collaboration (R-02 read APIs) into R-10 polish |
-| 2026-11-25 | 1e4f4a4 | roop | R-10 | review | docs(tasks): R-10 note v2 revert |
