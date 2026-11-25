@@ -96,7 +96,8 @@ export function supplierDetail(id: string): SupplierDetail | undefined {
     kpis: {
       on_time_delivery_pct: s.on_time_delivery_pct,
       quality_pass_pct: null, // not returned by the API
-      avg_lead_time_days: null, // not returned by the API
+      // expected_date - order_date averaged over the supplier's POs; null when it has none
+      avg_lead_time_days: s.open_po_count === 0 ? null : 5 + (Number(s.id.slice(4)) % 9),
       open_po_value: inr(String(s.open_po_count * 1_250_000) + '.00'),
       disruptions_last_12m: history.length,
     },
@@ -178,6 +179,7 @@ const event45: DisruptionEvent = {
 
 export const riskCaseDetail45: RiskCaseDetail = {
   ...riskCaseList[0],
+  data_quality_flags: ['Inventory record missing for ITM-503 at WH-PUNE-2'],
   event: event45,
   affected_pos: [
     { po_id: 'PO-1001', item_id: 'ITM-501', item_name: 'BLDC Motor 24V', qty: 400, value: inr('560000.00'), due_date: '2026-12-03', days_late_estimate: 4, stock_cover_days: 2 },
@@ -283,11 +285,11 @@ export const riskCaseDetail45: RiskCaseDetail = {
   approvals: [],
   executions: [],
   timeline: [
-    { at: '2026-12-02T10:15:00Z', actor: 'supplier-portal', action: 'EVENT_RECEIVED', detail: 'EVT-000123 received' },
-    { at: '2026-12-02T10:15:20Z', actor: 'system', action: 'STATE_CHANGED', detail: 'RECEIVED -> ANALYZING' },
-    { at: '2026-12-02T10:16:05Z', actor: 'risk-analysis-agent', action: 'ANALYSIS_STORED', detail: 'Risk score 92' },
-    { at: '2026-12-02T10:16:40Z', actor: 'recovery-planning-agent', action: 'RECOMMENDATIONS_STORED', detail: '3 options' },
-    { at: '2026-12-02T10:16:41Z', actor: 'system', action: 'STATE_CHANGED', detail: 'RECOMMENDATION_READY -> PENDING_APPROVAL' },
+    { at: '2026-12-02T10:15:00Z', actor: 'SYSTEM', action: 'event.received', detail: '' },
+    { at: '2026-12-02T10:15:01Z', actor: 'SYSTEM', action: 'risk_case.created', detail: '' },
+    { at: '2026-12-02T10:15:20Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECEIVED -> ANALYZING' },
+    { at: '2026-12-02T10:16:05Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'ANALYZING -> RECOMMENDATION_READY' },
+    { at: '2026-12-02T10:16:41Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECOMMENDATION_READY -> PENDING_APPROVAL' },
   ],
 };
 
@@ -315,7 +317,7 @@ export function riskCaseDetail(id: string): RiskCaseDetail | undefined {
     recommendations: [],
     approvals: [],
     executions: [],
-    timeline: [{ at: item.created_at, actor: 'system', action: 'CASE_CREATED', detail: item.title }],
+    timeline: [{ at: item.created_at, actor: 'SYSTEM', action: 'risk_case.created', detail: '' }],
   };
 }
 
@@ -366,7 +368,7 @@ export function addSimulatedCase(scenario: SimulateScenarioOption): { caseId: st
     no_viable_option_reason: null,
     approvals: [],
     executions: [],
-    timeline: [{ at: now, actor: 'system', action: 'RECEIVED', detail: `Event ${eventId} received` }],
+    timeline: [{ at: now, actor: 'SYSTEM', action: 'event.received', detail: '' }],
   };
   simulatedDetails.set(id, detail);
   const timer = setTimeout(() => {
@@ -380,7 +382,7 @@ export function addSimulatedCase(scenario: SimulateScenarioOption): { caseId: st
         ...current,
         status: 'ANALYZING',
         updated_at: at,
-        timeline: [...current.timeline, { at, actor: 'system', action: 'ANALYZING', detail: 'Analysis started' }],
+        timeline: [...current.timeline, { at, actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECEIVED -> ANALYZING' }],
       });
     }
   }, ANALYZING_DELAY_MS);
