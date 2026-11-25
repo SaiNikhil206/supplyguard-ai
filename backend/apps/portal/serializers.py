@@ -19,7 +19,7 @@ def timeline_detail(data) -> str:
     if data.get("decision"):
         return f"decision: {data['decision']}"
     if data.get("error"):
-        return str(data["error"])
+        return str(data["error"]).split(":", 1)[0].strip() or "error"  # class name only
     if data.get("reason"):
         return str(data["reason"])
     return str(data.get("detail") or data.get("message") or "")

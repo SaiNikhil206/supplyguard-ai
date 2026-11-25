@@ -240,7 +240,13 @@ def test_timeline_detail_from_real_transition_and_other_shapes(client_a, tenant_
 
     case = make_case(tenant_a, status="RECEIVED")
     transition(case, "ANALYZING", actor="SYSTEM", reason="intake complete")
-    record("SYSTEM", "x.err", ("RiskCase", case.id), tenant=tenant_a, data={"error": "boom"})
+    record(
+        "SYSTEM",
+        "x.err",
+        ("RiskCase", case.id),
+        tenant=tenant_a,
+        data={"error": "ValueError: secret detail"},
+    )
     record("SYSTEM", "x.reason", ("RiskCase", case.id), tenant=tenant_a, data={"reason": "why"})
     record("SYSTEM", "x.dec", ("RiskCase", case.id), tenant=tenant_a, data={"decision": "APPROVE"})
     record("SYSTEM", "x.none", ("RiskCase", case.id), tenant=tenant_a, data={})
@@ -249,7 +255,7 @@ def test_timeline_detail_from_real_transition_and_other_shapes(client_a, tenant_
     changed = by_action["risk_case.status_changed"]
     assert changed["detail"] == "RECEIVED -> ANALYZING (intake complete)"
     assert changed["actor"] == "SYSTEM"
-    assert by_action["x.err"]["detail"] == "boom"
+    assert by_action["x.err"]["detail"] == "ValueError"
     assert by_action["x.reason"]["detail"] == "why"
     assert by_action["x.dec"]["detail"] == "decision: APPROVE"
     assert by_action["x.none"]["detail"] == ""
