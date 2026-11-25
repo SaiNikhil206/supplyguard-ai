@@ -56,16 +56,8 @@ export default function SupplierIntelligence() {
     placeholderData: keepPreviousData,
   });
 
-  const totalCount = data?.count ?? 0;
-  const outOfRange = !!data && !isPlaceholderData && data.results.length === 0 && totalCount > 0 && filters.page > 1;
-  const lastPage = Math.max(1, Math.ceil(totalCount / pageSize));
-  // ?page=N beyond the last page: clamp to the last page (replace, no history entry).
-  useEffect(() => {
-    if (outOfRange) update({ page: String(lastPage) }, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outOfRange, lastPage]);
-
-  useClampPage({
+  // ?page=N beyond the last page: the API answers 404; clamp to the last page (replace, no history).
+  const clamping = useClampPage({
     error,
     page: filters.page,
     pageSize,
@@ -127,7 +119,9 @@ export default function SupplierIntelligence() {
       </form>
 
       <Card className="overflow-hidden">
-        {isError ? (
+        {clamping ? (
+          <SupplierTable loading />
+        ) : isError ? (
           <ErrorState
             message={error instanceof ApiError ? error.message : 'Could not load suppliers.'}
             correlationId={error instanceof ApiError ? (error.correlationId ?? undefined) : undefined}

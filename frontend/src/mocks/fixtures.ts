@@ -269,7 +269,10 @@ export const riskCaseDetail45: RiskCaseDetail = {
       rank: 4,
       round: 1,
       status: 'PENDING',
-      unsupported: false,
+      unsupported: true,
+      unsupported_reasons: [
+        { code: 'MISSING_DATA', message: 'Alternate supplier lead time and unit price for ITM-502 are not in the ERP data.' },
+      ],
       option_type: 'SPLIT_ORDER',
       proposed_action: { po_id: 'PO-1002', change: { supplier_id: 'SUP-1003', qty: 300 } },
       action_steps: ['Move 300 units of PO-1002 to Rhine Precision GmbH'],
@@ -286,8 +289,8 @@ export const riskCaseDetail45: RiskCaseDetail = {
   executions: [],
   timeline: [
     { at: '2026-12-02T10:15:00Z', actor: 'SYSTEM', action: 'event.received', detail: '' },
-    { at: '2026-12-02T10:15:01Z', actor: 'SYSTEM', action: 'risk_case.created', detail: '' },
-    { at: '2026-12-02T10:15:20Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECEIVED -> ANALYZING' },
+    { at: '2026-12-02T10:15:01Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECEIVED -> ANALYZING' },
+    { at: '2026-12-02T10:15:02Z', actor: 'SYSTEM', action: 'risk_case.created', detail: '' },
     { at: '2026-12-02T10:16:05Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'ANALYZING -> RECOMMENDATION_READY' },
     { at: '2026-12-02T10:16:41Z', actor: 'SYSTEM', action: 'risk_case.status_changed', detail: 'RECOMMENDATION_READY -> PENDING_APPROVAL' },
   ],
