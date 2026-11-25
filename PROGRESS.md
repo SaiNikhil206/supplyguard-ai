@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 3 | 3 | 3 | 0 | 3 | 0 | 25% | R-05 |
+| Roop | 3 | 2 | 4 | 0 | 3 | 0 | 25% | R-05 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -49,7 +49,7 @@
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
 | R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | in-progress | 0/1 | - |
-| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | in-progress | 0/1 | - |
+| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | review | 0/1 | - |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | review | 0/1 | - |
@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | 0cb4af9 | roop | R-07 | review | docs(tasks): R-07 review (wired to real what-if API) |
+| 2026-11-25 | cba509a | roop | R-05 | done | docs(tasks): R-05 done (real decision API, role gating) |
 | 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
 | 2026-11-25 | 988f3f5 | roop | R-04 | review | docs(tasks): R-03 done, R-04 wired to real API (review) |
 | 2026-11-25 | 1f36254 | roop | R-04 | in-progress | test(frontend): stabilize Vitest under load (asyncUtilTimeout 5s, cap workers) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 9529d38 | roop | R-10 | review | style(frontend): restore indigo palette, remove severity side strips |
 | 2026-11-25 | ef7b712 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | a0fed9c | roop | R-10 | review | style(frontend): warm neutral, editorial look; tables fit without side scroll |
-| 2026-11-25 | 349f00a | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 3e365a9 | roop | R-10 | review | test(frontend): app shell is light only |
