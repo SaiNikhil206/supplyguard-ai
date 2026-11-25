@@ -1,6 +1,8 @@
 import { useSearchParams } from 'react-router-dom';
 import { ApiError } from '@/api/client';
+import { listRiskCases } from '@/api/endpoints';
 import { useRiskCases } from '@/api/queries';
+import { useClampPage } from '@/api/useClampPage';
 import type { RiskCaseState, Severity } from '@/api/types';
 import { useAuth } from '@/auth/AuthProvider';
 import { Button, EmptyState, ErrorState, Skeleton } from '@/components/ui';
@@ -42,6 +44,14 @@ export function RiskInbox() {
     { refetchInterval: POLL_MS, keepPrevious: true },
   );
 
+  const clamping = useClampPage({
+    error,
+    page,
+    pageSize: PAGE_SIZE,
+    fetchCount: async () => (await listRiskCases({ severity, status, page: 1, page_size: PAGE_SIZE })).count,
+    onClamp: setPage,
+  });
+
   const viewKey = `${severity ?? ''}|${status ?? ''}|${page}`;
   const { fresh, announcement } = useNewCases(
     data && !isPlaceholderData ? data.results.map((c) => c.id) : undefined,
@@ -52,7 +62,7 @@ export function RiskInbox() {
   const now = dataUpdatedAt; // relative times refresh with every poll
 
   let body;
-  if (isPending) {
+  if (isPending || clamping) {
     body = (
       <div className="space-y-2" aria-busy="true" aria-label="Loading risk cases">
         {Array.from({ length: 5 }, (_, i) => (

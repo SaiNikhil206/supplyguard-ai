@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { listSuppliers } from '@/api/endpoints';
+import { useClampPage } from '@/api/useClampPage';
 import { queryKeys } from '@/api/queries';
 import { ApiError } from '@/api/client';
 import { Button, Card, EmptyState, ErrorState, Field, Input, Select } from '@/components/ui';
@@ -13,8 +14,10 @@ const DEBOUNCE_MS = 300;
 
 export default function SupplierIntelligence() {
   const [params, setParams] = useSearchParams();
-  const filters = filtersFromParams(params);
-  const pageSize = filters.page_size ?? 10;
+  const parsed = filtersFromParams(params);
+  const pageSize = parsed.page_size ?? 10;
+  // Always send page_size: the backend default (25) differs from this page's 10.
+  const filters = { ...parsed, page_size: pageSize };
 
   const [searchText, setSearchText] = useState(params.get('search') ?? '');
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -53,14 +56,14 @@ export default function SupplierIntelligence() {
     placeholderData: keepPreviousData,
   });
 
-  const totalCount = data?.count ?? 0;
-  const outOfRange = !!data && !isPlaceholderData && data.results.length === 0 && totalCount > 0 && filters.page > 1;
-  const lastPage = Math.max(1, Math.ceil(totalCount / pageSize));
-  // ?page=N beyond the last page: clamp to the last page (replace, no history entry).
-  useEffect(() => {
-    if (outOfRange) update({ page: String(lastPage) }, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outOfRange, lastPage]);
+  // ?page=N beyond the last page: the API answers 404; clamp to the last page (replace, no history).
+  const clamping = useClampPage({
+    error,
+    page: filters.page,
+    pageSize,
+    fetchCount: async () => (await listSuppliers({ ...filters, page: 1 })).count,
+    onClamp: (p) => update({ page: String(p) }, true),
+  });
 
   const hasFilters = !!(filters.search || filters.status || filters.risk_level || searchText);
   const totalPages = data ? Math.max(1, Math.ceil(data.count / pageSize)) : 1;
@@ -116,7 +119,9 @@ export default function SupplierIntelligence() {
       </form>
 
       <Card className="overflow-hidden">
-        {isError ? (
+        {clamping ? (
+          <SupplierTable loading />
+        ) : isError ? (
           <ErrorState
             message={error instanceof ApiError ? error.message : 'Could not load suppliers.'}
             correlationId={error instanceof ApiError ? (error.correlationId ?? undefined) : undefined}
