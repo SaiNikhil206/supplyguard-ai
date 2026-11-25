@@ -18,11 +18,11 @@ import { ActorCell, CopyId, EntityCell, StateChange } from "./AuditTable";
 const STAGE_META: Record<Stage, { icon: typeof Radio; tint: string }> = {
   Event: {
     icon: Radio,
-    tint: "bg-info/10 text-info ring-info/30 dark:text-info",
+    tint: "bg-sky-500/10 text-sky-600 ring-sky-500/30 dark:text-sky-400",
   },
   Analysis: {
     icon: ScanSearch,
-    tint: "bg-primary/10 text-primary ring-primary/30 dark:text-primary",
+    tint: "bg-violet-500/10 text-violet-600 ring-violet-500/30 dark:text-violet-400",
   },
   Approval: {
     icon: UserCheck,

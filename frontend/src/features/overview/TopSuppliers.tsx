@@ -47,7 +47,7 @@ export function TopSuppliers() {
             >
               <SupplierMonogram name={s.name} level={s.risk_level} />
               <span className="min-w-0 flex-1 truncate text-sm font-medium">{s.name}</span>
-              <RiskBar score={s.risk_score} level={s.risk_level} className="w-20" />
+              {s.risk_score != null && <RiskBar score={s.risk_score} level={s.risk_level} className="w-20" />}
               <SeverityBadge severity={s.risk_level} className="hidden sm:inline-flex" />
             </Link>
           ))

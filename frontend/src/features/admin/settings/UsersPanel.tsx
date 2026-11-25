@@ -37,8 +37,8 @@ const label = (r: string) =>
 const ROLE_STYLE: Record<string, string> = {
   ADMIN: "bg-rose-500/10 text-rose-600 ring-rose-500/20 dark:text-rose-400",
   PROCUREMENT_MANAGER:
-    "bg-primary/10 text-primary ring-primary/20 dark:text-primary",
-  OPS_MANAGER: "bg-info/10 text-info ring-info/20 dark:text-info",
+    "bg-violet-500/10 text-violet-600 ring-violet-500/20 dark:text-violet-400",
+  OPS_MANAGER: "bg-sky-500/10 text-sky-600 ring-sky-500/20 dark:text-sky-400",
   VIEWER:
     "bg-slate-500/10 text-slate-600 ring-slate-500/20 dark:text-slate-300",
 };

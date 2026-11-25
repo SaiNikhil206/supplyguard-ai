@@ -47,10 +47,10 @@ export const STATUS_META: Record<
     label: "Fallback",
     tone: "info",
     icon: "↺",
-    dot: "bg-info",
-    pill: "bg-info/10 text-info ring-info/20 dark:text-info",
+    dot: "bg-sky-500",
+    pill: "bg-sky-500/10 text-sky-600 ring-sky-500/20 dark:text-sky-400",
     stroke: "#0ea5e9",
-    bar: "bg-info",
+    bar: "bg-sky-500",
   },
 };
 
@@ -61,7 +61,7 @@ export const KIND_META: Record<
 > = {
   BOOMI_INTEGRATION: {
     mono: "BI",
-    gradient: "from-primary to-blue-600",
+    gradient: "from-indigo-500 to-blue-600",
     sub: "Integration",
   },
   EVENT_STREAMS: {
@@ -71,7 +71,7 @@ export const KIND_META: Record<
   },
   AGENTSTUDIO: {
     mono: "AS",
-    gradient: "from-primary to-primary",
+    gradient: "from-violet-500 to-fuchsia-600",
     sub: "AI agents",
   },
   FLOW: {
