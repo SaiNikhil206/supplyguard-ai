@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | ecdb7d7 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 87a9d29 | roop | R-10 | review | style(frontend): neutral icon tiles, ring and monograms |
 | 2026-11-25 | 563267b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 3c9b4e9 | roop | R-10 | review | style(frontend): remove sparklines from KPI cards |
 | 2026-11-25 | f3562f4 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | da7b673 | roop | R-02 | in-progress | merge: R-02 backend review fixes (--backend2) |
 | 2026-11-25 | a87be8b | roop | R-02 | in-progress | fix(portal): review fixes for read APIs |
 | 2026-11-25 | 7347b5b | roop | R-02 | in-progress | merge: R-02 mocks review fixes (--mocks2) |
-| 2026-11-25 | d8ec23c | roop | R-02 | in-progress | fix(frontend): R-02 review fixes for mocks |
-| 2026-11-25 | 5574e8e | roop | R-02 | in-progress | docs(tasks): R-02 notes for Uday-owned edits and open team questions |
