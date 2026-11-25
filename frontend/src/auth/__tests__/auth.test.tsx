@@ -47,7 +47,8 @@ describe('auth flow', () => {
   it('sign out returns to login and protected pages are unreachable', async () => {
     await loginAs('admin');
     const { router } = renderWithProviders({ path: '/' });
-    await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'User menu' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Sign out' }));
     expect(await screen.findByRole('button', { name: /Sign in/ })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/login');
     expect(getAccessToken()).toBeNull();

@@ -6,11 +6,11 @@ import {
   type ReactElement,
   type SelectHTMLAttributes,
 } from 'react';
-import clsx from 'clsx';
+import { cn } from '@/lib/utils';
 
 const control =
-  'block w-full rounded-md border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50';
+  'block h-10 w-full rounded-md border bg-card px-3 py-2 text-sm text-foreground shadow-soft transition-colors placeholder:text-muted ' +
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
@@ -21,7 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ i
     <input
       ref={ref}
       aria-invalid={invalid || undefined}
-      className={clsx(control, invalid ? 'border-danger' : 'border-border', className)}
+      className={cn(control, invalid ? 'border-danger' : 'border-input', className)}
       {...rest}
     />
   );
@@ -31,6 +31,7 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   invalid?: boolean;
 }
 
+/** Native <select> (keeps keyboard + userEvent.selectOptions behaviour) with a themed chevron. */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { invalid, className, children, ...rest },
   ref,
@@ -39,7 +40,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
     <select
       ref={ref}
       aria-invalid={invalid || undefined}
-      className={clsx(control, invalid ? 'border-danger' : 'border-border', className)}
+      className={cn(control, 'sg-select', invalid ? 'border-danger' : 'border-input', className)}
       {...rest}
     >
       {children}
@@ -64,8 +65,8 @@ export function Field({ label, error, hint, children, className }: FieldProps) {
   const describedBy = [errorId, hintId].filter(Boolean).join(' ') || undefined;
 
   return (
-    <div className={clsx('space-y-1', className)}>
-      <label htmlFor={id} className="block text-sm font-medium text-text">
+    <div className={cn('space-y-1.5', className)}>
+      <label htmlFor={id} className="block text-sm font-medium leading-none text-foreground">
         {label}
       </label>
       {cloneElement(children, { id, 'aria-describedby': describedBy, invalid: !!error || children.props.invalid })}
