@@ -1,19 +1,29 @@
-import type { AuditEntityType, AuditEvent } from "@/api/admin/audit";
+import { sortOldestFirst, type AuditEvent } from "@/api/admin/audit";
 
 export const STAGES = ["Event", "Analysis", "Approval", "Execution"] as const;
 export type Stage = (typeof STAGES)[number];
 
-const STAGE_OF: Partial<Record<AuditEntityType, Stage>> = {
-  EVENT: "Event",
-  RISK_CASE: "Analysis",
-  ANALYSIS: "Analysis",
-  RECOMMENDATION: "Analysis",
-  APPROVAL: "Approval",
-  EXECUTION: "Execution",
-};
+const ANALYSIS_STATES = ["ANALYZING", "RECOMMENDATION_READY", "PENDING_APPROVAL"];
+const APPROVAL_STATES = ["APPROVED", "REJECTED"];
+const EXECUTION_STATES = ["EXECUTING", "RECOVERED", "EXECUTION_FAILED"];
 
+/**
+ * Map a real audit row to a trace stage. Approvals are recorded as `recommendation.decided`,
+ * and case moves as `risk_case.status_changed` with data.to (CONTRACTS section 7).
+ */
 export function stageOf(e: AuditEvent): Stage | null {
-  return STAGE_OF[e.entity_type] ?? null;
+  const a = e.action;
+  if (e.entity_type === "DisruptionEvent" || a.startsWith("event.")) return "Event";
+  if (a === "recommendation.decided" || a.startsWith("approval.")) return "Approval";
+  if (e.entity_type === "Execution" || a.startsWith("execution.")) return "Execution";
+  if (a.startsWith("analysis.") || a === "risk_case.created") return "Analysis";
+  if (a === "risk_case.status_changed") {
+    const to = e.to_state ?? "";
+    if (ANALYSIS_STATES.includes(to)) return "Analysis";
+    if (APPROVAL_STATES.includes(to)) return "Approval";
+    if (EXECUTION_STATES.includes(to)) return "Execution";
+  }
+  return null;
 }
 
 export interface StageGroup {
@@ -26,7 +36,7 @@ export function groupByStage(events: AuditEvent[]): {
   groups: StageGroup[];
   other: AuditEvent[];
 } {
-  const sorted = [...events].sort((a, b) => a.at.localeCompare(b.at));
+  const sorted = sortOldestFirst(events);
   const groups: StageGroup[] = STAGES.map((stage) => ({ stage, events: [] }));
   const other: AuditEvent[] = [];
   for (const e of sorted) {
@@ -37,21 +47,10 @@ export function groupByStage(events: AuditEvent[]): {
   return { groups, other };
 }
 
-export const AUDIT_ACTIONS = [
-  "CREATED",
-  "DECIDED",
-  "RECEIVED",
-  "RESULT",
-  "STORED",
-  "TRANSITION",
-  "UPDATED",
-];
-
 export function formatTime(iso: string): string {
-  return iso
-    .replace("T", " ")
-    .replace(/:\d\dZ$/, "Z")
-    .replace(/Z$/, " UTC");
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${d.toISOString().slice(0, 19).replace("T", " ")} UTC`;
 }
 
 export function formatGap(ms: number): string {

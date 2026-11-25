@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 3 | 2 | 4 | 0 | 3 | 0 | 25% | R-05 |
+| Roop | 4 | 1 | 4 | 0 | 3 | 0 | 33% | R-07 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -43,13 +43,13 @@
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
-| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | in-progress | 0/2 | - |
+| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | done | 2/2 | `roop/R-05-approvals` (`--wire` d3f96ee merged; reviewer-lite APPROVE on combined diff, 2026-11-25) |
 | R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
-| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | review | 0/1 | - |
-| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | in-progress | 0/1 | - |
+| R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | in-progress | 0/1 | - |
+| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | review | 0/1 | - |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | review | 0/1 | - |
@@ -62,12 +62,12 @@
 ## Where each member left off
 
 ### Roop
-- **Last updated:** 2026-11-25 (R-02 read APIs done and merged)
-- **Current task:** - (R-02 `done`; R-03, R-04, R-09 in `review`; R-05, R-07, R-08, R-10 `in-progress`)
-- **Branch:** `roop/R-02-read-apis` (pieces `--backend2` and `--mocks2` merged; `--backend` and `--mocks` are superseded duplicates, not merged)
-- **Where I left off:** 5 portal endpoints live in `backend/apps/portal/` (tenant-scoped, 21 tests); MSW mocks + TS types match them; Opus review APPROVE; backend 1233, frontend 129 tests, run_checks all PASS.
-- **Next step:** R-05 AI Recommendations + Approval Center. Also switch R-03/R-04 screens from mocks to the real API (set `VITE_API_MOCK=false` and check).
-- **Blockers:** Uday to confirm R-02 edits in his files (`apps/accounts/permissions.py` routed=True for suppliers/dashboard/risk-cases.read, `tests/test_role_matrix.py`, `config/urls.py` include). Team to confirm: case timeline visible to all reader roles; REJECTED cases count as open; `recovered_value` = exposure of RECOVERED cases. Nested sessions first failed with "organization has disabled Claude subscription access" - used subagent fallback. R-09: `ci-ok` on `main` only; drop `[skip ci]` from bot commits.
+- **Last updated:** 2026-11-25 (real-API wiring of R-03/04/05/07/08 done; R-06 docs aligned)
+- **Current task:** - (R-01, R-02, R-03, R-05 `done`; R-04, R-07, R-08, R-09, R-10 `review`; R-06 docs done, Flow build manual, still `todo` on collaboration)
+- **Branch:** `roop/R-08-admin-screens` (task branches R-04, R-05, R-07, R-08 pushed; R-04 already in collaboration; `roop/R-06-flow-approval` `5408f6e` pushed; `--wire` and `--stability` sub branches merged)
+- **Where I left off:** Screens run against real API shapes (decision flat 201, what-if, audit, settings/users, portal); R-03 + R-04 auth/read checked live on seeded Django (VITE_API_MOCK=false). Combined branch check: tsc, lint, build, backend 1233 + portal 38 pass; Vitest was flaky (CPU contention), fixed in `--stability` (asyncUtilTimeout 5 s, maxWorkers 4; 5 green runs of 200). reviewer-lite APPROVE. NOT run live: R-05 decision, R-07 <3 s, R-08 AC-07 trace. R-05/R-07/R-08 pushes await auto-merge (gh not logged in here, Actions not checked).
+- **Next step:** check Actions / `/merge-prs` so R-05, R-07, R-08 land in collaboration; set R-06 to `in-progress` on its own branch; live-run what-if, decision and audit trace on seeded Django; then R-06 Boomi Flow build (manual in Boomi UI). R-11/R-12 wait on S-03, U-10, N-09. Delete `tmp/roop-integ-check` + worktree `D:/hackathon/sg-integ`.
+- **Blockers:** Backend gaps (Nikhil/Uday): no `POST /executions/{id}/retry` (`workflow.services.retry_execution` has no route), no approvals-queue endpoint, no tenant-roles endpoint, no user-update route, `/integrations/status` lacks per-service health. R-04 simulate-to-case 5 s needs U-07 -> N-08/N-09 chain. Uday still to confirm R-02 edits in his files; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning. Nested sessions refused on automated turns (visible ones worked on user request).
 
 ### Nikhil
 - **Last updated:** 2026-11-23 (N-07 validator built + reviewed, in review)
@@ -89,6 +89,11 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | ccaf1f2 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
+| 2026-11-25 | 9c91b0b | roop | R-08 | review | chore(tasks): handoff R-08 - wiring done, R-05/R-07/R-08 pushed |
+| 2026-11-25 | cd20334 | roop | R-08 | review | docs(tasks): R-08 review (admin screens on real API) |
+| 2026-11-25 | 41c3d43 | roop | R-05 | done | merge: R-05 AI Recommendations + Approval Center (auto-merge) |
+| 2026-11-25 | 0cb4af9 | roop | R-07 | review | docs(tasks): R-07 review (wired to real what-if API) |
 | 2026-11-25 | cba509a | roop | R-05 | done | docs(tasks): R-05 done (real decision API, role gating) |
 | 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
 | 2026-11-25 | 988f3f5 | roop | R-04 | review | docs(tasks): R-03 done, R-04 wired to real API (review) |
@@ -104,8 +109,3 @@
 | 2026-11-25 | 16a3d2c | roop | R-08 | in-progress | wip(frontend): R-08 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | c99b0e8 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 350d493 | roop | R-10 | review | fix(frontend): full-width layout polish |
-| 2026-11-25 | f999e54 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | 9529d38 | roop | R-10 | review | style(frontend): restore indigo palette, remove severity side strips |
-| 2026-11-25 | ef7b712 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | a0fed9c | roop | R-10 | review | style(frontend): warm neutral, editorial look; tables fit without side scroll |
-| 2026-11-25 | 349f00a | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |

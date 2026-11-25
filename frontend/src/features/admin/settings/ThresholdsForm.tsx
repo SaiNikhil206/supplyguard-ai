@@ -11,10 +11,10 @@ const num = (s: string) => (s.trim() === "" ? NaN : Number(s));
 export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
   const t = settings.risk_thresholds;
   const initial = {
-    critical: String(t.critical_score),
-    high: String(t.high_score),
-    medium: String(t.medium_score),
-    exposure: t.exposure_alert.amount,
+    critical: String(t.critical),
+    high: String(t.high),
+    medium: String(t.medium),
+    exposure: String(t.exposure_full_scale ?? ""),
   };
   const [form, setForm] = useState(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -39,13 +39,12 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
     save.mutate(
       {
         risk_thresholds: {
-          critical_score: num(form.critical),
-          high_score: num(form.high),
-          medium_score: num(form.medium),
-          exposure_alert: {
-            amount: form.exposure,
-            currency: t.exposure_alert.currency,
-          },
+          critical: num(form.critical),
+          high: num(form.high),
+          medium: num(form.medium),
+          ...(form.exposure !== initial.exposure && form.exposure.trim() !== ""
+            ? { exposure_full_scale: num(form.exposure) }
+            : {}),
         },
       },
       {
@@ -99,7 +98,7 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
           <div className="space-y-2">
             <Field
               label="Critical score (above)"
-              error={e("critical_score")}
+              error={e("critical")}
               hint="Scores 0-100; must exceed High."
             >
               <Input
@@ -113,7 +112,7 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
           <div className="space-y-2">
             <Field
               label="High score (above)"
-              error={e("high_score")}
+              error={e("high")}
               hint="Must exceed Medium."
             >
               <Input type="number" value={form.high} onChange={set("high")} />
@@ -121,7 +120,7 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
             {slider("high", "Adjust high threshold")}
           </div>
           <div className="space-y-2">
-            <Field label="Medium score (above)" error={e("medium_score")}>
+            <Field label="Medium score (above)" error={e("medium")}>
               <Input
                 type="number"
                 value={form.medium}
@@ -131,8 +130,9 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
             {slider("medium", "Adjust medium threshold")}
           </div>
           <Field
-            label={`Exposure alert (${t.exposure_alert.currency})`}
-            error={e("exposure_alert")}
+            label="Exposure full scale"
+            error={e("exposure_full_scale")}
+            hint="Exposure (tenant currency) treated as 100% in the impact score. Default 500000."
           >
             <Input
               type="number"

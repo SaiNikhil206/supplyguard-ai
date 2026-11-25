@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { flattenDetails } from "@/features/admin/ui/errors";
 import {
   createUser,
   getSettings,
@@ -23,7 +24,11 @@ export function useSaveSettings() {
 }
 
 export const useTenantUsers = () =>
-  useQuery({ queryKey: settingsKeys.users, queryFn: listUsers });
+  useQuery({
+    queryKey: settingsKeys.users,
+    queryFn: listUsers,
+    select: (p) => p.results,
+  });
 
 export function useAddUser() {
   const qc = useQueryClient();
@@ -33,13 +38,5 @@ export function useAddUser() {
   });
 }
 
-/** Flatten ApiError.details ({field: string[]}) to {field: first message}. */
-export function fieldErrors(
-  details: Record<string, unknown> | undefined,
-): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [k, v] of Object.entries(details ?? {})) {
-    out[k] = Array.isArray(v) ? String(v[0]) : String(v);
-  }
-  return out;
-}
+/** Flatten ApiError.details (DRF, nested: {risk_thresholds: {high: [msg]}}) to {"risk_thresholds.high": msg}. */
+export const fieldErrors = flattenDetails;
