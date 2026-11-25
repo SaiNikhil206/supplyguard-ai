@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 3 | 3 | 3 | 0 | 3 | 0 | 25% | R-05 |
+| Roop | 4 | 2 | 3 | 0 | 3 | 0 | 33% | R-07 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -43,7 +43,7 @@
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
-| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | in-progress | 0/2 | - |
+| R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | done | 2/2 | `roop/R-05-approvals` (`--wire` d3f96ee merged; reviewer-lite APPROVE on combined diff, 2026-11-25) |
 | R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |

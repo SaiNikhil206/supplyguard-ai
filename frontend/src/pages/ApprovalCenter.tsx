@@ -22,7 +22,7 @@ export default function ApprovalCenter() {
   const { pending, decided, isLoading, error, refetch } = useApprovalQueue();
 
   const select = (id: string) => setParams({ case: id }, { replace: true });
-  const canDecide = hasRole("PROCUREMENT_MANAGER", "ADMIN");
+  const canDecide = hasRole("PROCUREMENT_MANAGER");
 
   const oldest = pending.length
     ? pending.reduce((a, b) => (a.updated_at < b.updated_at ? a : b))

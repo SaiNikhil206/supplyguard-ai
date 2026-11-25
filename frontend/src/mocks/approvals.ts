@@ -1,7 +1,7 @@
 /**
  * Stateful MSW mock for the approval flow (PROVISIONAL shapes, CONTRACTS section 4).
  *
- *  POST /recommendations/:id/decision  -> 403 role | 404 | 409 already decided | 422 unsupported option | 200 DecisionResult
+ *  POST /recommendations/:id/decision  -> 403 role | 404 | 409 already decided | 422 unsupported option | 201 flat DecisionResult (real backend shape)
  *  POST /executions/:id/retry          -> 403 role | 404 | 409 unless FAILED and retryable | 200 Execution
  *  GET  /risk-cases, /risk-cases/:id   -> overridden here so decisions/executions show up (registered BEFORE the base handlers)
  *
@@ -25,7 +25,7 @@ import { riskCaseDetail, riskCaseList, users } from './fixtures';
 
 export const DEFAULT_EXECUTION_DELAY_MS = 400;
 export const FAILING_DEMO_RECOMMENDATION = 'REC-000102';
-const DECIDERS = ['ADMIN', 'PROCUREMENT_MANAGER'];
+const DECIDERS = ['PROCUREMENT_MANAGER']; // backend record_decision allows only this role
 const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 const CASE_STATES: string[] = [
   'RECEIVED', 'ANALYZING', 'RECOMMENDATION_READY', 'PENDING_APPROVAL', 'APPROVED',
@@ -314,7 +314,21 @@ export const approvalHandlers: HttpHandler[] = [
       s.executions.push({ exec: execution, startedMs: Date.now(), willFail, settled: false });
     }
     seq += 1;
-    return HttpResponse.json({ approval, execution, risk_case_status: s.status });
+    return HttpResponse.json(
+      {
+        approval_id: approval.id,
+        recommendation_id: recId,
+        decision: body.decision,
+        recommendation_status: body.decision === 'APPROVE' ? 'APPROVED' : body.decision === 'REJECT' ? 'REJECTED' : 'CHANGES_REQUESTED',
+        risk_case_id: found.caseId,
+        case_status: s.status,
+        execution_id: execution?.id ?? null,
+        decided_by: user.name,
+        decided_at: now,
+        correlation_id: request.headers.get('X-Correlation-ID') ?? crypto.randomUUID(),
+      },
+      { status: 201 },
+    );
   }),
 
   http.post(`${API}/executions/:id/retry`, ({ request, params }) => {
