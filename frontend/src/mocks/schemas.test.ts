@@ -29,7 +29,8 @@ describe('RC-000045 fixture vs ai/schemas', () => {
       risk_case_id: riskCaseDetail45.id,
       options: riskCaseDetail45.recommendations.map((rec) => {
         const opt: Record<string, unknown> = { ...rec };
-        delete opt.id;
+        // Django-added columns that are not part of the agent output schema.
+        for (const k of ['id', 'round', 'status', 'unsupported']) delete opt[k];
         return opt;
       }),
       no_viable_option_reason: riskCaseDetail45.no_viable_option_reason,

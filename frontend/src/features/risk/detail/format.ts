@@ -22,7 +22,8 @@ export function formatDate(iso: string): string {
   return d.toLocaleDateString('en-GB', { dateStyle: 'medium', timeZone: 'UTC' });
 }
 
-export function formatDuration(hours: number): string {
+export function formatDuration(hours: number | null): string {
+  if (hours === null) return 'Not provided';
   if (hours >= 48 && hours % 24 === 0) return `${hours / 24} days`;
   return `${hours} hours`;
 }

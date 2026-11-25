@@ -90,10 +90,15 @@ function authenticate(request: Request): MockUser | Response {
   return user;
 }
 
+/** DRF PageNumberPagination: default page size 25; `page_size` is honoured up to 100. */
+const DEFAULT_PAGE_SIZE = 25;
+
 function paginate<T>(items: T[], url: URL): Paginated<T> {
   const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
-  const size = Math.min(100, Math.max(1, Number(url.searchParams.get('page_size')) || 10));
+  const size = Math.min(100, Math.max(1, Number(url.searchParams.get('page_size')) || DEFAULT_PAGE_SIZE));
   const start = (page - 1) * size;
+  // NOTE: real DRF answers 404 for a page past the end; the mock returns an empty page because
+  // the suppliers/risk screens clamp on empty results (see R-02 report).
   const link = (p: number) => {
     const u = new URL(url);
     u.searchParams.set('page', String(p));
@@ -107,6 +112,32 @@ function paginate<T>(items: T[], url: URL): Paginated<T> {
   };
 }
 
+/** `from` (inclusive) / `to` (exclusive): a date (UTC midnight) or a full ISO timestamp. NaN = invalid. */
+function dateBound(raw: string | null): number | null {
+  if (!raw) return null;
+  return Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T00:00:00Z` : raw);
+}
+
+const SUPPLIER_STATUSES = ['ACTIVE', 'ON_HOLD', 'INACTIVE'];
+const LEVELS = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+const CASE_STATES = [
+  'RECEIVED', 'ANALYZING', 'RECOMMENDATION_READY', 'PENDING_APPROVAL', 'APPROVED',
+  'REJECTED', 'EXECUTING', 'EXECUTION_FAILED', 'RECOVERED', 'CLOSED',
+];
+
+/** Backend answers 400 VALIDATION_ERROR for a filter value outside its enum / an unparseable date. */
+function badFilter(request: Request, checks: [string, string | null, string[] | 'date'][]): Response | null {
+  const details: Record<string, string[]> = {};
+  for (const [name, value, allowed] of checks) {
+    if (value === null || value === '') continue;
+    const ok = allowed === 'date' ? !Number.isNaN(dateBound(value)) : allowed.includes(value);
+    if (!ok) details[name] = [allowed === 'date' ? 'Enter a valid date.' : `"${value}" is not a valid choice.`];
+  }
+  return Object.keys(details).length
+    ? errorResponse(400, 'VALIDATION_ERROR', 'Invalid filter value.', request, details)
+    : null;
+}
+
 /** Wrap a handler so it requires a valid Bearer token. */
 function protectedRoute(
   fn: (ctx: { request: Request; params: Record<string, string | readonly string[] | undefined>; user: MockUser; url: URL }) => Response | Promise<Response>,
@@ -116,6 +147,11 @@ function protectedRoute(
     if (user instanceof Response) return user;
     return fn({ request, params, user, url: new URL(request.url) });
   };
+}
+
+function paginated<T>(items: T[], url: URL, request: Request): Response {
+  void request;
+  return HttpResponse.json(paginate(items, url));
 }
 
 const API = '*/api/v1';
@@ -149,9 +185,14 @@ export const handlers: HttpHandler[] = [
 
   http.get(
     `${API}/suppliers`,
-    protectedRoute(({ url }) => {
+    protectedRoute(({ url, request }) => {
       const status = url.searchParams.get('status');
       const risk = url.searchParams.get('risk_level');
+      const bad = badFilter(request, [
+        ['status', status, SUPPLIER_STATUSES],
+        ['risk_level', risk, LEVELS],
+      ]);
+      if (bad) return bad;
       const search = url.searchParams.get('search')?.toLowerCase();
       const filtered = suppliers.filter(
         (s) =>
@@ -159,7 +200,7 @@ export const handlers: HttpHandler[] = [
           (!risk || s.risk_level === risk) &&
           (!search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search)),
       );
-      return HttpResponse.json(paginate(filtered, url));
+      return paginated(filtered, url, request);
     }),
   ),
 
@@ -176,19 +217,28 @@ export const handlers: HttpHandler[] = [
 
   http.get(
     `${API}/risk-cases`,
-    protectedRoute(({ url }) => {
+    protectedRoute(({ url, request }) => {
       const status = url.searchParams.get('status');
       const severity = url.searchParams.get('severity');
-      const from = url.searchParams.get('from');
-      const to = url.searchParams.get('to');
-      const filtered = riskCaseList.filter(
-        (c) =>
+      const bad = badFilter(request, [
+        ['status', status, CASE_STATES],
+        ['severity', severity, LEVELS],
+        ['from', url.searchParams.get('from'), 'date'],
+        ['to', url.searchParams.get('to'), 'date'],
+      ]);
+      if (bad) return bad;
+      const from = dateBound(url.searchParams.get('from'));
+      const to = dateBound(url.searchParams.get('to'));
+      const filtered = riskCaseList.filter((c) => {
+        const t = Date.parse(c.created_at);
+        return (
           (!status || c.status === status) &&
           (!severity || c.severity === severity) &&
-          (!from || c.created_at >= from) &&
-          (!to || c.created_at <= to),
-      );
-      return HttpResponse.json(paginate(filtered, url));
+          (from === null || t >= from) &&
+          (to === null || t < to)
+        );
+      });
+      return paginated(filtered, url, request);
     }),
   ),
 
