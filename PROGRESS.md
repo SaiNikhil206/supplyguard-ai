@@ -62,12 +62,12 @@
 ## Where each member left off
 
 ### Roop
-- **Last updated:** 2026-11-25 (R-02 read APIs done and merged)
-- **Current task:** - (R-02 `done`; R-03, R-04, R-09 in `review`; R-05, R-07, R-08, R-10 `in-progress`)
-- **Branch:** `roop/R-02-read-apis` (pieces `--backend2` and `--mocks2` merged; `--backend` and `--mocks` are superseded duplicates, not merged)
-- **Where I left off:** 5 portal endpoints live in `backend/apps/portal/` (tenant-scoped, 21 tests); MSW mocks + TS types match them; Opus review APPROVE; backend 1233, frontend 129 tests, run_checks all PASS.
-- **Next step:** R-05 AI Recommendations + Approval Center. Also switch R-03/R-04 screens from mocks to the real API (set `VITE_API_MOCK=false` and check).
-- **Blockers:** Uday to confirm R-02 edits in his files (`apps/accounts/permissions.py` routed=True for suppliers/dashboard/risk-cases.read, `tests/test_role_matrix.py`, `config/urls.py` include). Team to confirm: case timeline visible to all reader roles; REJECTED cases count as open; `recovered_value` = exposure of RECOVERED cases. Nested sessions first failed with "organization has disabled Claude subscription access" - used subagent fallback. R-09: `ci-ok` on `main` only; drop `[skip ci]` from bot commits.
+- **Last updated:** 2026-11-25 (real-API wiring of R-03/04/05/07/08 done; R-06 docs aligned)
+- **Current task:** - (R-01, R-02, R-03, R-05 `done`; R-04, R-07, R-08, R-09, R-10 `review`; R-06 docs done, Flow build manual, still `todo` on collaboration)
+- **Branch:** `roop/R-08-admin-screens` (task branches R-04, R-05, R-07, R-08 pushed; R-04 already in collaboration; `roop/R-06-flow-approval` `5408f6e` pushed; `--wire` and `--stability` sub branches merged)
+- **Where I left off:** Screens run against real API shapes (decision flat 201, what-if, audit, settings/users, portal); R-03 + R-04 auth/read checked live on seeded Django (VITE_API_MOCK=false). Combined branch check: tsc, lint, build, backend 1233 + portal 38 pass; Vitest was flaky (CPU contention), fixed in `--stability` (asyncUtilTimeout 5 s, maxWorkers 4; 5 green runs of 200). reviewer-lite APPROVE. NOT run live: R-05 decision, R-07 <3 s, R-08 AC-07 trace. R-05/R-07/R-08 pushes await auto-merge (gh not logged in here, Actions not checked).
+- **Next step:** check Actions / `/merge-prs` so R-05, R-07, R-08 land in collaboration; set R-06 to `in-progress` on its own branch; live-run what-if, decision and audit trace on seeded Django; then R-06 Boomi Flow build (manual in Boomi UI). R-11/R-12 wait on S-03, U-10, N-09. Delete `tmp/roop-integ-check` + worktree `D:/hackathon/sg-integ`.
+- **Blockers:** Backend gaps (Nikhil/Uday): no `POST /executions/{id}/retry` (`workflow.services.retry_execution` has no route), no approvals-queue endpoint, no tenant-roles endpoint, no user-update route, `/integrations/status` lacks per-service health. R-04 simulate-to-case 5 s needs U-07 -> N-08/N-09 chain. Uday still to confirm R-02 edits in his files; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning. Nested sessions refused on automated turns (visible ones worked on user request).
 
 ### Nikhil
 - **Last updated:** 2026-11-23 (N-07 validator built + reviewed, in review)
@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | cd20334 | roop | R-08 | review | docs(tasks): R-08 review (admin screens on real API) |
 | 2026-11-25 | 0cb4af9 | roop | R-07 | review | docs(tasks): R-07 review (wired to real what-if API) |
 | 2026-11-25 | cba509a | roop | R-05 | done | docs(tasks): R-05 done (real decision API, role gating) |
 | 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
@@ -108,4 +109,3 @@
 | 2026-11-25 | f999e54 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 9529d38 | roop | R-10 | review | style(frontend): restore indigo palette, remove severity side strips |
 | 2026-11-25 | ef7b712 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
-| 2026-11-25 | a0fed9c | roop | R-10 | review | style(frontend): warm neutral, editorial look; tables fit without side scroll |
