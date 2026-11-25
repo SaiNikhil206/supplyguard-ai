@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import clsx from 'clsx';
 import type { RiskCaseListItem } from '@/api/types';
 import { Money, SeverityBadge, StatusBadge, Table, TBody, TD, TH, THead, TR } from '@/components/ui';
+import { cn } from '@/lib/utils';
 import { eventTypeLabel, relativeTime } from './format';
 
 interface Props {
@@ -12,55 +12,67 @@ interface Props {
 
 export function CaseTable({ items, fresh, now }: Props) {
   return (
-    <Table aria-label="Risk cases">
-      <THead>
-        <tr>
-          <TH>Case</TH>
-          <TH>Supplier</TH>
-          <TH>Event</TH>
-          <TH>Severity</TH>
-          <TH>Status</TH>
-          <TH className="text-right">Affected POs</TH>
-          <TH className="text-right">Exposure</TH>
-          <TH>Created</TH>
-        </tr>
-      </THead>
-      <TBody>
-        {items.map((c) => {
-          const isNew = fresh.has(c.id);
-          return (
-            <TR key={c.id} className={clsx(isNew && 'bg-primary/10 ring-2 ring-inset ring-primary')}>
-              <TD>
-                <Link to={`/risk/${c.id}`} className="font-mono font-medium text-primary hover:underline">
-                  {c.id}
-                </Link>
-                {isNew && (
-                  <span className="ml-2 rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold uppercase text-primary-fg">
-                    New
-                  </span>
+    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur [&_td]:px-3 [&_th]:px-3">
+      <Table aria-label="Risk cases">
+        <THead>
+          <tr>
+            <TH>Case</TH>
+            <TH>Supplier</TH>
+            <TH className="hidden xl:table-cell">Event</TH>
+            <TH>Severity</TH>
+            <TH>Status</TH>
+            <TH className="whitespace-nowrap text-right">POs</TH>
+            <TH className="text-right">Exposure</TH>
+            <TH>Created</TH>
+          </tr>
+        </THead>
+        <TBody>
+          {items.map((c) => {
+            const isNew = fresh.has(c.id);
+            return (
+              <TR
+                key={c.id}
+                className={cn(
+                  'h-16 animate-in fade-in-0 duration-300',
+                  isNew && 'slide-in-from-left-4 bg-primary/10 ring-2 ring-inset ring-primary',
                 )}
-              </TD>
-              <TD>{c.supplier_name}</TD>
-              <TD>{eventTypeLabel(c.event_type)}</TD>
-              <TD>
-                <SeverityBadge severity={c.severity} />
-              </TD>
-              <TD>
-                <StatusBadge status={c.status} />
-              </TD>
-              <TD className="text-right tabular-nums">{c.affected_po_count}</TD>
-              <TD className="text-right">
-                <Money value={c.exposure} />
-              </TD>
-              <TD>
-                <time dateTime={c.created_at} title={new Date(c.created_at).toLocaleString()}>
-                  {relativeTime(c.created_at, now)}
-                </time>
-              </TD>
-            </TR>
-          );
-        })}
-      </TBody>
-    </Table>
+              >
+                <TD className="whitespace-nowrap">
+                  <Link to={`/risk/${c.id}`} className="font-mono font-medium text-primary hover:underline">
+                    {c.id}
+                  </Link>
+                  {isNew && (
+                    <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold uppercase text-primary-foreground">
+                      New
+                    </span>
+                  )}
+                </TD>
+                <TD className="font-medium">{c.supplier_name ?? c.supplier_id}</TD>
+                <TD className="hidden whitespace-nowrap xl:table-cell">{eventTypeLabel(c.event_type)}</TD>
+                <TD className="whitespace-nowrap">
+                  <SeverityBadge severity={c.severity} />
+                </TD>
+                <TD className="whitespace-nowrap">
+                  <StatusBadge status={c.status} />
+                </TD>
+                <TD className="text-right tabular-nums">{c.affected_po_count}</TD>
+                <TD className="whitespace-nowrap text-right font-medium tabular-nums">
+                  <Money value={c.exposure} />
+                </TD>
+                <TD className="whitespace-nowrap text-muted">
+                  <time
+                    dateTime={c.created_at}
+                    title={new Date(c.created_at).toLocaleString()}
+                    className="inline-flex items-center gap-1"
+                  >
+                    {relativeTime(c.created_at, now)}
+                  </time>
+                </TD>
+              </TR>
+            );
+          })}
+        </TBody>
+      </Table>
+    </div>
   );
 }

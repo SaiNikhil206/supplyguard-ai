@@ -356,12 +356,14 @@ Flow (R-06) retrying a decision after a timeout gets 409 `ALREADY_DECIDED` /
 
 ## 4. Where the trigger points live
 
-### 4.1 N-04 service (impact -> case)
-`apps.intelligence.services.create_risk_case(...)` creates the case at RECEIVED (model default)
-and, in the **same** `atomic()`, calls
-`transition(case, ANALYZING, actor="SYSTEM", reason="impact computed")` (T1). Boomi (N-08) then
-invokes the agents. Pass `actor=request.user` when the caller is the SystemPrincipal of U-06's
-endpoint, else `"SYSTEM"`.
+### 4.1 Impact -> case (N-04 service + U-06 wrapper)
+`apps.intelligence.services.create_risk_case(...)` only creates the case (at RECEIVED, the model
+default) with its impact and AffectedPO rows; it does **not** call `transition()`.
+The RECEIVED -> ANALYZING move (T1) happens in U-06's wrapper
+`apps.integrations.risk_cases.create_risk_case_from_snapshot` (via `move_to_analyzing`), right
+after `create_risk_case` returns, as
+`transition(case, ANALYZING, actor=<SystemPrincipal of the API key>, reason="impact computed")`;
+the wrapper also heals an existing case still in RECEIVED. Boomi (N-08) then invokes the agents.
 
 ### 4.2 N-07 analysis persistence (`POST /internal/risk-cases/{id}/analysis`, SYSTEM)
 In one `atomic()`:

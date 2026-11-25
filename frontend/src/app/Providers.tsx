@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { ApiError } from '@/api/client';
 import { AuthProvider } from '@/auth/AuthProvider';
 import { ThemeProvider } from '@/theme/ThemeProvider';
+import { Toaster } from '@/components/ui';
 
 /** Retry once, and never on 4xx ApiErrors. */
 // eslint-disable-next-line react-refresh/only-export-components -- pure helper kept beside the provider; exported for unit tests
@@ -25,6 +26,7 @@ export function Providers({ children, client = queryClient }: { children: ReactN
     <QueryClientProvider client={client}>
       <ThemeProvider>
         <AuthProvider>{children}</AuthProvider>
+        <Toaster />
       </ThemeProvider>
     </QueryClientProvider>
   );

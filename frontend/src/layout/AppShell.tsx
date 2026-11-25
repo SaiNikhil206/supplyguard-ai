@@ -1,119 +1,128 @@
-import { useEffect, useRef, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
-import clsx from 'clsx';
-import { navItems } from './nav';
-import { UserBadge } from './UserBadge';
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { Menu, PanelLeftClose, PanelLeftOpen, FlaskConical } from 'lucide-react';
+import { Badge, Button, Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui';
+import { LogoMark, Wordmark } from '@/components/Logo';
+import { cn } from '@/lib/utils';
+import { config } from '@/config';
 import { useAuth } from '@/auth/AuthProvider';
-import { useTheme } from '@/theme/ThemeProvider';
+import { navItems } from './nav';
+import { SidebarNav } from './SidebarNav';
+import { Breadcrumbs } from './Breadcrumbs';
+import { CommandPalette } from './CommandPalette';
+import { UserMenu } from './UserMenu';
 
-const roleLabel = (r: string) =>
-  r
-    .toLowerCase()
-    .split('_')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+const COLLAPSE_KEY = 'sg.sidebar.collapsed';
+
+function readCollapsed(): boolean {
+  try {
+    const stored = localStorage.getItem(COLLAPSE_KEY);
+    if (stored === '1' || stored === '0') return stored === '1';
+  } catch {
+    /* storage unavailable */
+  }
+  // No saved choice: narrow desktop windows start with the icon rail so data tables keep their width.
+  return typeof window !== 'undefined' && window.innerWidth >= 768 && window.innerWidth < 1200;
+}
+
+function Brand({ collapsed = false }: { collapsed?: boolean }) {
+  return (
+    <div className={cn('flex h-14 items-center gap-2.5 px-5 text-foreground', collapsed && 'justify-center px-0')}>
+      <LogoMark className="text-primary" />
+      <Wordmark className={cn(collapsed && 'sr-only')} />
+    </div>
+  );
+}
 
 export function AppShell() {
-  const [open, setOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
-  const { me, signOut } = useAuth();
-  const asideRef = useRef<HTMLElement>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const { hasRole } = useAuth();
+  const items = navItems.filter((item) => !item.roles || hasRole(...item.roles));
 
-  // Below md a closed sidebar is off-screen: make it inert so links leave the tab order.
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const apply = () => {
-      if (asideRef.current) (asideRef.current as HTMLElement & { inert: boolean }).inert = !open && !mq.matches;
-    };
-    apply();
-    mq.addEventListener?.('change', apply);
-    return () => mq.removeEventListener?.('change', apply);
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
+  const toggleCollapsed = () =>
+    setCollapsed((c) => {
+      try {
+        localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1');
+      } catch {
+        /* storage unavailable */
+      }
+      return !c;
+    });
 
   return (
-    <div className="flex min-h-screen bg-bg text-text">
+    <div className="flex min-h-screen bg-background text-foreground">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-fg"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
       >
         Skip to main content
       </a>
+
+      {/* Desktop sidebar */}
       <aside
-        ref={asideRef}
         aria-label="Sidebar"
-        className={clsx(
-          'fixed inset-y-0 left-0 z-30 w-64 transform border-r border-border bg-surface transition-transform md:static md:translate-x-0',
-          open ? 'translate-x-0' : '-translate-x-full',
+        className={cn(
+          'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 md:flex',
+          collapsed ? 'w-[4.5rem]' : 'w-64',
         )}
       >
-        <div className="flex h-14 items-center gap-2 border-b border-border px-4 text-lg font-semibold">
-          <span className="text-primary">▣</span> SupplyGuard AI
+        <Brand collapsed={collapsed} />
+        <div className="flex-1 overflow-y-auto">
+          <SidebarNav items={items} collapsed={collapsed} />
         </div>
-        <nav aria-label="Main" className="flex flex-col gap-1 p-3">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/'}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                clsx(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium',
-                  isActive ? 'bg-primary text-primary-fg' : 'text-muted hover:bg-surface-2 hover:text-text',
-                )
-              }
-            >
-              <span aria-hidden="true" className="w-4 text-center">
-                {item.icon}
-              </span>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
-      {open && (
-        <div className="fixed inset-0 z-20 bg-black/40 md:hidden" onClick={() => setOpen(false)} aria-hidden="true" />
-      )}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4">
-          <button
-            type="button"
-            className="rounded-md border border-border px-3 py-1 text-sm md:hidden"
-            aria-label="Toggle menu"
-            aria-expanded={open}
-            onClick={() => setOpen((o) => !o)}
+        <div className="border-t border-border p-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleCollapsed}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-pressed={collapsed}
+            className={cn('w-full justify-start text-sidebar-fg hover:bg-primary/10 hover:text-primary', collapsed && 'justify-center px-0')}
           >
-            ☰ Menu
-          </button>
-          <div className="hidden md:block" />
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-surface-2"
-            >
-              {theme === 'dark' ? '☀ Light' : '☾ Dark'}
-            </button>
-            <UserBadge name={me?.user.full_name} tenant={me?.tenant.name} role={me ? roleLabel(me.role) : undefined} />
-            <button
-              type="button"
-              onClick={signOut}
-              className="rounded-md border border-border px-3 py-1 text-sm hover:bg-surface-2"
-            >
-              Sign out
-            </button>
+            {collapsed ? <PanelLeftOpen aria-hidden="true" className="h-4 w-4" /> : <PanelLeftClose aria-hidden="true" className="h-4 w-4" />}
+            {!collapsed && <span>Collapse</span>}
+          </Button>
+        </div>
+      </aside>
+
+      {/* Mobile nav */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-72 gap-0 border-border bg-sidebar p-0 text-sidebar-fg [&>button]:text-sidebar-fg">
+          <SheetTitle className="sr-only">Navigation</SheetTitle>
+          <SheetDescription className="sr-only">Main navigation menu</SheetDescription>
+          <Brand />
+          <div className="flex-1 overflow-y-auto">
+            <SidebarNav items={items} label="Mobile" onNavigate={() => setMobileOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card/85 px-4 backdrop-blur supports-[backdrop-filter]:bg-card/70">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 md:hidden"
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((o) => !o)}
+          >
+            <Menu aria-hidden="true" className="h-5 w-5" />
+          </Button>
+          <Breadcrumbs />
+          <div className="ml-auto flex items-center gap-2">
+            {config.apiMock && (
+              <Badge tone="warning" className="hidden sm:inline-flex" title="All figures are generated demo data">
+                <FlaskConical aria-hidden="true" />
+                Illustrative synthetic data
+              </Badge>
+            )}
+            <CommandPalette />
+            <UserMenu />
           </div>
         </header>
-        <main id="main" tabIndex={-1} className="flex-1 p-6 focus:outline-none">
+        <main id="main" tabIndex={-1} className="flex-1 p-4 focus:outline-none sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>
