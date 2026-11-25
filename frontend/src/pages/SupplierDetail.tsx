@@ -39,7 +39,7 @@ function LoadingView() {
   return (
     <div aria-busy="true" data-testid="supplier-skeleton" className="space-y-6">
       <Skeleton className="h-48 w-full rounded-2xl" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 5 }, (_, i) => (
           <Skeleton key={i} className="h-28 rounded-2xl" />
         ))}
@@ -55,7 +55,7 @@ function Hero({ s }: { s: SupplierDetailData }) {
     <GradientRing>
       <div className="flex flex-wrap items-center justify-between gap-6 rounded-[15px] bg-card p-6 duration-200 animate-in fade-in">
         <div className="flex min-w-0 items-center gap-5">
-          <GradientRing radius="rounded-2xl" gradient="from-primary via-violet-500 to-sky-500">
+          <GradientRing radius="rounded-2xl">
             <SupplierMonogram name={s.name} level={s.risk_level} className="h-16 w-16 rounded-[15px] text-xl" />
           </GradientRing>
           <div className="min-w-0 space-y-2">
@@ -137,7 +137,7 @@ export default function SupplierDetail() {
     <section className="space-y-6">
       <Breadcrumb name={s.name} />
       <Hero s={s} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="On-time delivery" value={`${k.on_time_delivery_pct}%`} icon={<Clock />} tone="emerald" />
         <StatCard label="Quality pass" value={k.quality_pass_pct == null ? 'Not available' : `${k.quality_pass_pct}%`} icon={<ShieldCheck />} tone="primary" />
         <StatCard label="Avg lead time" value={k.avg_lead_time_days == null ? 'Not available' : `${k.avg_lead_time_days} days`} icon={<Timer />} tone="sky" />
