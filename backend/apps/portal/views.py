@@ -35,7 +35,8 @@ from .serializers import (
 )
 
 TAG = ["portal"]
-CLOSED_STATES = ("RECOVERED", "CLOSED", "REJECTED")
+# REJECTED is not terminal: it can go back to ANALYZING (CONTRACTS s7).
+CLOSED_STATES = ("RECOVERED", "CLOSED")
 TREND_DAYS = 30
 
 
@@ -172,7 +173,6 @@ class RiskCaseViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, TenantSc
             )
             return qs.prefetch_related(
                 "affected_pos",
-                "agent_runs",
                 "recommendations",
                 Prefetch("approvals", queryset=approvals),
             )
@@ -200,8 +200,9 @@ class RiskCaseViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, TenantSc
             .filter(
                 Q(correlation_id=case.correlation_id) | Q(entity_type="RiskCase", entity_id=case.id)
             )
-            .order_by("timestamp", "id")[:200]
+            .order_by("-timestamp", "-id")[:200]
         )
+        timeline.reverse()  # newest 200, shown oldest first
         ctx = {**self.get_serializer_context(), "timeline": timeline}
         return Response(RiskCaseDetailSerializer(case, context=ctx).data)
 
@@ -216,6 +217,8 @@ class DashboardSummaryView(TenantScopedMixin, APIView):
         cur = tenant.currency
         cases = RiskCase.objects.filter(tenant=tenant)
         open_cases = cases.exclude(status__in=CLOSED_STATES)
+        priced = cases.filter(currency=cur)  # never sum amounts in another currency
+        open_priced = open_cases.filter(currency=cur)
         today = timezone.now().date()
         days = [today - timedelta(days=i) for i in range(TREND_DAYS - 1, -1, -1)]
         per_day = {
@@ -223,7 +226,10 @@ class DashboardSummaryView(TenantScopedMixin, APIView):
             for r in cases.filter(created_at__date__gte=days[0])
             .annotate(day=TruncDate("created_at"))
             .values("day")
-            .annotate(n=Count("id"), exposure=Sum("exposure_amount"))
+            .annotate(
+                n=Count("id"),
+                exposure=Sum("exposure_amount", filter=Q(currency=cur)),
+            )
         }
         zero = Decimal("0")
         return Response(
@@ -235,10 +241,12 @@ class DashboardSummaryView(TenantScopedMixin, APIView):
                 "active_shipments": Shipment.objects.filter(
                     tenant=tenant, status=Shipment.Status.IN_TRANSIT
                 ).count(),
-                "exposure": money(open_cases.aggregate(s=Sum("exposure_amount"))["s"] or zero, cur),
+                "exposure": money(
+                    open_priced.aggregate(s=Sum("exposure_amount"))["s"] or zero, cur
+                ),
                 "open_cases": open_cases.count(),
                 "recovered_value": money(
-                    cases.filter(status="RECOVERED").aggregate(s=Sum("exposure_amount"))["s"]
+                    priced.filter(status="RECOVERED").aggregate(s=Sum("exposure_amount"))["s"]
                     or zero,
                     cur,
                 ),
