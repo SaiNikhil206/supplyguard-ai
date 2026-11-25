@@ -21,6 +21,8 @@ export default defineConfig(({ mode }) => {
     // jsdom + recharts renders are slow when many suites run in parallel (CI, busy dev box); 5s default flakes.
     testTimeout: 20000,
     hookTimeout: 20000,
+    // Each jsdom worker is heavy; cap workers so a busy machine does not starve renders.
+    maxWorkers: 4,
   },
 };
 });
