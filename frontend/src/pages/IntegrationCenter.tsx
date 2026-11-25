@@ -41,10 +41,10 @@ export default function IntegrationCenter() {
       {q.isPending && (
         <div role="status" aria-busy="true" className="space-y-6">
           <span className="sr-only">Loading integration status</span>
-          <Skeleton className="h-32 w-full rounded-lg" />
-          <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <Skeleton className="h-44 w-full rounded-2xl" />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} className="h-32 w-full rounded-lg" />
+              <Skeleton key={i} className="h-44 w-full rounded-2xl" />
             ))}
           </div>
         </div>
@@ -63,13 +63,11 @@ export default function IntegrationCenter() {
       )}
 
       {data && data.connections.length === 0 && (
-        <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border bg-card px-6 py-16 text-center">
-          <Plug
-            className="h-10 w-10 text-muted"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
-          <h2 className="text-sm font-semibold">No integrations configured</h2>
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-card/40 px-6 py-16 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Plug className="h-6 w-6" aria-hidden="true" />
+          </span>
+          <h2 className="text-lg font-semibold">No integrations configured</h2>
           <p className="max-w-sm text-sm text-muted">
             Connections appear here once the tenant integrations are set up.
           </p>
@@ -82,7 +80,7 @@ export default function IntegrationCenter() {
             connections={data.connections}
             checkedAt={data.checked_at}
           />
-          <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {data.connections.map((c) => (
               <ConnectionCard key={c.id} connection={c} />
             ))}

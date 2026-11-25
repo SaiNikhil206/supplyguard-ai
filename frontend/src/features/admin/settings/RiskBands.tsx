@@ -27,45 +27,45 @@ export function RiskBands({
       key: "Low",
       from: 0,
       to: m,
-      cls: "bg-sev-low",
-      txt: "text-sev-low",
+      cls: "bg-emerald-500",
+      txt: "text-emerald-600 dark:text-emerald-400",
     },
     {
       key: "Medium",
       from: m,
       to: h,
-      cls: "bg-sev-medium",
-      txt: "text-sev-medium",
+      cls: "bg-amber-500",
+      txt: "text-amber-600 dark:text-amber-400",
     },
     {
       key: "High",
       from: h,
       to: c,
-      cls: "bg-sev-high",
-      txt: "text-sev-high",
+      cls: "bg-orange-500",
+      txt: "text-orange-600 dark:text-orange-400",
     },
     {
       key: "Critical",
       from: c,
       to: 100,
-      cls: "bg-sev-critical",
-      txt: "text-sev-critical",
+      cls: "bg-rose-500",
+      txt: "text-rose-600 dark:text-rose-400",
     },
   ];
   return (
     <div className="space-y-3" data-testid="risk-bands">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Live preview</h3>
+        <h3 className="text-sm font-semibold tracking-tight">Live preview</h3>
         <span className="text-xs text-muted">Score 0 to 100</span>
       </div>
       <div
         aria-hidden="true"
-        className="flex h-2 overflow-hidden rounded-full bg-surface-2"
+        className="flex h-4 overflow-hidden rounded-full bg-surface-2"
       >
         {segs.map((s) => (
           <div
             key={s.key}
-            className={`${s.cls} transition-all duration-200`}
+            className={`${s.cls} transition-all duration-300`}
             style={{ width: `${Math.max(0, s.to - s.from)}%` }}
           />
         ))}
@@ -74,7 +74,7 @@ export function RiskBands({
         {segs.map((s) => (
           <li
             key={s.key}
-            className="rounded-md border border-border px-2 py-1.5"
+            className="rounded-lg border border-border/60 px-2 py-1.5"
           >
             <span className={`font-semibold ${s.txt}`}>{s.key}</span>
             <span className="block tabular-nums text-muted">
@@ -84,7 +84,7 @@ export function RiskBands({
         ))}
       </ul>
       {!valid && (
-        <p className="flex items-center gap-1.5 text-xs text-warning">
+        <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
           <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
           Thresholds should increase: Medium &lt; High &lt; Critical.
         </p>

@@ -8,7 +8,7 @@ const EXEC_TONE: Record<Execution['status'], BadgeTone> = { PENDING: 'neutral', 
 export function ApprovalsExecutions({ approvals, executions }: { approvals: Approval[]; executions: Execution[] }) {
   return (
     <>
-      <Card className="overflow-hidden" role="region" aria-labelledby="approvals-heading">
+      <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="approvals-heading">
         <CardHeader>
           <CardTitle id="approvals-heading">Approvals</CardTitle>
         </CardHeader>
@@ -33,7 +33,7 @@ export function ApprovalsExecutions({ approvals, executions }: { approvals: Appr
           )}
         </CardBody>
       </Card>
-      <Card className="overflow-hidden" role="region" aria-labelledby="executions-heading">
+      <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="executions-heading">
         <CardHeader>
           <CardTitle id="executions-heading">Executions</CardTitle>
         </CardHeader>

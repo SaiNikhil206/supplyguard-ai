@@ -76,7 +76,7 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
         description="Approvers must explain why a recommendation was rejected. The comment is stored in the audit trail."
         icon={<MessageSquareWarning aria-hidden="true" />}
       />
-      <div className="grid gap-5 rounded-lg border border-border bg-card p-5 sm:grid-cols-2">
+      <div className="grid gap-5 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm sm:grid-cols-2">
         <Field
           label="Auto-escalate after (hours)"
           error={errors["approval.auto_escalate_hours"]}

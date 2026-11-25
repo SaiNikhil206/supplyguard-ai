@@ -6,7 +6,7 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
   const currency = pos[0]?.value.currency ?? 'INR';
   const total = pos.reduce((a, p) => a + Number(p.value.amount), 0);
   return (
-    <Card className="overflow-hidden" role="region" aria-labelledby="pos-heading">
+    <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="pos-heading">
       <CardHeader>
         <CardTitle id="pos-heading">Affected purchase orders ({pos.length})</CardTitle>
         <span className="text-sm font-semibold tabular-nums"><Money amount={total.toFixed(2)} currency={currency} /></span>
@@ -47,11 +47,11 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
         </TBody>
         {pos.length > 0 && (
           <tfoot>
-            <tr className="border-t border-border bg-surface-2/50 font-semibold">
-              <th scope="row" colSpan={4} className="px-4 py-3 text-left text-sm">
+            <tr className="border-t-2 border-border bg-primary/5 font-semibold">
+              <th scope="row" colSpan={4} className="px-3 py-2 text-left text-sm">
                 Total exposure
               </th>
-              <td className="px-4 py-3 text-right text-sm" data-testid="total-exposure">
+              <td className="px-3 py-2 text-right text-sm" data-testid="total-exposure">
                 <Money amount={total.toFixed(2)} currency={currency} />
               </td>
               <td colSpan={2} />

@@ -1,22 +1,22 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, TriangleAlert } from 'lucide-react';
-import { AiChip, Alert, AlertDescription, AlertTitle, Button, EmptyState, ErrorState, Skeleton } from '@/components/ui';
+import { Alert, AlertDescription, AlertTitle, Button, EmptyState, ErrorState, Skeleton } from '@/components/ui';
 import { useRiskCase } from '@/api/queries';
 import { ComparisonChart } from './ComparisonChart';
 import { ComparisonTable } from './ComparisonTable';
 import { OptionCard } from './OptionCard';
 
-const panel = 'rounded-lg border border-border bg-card p-5';
+const panel = 'rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur';
 
 export function CaseRecommendations({ caseId }: { caseId: string }) {
   const q = useRiskCase(caseId);
   if (q.isPending)
     return (
       <div role="status" aria-label="Loading recommendations" className="space-y-4">
-        <Skeleton className="h-56 rounded-lg" />
+        <Skeleton className="h-56 rounded-2xl" />
         <div className="grid gap-4 lg:grid-cols-2">
-          <Skeleton className="h-80 rounded-lg" />
-          <Skeleton className="h-80 rounded-lg" />
+          <Skeleton className="h-80 rounded-2xl" />
+          <Skeleton className="h-80 rounded-2xl" />
         </div>
       </div>
     );
@@ -27,9 +27,9 @@ export function CaseRecommendations({ caseId }: { caseId: string }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold tracking-tight">{c.title}</h2>
+          <h2 className="text-lg font-semibold">{c.title}</h2>
           <p className="text-xs text-muted">
-            <span className="font-mono">{c.id}</span> · {c.supplier_name}
+            {c.id} · {c.supplier_name}
           </p>
         </div>
         <Button asChild>
@@ -52,11 +52,9 @@ export function CaseRecommendations({ caseId }: { caseId: string }) {
       ) : (
         <>
           <section aria-label="Compare options" className={panel}>
-            <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold">
-              Compare options <AiChip />
-            </h3>
+            <h3 className="mb-4 text-base font-semibold">Compare options</h3>
             <ComparisonChart recs={recs} />
-            <div className="mt-6 overflow-hidden rounded-md border border-border">
+            <div className="mt-6 overflow-hidden rounded-xl border border-border/60">
               <ComparisonTable recs={recs} />
             </div>
           </section>

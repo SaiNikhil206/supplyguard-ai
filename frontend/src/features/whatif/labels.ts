@@ -50,8 +50,9 @@ export const PRESETS: Preset[] = [
 ];
 
 export const SEVERITY_STYLE: Record<Severity, string> = {
-  LOW: "text-sev-low bg-sev-low/10 ring-sev-low/20",
-  MEDIUM: "text-sev-medium bg-sev-medium/10 ring-sev-medium/25",
-  HIGH: "text-sev-high bg-sev-high/10 ring-sev-high/20",
-  CRITICAL: "text-sev-critical bg-sev-critical/10 ring-sev-critical/20",
+  LOW: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 ring-emerald-500/20",
+  MEDIUM:
+    "text-amber-600 dark:text-amber-400 bg-amber-500/10 ring-amber-500/20",
+  HIGH: "text-orange-600 dark:text-orange-400 bg-orange-500/10 ring-orange-500/20",
+  CRITICAL: "text-rose-600 dark:text-rose-400 bg-rose-500/10 ring-rose-500/20",
 };

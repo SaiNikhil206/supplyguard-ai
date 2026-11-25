@@ -89,9 +89,9 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
       className="space-y-6"
     >
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
-        <div className="space-y-5 rounded-lg border border-border bg-card p-5">
+        <div className="space-y-5 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm">
           <div>
-            <h2 className="text-sm font-semibold">Score thresholds</h2>
+            <h2 className="text-base font-semibold">Score thresholds</h2>
             <p className="text-sm text-muted">
               A case scoring above a threshold moves into that band.
             </p>
@@ -141,7 +141,7 @@ export function ThresholdsForm({ settings }: { settings: TenantSettings }) {
             />
           </Field>
         </div>
-        <div className="self-start rounded-lg border border-border bg-card p-5">
+        <div className="self-start rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm">
           <RiskBands
             medium={num(form.medium)}
             high={num(form.high)}

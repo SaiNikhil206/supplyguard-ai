@@ -20,7 +20,7 @@ const ENTITY_LABEL: Record<AffectedEntityType, string> = {
 const ENTITY_ORDER: AffectedEntityType[] = ['PO', 'SUPPLIER', 'ITEM', 'SHIPMENT', 'LOCATION'];
 
 const chipCls =
-  'inline-flex items-center rounded-md border border-border bg-surface-2/60 px-2 py-0.5 font-mono text-xs text-foreground';
+  'inline-flex items-center rounded-md border border-violet-500/20 bg-violet-500/5 px-2 py-0.5 font-mono text-xs text-fg';
 
 function EntityRef({ id, link }: { id: string; link: boolean }) {
   return link ? (
@@ -34,12 +34,12 @@ function EntityRef({ id, link }: { id: string; link: boolean }) {
 
 function ScoreMeter({ score }: { score: number }) {
   const pct = Math.max(0, Math.min(100, score));
-  const color = pct >= 80 ? 'bg-sev-critical' : pct >= 60 ? 'bg-sev-high' : pct >= 35 ? 'bg-sev-medium' : 'bg-sev-low';
+  const R = 40;
+  const C = 2 * Math.PI * R;
+  const arc = C * 0.75; // 270 degree gauge
+  const color = pct >= 80 ? 'stroke-sev-critical' : pct >= 60 ? 'stroke-sev-high' : pct >= 35 ? 'stroke-sev-medium' : 'stroke-sev-low';
   return (
     <div className="flex items-center gap-3">
-      <span id="risk-score-label" className="text-xs font-medium uppercase tracking-wide text-muted">
-        Risk score
-      </span>
       <div
         role="meter"
         aria-labelledby="risk-score-label"
@@ -47,16 +47,29 @@ function ScoreMeter({ score }: { score: number }) {
         aria-valuemax={100}
         aria-valuenow={pct}
         aria-valuetext={`${pct} out of 100`}
-        className="flex items-center gap-2"
+        className="relative h-28 w-28 shrink-0"
       >
-        <div aria-hidden="true" className="h-1.5 w-28 overflow-hidden rounded-full bg-surface-2">
-          <div className={clsx('h-full rounded-full transition-[width] duration-200 ease-out', color)} style={{ width: `${pct}%` }} />
+        <svg viewBox="0 0 100 100" className="h-full w-full -rotate-[225deg]" aria-hidden="true">
+          <circle cx="50" cy="50" r={R} fill="none" strokeWidth="9" strokeLinecap="round" className="stroke-border" strokeDasharray={`${arc} ${C}`} />
+          <circle
+            cx="50"
+            cy="50"
+            r={R}
+            fill="none"
+            strokeWidth="9"
+            strokeLinecap="round"
+            className={clsx(color, 'transition-all duration-700 ease-out motion-reduce:transition-none')}
+            strokeDasharray={`${(arc * pct) / 100} ${C}`}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-semibold tabular-nums leading-none">{score}</span>
+          <span className="text-[10px] uppercase tracking-wide text-muted">/ 100</span>
         </div>
-        <span className="text-sm font-semibold tabular-nums">
-          {score}
-          <span className="font-normal text-muted"> / 100</span>
-        </span>
       </div>
+      <span id="risk-score-label" className="text-xs font-medium uppercase tracking-wide text-muted">
+        Risk score
+      </span>
     </div>
   );
 }
@@ -73,8 +86,8 @@ function Group({
   className?: string;
 }) {
   return (
-    <section aria-label={title} className={clsx('rounded-md border border-border bg-card p-4', className)}>
-      <h3 className="mb-3 text-sm font-semibold text-foreground">
+    <section aria-label={title} className={clsx('rounded-xl border border-border/60 bg-card/60 p-4', className)}>
+      <h3 className="mb-3 text-sm font-semibold text-fg">
         {title} <span className="font-normal text-muted">({count})</span>
       </h3>
       {children}
@@ -86,10 +99,10 @@ function EvidenceRow({ e }: { e: EvidenceRef }) {
   const missing = e.value === null;
   return (
     <tr className="border-t border-border align-top">
-      <td className="px-3 py-2">
-        <span className="inline-flex items-center gap-1.5"><Database aria-hidden="true" className="h-3.5 w-3.5 text-muted" /><Badge>{e.source}</Badge></span>
+      <td className="px-2 py-1.5">
+        <span className="inline-flex items-center gap-1.5"><Database aria-hidden="true" className="h-3.5 w-3.5 text-violet-500" /><Badge>{e.source}</Badge></span>
       </td>
-      <td className="px-3 py-2 font-mono text-xs">
+      <td className="px-2 py-1.5 font-mono text-xs">
         <EntityRef id={e.entity} link={e.entity.startsWith('SUP-')} />
         {(e.item_id || e.location_id) && (
           <div className="text-muted">
@@ -98,8 +111,8 @@ function EvidenceRow({ e }: { e: EvidenceRef }) {
           </div>
         )}
       </td>
-      <td className="px-3 py-2 font-mono text-xs">{e.field}</td>
-      <td className="px-3 py-2 font-mono text-xs">
+      <td className="px-2 py-1.5 font-mono text-xs">{e.field}</td>
+      <td className="px-2 py-1.5 font-mono text-xs">
         {missing ? (
           <span className="inline-flex items-center gap-1.5">
             <span className="italic text-danger">missing</span>
@@ -117,7 +130,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
   if (!analysis) {
     if (status === 'RECEIVED' || status === 'ANALYZING') {
       return (
-        <div className="flex items-center gap-3 rounded-md border border-dashed border-border bg-surface-2/50 p-4 text-sm text-muted">
+        <div className="flex items-center gap-3 rounded-xl border border-dashed border-violet-500/40 bg-violet-500/5 p-4 text-sm text-muted">
           <Spinner size="sm" label="Analysis in progress" />
           <span>AI analysis in progress…</span>
         </div>
@@ -134,7 +147,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-3 rounded-md border border-border bg-surface-2/40 p-4">
+      <div className="space-y-3 rounded-xl bg-gradient-to-br from-violet-500/10 via-transparent to-primary/5 p-4 ring-1 ring-violet-500/20">
         <div className="flex flex-wrap items-center gap-4">
           <SeverityBadge severity={a.risk_level} />
           <ScoreMeter score={a.risk_score} />
@@ -143,7 +156,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
             Confidence: {a.confidence}
           </Badge>
         </div>
-        <p className="text-sm text-foreground">{a.summary}</p>
+        <p className="text-sm text-fg">{a.summary}</p>
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
@@ -195,13 +208,13 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
           )}
         </Group>
 
-        <Group title="Missing data" count={a.missing_data.length} className="md:col-span-2">
+        <Group title="Missing data" count={a.missing_data.length} className="border-2 border-danger/40 bg-danger/5 md:col-span-2">
           {a.missing_data.length === 0 ? (
             <p className="text-sm text-muted">No data gaps reported</p>
           ) : (
-            <Alert variant="warning">
+            <Alert variant="destructive">
               <TriangleAlert aria-hidden="true" />
-              <p className="mb-2 text-sm font-semibold text-foreground">The AI did not have:</p>
+              <p className="mb-2 text-sm font-semibold text-danger">The AI did not have:</p>
               <ul className="space-y-2">
                 {a.missing_data.map((m, i) => (
                   <li key={i} className="flex flex-wrap items-start gap-2 text-sm">
@@ -216,7 +229,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
       </div>
 
       <section aria-label="Affected entities">
-        <h3 className="mb-2 text-sm font-semibold text-foreground">
+        <h3 className="mb-2 text-sm font-semibold text-fg">
           Affected entities <span className="font-normal text-muted">({a.affected_entities.length})</span>
         </h3>
         {byType.length === 0 ? (
@@ -240,20 +253,20 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
       </section>
 
       <section aria-label="Evidence">
-        <h3 className="mb-2 text-sm font-semibold text-foreground">
+        <h3 className="mb-2 text-sm font-semibold text-fg">
           Evidence <span className="font-normal text-muted">({a.evidence.length})</span>
         </h3>
         {a.evidence.length === 0 ? (
           none
         ) : (
-          <div className="overflow-x-auto rounded-md border border-border">
+          <div className="overflow-x-auto rounded-lg border border-border">
             <table className="w-full text-left text-sm">
-              <thead className="bg-surface-2/50 text-xs text-muted">
+              <thead className="bg-surface-2 text-xs text-muted">
                 <tr>
-                  <th scope="col" className="px-3 py-2 font-medium">Source</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Entity</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Field</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Value</th>
+                  <th scope="col" className="px-2 py-1.5 font-medium">Source</th>
+                  <th scope="col" className="px-2 py-1.5 font-medium">Entity</th>
+                  <th scope="col" className="px-2 py-1.5 font-medium">Field</th>
+                  <th scope="col" className="px-2 py-1.5 font-medium">Value</th>
                 </tr>
               </thead>
               <tbody>

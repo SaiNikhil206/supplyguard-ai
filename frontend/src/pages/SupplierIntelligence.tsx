@@ -80,11 +80,12 @@ export default function SupplierIntelligence() {
   return (
     <div className="space-y-6">
       <PageHeader
+        eyebrow="Suppliers"
         title="Supplier Intelligence"
         description="Risk, reliability and disruption exposure across your supplier base."
         actions={
           data && (
-            <p className="text-sm tabular-nums text-muted" aria-live="polite">
+            <p className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary" aria-live="polite">
               {data.count} {data.count === 1 ? 'supplier' : 'suppliers'}
             </p>
           )
@@ -93,12 +94,12 @@ export default function SupplierIntelligence() {
 
       <SummaryChips counts={counts} active={filters.risk_level} onSelect={(lvl) => update({ risk_level: lvl })} />
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 shadow-sm backdrop-blur">
         <form
           role="search"
           aria-label="Supplier filters"
           onSubmit={(e) => e.preventDefault()}
-          className="flex flex-wrap items-center gap-3 border-b border-border p-4"
+          className="flex flex-wrap items-center gap-3 border-b border-border/60 p-4"
         >
           <div className="relative min-w-[14rem] flex-1">
             <label htmlFor="supplier-search" className="sr-only">
@@ -115,7 +116,7 @@ export default function SupplierIntelligence() {
             />
           </div>
 
-          <div role="group" aria-label="Status" className="inline-flex rounded-md bg-surface-2 p-0.5">
+          <div role="group" aria-label="Status" className="inline-flex rounded-xl bg-foreground/5 p-1">
             {[{ value: undefined, label: 'All' }, ...STATUS_OPTIONS].map((o) => {
               const on = filters.status === o.value;
               return (
@@ -125,8 +126,8 @@ export default function SupplierIntelligence() {
                   aria-pressed={on}
                   onClick={() => update({ status: o.value })}
                   className={cn(
-                    'cursor-pointer rounded px-3 py-1 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-                    on ? 'bg-card text-foreground ring-1 ring-border' : 'text-muted hover:text-foreground',
+                    'rounded-lg px-3 py-1.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                    on ? 'bg-card text-foreground shadow-sm' : 'text-muted hover:text-foreground',
                   )}
                 >
                   {o.label}
@@ -185,7 +186,7 @@ export default function SupplierIntelligence() {
         )}
 
         {data && data.count > 0 && (
-          <nav aria-label="Pagination" className="flex items-center justify-between gap-2 border-t border-border px-4 py-3">
+          <nav aria-label="Pagination" className="flex items-center justify-between gap-2 border-t border-border/60 px-4 py-3">
             <span className="hidden text-xs text-muted sm:inline">
               Showing {from}–{to} of {data.count}
             </span>

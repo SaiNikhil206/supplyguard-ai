@@ -1,24 +1,20 @@
-import type { ReactNode } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Clock } from 'lucide-react';
 import type { RiskCaseListItem } from '@/api/types';
-import { Card, Money, SeverityBadge, StatusBadge, Table, TBody, TD, TH, THead, TR } from '@/components/ui';
+import { Money, SeverityBadge, StatusBadge, Table, TBody, TD, TH, THead, TR } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { EVENT_ICON, Monogram } from '../ui';
+import { EVENT_ICON, Monogram, SEV_META } from '../ui';
 import { eventTypeLabel, relativeTime } from './format';
 
 interface Props {
   items: RiskCaseListItem[];
   fresh: Set<string>;
   now: number;
-  /** Footer slot (pagination) rendered inside the card. */
-  footer?: ReactNode;
 }
 
-export function CaseTable({ items, fresh, now, footer }: Props) {
-  const navigate = useNavigate();
+export function CaseTable({ items, fresh, now }: Props) {
   return (
-    <Card className="overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur">
       <Table aria-label="Risk cases">
         <THead>
           <tr>
@@ -30,9 +26,6 @@ export function CaseTable({ items, fresh, now, footer }: Props) {
             <TH className="text-right">Affected POs</TH>
             <TH className="text-right">Exposure</TH>
             <TH>Created</TH>
-            <TH className="w-8">
-              <span className="sr-only">Open</span>
-            </TH>
           </tr>
         </THead>
         <TBody>
@@ -42,15 +35,17 @@ export function CaseTable({ items, fresh, now, footer }: Props) {
             return (
               <TR
                 key={c.id}
-                onClick={() => navigate(`/risk/${c.id}`)}
-                className={cn('group cursor-pointer', isNew && 'bg-primary/5 hover:bg-primary/10')}
+                className={cn(
+                  'h-16 animate-in fade-in-0 duration-300',
+                  isNew && 'slide-in-from-left-4 bg-primary/10 ring-2 ring-inset ring-primary',
+                )}
               >
-                <TD className="whitespace-nowrap">
-                  <Link
-                    to={`/risk/${c.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="font-mono text-xs font-medium text-primary hover:underline"
-                  >
+                <TD className="relative pl-6">
+                  <span
+                    aria-hidden="true"
+                    className={cn('absolute inset-y-2 left-0 w-1 rounded-r-full', SEV_META[c.severity].bar)}
+                  />
+                  <Link to={`/risk/${c.id}`} className="font-mono font-medium text-primary hover:underline">
                     {c.id}
                   </Link>
                   {isNew && (
@@ -66,8 +61,8 @@ export function CaseTable({ items, fresh, now, footer }: Props) {
                   </span>
                 </TD>
                 <TD>
-                  <span className="flex items-center gap-2 text-muted">
-                    <Icon aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+                  <span className="flex items-center gap-2">
+                    <Icon aria-hidden="true" className="h-4 w-4 text-muted" />
                     {eventTypeLabel(c.event_type)}
                   </span>
                 </TD>
@@ -81,23 +76,21 @@ export function CaseTable({ items, fresh, now, footer }: Props) {
                 <TD className="text-right font-medium tabular-nums">
                   <Money value={c.exposure} />
                 </TD>
-                <TD className="whitespace-nowrap text-xs text-muted">
-                  <time dateTime={c.created_at} title={new Date(c.created_at).toLocaleString()}>
+                <TD className="text-muted">
+                  <time
+                    dateTime={c.created_at}
+                    title={new Date(c.created_at).toLocaleString()}
+                    className="inline-flex items-center gap-1"
+                  >
+                    <Clock aria-hidden="true" className="h-3.5 w-3.5" />
                     {relativeTime(c.created_at, now)}
                   </time>
-                </TD>
-                <TD className="pl-0">
-                  <ChevronRight
-                    aria-hidden="true"
-                    className="h-4 w-4 text-muted opacity-0 transition-opacity duration-150 group-hover:opacity-100"
-                  />
                 </TD>
               </TR>
             );
           })}
         </TBody>
       </Table>
-      {footer}
-    </Card>
+    </div>
   );
 }

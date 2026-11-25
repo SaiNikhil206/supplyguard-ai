@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 export interface SectionTitleProps {
   title: string;
@@ -9,28 +9,20 @@ export interface SectionTitleProps {
   className?: string;
 }
 
-export function SectionTitle({
-  title,
-  description,
-  icon,
-  action,
-  className,
-}: SectionTitleProps) {
+export function SectionTitle({ title, description, icon, action, className }: SectionTitleProps) {
   return (
-    <div className={cn("flex items-center justify-between gap-3", className)}>
-      <div className="flex items-center gap-2">
+    <div className={cn('flex items-center justify-between gap-3', className)}>
+      <div className="flex items-center gap-2.5">
         {icon && (
           <span
             aria-hidden="true"
-            className="text-muted [&_svg]:h-4 [&_svg]:w-4 [&_svg]:stroke-[1.75]"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary [&_svg]:h-4 [&_svg]:w-4"
           >
             {icon}
           </span>
         )}
         <div>
-          <h2 className="text-sm font-semibold leading-tight text-foreground">
-            {title}
-          </h2>
+          <h2 className="text-sm font-semibold leading-tight text-foreground">{title}</h2>
           {description && <p className="text-xs text-muted">{description}</p>}
         </div>
       </div>

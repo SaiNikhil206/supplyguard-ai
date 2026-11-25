@@ -1,8 +1,10 @@
+import { OctagonAlert, TriangleAlert, CircleAlert, CircleCheck } from 'lucide-react';
 import { useRiskCases } from '@/api/queries';
 import type { Severity } from '@/api/types';
 import { SEV_META, StatCard } from '../ui';
 import { SEVERITIES } from './filterOptions';
 
+const ICON = { CRITICAL: OctagonAlert, HIGH: TriangleAlert, MEDIUM: CircleAlert, LOW: CircleCheck } as const;
 const ORDER: Severity[] = [...SEVERITIES].reverse();
 
 function Card({ sev, active, onToggle, pollMs }: { sev: Severity; active: boolean; onToggle: () => void; pollMs: number }) {
@@ -10,10 +12,11 @@ function Card({ sev, active, onToggle, pollMs }: { sev: Severity; active: boolea
   const m = SEV_META[sev];
   return (
     <StatCard
+      icon={ICON[sev]}
       label={m.label}
-      dot={m.bar}
       value={data ? data.count : '-'}
       hint={data ? (data.count === 1 ? '1 case' : `${data.count} cases`) : 'Loading'}
+      tone={`${m.tint} ${m.text}`}
       active={active}
       ariaLabel={m.label}
       onClick={onToggle}

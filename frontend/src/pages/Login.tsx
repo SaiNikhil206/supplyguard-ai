@@ -59,37 +59,47 @@ export default function Login() {
 
   return (
     <div className="grid min-h-screen bg-background text-foreground lg:grid-cols-2">
-      <aside className="relative hidden flex-col justify-between border-r border-border bg-card p-12 lg:flex">
-        <div className="flex items-center gap-2.5 text-sm font-semibold">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
-            <ShieldCheck aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+      <aside
+        className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 p-12 text-white lg:flex"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-indigo-500/30 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl"
+        />
+        <div className="relative flex items-center gap-2.5 text-lg font-semibold">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
+            <ShieldCheck aria-hidden="true" className="h-5 w-5" />
           </span>
           SupplyGuard AI
         </div>
-        <div className="max-w-md space-y-8">
-          <p className="text-3xl font-semibold leading-tight tracking-tight text-foreground">
+        <div className="relative max-w-md space-y-8">
+          <p className="text-3xl font-semibold leading-tight tracking-tight">
             Spot supplier disruptions before they stop your line.
           </p>
           <ul className="space-y-5">
             {VALUE_POINTS.map(({ icon: Icon, title, text }) => (
               <li key={title} className="flex gap-3">
-                <span className="mt-0.5 text-primary">
-                  <Icon aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white/10 ring-1 ring-white/15">
+                  <Icon aria-hidden="true" className="h-4 w-4" />
                 </span>
                 <div>
-                  <div className="text-sm font-semibold text-foreground">{title}</div>
-                  <div className="text-sm text-muted">{text}</div>
+                  <div className="text-sm font-semibold">{title}</div>
+                  <div className="text-sm text-indigo-100">{text}</div>
                 </div>
               </li>
             ))}
           </ul>
         </div>
-        <p className="text-xs text-muted">Boomi World 2027 Hackathon</p>
+        <p className="relative text-xs text-indigo-200">Boomi World 2027 Hackathon</p>
       </aside>
 
       <main className="flex items-center justify-center p-6">
-        <Card className="w-full max-w-sm">
-          <CardBody className="space-y-5 p-6">
+        <Card className="w-full max-w-sm shadow-lift">
+          <CardBody className="space-y-5 p-7">
             <div className="space-y-1.5">
               <h1 className="flex items-center gap-2 text-2xl font-semibold">
                 <ShieldCheck aria-hidden="true" className="h-6 w-6 text-primary lg:hidden" />
