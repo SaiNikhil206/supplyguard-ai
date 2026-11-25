@@ -9,7 +9,6 @@ import {
   YAxis,
 } from "recharts";
 import type { InventoryGapPoint } from "@/api/whatif";
-import { ChartTooltip } from "@/components/patterns/ChartTooltip";
 import { LegendChip } from "@/features/admin/ui/ChartCard";
 
 export function InventoryGapChart({ data }: { data: InventoryGapPoint[] }) {
@@ -63,8 +62,8 @@ export function InventoryGapChart({ data }: { data: InventoryGapPoint[] }) {
       <div aria-hidden="true">
         <div className="mb-2 flex flex-wrap gap-2 text-xs text-muted">
           <LegendChip color="hsl(var(--primary))" label="On hand" />
-          <LegendChip color="hsl(var(--muted-text))" label="Required" />
-          <LegendChip color="hsl(var(--danger))" label="Shortage" />
+          <LegendChip color="#f59e0b" label="Required" />
+          <LegendChip color="#f43f5e" label="Shortage" />
         </div>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -73,21 +72,29 @@ export function InventoryGapChart({ data }: { data: InventoryGapPoint[] }) {
               margin={{ top: 8, right: 8, bottom: 0, left: -12 }}
             >
               <CartesianGrid
+                strokeDasharray="3 3"
                 vertical={false}
-                stroke="hsl(var(--border))"
+                className="stroke-border/50"
               />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-text))" }}
+                tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
               />
               <YAxis
-                tick={{ fontSize: 12, fill: "hsl(var(--muted-text))" }}
+                tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
               />
-              <Tooltip content={<ChartTooltip />} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 12,
+                  border: "1px solid hsl(var(--border))",
+                  background: "hsl(var(--card))",
+                  fontSize: 12,
+                }}
+              />
               <Area
                 dataKey="base"
                 stackId="g"
@@ -99,27 +106,27 @@ export function InventoryGapChart({ data }: { data: InventoryGapPoint[] }) {
                 dataKey="gap"
                 stackId="g"
                 stroke="none"
-                fill="hsl(var(--danger))"
-                fillOpacity={0.1}
+                fill="#f43f5e"
+                fillOpacity={0.22}
                 name="Shortage"
-                isAnimationActive={false}
+                animationDuration={700}
               />
               <Line
                 dataKey="on_hand"
                 name="On hand"
                 stroke="hsl(var(--primary))"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 dot={false}
-                isAnimationActive={false}
+                animationDuration={700}
               />
               <Line
                 dataKey="required"
                 name="Required"
-                stroke="hsl(var(--muted-text))"
-                strokeWidth={1.5}
+                stroke="#f59e0b"
+                strokeWidth={2}
                 strokeDasharray="5 3"
                 dot={false}
-                isAnimationActive={false}
+                animationDuration={700}
               />
             </ComposedChart>
           </ResponsiveContainer>
