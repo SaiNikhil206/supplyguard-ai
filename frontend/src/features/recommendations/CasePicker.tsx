@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { EmptyState, ErrorState, Money, SeverityBadge, Skeleton } from '@/components/ui';
 import { useRiskCases } from '@/api/queries';
-import { Monogram, SEV_META } from '@/features/risk/ui';
-import { cn } from '@/lib/utils';
+import { Monogram } from '@/features/risk/ui';
 
 const PICKABLE = ['RECOMMENDATION_READY', 'PENDING_APPROVAL'];
 
@@ -33,7 +32,6 @@ export function CasePicker() {
         {cases.map((c) => (
           <li key={c.id}>
             <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur transition hover:shadow-md">
-              <span aria-hidden="true" className={cn('absolute inset-y-0 left-0 w-1', SEV_META[c.severity].bar)} />
               <div className="flex min-w-0 items-center gap-3">
                 <Monogram name={c.supplier_name ?? c.supplier_id} className="h-10 w-10" />
                 <div className="min-w-0">
