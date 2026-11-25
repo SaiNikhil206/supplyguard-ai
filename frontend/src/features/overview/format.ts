@@ -20,14 +20,6 @@ export function trendDelta(t: TrendPoint[] | undefined): { pct: number; up: bool
   return { pct: Math.abs(Math.round(pct)), up: pct >= 0 };
 }
 
-/** Sparkline series for a tile without its own history: the shape of `shape`, scaled to end at `end`. */
-export function derivedSeries(shape: TrendPoint[] | undefined, end: number): number[] | undefined {
-  if (!shape || shape.length < 2) return undefined;
-  const max = Math.max(...shape.map((p) => p.value)) || 1;
-  const min = Math.min(...shape.map((p) => p.value));
-  return shape.map((p) => end * (0.82 + (0.18 * (p.value - min)) / (max - min || 1)));
-}
-
 export function greeting(d = new Date()): string {
   const h = d.getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';

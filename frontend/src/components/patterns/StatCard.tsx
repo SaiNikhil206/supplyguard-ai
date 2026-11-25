@@ -1,5 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { Area, AreaChart, ResponsiveContainer } from 'recharts';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Spinner';
@@ -60,8 +59,6 @@ export interface StatCardProps {
   tone?: StatTone;
   delta?: StatDelta;
   hint?: string;
-  /** Numeric series for the gradient sparkline. */
-  trend?: number[];
   loading?: boolean;
   className?: string;
 }
@@ -72,8 +69,7 @@ const chip = {
   neutral: 'bg-foreground/5 text-muted ring-border',
 } as const;
 
-export function StatCard({ label, value, icon, tone = 'primary', delta, hint, trend, loading, className }: StatCardProps) {
-  const gid = `sg${useId().replace(/:/g, '')}`;
+export function StatCard({ label, value, icon, tone = 'primary', delta, hint, loading, className }: StatCardProps) {
   const t = TONE[tone];
   return (
     <div
@@ -97,7 +93,6 @@ export function StatCard({ label, value, icon, tone = 'primary', delta, hint, tr
       {loading ? (
         <div data-testid="kpi-skeleton" className="mt-3 space-y-2">
           <Skeleton className="h-8 w-24" />
-          <Skeleton className="h-10 w-full" />
         </div>
       ) : (
         <>
@@ -123,28 +118,6 @@ export function StatCard({ label, value, icon, tone = 'primary', delta, hint, tr
                 </span>
               )}
               {hint && <span className="text-xs text-muted">{hint}</span>}
-            </div>
-          )}
-          {trend && trend.length > 1 && (
-            <div aria-hidden="true" className="mt-3 h-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trend.map((v, i) => ({ i, v }))} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={t.stroke} stopOpacity={0.35} />
-                      <stop offset="100%" stopColor={t.stroke} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <Area
-                    type="monotone"
-                    dataKey="v"
-                    stroke={t.stroke}
-                    strokeWidth={2}
-                    fill={`url(#${gid})`}
-                    isAnimationActive={false}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
             </div>
           )}
         </>
