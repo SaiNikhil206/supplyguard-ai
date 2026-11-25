@@ -9,19 +9,18 @@ import {
 } from "lucide-react";
 import {
   Button,
-  ErrorState,
   Field,
   Input,
   Select,
   Skeleton,
 } from "@/components/ui";
+import { AdminError } from "@/features/admin/ui/AdminError";
 import { PageHeader } from "@/features/admin/ui/PageHeader";
-import { AUDIT_ENTITY_TYPES, useAudit } from "@/api/admin/audit";
+import { AUDIT_ACTIONS, AUDIT_ENTITY_TYPES, useAudit } from "@/api/admin/audit";
 import { AuditTable } from "@/features/admin/audit/AuditTable";
 import { TraceView } from "@/features/admin/audit/TraceView";
-import { AUDIT_ACTIONS } from "@/features/admin/audit/stages";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 25; // fixed by the backend (PageNumberPagination, no page_size param)
 
 export default function AuditCenter() {
   const [params, setParams] = useSearchParams();
@@ -49,7 +48,6 @@ export default function AuditCenter() {
     to: get("to"),
     correlation_id: correlationId,
     page,
-    page_size: PAGE_SIZE,
   });
 
   const openTrace = (id: string) => {
@@ -172,12 +170,7 @@ export default function AuditCenter() {
               ))}
             </div>
           )}
-          {q.isError && (
-            <ErrorState
-              message={q.error.message}
-              onRetry={() => void q.refetch()}
-            />
-          )}
+          {q.isError && <AdminError error={q.error} refetch={q.refetch} />}
           {q.data && q.data.results.length === 0 && (
             <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
               <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -225,3 +218,7 @@ export default function AuditCenter() {
     </section>
   );
 }
+
+const AUDIT_FORBIDDEN =
+  "The audit log is available to Admin and Procurement Manager roles.";
+export { AUDIT_FORBIDDEN };

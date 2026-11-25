@@ -9,8 +9,9 @@ import {
   UserCheck,
   Zap,
 } from "lucide-react";
-import { ErrorState, Button, Skeleton } from "@/components/ui";
-import { useAudit, type AuditEvent } from "@/api/admin/audit";
+import { AdminError } from "../ui/AdminError";
+import { Button, Skeleton } from "@/components/ui";
+import { useAuditTrace, type AuditEvent } from "@/api/admin/audit";
 import { cn } from "@/lib/utils";
 import { formatGap, formatTime, groupByStage, type Stage } from "./stages";
 import { ActorCell, CopyId, EntityCell, StateChange } from "./AuditTable";
@@ -41,7 +42,7 @@ export function TraceView({
   correlationId: string;
   onBack: () => void;
 }) {
-  const q = useAudit({ correlation_id: correlationId, page_size: 100 });
+  const q = useAuditTrace(correlationId);
 
   return (
     <section aria-label="Correlation trace" className="space-y-4">
@@ -62,13 +63,8 @@ export function TraceView({
           ))}
         </div>
       )}
-      {q.isError && (
-        <ErrorState
-          message={q.error.message}
-          onRetry={() => void q.refetch()}
-        />
-      )}
-      {q.data && q.data.results.length === 0 && (
+      {q.isError && <AdminError error={q.error} refetch={q.refetch} />}
+      {q.data && q.data.length === 0 && (
         <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 px-6 py-12 text-center">
           <ScanSearch className="h-8 w-8 text-muted" aria-hidden="true" />
           <p className="text-sm text-muted">
@@ -76,8 +72,8 @@ export function TraceView({
           </p>
         </div>
       )}
-      {q.data && q.data.results.length > 0 && (
-        <Stages events={q.data.results} />
+      {q.data && q.data.length > 0 && (
+        <Stages events={q.data} />
       )}
     </section>
   );

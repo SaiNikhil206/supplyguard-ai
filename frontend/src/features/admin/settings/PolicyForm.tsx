@@ -7,12 +7,11 @@ import { SaveBar } from "../ui/SaveBar";
 import { Switch } from "../ui/Switch";
 import { fieldErrors, useSaveSettings } from "./hooks";
 
-/** PROVISIONAL: approval settings and polling_seconds are not in docs/CONTRACTS.md yet. */
-export function ApprovalForm({ settings }: { settings: TenantSettings }) {
+/** Recovery policy: the two non-threshold tenant settings the backend supports. */
+export function PolicyForm({ settings }: { settings: TenantSettings }) {
   const initial = {
-    comment: settings.approval.require_comment_on_reject,
-    hours: String(settings.approval.auto_escalate_hours),
-    polling: String(settings.polling_seconds),
+    qualified: settings.require_qualified_alternates,
+    pct: String(settings.max_cost_increase_pct),
   };
   const [form, setForm] = useState(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -21,9 +20,7 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
   const save = useSaveSettings();
 
   const dirty =
-    form.comment !== initial.comment ||
-    form.hours !== initial.hours ||
-    form.polling !== initial.polling;
+    form.qualified !== initial.qualified || form.pct !== initial.pct;
   const change = (patch: Partial<typeof initial>) => {
     setForm((f) => ({ ...f, ...patch }));
     setSaved(false);
@@ -36,16 +33,13 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
     setSaved(false);
     save.mutate(
       {
-        approval: {
-          require_comment_on_reject: form.comment,
-          auto_escalate_hours: Number(form.hours),
-        },
-        polling_seconds: Number(form.polling),
+        require_qualified_alternates: form.qualified,
+        max_cost_increase_pct: form.pct.trim() === "" ? NaN : Number(form.pct),
       },
       {
         onSuccess: () => {
           setSaved(true);
-          toast.success("Approval settings updated");
+          toast.success("Policy updated");
         },
         onError: (err) => {
           if (err instanceof ApiError && err.code === "VALIDATION_ERROR") {
@@ -67,41 +61,30 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
       onSubmit={onSubmit}
       noValidate
       className="max-w-2xl space-y-5"
-      aria-label="Approval settings"
+      aria-label="Recovery policy"
     >
       <Switch
-        checked={form.comment}
-        onChange={(v) => change({ comment: v })}
-        label="Require a comment when rejecting"
-        description="Approvers must explain why a recommendation was rejected. The comment is stored in the audit trail."
+        checked={form.qualified}
+        onChange={(v) => change({ qualified: v })}
+        label="Require qualified alternate suppliers"
+        description="Recommendations may only propose alternates that are already qualified."
         icon={<MessageSquareWarning aria-hidden="true" />}
       />
-      <div className="grid gap-5 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm sm:grid-cols-2">
+      <div className="grid gap-5 rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm">
         <Field
-          label="Auto-escalate after (hours)"
-          error={errors["approval.auto_escalate_hours"]}
-          hint="Pending approvals escalate to the next role."
+          label="Max cost increase (%)"
+          error={errors["max_cost_increase_pct"]}
+          hint="Recovery options costing more than this over the current order are flagged. 0 to 1000."
         >
           <Input
             type="number"
-            value={form.hours}
-            onChange={(e) => change({ hours: e.target.value })}
+            value={form.pct}
+            onChange={(e) => change({ pct: e.target.value })}
           />
         </Field>
-        <Field
-          label="Polling interval (seconds)"
-          error={errors["polling_seconds"]}
-          hint="How often screens refresh live data."
-        >
-          <Input
-            type="number"
-            value={form.polling}
-            onChange={(e) => change({ polling: e.target.value })}
-          />
-        </Field>
-        <p className="flex items-center gap-1.5 text-xs text-muted sm:col-span-2">
-          <Timer className="h-3.5 w-3.5" aria-hidden="true" /> Changes apply to
-          new approvals and refreshes only.
+        <p className="flex items-center gap-1.5 text-xs text-muted">
+          <Timer className="h-3.5 w-3.5" aria-hidden="true" /> Applies to new
+          analyses only. Approval rules are fixed by role (see CONTRACTS).
         </p>
       </div>
       {formError && (
@@ -117,7 +100,7 @@ export function ApprovalForm({ settings }: { settings: TenantSettings }) {
       <SaveBar
         dirty={dirty}
         saving={save.isPending}
-        label="Save approval settings"
+        label="Save policy"
         onDiscard={() => {
           setForm(initial);
           setErrors({});
