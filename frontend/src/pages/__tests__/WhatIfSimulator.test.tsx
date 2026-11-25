@@ -13,9 +13,10 @@ vi.mock("recharts", () => {
   );
   return {
     ResponsiveContainer: Stub,
-    ComposedChart: Stub,
-    Area: () => null,
-    Line: () => null,
+    BarChart: Stub,
+    Bar: Stub,
+    Cell: () => null,
+    ReferenceLine: () => null,
     XAxis: () => null,
     YAxis: () => null,
     CartesianGrid: () => null,
@@ -45,27 +46,21 @@ describe("What-if Simulator", () => {
     await clickPreset();
     expect(await screen.findByText("Estimated exposure")).toBeInTheDocument();
     expect(screen.getAllByRole("table")).toHaveLength(2);
-    expect(screen.getByText("Best option")).toBeInTheDocument();
+    expect(screen.getByText("Best option (estimate)")).toBeInTheDocument();
     expect(screen.getByText(/Computed in \d+ ms/)).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Supplier" })).toHaveValue(
       "SUP-1001",
     );
     expect(screen.getByRole("slider")).toHaveValue("7");
-    expect(
-      screen
-        .getByText(/Inventory falls below requirement on \d{4}-\d{2}-\d{2}/)
-        .closest(".sr-only"),
-    ).not.toBeNull();
-    const gapTable = screen.getByRole("table", { name: /inventory gap data/i });
-    expect(within(gapTable).getAllByRole("row").length).toBeGreaterThan(2);
-    expect(
-      screen.getByText(
-        /Largest shortfall: \d+ units on \d{4}-\d{2}-\d{2}\. Range: \d{4}-\d{2}-\d{2} to \d{4}-\d{2}-\d{2}/,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Simulation only/)).toBeInTheDocument();
+    const covTable = screen.getByRole("table", {
+      name: /inventory coverage data/i,
+    });
+    expect(within(covTable).getAllByRole("row").length).toBeGreaterThan(1);
+    expect(within(covTable).getByText("Unknown")).toBeInTheDocument();
   });
 
-  it("runs other preset chips with their own event, duration and severity", async () => {
+  it("runs other preset chips with their own event and duration", async () => {
     await openPage();
     await screen.findByRole("option", { name: /Bharat Steelworks/ });
     await userEvent.click(
@@ -74,7 +69,7 @@ describe("What-if Simulator", () => {
     expect(await screen.findByText("Estimated exposure")).toBeInTheDocument();
     expect(screen.getByRole("slider")).toHaveValue("5");
     expect(screen.getByRole("radio", { name: "Quality hold" })).toBeChecked();
-    expect(screen.getByRole("radio", { name: "High" })).toBeChecked();
+    expect(screen.queryByRole("radiogroup", { name: "Severity" })).toBeNull();
     expect(screen.getByRole("combobox", { name: "Supplier" })).toHaveValue(
       "SUP-1001",
     );
@@ -169,7 +164,27 @@ describe("What-if Simulator", () => {
     ).toBeInTheDocument();
   });
 
-  it('shows "No viable option" when best_option is null', async () => {
+  it("sends only the fields the backend accepts (no severity)", async () => {
+    let sent: Record<string, unknown> = {};
+    server.use(
+      http.post("*/api/v1/what-if", async ({ request }) => {
+        sent = (await request.json()) as Record<string, unknown>;
+        return HttpResponse.json(
+          computeWhatIf(sent as unknown as Parameters<typeof computeWhatIf>[0]),
+        );
+      }),
+    );
+    await openPage();
+    await clickPreset();
+    await screen.findByText("Estimated exposure");
+    expect(Object.keys(sent).sort()).toEqual([
+      "duration_days",
+      "event_type",
+      "supplier_id",
+    ]);
+  });
+
+  it('shows "No viable option" when best_option_estimate is null', async () => {
     const base = computeWhatIf({
       supplier_id: "SUP-1001",
       event_type: "FACTORY_OUTAGE",
@@ -177,7 +192,7 @@ describe("What-if Simulator", () => {
     })!;
     server.use(
       http.post("*/api/v1/what-if", () =>
-        HttpResponse.json({ ...base, best_option: null }),
+        HttpResponse.json({ ...base, best_option_estimate: null }),
       ),
     );
     await openPage();
@@ -204,5 +219,6 @@ describe("What-if Simulator", () => {
     expect(
       document.querySelectorAll('[data-evidence="MISSING_DATA"]').length,
     ).toBeGreaterThan(0);
+    expect(screen.getByText(/daily_demand missing for/)).toBeInTheDocument();
   });
 });

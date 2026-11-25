@@ -1,16 +1,14 @@
 import { http, HttpResponse, delay, type HttpHandler } from 'msw';
-import type { AffectedPO, ErrorCode } from '@/api/types';
-import type { WhatIfBestOption, WhatIfRequest, WhatIfResult } from '@/api/whatif';
+import type { ErrorCode, Severity } from '@/api/types';
+import type {
+  WhatIfAffectedPO,
+  WhatIfCoverageRow,
+  WhatIfInventoryItem,
+  WhatIfItemOption,
+  WhatIfRequest,
+  WhatIfResponse,
+} from '@/api/whatif';
 import { suppliers } from './fixtures';
-
-const RISK_FACTOR = { LOW: 1, MEDIUM: 1.3, HIGH: 1.6, CRITICAL: 2 } as const;
-const EVENT_FACTOR = {
-  FACTORY_OUTAGE: 1.5,
-  SHIPMENT_DELAY: 1,
-  QUALITY_HOLD: 1.2,
-  CAPACITY_REDUCTION: 0.8,
-  LOGISTICS_DISRUPTION: 1.1,
-} as const;
 
 function err(status: number, code: ErrorCode, message: string, request: Request) {
   const cid = request.headers.get('X-Correlation-ID') ?? crypto.randomUUID();
@@ -34,57 +32,136 @@ function roleOf(request: Request): string | null {
 
 const addDays = (base: Date, n: number) => new Date(base.getTime() + n * 86_400_000).toISOString().slice(0, 10);
 
-/** Deterministic estimate: same input -> same output; scales with duration. */
-export function computeWhatIf(req: WhatIfRequest): WhatIfResult | null {
+const severityFor = (days: number): Severity => (days <= 3 ? 'MEDIUM' : days <= 14 ? 'HIGH' : 'CRITICAL');
+
+/**
+ * Deterministic estimate in the REAL backend shape (apps/intelligence/whatif.py): same input -> same output,
+ * scales with duration. Includes one unknown-cover row and a data gap so the "missing data" UI is exercised.
+ */
+export function computeWhatIf(req: WhatIfRequest): WhatIfResponse | null {
   const s = suppliers.find((x) => x.id === req.supplier_id);
   if (!s) return null;
-  const factor = RISK_FACTOR[req.severity ?? s.risk_level] * EVENT_FACTOR[req.event_type];
   const d = req.duration_days;
-  const poCount = Math.min(s.open_po_count, Math.max(0, Math.ceil((d / 30) * s.open_po_count * factor)));
-  const base = new Date('2026-12-01T00:00:00Z');
+  const poCount = Math.min(s.open_po_count, Math.max(0, Math.ceil(d / 4)));
+  const base = new Date('2026-12-02T10:15:00Z');
+  const start = base.toISOString().replace('.000Z', 'Z');
+  const end = new Date(base.getTime() + d * 86_400_000).toISOString().replace('.000Z', 'Z');
 
-  const affected_pos: AffectedPO[] = Array.from({ length: poCount }, (_, i) => ({
-    po_id: `PO-${s.id.slice(-3)}${String(i + 1).padStart(2, '0')}`,
-    item_id: `ITM-${100 + i}`,
-    item_name: `${s.category} component ${i + 1}`,
-    qty: 200 + i * 50,
-    value: { amount: String((200 + i * 50) * 1500), currency: 'INR' },
-    due_date: addDays(base, 3 + i * 2),
-    days_late_estimate: Math.max(0, Math.round(d * factor) - i),
-    stock_cover_days: Math.max(0, 10 - i - Math.round(d / 3)),
+  const affected_pos: WhatIfAffectedPO[] = Array.from({ length: poCount }, (_, i) => {
+    const qty = 200 + i * 50;
+    return {
+      po_id: `PO-${s.id.slice(-3)}${String(i + 1).padStart(2, '0')}`,
+      item_id: `ITM-${100 + (i % 2)}`,
+      line_nos: [i + 1],
+      due_date: addDays(base, 3 + i * 2),
+      affected_qty: qty,
+      estimated_delay_days: Math.max(1, d - i),
+      exposure_amount: { amount: (qty * 1500).toFixed(2), currency: 'INR' },
+      inventory_coverage_days: i % 2 === 0 ? Math.max(0, 10 - d / 2) : null,
+      shortage: i % 2 === 0 ? 10 - d / 2 < d : false,
+    };
+  });
+  const total = affected_pos.reduce((a, p) => a + Number(p.exposure_amount.amount), 0);
+  const itemIds = [...new Set(affected_pos.map((p) => p.item_id))];
+
+  const items: WhatIfInventoryItem[] = itemIds.map((item_id, i) => ({
+    item_id,
+    affected_qty: affected_pos.filter((p) => p.item_id === item_id).reduce((a, p) => a + p.affected_qty, 0),
+    min_coverage_days: i === 0 ? Math.max(0, 10 - d / 2) : null,
+    shortage: i === 0 ? 10 - d / 2 < d : false,
+    shortage_gap_ratio: i === 0 ? 0.5 : null,
+    mitigation_level: 0.5,
+    candidate_alternate_supplier_ids: ['SUP-2001'],
   }));
-  const total = affected_pos.reduce((a, p) => a + Number(p.value.amount), 0);
+  const coverage: WhatIfCoverageRow[] = itemIds.flatMap((item_id, i) => [
+    {
+      item_id,
+      location_id: 'LOC-MAIN',
+      on_hand: 1000,
+      reserved: 100,
+      safety_stock: 100,
+      daily_demand: i === 0 ? 80 : null,
+      available_qty: 800,
+      coverage_days: i === 0 ? Math.max(0, 10 - d / 2) : null,
+      coverage_days_gross: i === 0 ? 11 : null,
+      transfer_surplus_qty: i === 0 ? 0 : null,
+    },
+  ]);
 
-  const inventory_gap = Array.from({ length: Math.min(14, d + 5) }, (_, day) => ({
-    date: addDays(base, day),
-    on_hand: Math.max(0, Math.round(1000 - day * (60 + 20 * factor))),
-    required: Math.round(400 + day * 25),
-  }));
-
-  const best_option: WhatIfBestOption | null =
-    poCount === 0
-      ? null
+  const options: WhatIfItemOption[] = items.map((it, i) =>
+    i === 0
+      ? {
+          item_id: it.item_id,
+          affected_qty: it.affected_qty,
+          status: 'RECOMMENDED',
+          recommended: {
+            option_type: 'ALTERNATE_SUPPLIER',
+            supplier_id: 'SUP-2001',
+            qty: it.affected_qty,
+            unit_price: { amount: '1600.00', currency: 'INR' },
+            capacity_known: false,
+            lead_time_days: 9,
+            estimated_cost_delta: { amount: String(Math.round(total * 0.08)) + '.00', currency: 'INR' },
+          },
+          data_gap: null,
+          note: null,
+        }
       : {
-          option_type: d > 14 ? 'ALTERNATE_SUPPLIER' : 'REVISED_SCHEDULE',
-          summary:
-            d > 14
-              ? `Source ${poCount} PO(s) from an alternate supplier.`
-              : `Re-schedule ${poCount} PO(s) by about ${d} days.`,
-          estimated_lead_time_days: d > 14 ? 9 : d,
-          estimated_cost_delta: d > 14 ? { amount: String(Math.round(total * 0.08)), currency: 'INR' } : null,
-        };
+          item_id: it.item_id,
+          affected_qty: it.affected_qty,
+          status: 'NO_OPTION',
+          recommended: null,
+          data_gap: null,
+          note: 'No qualified alternate with enough capacity and no transferable stock.',
+        },
+  );
+
+  const gaps = [
+    ...(poCount === 0 ? ['no open purchase order line falls inside the simulated outage window'] : []),
+    ...(poCount > 0 ? ['daily_demand missing for ITM-101 at LOC-MAIN', 'capacity unknown for recommended alternate SUP-2001 (ITM-100)'] : []),
+  ];
 
   return {
+    estimate: true,
+    disclaimer:
+      'Simulation only: every figure below is an estimate computed on a fresh ERP snapshot. Nothing was saved or changed in the ERP.',
+    labels: { affected_pos: 'ESTIMATE', inventory: 'ESTIMATE', exposure: 'ESTIMATE', risk: 'ESTIMATE', best_option_estimate: 'ESTIMATE' },
+    scenario: {
+      supplier_id: s.id,
+      supplier_name: s.name,
+      event_type: req.event_type,
+      severity: severityFor(d),
+      duration_days: d,
+      duration_hours: d * 24,
+      start,
+      end,
+      risk_case_id: null,
+      source: 'REQUEST',
+    },
     affected_pos,
-    inventory_gap,
-    exposure: { amount: String(total), currency: 'INR' },
-    best_option,
+    inventory: { gaps: items.filter((i) => i.shortage), items, coverage },
+    exposure: { amount: total.toFixed(2), currency: 'INR' },
+    estimated_delay_days: poCount ? d : 0,
+    shortage: items.some((i) => i.shortage),
+    risk: { score: Math.min(100, 20 + d * 3), level: severityFor(d), components: {} },
+    best_option_estimate:
+      poCount === 0
+        ? null
+        : {
+            is_estimate: true,
+            rule: 'Per item: stock transfer if a location has surplus above the outage need, else the cheapest qualified alternate whose capacity is enough or unknown.',
+            items: options,
+            uncovered_item_ids: options.filter((o) => o.status === 'NO_OPTION').map((o) => o.item_id),
+            total_estimated_cost_delta: { amount: String(Math.round(total * 0.08)) + '.00', currency: 'INR' },
+            cost_delta_complete: true,
+            max_lead_time_days: 9,
+          },
     assumptions: [
-      `Outage lasts ${d} day(s) with no partial shipments.`,
-      'Demand follows the trailing 30-day run rate.',
+      'Every figure is an ESTIMATE from a simulated disruption, not a real event.',
+      `The supplier is fully unable to deliver for ${d} days from ${start}; event type ${req.event_type} does not change the maths.`,
+      'Nothing was written to the ERP or saved as a risk case.',
     ],
-    missing_data: best_option && d > 14 ? [] : ['Alternate supplier quotes are not available.'],
-    computed_ms: 120 + d * 4,
+    data_gaps: gaps,
   };
 }
 
