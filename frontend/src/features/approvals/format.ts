@@ -24,6 +24,10 @@ export const NOT_APPROVABLE = 'This option cannot be approved because the data d
 
 /** Reason an option cannot be approved, or null. Mirrors the backend BUSINESS_RULE check (PROVISIONAL). */
 export function unsupportedReason(rec: Recommendation): string | null {
+  if (rec.unsupported) {
+    const why = rec.unsupported_reasons?.[0]?.message ?? rec.data_gaps[0];
+    return why ? `${NOT_APPROVABLE}: ${why}` : `${NOT_APPROVABLE}.`;
+  }
   if (rec.estimated_lead_time_days === null || rec.estimated_cost_delta === null) {
     return rec.data_gaps[0] ? `${NOT_APPROVABLE}: ${rec.data_gaps[0]}` : `${NOT_APPROVABLE}.`;
   }

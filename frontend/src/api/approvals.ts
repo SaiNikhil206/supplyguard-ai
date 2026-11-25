@@ -1,5 +1,5 @@
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from './client';
+import { ApiError, apiFetch } from './client';
 import { getRiskCase, listRiskCases } from './endpoints';
 import { queryKeys } from './queries';
 import type {
@@ -16,11 +16,20 @@ export const PENDING_STATUSES: RiskCaseState[] = ['PENDING_APPROVAL', 'RECOMMEND
 /** How often the execution panel refetches while an execution is RUNNING. */
 export const EXECUTION_POLL_MS = import.meta.env.MODE === 'test' ? 100 : 2000;
 
-/** PROVISIONAL: CONTRACTS section 4 only gives the request body. */
+/** Real 201 body of POST /recommendations/{id}/decision (backend/apps/workflow DecisionResponseSerializer). FLAT. */
 export interface DecisionResult {
-  approval: Approval;
-  execution: Execution | null;
-  risk_case_status: RiskCaseState;
+  approval_id: string;
+  recommendation_id: string;
+  decision: ApprovalDecision;
+  recommendation_status: string;
+  risk_case_id: string;
+  case_status: RiskCaseState;
+  analysis_round?: number;
+  /** null unless the decision was APPROVE. */
+  execution_id: string | null;
+  decided_by: string;
+  decided_at: string;
+  correlation_id: string;
 }
 
 export interface DecisionRequest {
@@ -34,8 +43,23 @@ export const submitDecision = (recommendationId: string, body: DecisionRequest) 
     body: JSON.stringify(body),
   });
 
-export const retryExecution = (executionId: string) =>
-  apiFetch<Execution>(`/executions/${encodeURIComponent(executionId)}/retry`, { method: 'POST' });
+export const RETRY_UNAVAILABLE =
+  'Retry is not available yet: the server has no retry endpoint. Ask an administrator to re-run the execution.';
+
+/**
+ * BACKEND GAP: workflow.services.retry_execution exists but no route `POST /executions/{id}/retry` is exposed.
+ * A 404/405 becomes a clear message instead of a crash.
+ */
+export async function retryExecution(executionId: string): Promise<Execution> {
+  try {
+    return await apiFetch<Execution>(`/executions/${encodeURIComponent(executionId)}/retry`, { method: 'POST' });
+  } catch (e) {
+    if (e instanceof ApiError && (e.status === 404 || e.status === 405)) {
+      throw new ApiError({ code: e.code, status: e.status, message: RETRY_UNAVAILABLE, details: e.details, correlationId: e.correlationId });
+    }
+    throw e;
+  }
+}
 
 export const isPending = (c: Pick<RiskCaseDetail, 'status'>) => PENDING_STATUSES.includes(c.status);
 
