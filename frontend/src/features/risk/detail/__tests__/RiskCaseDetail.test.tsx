@@ -43,6 +43,12 @@ describe('Risk case detail /risk/:id', () => {
     expect(link).toHaveAttribute('href', '/suppliers/SUP-1008');
   });
 
+  it('shows data quality flags', async () => {
+    renderWithProviders({ path: '/risk/RC-000045' });
+    const note = await screen.findByRole('note', { name: 'Data quality flags' });
+    expect(note).toHaveTextContent('Inventory record missing for ITM-503');
+  });
+
   it('shows the timeline oldest to newest with the current entry highlighted', async () => {
     const reversed = { ...riskCaseDetail45, timeline: [...riskCaseDetail45.timeline].reverse() };
     server.use(http.get(URL, () => HttpResponse.json(reversed)));
@@ -50,7 +56,7 @@ describe('Risk case detail /risk/:id', () => {
     const region = await screen.findByRole('region', { name: 'Status timeline' });
     const items = within(within(region).getByRole('list', { name: 'Timeline' })).getAllByRole('listitem');
     expect(items).toHaveLength(5);
-    expect(items[0]).toHaveTextContent('event received');
+    expect(items[0]).toHaveTextContent('Event received');
     expect(items[4]).toHaveTextContent('RECOMMENDATION_READY -> PENDING_APPROVAL');
     expect(items[4]).toHaveAttribute('data-current', 'true');
     expect(items[0]).not.toHaveAttribute('data-current');

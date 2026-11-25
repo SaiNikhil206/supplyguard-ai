@@ -28,6 +28,26 @@ export function formatDuration(hours: number | null): string {
   return `${hours} hours`;
 }
 
+const ACTION_LABELS: Record<string, string> = {
+  'event.received': 'Event received',
+  'event.duplicate': 'Duplicate event ignored',
+  'event.flagged_data_correction': 'Flagged for data correction',
+  'event.publish_failed': 'Event publish failed',
+  'risk_case.created': 'Case created',
+  'risk_case.status_changed': 'Status changed',
+  'analysis.rejected': 'AI analysis rejected',
+  'analysis.request_failed': 'AI analysis request failed',
+  'analysis.request_stubbed': 'AI analysis requested',
+  'recommendation.decided': 'Decision recorded',
+  'execution.dispatch_stubbed': 'Execution dispatched',
+  'what_if.run': 'What-if run',
+};
+
+/** Audit action (`risk_case.status_changed`) -> readable label; unknown names are humanised. */
+export function actionLabel(action: string): string {
+  return ACTION_LABELS[action] ?? action.replace(/[._]/g, ' ').replace(/^./, (c) => c.toUpperCase());
+}
+
 /** CONTRACTS section 7 happy path. */
 export const STATE_PATH: RiskCaseState[] = [
   'RECEIVED',

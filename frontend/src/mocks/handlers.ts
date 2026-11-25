@@ -93,12 +93,14 @@ function authenticate(request: Request): MockUser | Response {
 /** DRF PageNumberPagination: default page size 25; `page_size` is honoured up to 100. */
 const DEFAULT_PAGE_SIZE = 25;
 
-function paginate<T>(items: T[], url: URL): Paginated<T> {
+function paginate<T>(items: T[], url: URL, request: Request): Paginated<T> | Response {
   const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
   const size = Math.min(100, Math.max(1, Number(url.searchParams.get('page_size')) || DEFAULT_PAGE_SIZE));
   const start = (page - 1) * size;
-  // NOTE: real DRF answers 404 for a page past the end; the mock returns an empty page because
-  // the suppliers/risk screens clamp on empty results (see R-02 report).
+  // DRF answers 404 for a page past the end (page 1 of an empty list is fine).
+  if (page > 1 && start >= items.length) {
+    return errorResponse(404, 'NOT_FOUND', 'Invalid page.', request);
+  }
   const link = (p: number) => {
     const u = new URL(url);
     u.searchParams.set('page', String(p));
@@ -150,8 +152,8 @@ function protectedRoute(
 }
 
 function paginated<T>(items: T[], url: URL, request: Request): Response {
-  void request;
-  return HttpResponse.json(paginate(items, url));
+  const result = paginate(items, url, request);
+  return result instanceof Response ? result : HttpResponse.json(result);
 }
 
 const API = '*/api/v1';

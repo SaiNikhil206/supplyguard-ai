@@ -72,7 +72,7 @@ export interface SupplierKpis {
   on_time_delivery_pct: number;
   /** Not returned by the API (no source): UI must handle it missing. */
   quality_pass_pct?: number | null;
-  /** Not stored anywhere in the models: optional/null until a source exists. */
+  /** Average of (expected_date - order_date) over the supplier's POs; null when it has no POs. */
   avg_lead_time_days?: number | null;
   open_po_value: Money;
   disruptions_last_12m: number;
@@ -256,6 +256,7 @@ export interface Recommendation {
   /** Recommendation.status; APPROVED never together with unsupported. */
   status?: RecommendationStatus;
   unsupported?: boolean;
+  unsupported_reasons?: string[];
   option_type: OptionType;
   proposed_action: { po_id: string; change: ProposedChange };
   action_steps: string[];
@@ -282,16 +283,12 @@ export interface Approval {
 }
 
 export type ExecutionStatus = 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
-export type ExecutionErrorClass = 'VALIDATION' | 'AUTH' | 'BUSINESS' | 'TRANSIENT' | 'DOWNSTREAM';
 
 /** From `core.Execution`; recommendation_id comes via execution.approval.recommendation. */
 export interface Execution {
   id: string; // EXE-...
-  approval_id?: string;
   recommendation_id: string;
   status: ExecutionStatus;
-  retry_count?: number;
-  error_class?: ExecutionErrorClass | null;
   started_at: string | null; // null while PENDING
   finished_at: string | null;
   error: string | null;
@@ -307,9 +304,8 @@ export interface TimelineEntry {
 }
 
 export interface RiskCaseDetail extends RiskCaseListItem {
-  impact_summary?: string;
-  analysis_round?: number;
-  data_quality_flags?: unknown[];
+  /** Missing/odd source data noticed by the impact engine; shown on the case page. */
+  data_quality_flags?: string[];
   event: DisruptionEvent;
   affected_pos: AffectedPO[];
   analysis: RiskAnalysis | null;

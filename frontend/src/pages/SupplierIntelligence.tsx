@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { listSuppliers } from '@/api/endpoints';
+import { useClampPage } from '@/api/useClampPage';
 import { queryKeys } from '@/api/queries';
 import { ApiError } from '@/api/client';
 import { Button, Card, EmptyState, ErrorState, Field, Input, Select } from '@/components/ui';
@@ -63,6 +64,14 @@ export default function SupplierIntelligence() {
     if (outOfRange) update({ page: String(lastPage) }, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [outOfRange, lastPage]);
+
+  useClampPage({
+    error,
+    page: filters.page,
+    pageSize,
+    fetchCount: async () => (await listSuppliers({ ...filters, page: 1 })).count,
+    onClamp: (p) => update({ page: String(p) }, true),
+  });
 
   const hasFilters = !!(filters.search || filters.status || filters.risk_level || searchText);
   const totalPages = data ? Math.max(1, Math.ceil(data.count / pageSize)) : 1;

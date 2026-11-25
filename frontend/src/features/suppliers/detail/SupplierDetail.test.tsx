@@ -41,7 +41,8 @@ describe('SupplierDetail page', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
     }
     expect(screen.getByText(`${detail.kpis.on_time_delivery_pct}%`)).toBeInTheDocument();
-    expect(screen.getAllByText('Not available')).toHaveLength(2); // quality pass + lead time
+    expect(screen.getByText('Not available')).toBeInTheDocument(); // quality pass
+    expect(screen.getByText(`${detail.kpis.avg_lead_time_days} days`)).toBeInTheDocument();
   });
 
   it('lists disruption history with a case link', async () => {
