@@ -1,0 +1,10 @@
+{
+    "id": "USR-1",
+    "email": "acme.admin@example.com",
+    "name": "Acme Admin",
+    "role": "ADMIN",
+    "tenant": {
+        "id": "TEN-ACME",
+        "name": "Acme Manufacturing Pvt Ltd"
+    }
+}

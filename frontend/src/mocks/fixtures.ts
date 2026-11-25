@@ -2,7 +2,7 @@ import type {
   DashboardSummary,
   DisruptionEvent,
   EventType,
-  Me,
+  MeResponse,
   Money,
   RiskCaseDetail,
   RiskCaseListItem,
@@ -34,11 +34,14 @@ export const users: MockUser[] = [
   { id: 'USR-3', username: 'viewer', full_name: 'Vikram Viewer', email: 'viewer@acme.example', role: 'VIEWER', password: DEMO_PASSWORD },
 ];
 
-export function meFor(user: MockUser): Me {
+/** Same flat shape as the real `GET /me` (accounts.MeSerializer). */
+export function meFor(user: MockUser): MeResponse {
   return {
-    user: { id: user.id, username: user.username, full_name: user.full_name, email: user.email },
-    tenant: TENANT,
+    id: user.id,
+    email: user.email,
+    name: user.full_name,
     role: user.role,
+    tenant: TENANT,
   };
 }
 

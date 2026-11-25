@@ -1,0 +1,27 @@
+{
+    "count": 60,
+    "next": "http://localhost:8000/api/v1/suppliers?page=2&page_size=2",
+    "previous": null,
+    "results": [
+        {
+            "id": "SUP-1001",
+            "name": "Summit Bearings Pvt Ltd",
+            "country": "IN",
+            "category": "Raw Material",
+            "status": "ACTIVE",
+            "risk_level": "MEDIUM",
+            "open_po_count": 3,
+            "on_time_delivery_pct": 88.2
+        },
+        {
+            "id": "SUP-1002",
+            "name": "Orion Forgings Pvt Ltd",
+            "country": "IN",
+            "category": "Raw Material",
+            "status": "ACTIVE",
+            "risk_level": "HIGH",
+            "open_po_count": 4,
+            "on_time_delivery_pct": 94.1
+        }
+    ]
+}
