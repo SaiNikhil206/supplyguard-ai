@@ -89,6 +89,9 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | 349f00a | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 3e365a9 | roop | R-10 | review | test(frontend): app shell is light only |
+| 2026-11-25 | b282786 | roop | R-10 | review | feat(frontend): new logo mark, light theme only |
 | 2026-11-25 | 6a3bf8b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | e728e5c | roop | R-10 | review | style(frontend): tidy recommendations and audit pages |
 | 2026-11-25 | fbfb0b6 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -106,6 +109,3 @@
 | 2026-11-25 | 8e13a2e | roop | R-02 | done | merge: R-02 Read APIs for the UI (Django `apps/portal`) (auto-merge) |
 | 2026-11-25 | bb1160c | roop | R-02 | done | chore(progress): R-02 done - handoff, session log, PROGRESS.md |
 | 2026-11-25 | 3ffed0f | roop | R-02 | done | chore(tasks): R-02 done - acceptance met with evidence |
-| 2026-11-25 | 9912148 | roop | R-02 | in-progress | merge: R-02 mocks re-review fixes (--mocks2) |
-| 2026-11-25 | d1924df | roop | R-02 | in-progress | fix(frontend): R-02 re-review fixes (unsupported reasons type, timeline order, clamp without error flash) |
-| 2026-11-25 | d8d75e6 | roop | R-02 | in-progress | merge: R-02 hide raw error text in timeline (--backend2) |
