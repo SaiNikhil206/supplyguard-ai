@@ -73,7 +73,6 @@ export default function WhatIfSimulator() {
     if (!first) return;
     const v: WhatIfRequest = {
       supplier_id: first.id,
-      severity: undefined,
       ...p.patch,
     };
     setValues(v);

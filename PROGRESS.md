@@ -89,14 +89,6 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
-| 2026-11-25 | e707608 | roop | R-04 | in-progress | feat(frontend): run against real backend (VITE_API_MOCK=false), real-API contract tests |
-| 2026-11-25 | 1d1cac8 | roop | R-08 | review | feat(frontend): R-08 wire admin screens to real backend shapes |
-| 2026-11-25 | 75f2cd4 | roop | R-07 | in-progress | fix(frontend): R-07 what-if test matches real heading |
-| 2026-11-25 | d3f96ee | roop | R-05 | in-progress | feat(frontend): R-05 real decision shape, decider role, retry degrade test |
-| 2026-11-25 | 87b3031 | roop | R-04 | in-progress | wip(frontend): R-04 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | feecf63 | roop | R-07 | in-progress | wip(frontend): R-07 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | 843c9af | roop | R-05 | in-progress | wip(frontend): R-05 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | 16a3d2c | roop | R-08 | in-progress | wip(frontend): R-08 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | c99b0e8 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 350d493 | roop | R-10 | review | fix(frontend): full-width layout polish |
 | 2026-11-25 | f999e54 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -109,3 +101,11 @@
 | 2026-11-25 | 6a3bf8b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | e728e5c | roop | R-10 | review | style(frontend): tidy recommendations and audit pages |
 | 2026-11-25 | fbfb0b6 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 35bc232 | roop | R-10 | review | style(frontend): calm risk and approvals pages, remove gradients |
+| 2026-11-25 | ecdb7d7 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 87a9d29 | roop | R-10 | review | style(frontend): neutral icon tiles, ring and monograms |
+| 2026-11-25 | 563267b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 3c9b4e9 | roop | R-10 | review | style(frontend): remove sparklines from KPI cards |
+| 2026-11-25 | f3562f4 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 603a364 | roop | R-10 | review | style(frontend): light sidebar in light theme |
+| 2026-11-25 | 8e43044 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
