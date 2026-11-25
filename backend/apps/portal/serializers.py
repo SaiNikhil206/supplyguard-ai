@@ -11,6 +11,20 @@ def money(amount, currency):
     return {"amount": f"{amount:.2f}", "currency": currency}
 
 
+def timeline_detail(data) -> str:
+    """Readable text from the real audit `data` keys (same rule the frontend mocks copy)."""
+    if data.get("from") and data.get("to"):
+        text = f"{data['from']} -> {data['to']}"
+        return f"{text} ({data['reason']})" if data.get("reason") else text
+    if data.get("decision"):
+        return f"decision: {data['decision']}"
+    if data.get("error"):
+        return str(data["error"])
+    if data.get("reason"):
+        return str(data["reason"])
+    return str(data.get("detail") or data.get("message") or "")
+
+
 def num(value):
     return None if value is None else float(value)
 
@@ -87,6 +101,7 @@ class RiskCaseDetailSerializer(RiskCaseListSerializer):
     analysis = serializers.SerializerMethodField()
     recommendations = serializers.SerializerMethodField()
     no_viable_option_reason = serializers.CharField(allow_null=True)
+    data_quality_flags = serializers.ListField(child=serializers.JSONField())
     approvals = serializers.SerializerMethodField()
     executions = serializers.SerializerMethodField()
     timeline = serializers.SerializerMethodField()
@@ -123,11 +138,8 @@ class RiskCaseDetailSerializer(RiskCaseListSerializer):
         ]
 
     def get_analysis(self, obj) -> dict | None:
-        # Latest valid Risk Analyst run (its raw output was schema-validated before storing).
-        runs = [r for r in obj.agent_runs.all() if r.agent == "RISK_ANALYST" and r.valid]
-        if not runs:
-            return None
-        return max(runs, key=lambda r: (r.created_at, r.id)).raw
+        # RiskCase.analysis is the validated, stored analysis (set by intelligence services).
+        return obj.analysis or None
 
     def get_recommendations(self, obj) -> list:
         return [
@@ -138,6 +150,7 @@ class RiskCaseDetailSerializer(RiskCaseListSerializer):
                 "option_type": r.option_type,
                 "status": r.status,
                 "unsupported": r.unsupported,
+                "unsupported_reasons": r.unsupported_reasons,
                 "proposed_action": r.proposed_action,
                 "action_steps": r.action_steps,
                 "estimated_lead_time_days": num(r.estimated_lead_time_days),
@@ -195,7 +208,7 @@ class RiskCaseDetailSerializer(RiskCaseListSerializer):
                     "at": t.timestamp,
                     "actor": t.actor,
                     "action": t.action,
-                    "detail": str(data.get("detail") or data.get("message") or ""),
+                    "detail": timeline_detail(data),
                 }
             )
         return out

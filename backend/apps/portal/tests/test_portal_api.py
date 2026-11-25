@@ -7,7 +7,7 @@ from django.utils import timezone
 from rest_framework.test import APIClient
 
 from apps.audit import record
-from apps.core.models import AgentRun
+from apps.core.models import AgentRun, RiskCase
 from tests.factories import (
     make_affected,
     make_agent_run,
@@ -167,6 +167,9 @@ def _full_case(tenant, n_pos=1):
     make_agent_run(tenant, case, valid=False, raw={"summary": "bad"})
     make_agent_run(tenant, case, valid=True, raw={"summary": "old"})
     make_agent_run(tenant, case, valid=True, raw={"summary": "latest"})
+    RiskCase.objects.filter(pk=case.pk).update(
+        analysis={"summary": "stored"}, data_quality_flags=["MISSING_ETA"]
+    )
     recs = [make_rec(tenant, case, estimated_cost_delta=Decimal("12.50"), currency="USD")]
     recs.append(make_rec(tenant, case))
     approval = make_approval(tenant, recs[0])
@@ -199,7 +202,9 @@ def test_risk_case_detail_has_all_sections(client_a, tenant_a, tenant_b):
     assert body["event"]["correlation_id"] == str(case.correlation_id)
     assert len(body["affected_pos"]) == 1
     assert body["affected_pos"][0]["value"]["currency"] == "USD"
-    assert body["analysis"] == {"summary": "latest"}
+    assert body["analysis"] == {"summary": "stored"}  # RiskCase.analysis, not AgentRun
+    assert body["data_quality_flags"] == ["MISSING_ETA"]
+    assert body["recommendations"][0]["unsupported_reasons"] == []
     assert len(body["recommendations"]) == 2
     assert body["recommendations"][0]["estimated_cost_delta"] == {
         "amount": "12.50",
@@ -222,6 +227,51 @@ def test_risk_case_detail_without_analysis(client_a, tenant_a):
     assert body["analysis"] is None
     assert body["recommendations"] == body["approvals"] == body["executions"] == []
     assert AgentRun.objects.count() == 0
+
+
+def test_analysis_null_when_case_analysis_empty_even_with_valid_agent_run(client_a, tenant_a):
+    case = make_case(tenant_a)
+    make_agent_run(tenant_a, case, valid=True, raw={"summary": "only in the run"})
+    assert client_a.get(f"/api/v1/risk-cases/{case.id}").json()["analysis"] is None
+
+
+def test_timeline_detail_from_real_transition_and_other_shapes(client_a, tenant_a):
+    from apps.workflow.services import transition
+
+    case = make_case(tenant_a, status="RECEIVED")
+    transition(case, "ANALYZING", actor="SYSTEM", reason="intake complete")
+    record("SYSTEM", "x.err", ("RiskCase", case.id), tenant=tenant_a, data={"error": "boom"})
+    record("SYSTEM", "x.reason", ("RiskCase", case.id), tenant=tenant_a, data={"reason": "why"})
+    record("SYSTEM", "x.dec", ("RiskCase", case.id), tenant=tenant_a, data={"decision": "APPROVE"})
+    record("SYSTEM", "x.none", ("RiskCase", case.id), tenant=tenant_a, data={})
+    rows = client_a.get(f"/api/v1/risk-cases/{case.id}").json()["timeline"]
+    by_action = {r["action"]: r for r in rows}
+    changed = by_action["risk_case.status_changed"]
+    assert changed["detail"] == "RECEIVED -> ANALYZING (intake complete)"
+    assert changed["actor"] == "SYSTEM"
+    assert by_action["x.err"]["detail"] == "boom"
+    assert by_action["x.reason"]["detail"] == "why"
+    assert by_action["x.dec"]["detail"] == "decision: APPROVE"
+    assert by_action["x.none"]["detail"] == ""
+
+
+def test_timeline_keeps_newest_200_oldest_first(client_a, tenant_a):
+    case = make_case(tenant_a)
+    for i in range(205):
+        record("SYSTEM", f"n.{i:03d}", ("RiskCase", case.id), tenant=tenant_a)
+    tl = client_a.get(f"/api/v1/risk-cases/{case.id}").json()["timeline"]
+    assert len(tl) == 200
+    assert tl[0]["at"] <= tl[-1]["at"]
+    assert tl[-1]["action"] == "n.204" and "n.004" not in [t["action"] for t in tl]
+
+
+def test_rejected_case_still_counts_as_open_and_other_currency_not_summed(client_a, tenant_a):
+    make_case(tenant_a, status="REJECTED", exposure_amount=Decimal("300.00"))
+    make_case(tenant_a, exposure_amount=Decimal("900.00"), currency="EUR")
+    body = client_a.get("/api/v1/dashboard/summary").json()
+    assert body["open_cases"] == 2
+    assert body["exposure"] == {"amount": "300.00", "currency": "USD"}
+    assert sum(p["value"] for p in body["exposure_trend"]) == 300.0
 
 
 def test_detail_query_count_is_bounded(client_a, tenant_a, django_assert_max_num_queries):
