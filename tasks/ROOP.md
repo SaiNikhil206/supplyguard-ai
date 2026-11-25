@@ -32,7 +32,7 @@
 - **Notes:** Built via nested branches `--scaffold` (subagent), `--api` + `--ui` (visible sessions), `--auth`, `--review-fixes`, `--schema-fixes` (subagents). Opus review x2: CHANGES REQUIRED -> all MAJORs fixed -> APPROVE WITH NITS. Stack: React 18.3, Vite 8, Vitest 5, TS 5.9 (TS 7 avoided: no JS API for openapi-typescript), Node >=22.22.2 (`.nvmrc`); auto-merge.yml now on Node 22.22.2. Types hand-written from CONTRACTS + `ai/schemas` (ajv test validates mock analysis/plan); swap to openapi-typescript after U-02. Deferred: cross-tab refresh-token rotation + short refresh lifetime (Uday, backend), refresh token in localStorage (hackathon trade-off, README), `/settings` ADMIN gating (R-08). Mock users in `frontend/README.md`.
 
 ### R-02: Read APIs for the UI (Django `apps/portal`)
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S1 (26-30 Nov) | **Est:** 2d | **Depends:** U-03, U-04
 - **Branch:** `roop/R-02-read-apis`
 - **Model hint:** sonnet / medium (Claude explains DRF as "the backend side of the screens you build")
@@ -42,7 +42,7 @@
   - [ ] `/risk-cases/{id}` returns event, affected POs, analysis, recommendations, approvals, executions, timeline in one call
   - [ ] MSW mocks in `frontend/` updated to match the real responses
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Plan (2026-11-25, deps U-03/U-04 in review): piece | runs as | model / effort | branch -- backend 5 endpoints + tests | nested session | sonnet / medium | `roop/R-02-read-apis--backend` ; MSW mocks + TS types to real shape | nested session | sonnet / medium | `roop/R-02-read-apis--mocks` ; run suites | subagent test-runner | haiku / low ; review | subagent reviewer-lite | sonnet / medium.
 
 ### R-03: Executive Overview + Supplier Intelligence screens
 - **Status:** review
