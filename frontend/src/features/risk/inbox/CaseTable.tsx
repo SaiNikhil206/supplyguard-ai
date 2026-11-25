@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Clock } from 'lucide-react';
 import type { RiskCaseListItem } from '@/api/types';
 import { Money, SeverityBadge, StatusBadge, Table, TBody, TD, TH, THead, TR } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { EVENT_ICON, Monogram, SEV_META } from '../ui';
+import { SEV_META } from '../ui';
 import { eventTypeLabel, relativeTime } from './format';
 
 interface Props {
@@ -14,7 +13,7 @@ interface Props {
 
 export function CaseTable({ items, fresh, now }: Props) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur">
+    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card/80 shadow-sm backdrop-blur [&_td]:px-3 [&_th]:px-3">
       <Table aria-label="Risk cases">
         <THead>
           <tr>
@@ -23,7 +22,7 @@ export function CaseTable({ items, fresh, now }: Props) {
             <TH>Event</TH>
             <TH>Severity</TH>
             <TH>Status</TH>
-            <TH className="text-right">Affected POs</TH>
+            <TH className="whitespace-nowrap text-right">POs</TH>
             <TH className="text-right">Exposure</TH>
             <TH>Created</TH>
           </tr>
@@ -31,7 +30,6 @@ export function CaseTable({ items, fresh, now }: Props) {
         <TBody>
           {items.map((c) => {
             const isNew = fresh.has(c.id);
-            const Icon = EVENT_ICON[c.event_type];
             return (
               <TR
                 key={c.id}
@@ -40,7 +38,7 @@ export function CaseTable({ items, fresh, now }: Props) {
                   isNew && 'slide-in-from-left-4 bg-primary/10 ring-2 ring-inset ring-primary',
                 )}
               >
-                <TD className="relative pl-6">
+                <TD className="relative whitespace-nowrap pl-6">
                   <span
                     aria-hidden="true"
                     className={cn('absolute inset-y-2 left-0 w-1 rounded-r-full', SEV_META[c.severity].bar)}
@@ -54,35 +52,24 @@ export function CaseTable({ items, fresh, now }: Props) {
                     </span>
                   )}
                 </TD>
-                <TD>
-                  <span className="flex items-center gap-2.5">
-                    <Monogram name={c.supplier_name ?? c.supplier_id} />
-                    <span className="font-medium">{c.supplier_name ?? c.supplier_id}</span>
-                  </span>
-                </TD>
-                <TD>
-                  <span className="flex items-center gap-2">
-                    <Icon aria-hidden="true" className="h-4 w-4 text-muted" />
-                    {eventTypeLabel(c.event_type)}
-                  </span>
-                </TD>
-                <TD>
+                <TD className="font-medium">{c.supplier_name ?? c.supplier_id}</TD>
+                <TD className="whitespace-nowrap">{eventTypeLabel(c.event_type)}</TD>
+                <TD className="whitespace-nowrap">
                   <SeverityBadge severity={c.severity} />
                 </TD>
-                <TD>
+                <TD className="whitespace-nowrap">
                   <StatusBadge status={c.status} />
                 </TD>
                 <TD className="text-right tabular-nums">{c.affected_po_count}</TD>
-                <TD className="text-right font-medium tabular-nums">
+                <TD className="whitespace-nowrap text-right font-medium tabular-nums">
                   <Money value={c.exposure} />
                 </TD>
-                <TD className="text-muted">
+                <TD className="whitespace-nowrap text-muted">
                   <time
                     dateTime={c.created_at}
                     title={new Date(c.created_at).toLocaleString()}
                     className="inline-flex items-center gap-1"
                   >
-                    <Clock aria-hidden="true" className="h-3.5 w-3.5" />
                     {relativeTime(c.created_at, now)}
                   </time>
                 </TD>

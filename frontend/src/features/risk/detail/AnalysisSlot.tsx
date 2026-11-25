@@ -10,10 +10,10 @@ export interface AnalysisSlotProps {
 
 export function AnalysisSlot({ status, analysis }: AnalysisSlotProps) {
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-violet-500/50 via-border to-transparent p-px">
+    <div className="rounded-2xl bg-border p-px">
       <section aria-labelledby="analysis-heading" className="rounded-[15px] bg-card p-5">
         <div className="mb-4 flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10 text-violet-500">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground/5 text-muted">
             <Sparkles aria-hidden="true" className="h-4 w-4" />
           </span>
           <h2 id="analysis-heading" className="text-base font-semibold">

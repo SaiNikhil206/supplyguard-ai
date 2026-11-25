@@ -53,7 +53,7 @@ export function SimulateDisruption() {
     <div className="flex flex-col items-end gap-1">
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger asChild>
-          <Button className="bg-gradient-to-r from-primary to-violet-600 text-white shadow-md transition hover:opacity-90 hover:shadow-lg">
+          <Button>
             <Zap aria-hidden="true" className="h-4 w-4" />
             Simulate Supplier Disruption
           </Button>

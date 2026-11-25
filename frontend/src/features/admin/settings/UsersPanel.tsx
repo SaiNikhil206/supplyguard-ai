@@ -226,7 +226,7 @@ export function UsersPanel() {
                     <div className="flex items-center gap-3">
                       <span
                         aria-hidden="true"
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-violet-500 text-xs font-semibold text-white"
+                        className="flex h-9 w-9 items-center justify-center rounded-full bg-foreground/5 text-xs font-semibold text-muted ring-1 ring-border"
                       >
                         {initials(u.full_name)}
                       </span>

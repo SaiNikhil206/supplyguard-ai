@@ -8,7 +8,7 @@ export default function NotFound() {
       <div className="relative">
         <p
           aria-hidden="true"
-          className="bg-gradient-to-br from-primary to-violet-500 bg-clip-text text-8xl font-bold tracking-tighter text-transparent"
+          className="text-8xl font-bold tracking-tighter text-primary"
         >
           404
         </p>

@@ -96,7 +96,7 @@ export default function WhatIfSimulator() {
         }
       />
       <div className="grid gap-6 lg:grid-cols-[24rem_1fr]">
-        <div className="self-start rounded-2xl bg-gradient-to-br from-primary/40 via-border to-transparent p-px lg:sticky lg:top-4">
+        <div className="self-start rounded-2xl bg-border p-px lg:sticky lg:top-4">
           <div className="rounded-2xl bg-card p-5">
             <h2 className="mb-4 text-sm font-semibold tracking-tight">
               Scenario

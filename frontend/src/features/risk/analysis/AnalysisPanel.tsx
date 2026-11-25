@@ -147,7 +147,7 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-3 rounded-xl bg-gradient-to-br from-violet-500/10 via-transparent to-primary/5 p-4 ring-1 ring-violet-500/20">
+      <div className="space-y-3 rounded-xl bg-surface-2/60 p-4 ring-1 ring-border">
         <div className="flex flex-wrap items-center gap-4">
           <SeverityBadge severity={a.risk_level} />
           <ScoreMeter score={a.risk_score} />
