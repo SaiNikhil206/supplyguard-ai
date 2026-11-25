@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { RiskCaseState, TimelineEntry } from '@/api/types';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui';
-import { formatDateTime, STATE_LABELS, stepperSteps } from './format';
+import { actionLabel, formatDateTime, STATE_LABELS, stepperSteps } from './format';
 
 const isDanger = (s: RiskCaseState) => s === 'REJECTED' || s === 'EXECUTION_FAILED';
 
@@ -9,7 +9,7 @@ export function StatusStepper({ status }: { status: RiskCaseState }) {
   const steps = stepperSteps(status);
   const current = steps.indexOf(status);
   return (
-    <ol aria-label="Case state path" className="flex flex-wrap gap-x-1 gap-y-2 text-xs">
+    <ol aria-label="Case state path" className="sr-only">
       {steps.map((s, i) => {
         const done = i < current;
         const isCurrent = i === current;
@@ -37,7 +37,7 @@ export function StatusStepper({ status }: { status: RiskCaseState }) {
 export function StatusTimeline({ status, timeline }: { status: RiskCaseState; timeline: TimelineEntry[] }) {
   const sorted = [...timeline].sort((a, b) => a.at.localeCompare(b.at));
   return (
-    <Card role="region" aria-labelledby="timeline-heading">
+    <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="timeline-heading">
       <CardHeader>
         <CardTitle id="timeline-heading">Status timeline</CardTitle>
       </CardHeader>
@@ -46,7 +46,7 @@ export function StatusTimeline({ status, timeline }: { status: RiskCaseState; ti
         {sorted.length === 0 ? (
           <p className="text-sm text-muted">No activity yet</p>
         ) : (
-          <ol aria-label="Timeline" className="relative space-y-4 border-l border-border pl-4">
+          <ol aria-label="Timeline" className="relative space-y-5 border-l-2 border-border/70 pl-5">
             {sorted.map((t, i) => {
               const current = i === sorted.length - 1;
               return (
@@ -54,15 +54,15 @@ export function StatusTimeline({ status, timeline }: { status: RiskCaseState; ti
                   <span
                     aria-hidden="true"
                     className={clsx(
-                      'absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-bg',
-                      current ? (isDanger(status) ? 'bg-danger' : 'bg-primary') : 'bg-border',
+                      'absolute -left-[22px] top-1.5 h-3 w-3 rounded-full border-2 border-card',
+                      current ? (isDanger(status) ? 'bg-danger ring-4 ring-danger/20' : 'bg-primary ring-4 ring-primary/20') : 'bg-border',
                     )}
                   />
                   <time dateTime={t.at} className="block text-xs text-muted">
                     {formatDateTime(t.at)}
                   </time>
                   <p className={clsx('font-medium', current ? 'text-text' : 'text-text/90')}>
-                    {t.action.replace(/_/g, ' ').toLowerCase()}
+                    {actionLabel(t.action)}
                     <span className="font-normal text-muted"> · {t.actor}</span>
                   </p>
                   {t.detail && <p className="text-muted">{t.detail}</p>}

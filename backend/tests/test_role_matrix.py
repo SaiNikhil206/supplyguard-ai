@@ -96,6 +96,7 @@ EXPECTED_ROUTED = {
     "events.create", "demo.simulate", "integrations.status",
     "internal.risk-cases", "internal.execution-result",
     "recommendations.decision", "what-if", "internal.analysis",
+    "suppliers.read", "dashboard.read", "risk-cases.read",
 }
 
 # permission_key -> (path, body factory or None). One entry per ROUTED matrix row.
@@ -110,6 +111,9 @@ ROUTES = {
     "demo.simulate": (API + "demo/simulate-disruption", lambda: {"scenario": "demo"}),
     "integrations.status": (API + "integrations/status", None),
     "internal.risk-cases": (API + "internal/risk-cases", _risk_case_body),
+    "suppliers.read": (API + "suppliers", None),
+    "dashboard.read": (API + "dashboard/summary", None),
+    "risk-cases.read": (API + "risk-cases", None),
     # callable path: a fresh PENDING execution per request
     "internal.execution-result": (_execution_path, _execution_body),
     # An id that does not exist: wrong roles get 403 before the lookup, the allowed role reaches

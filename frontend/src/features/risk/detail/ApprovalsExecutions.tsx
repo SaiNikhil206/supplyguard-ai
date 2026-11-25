@@ -8,7 +8,7 @@ const EXEC_TONE: Record<Execution['status'], BadgeTone> = { PENDING: 'neutral', 
 export function ApprovalsExecutions({ approvals, executions }: { approvals: Approval[]; executions: Execution[] }) {
   return (
     <>
-      <Card role="region" aria-labelledby="approvals-heading">
+      <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="approvals-heading">
         <CardHeader>
           <CardTitle id="approvals-heading">Approvals</CardTitle>
         </CardHeader>
@@ -33,7 +33,7 @@ export function ApprovalsExecutions({ approvals, executions }: { approvals: Appr
           )}
         </CardBody>
       </Card>
-      <Card role="region" aria-labelledby="executions-heading">
+      <Card className="overflow-hidden rounded-2xl border-border/60 bg-card/80 backdrop-blur" role="region" aria-labelledby="executions-heading">
         <CardHeader>
           <CardTitle id="executions-heading">Executions</CardTitle>
         </CardHeader>
@@ -49,7 +49,13 @@ export function ApprovalsExecutions({ approvals, executions }: { approvals: Appr
                     <span className="font-mono text-xs text-muted">{e.id}</span>
                   </div>
                   <p className="mt-1 text-muted">
-                    Started <time dateTime={e.started_at}>{formatDateTime(e.started_at)}</time>
+                    {e.started_at ? (
+                      <>
+                        Started <time dateTime={e.started_at}>{formatDateTime(e.started_at)}</time>
+                      </>
+                    ) : (
+                      'Not started'
+                    )}
                     {e.finished_at && (
                       <>
                         {' · '}finished <time dateTime={e.finished_at}>{formatDateTime(e.finished_at)}</time>
