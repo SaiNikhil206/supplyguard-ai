@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
+| 2026-11-25 | 988f3f5 | roop | R-04 | review | docs(tasks): R-03 done, R-04 wired to real API (review) |
 | 2026-11-25 | 1f36254 | roop | R-04 | in-progress | test(frontend): stabilize Vitest under load (asyncUtilTimeout 5s, cap workers) |
 | 2026-11-25 | 5408f6e | roop | R-06 | in-progress | docs(flow): align R-06 spec and test plan with real decision API |
 | 2026-11-25 | e707608 | roop | R-04 | in-progress | feat(frontend): run against real backend (VITE_API_MOCK=false), real-API contract tests |
@@ -107,5 +109,3 @@
 | 2026-11-25 | a0fed9c | roop | R-10 | review | style(frontend): warm neutral, editorial look; tables fit without side scroll |
 | 2026-11-25 | 349f00a | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | 3e365a9 | roop | R-10 | review | test(frontend): app shell is light only |
-| 2026-11-25 | b282786 | roop | R-10 | review | feat(frontend): new logo mark, light theme only |
-| 2026-11-25 | 6a3bf8b | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
