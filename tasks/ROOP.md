@@ -32,15 +32,15 @@
 - **Notes:** Built via nested branches `--scaffold` (subagent), `--api` + `--ui` (visible sessions), `--auth`, `--review-fixes`, `--schema-fixes` (subagents). Opus review x2: CHANGES REQUIRED -> all MAJORs fixed -> APPROVE WITH NITS. Stack: React 18.3, Vite 8, Vitest 5, TS 5.9 (TS 7 avoided: no JS API for openapi-typescript), Node >=22.22.2 (`.nvmrc`); auto-merge.yml now on Node 22.22.2. Types hand-written from CONTRACTS + `ai/schemas` (ajv test validates mock analysis/plan); swap to openapi-typescript after U-02. Deferred: cross-tab refresh-token rotation + short refresh lifetime (Uday, backend), refresh token in localStorage (hackathon trade-off, README), `/settings` ADMIN gating (R-08). Mock users in `frontend/README.md`.
 
 ### R-02: Read APIs for the UI (Django `apps/portal`)
-- **Status:** in-progress
+- **Status:** done
 - **Sprint:** S1 (26-30 Nov) | **Est:** 2d | **Depends:** U-03, U-04
 - **Branch:** `roop/R-02-read-apis`
 - **Model hint:** sonnet / medium (Claude explains DRF as "the backend side of the screens you build")
 - **Deliverables:** `backend/apps/portal/`: `GET /suppliers`, `GET /suppliers/{id}`, `GET /dashboard/summary`, `GET /risk-cases`, `GET /risk-cases/{id}` per CONTRACTS section 4; filters + pagination; built on Uday's tenant-scoped base classes (U-04); OpenAPI tags; pytest.
 - **Acceptance:**
-  - [ ] Every endpoint tenant-scoped (uses U-04 mixin) and tested
-  - [ ] `/risk-cases/{id}` returns event, affected POs, analysis, recommendations, approvals, executions, timeline in one call
-  - [ ] MSW mocks in `frontend/` updated to match the real responses
+  - [x] Every endpoint tenant-scoped (uses U-04 mixin) and tested - `TenantScopedViewSet`/`TenantScopedMixin` in `backend/apps/portal/views.py`; tests `test_suppliers_only_own_tenant`, `test_supplier_foreign_id_404`, `test_risk_case_foreign_id_404_and_list_scoped`, `test_dashboard_only_own_tenant`
+  - [x] `/risk-cases/{id}` returns event, affected POs, analysis, recommendations, approvals, executions, timeline in one call - `test_risk_case_detail_has_all_sections`, `test_detail_query_count_is_bounded`
+  - [x] MSW mocks in `frontend/` updated to match the real responses - `frontend/src/mocks/README.md` "R-02 response shapes"; Opus reviewer APPROVE at 9912148; frontend 129 tests
 - **Done in:** -
 - **Notes:** Plan (2026-11-25, deps U-03/U-04 in review): piece | runs as | model / effort | branch -- backend 5 endpoints + tests | nested session | sonnet / medium | `roop/R-02-read-apis--backend` ; MSW mocks + TS types to real shape | nested session | sonnet / medium | `roop/R-02-read-apis--mocks` ; run suites | subagent test-runner | haiku / low ; review | subagent reviewer-lite | sonnet / medium. Fallback: nested sessions hit an org auth error at first, so the backend was built by an implementer subagent on `--backend2` (merged); the duplicate `--backend` from the late-starting nested session is superseded (only its role-matrix lines were taken). Touched Uday-owned files (agreed with Roop 2026-11-25, Uday to confirm): `apps/accounts/permissions.py` routed=True for suppliers.read, dashboard.read, risk-cases.read; `tests/test_role_matrix.py` ROUTES + EXPECTED_ROUTED; `config/urls.py` one include line for `apps.portal`. Team to confirm: case timeline (audit rows) visible to all reader roles per CONTRACTS s4, though `GET /audit` is ADMIN/PM only; REJECTED cases count as open (can return to ANALYZING). Open question: dashboard `recovered_value` = exposure sum of RECOVERED cases.
 
