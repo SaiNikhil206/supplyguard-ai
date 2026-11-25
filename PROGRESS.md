@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-25 | f999e54 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
+| 2026-11-25 | 9529d38 | roop | R-10 | review | style(frontend): restore indigo palette, remove severity side strips |
 | 2026-11-25 | ef7b712 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | a0fed9c | roop | R-10 | review | style(frontend): warm neutral, editorial look; tables fit without side scroll |
 | 2026-11-25 | 349f00a | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 8e43044 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
 | 2026-11-25 | ff96aa8 | roop | R-10 | review | chore(sync): merge collaboration (R-02 read APIs) into R-10 polish |
 | 2026-11-25 | 1e4f4a4 | roop | R-10 | review | docs(tasks): R-10 note v2 revert |
-| 2026-11-25 | a2d8b23 | roop | R-10 | review | docs(tasks): R-10 to review to land v2 UI in collaboration |
-| 2026-11-25 | 8e13a2e | roop | R-02 | done | merge: R-02 Read APIs for the UI (Django `apps/portal`) (auto-merge) |
