@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/Spinner';
 import { AttentionPanel } from '@/features/overview/AttentionPanel';
 import { TopSuppliers } from '@/features/overview/TopSuppliers';
 import { CasesTrendChart, ExposureTrendChart } from '@/features/overview/TrendCharts';
-import { derivedSeries, greeting, hasTrend, trendDelta } from '@/features/overview/format';
+import { greeting, hasTrend, trendDelta } from '@/features/overview/format';
 
 const KPI_LABELS = [
   'Suppliers',
@@ -46,7 +46,6 @@ export default function ExecutiveOverview() {
 
   const expDelta = data ? trendDelta(data.exposure_trend) : undefined;
   const caseDelta = data ? trendDelta(data.cases_trend) : undefined;
-  const caseSeries = data?.cases_trend;
 
   return (
     <div className="space-y-6">
@@ -86,28 +85,24 @@ export default function ExecutiveOverview() {
                   value={data.suppliers}
                   icon={<Building2 />}
                   tone="primary"
-                  trend={derivedSeries(caseSeries, data.suppliers)}
                 />
                 <StatCard
                   label="Open POs"
                   value={data.open_pos}
                   icon={<Boxes />}
                   tone="sky"
-                  trend={derivedSeries(caseSeries, data.open_pos)}
                 />
                 <StatCard
                   label="Active shipments"
                   value={data.active_shipments}
                   icon={<Truck />}
                   tone="violet"
-                  trend={derivedSeries(caseSeries, data.active_shipments)}
                 />
                 <StatCard
                   label="Exposure"
                   value={<Money value={data.exposure} />}
                   icon={<AlertTriangle />}
                   tone="rose"
-                  trend={data.exposure_trend.map((p) => p.value)}
                   delta={
                     expDelta
                       ? { value: `${expDelta.pct}%`, direction: expDelta.up ? 'up' : 'down', tone: expDelta.up ? 'bad' : 'good' }
@@ -124,7 +119,6 @@ export default function ExecutiveOverview() {
                   }
                   icon={<Activity />}
                   tone="amber"
-                  trend={data.cases_trend.map((p) => p.value)}
                   delta={
                     caseDelta
                       ? { value: `${caseDelta.pct}%`, direction: caseDelta.up ? 'up' : 'down', tone: caseDelta.up ? 'bad' : 'good' }
@@ -137,7 +131,6 @@ export default function ExecutiveOverview() {
                   value={<Money value={data.recovered_value} />}
                   icon={<ShieldCheck />}
                   tone="emerald"
-                  trend={derivedSeries(caseSeries, Number(data.recovered_value.amount))}
                 />
               </>
             )}
