@@ -20,14 +20,14 @@ export function SupplierMonogram({ name, level, className }: { name: string; lev
 }
 
 /** Thin 0-100 bar coloured by risk level; the number sits beside it. */
-export function RiskBar({ score, level, className }: { score: number; level: RiskLevel; className?: string }) {
-  const v = Math.max(0, Math.min(100, score));
+export function RiskBar({ score, level, className }: { score?: number | null; level: RiskLevel; className?: string }) {
+  const v = score == null ? 0 : Math.max(0, Math.min(100, score));
   return (
     <span className={cn('flex items-center gap-2', className)}>
       <span aria-hidden="true" className="h-1.5 flex-1 overflow-hidden rounded-full bg-foreground/10">
         <span className={cn('block h-full rounded-full', LEVEL_BAR[level])} style={{ width: `${v}%` }} />
       </span>
-      <span className="w-6 text-right text-xs tabular-nums text-muted">{v}</span>
+      <span className="w-6 text-right text-xs tabular-nums text-muted">{score == null ? '—' : v}</span>
     </span>
   );
 }

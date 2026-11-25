@@ -61,9 +61,9 @@ export function QueueTable({
                 </span>
               </div>
               <div className="mt-3 flex items-center gap-2.5">
-                <Monogram name={c.supplier_name} />
+                <Monogram name={c.supplier_name ?? c.supplier_id} />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{c.supplier_name}</p>
+                  <p className="truncate text-sm font-medium">{c.supplier_name ?? c.supplier_id}</p>
                   <p className="truncate text-xs text-muted">{top ? OPTION_LABEL[top.option_type] : 'None'}</p>
                 </div>
               </div>

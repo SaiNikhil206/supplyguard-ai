@@ -28,7 +28,7 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
             <TableEmptyRow colSpan={7}>No affected purchase orders</TableEmptyRow>
           ) : (
             pos.map((p) => (
-              <TR key={p.po_id}>
+              <TR key={`${p.po_id}-${p.item_id}`}>
                 <TD className="font-mono text-xs">{p.po_id}</TD>
                 <TD>
                   {p.item_name}
@@ -40,7 +40,7 @@ export function AffectedPosTable({ pos }: { pos: AffectedPO[] }) {
                   <Money value={p.value} />
                 </TD>
                 <TD className="text-right tabular-nums">{p.days_late_estimate > 0 ? `${p.days_late_estimate} d` : 'On time'}</TD>
-                <TD className="text-right tabular-nums">{p.stock_cover_days} d</TD>
+                <TD className="text-right tabular-nums">{p.stock_cover_days == null ? 'Unknown' : `${p.stock_cover_days} d`}</TD>
               </TR>
             ))
           )}

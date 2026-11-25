@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { RiskCaseState, TimelineEntry } from '@/api/types';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui';
-import { formatDateTime, STATE_LABELS, stepperSteps } from './format';
+import { actionLabel, formatDateTime, STATE_LABELS, stepperSteps } from './format';
 
 const isDanger = (s: RiskCaseState) => s === 'REJECTED' || s === 'EXECUTION_FAILED';
 
@@ -62,7 +62,7 @@ export function StatusTimeline({ status, timeline }: { status: RiskCaseState; ti
                     {formatDateTime(t.at)}
                   </time>
                   <p className={clsx('font-medium', current ? 'text-text' : 'text-text/90')}>
-                    {t.action.replace(/_/g, ' ').toLowerCase()}
+                    {actionLabel(t.action)}
                     <span className="font-normal text-muted"> · {t.actor}</span>
                   </p>
                   {t.detail && <p className="text-muted">{t.detail}</p>}

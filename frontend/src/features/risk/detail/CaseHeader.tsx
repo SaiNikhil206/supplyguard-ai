@@ -82,9 +82,9 @@ export function CaseHeader({ detail }: { detail: RiskCaseDetail }) {
             <div>
               <dt className="text-xs uppercase tracking-wide text-muted">Supplier</dt>
               <dd className="mt-1 flex items-center gap-2">
-                <Monogram name={detail.supplier_name} className="h-8 w-8" />
+                <Monogram name={detail.supplier_name ?? detail.supplier_id} className="h-8 w-8" />
                 <Link className="font-medium text-primary hover:underline" to={`/suppliers/${detail.supplier_id}`}>
-                  {detail.supplier_name}
+                  {detail.supplier_name ?? detail.supplier_id}
                 </Link>
               </dd>
             </div>

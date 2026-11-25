@@ -139,8 +139,8 @@ export default function SupplierDetail() {
       <Hero s={s} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard label="On-time delivery" value={`${k.on_time_delivery_pct}%`} icon={<Clock />} tone="emerald" />
-        <StatCard label="Quality pass" value={`${k.quality_pass_pct}%`} icon={<ShieldCheck />} tone="primary" />
-        <StatCard label="Avg lead time" value={`${k.avg_lead_time_days} days`} icon={<Timer />} tone="sky" />
+        <StatCard label="Quality pass" value={k.quality_pass_pct == null ? 'Not available' : `${k.quality_pass_pct}%`} icon={<ShieldCheck />} tone="primary" />
+        <StatCard label="Avg lead time" value={k.avg_lead_time_days == null ? 'Not available' : `${k.avg_lead_time_days} days`} icon={<Timer />} tone="sky" />
         <StatCard label="Open PO value" value={<Money value={k.open_po_value} />} icon={<Wallet />} tone="violet" />
         <StatCard label="Disruptions (12 months)" value={k.disruptions_last_12m} icon={<Activity />} tone="amber" />
       </div>

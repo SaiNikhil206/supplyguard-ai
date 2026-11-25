@@ -29,7 +29,7 @@ export function CaseRecommendations({ caseId }: { caseId: string }) {
         <div>
           <h2 className="text-lg font-semibold">{c.title}</h2>
           <p className="text-xs text-muted">
-            {c.id} · {c.supplier_name}
+            {c.id} · {c.supplier_name ?? c.supplier_id}
           </p>
         </div>
         <Button asChild>

@@ -90,7 +90,7 @@ export function ExecutionPanel({ execution, canRetry, onNotice }: ExecutionPanel
       </div>
       <ExecutionStepper status={execution.status} />
       <p className="text-xs text-muted">
-        Started {formatTime(execution.started_at)}
+        Started {execution.started_at ? formatTime(execution.started_at) : 'pending'}
         {execution.finished_at ? `, finished ${formatTime(execution.finished_at)}` : ''}
       </p>
       {execution.status === 'SUCCEEDED' && (

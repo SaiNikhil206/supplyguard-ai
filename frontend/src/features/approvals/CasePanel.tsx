@@ -46,9 +46,9 @@ export function CasePanel({ caseId, canDecide, actor, onNotice }: CasePanelProps
     <section aria-label={`Case ${c.id}`} className={`${shell} animate-in fade-in-0 slide-in-from-right-2 space-y-5 p-5 duration-300`}>
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Monogram name={c.supplier_name} className="h-11 w-11" />
+          <Monogram name={c.supplier_name ?? c.supplier_id} className="h-11 w-11" />
           <h2 className="min-w-0 text-base font-semibold">
-            {c.id} · {c.supplier_name}
+            {c.id} · {c.supplier_name ?? c.supplier_id}
           </h2>
         </div>
         <StatusBadge status={c.status} />

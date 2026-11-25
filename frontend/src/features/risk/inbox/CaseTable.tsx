@@ -56,8 +56,8 @@ export function CaseTable({ items, fresh, now }: Props) {
                 </TD>
                 <TD>
                   <span className="flex items-center gap-2.5">
-                    <Monogram name={c.supplier_name} />
-                    <span className="font-medium">{c.supplier_name}</span>
+                    <Monogram name={c.supplier_name ?? c.supplier_id} />
+                    <span className="font-medium">{c.supplier_name ?? c.supplier_id}</span>
                   </span>
                 </TD>
                 <TD>

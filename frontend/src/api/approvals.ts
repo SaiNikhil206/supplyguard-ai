@@ -40,7 +40,7 @@ export const retryExecution = (executionId: string) =>
 export const isPending = (c: Pick<RiskCaseDetail, 'status'>) => PENDING_STATUSES.includes(c.status);
 
 export function latestExecution(c: Pick<RiskCaseDetail, 'executions'>): Execution | undefined {
-  return [...c.executions].sort((a, b) => b.started_at.localeCompare(a.started_at))[0];
+  return [...c.executions].sort((a, b) => (b.started_at ?? '').localeCompare(a.started_at ?? ''))[0];
 }
 
 export interface DecidedRow {

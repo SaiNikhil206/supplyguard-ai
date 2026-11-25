@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { BellRing, ShieldCheck } from 'lucide-react';
 import { ApiError } from '@/api/client';
+import { listRiskCases } from '@/api/endpoints';
 import { useRiskCases } from '@/api/queries';
+import { useClampPage } from '@/api/useClampPage';
 import type { RiskCaseState, Severity } from '@/api/types';
 import { useAuth } from '@/auth/AuthProvider';
 import { Button, EmptyState, ErrorState, Skeleton, toast } from '@/components/ui';
@@ -46,6 +48,14 @@ export function RiskInbox() {
     { refetchInterval: POLL_MS, keepPrevious: true },
   );
 
+  const clamping = useClampPage({
+    error,
+    page,
+    pageSize: PAGE_SIZE,
+    fetchCount: async () => (await listRiskCases({ severity, status, page: 1, page_size: PAGE_SIZE })).count,
+    onClamp: setPage,
+  });
+
   const viewKey = `${severity ?? ''}|${status ?? ''}|${page}`;
   const { fresh, announcement } = useNewCases(
     data && !isPlaceholderData ? data.results.map((c) => c.id) : undefined,
@@ -61,7 +71,7 @@ export function RiskInbox() {
   const now = dataUpdatedAt; // relative times refresh with every poll
 
   let body;
-  if (isPending) {
+  if (isPending || clamping) {
     body = (
       <div
         className="space-y-2 rounded-2xl border border-border/60 bg-card/80 p-4"

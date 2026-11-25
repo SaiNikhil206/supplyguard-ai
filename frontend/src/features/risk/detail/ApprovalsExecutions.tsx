@@ -49,7 +49,13 @@ export function ApprovalsExecutions({ approvals, executions }: { approvals: Appr
                     <span className="font-mono text-xs text-muted">{e.id}</span>
                   </div>
                   <p className="mt-1 text-muted">
-                    Started <time dateTime={e.started_at}>{formatDateTime(e.started_at)}</time>
+                    {e.started_at ? (
+                      <>
+                        Started <time dateTime={e.started_at}>{formatDateTime(e.started_at)}</time>
+                      </>
+                    ) : (
+                      'Not started'
+                    )}
                     {e.finished_at && (
                       <>
                         {' · '}finished <time dateTime={e.finished_at}>{formatDateTime(e.finished_at)}</time>

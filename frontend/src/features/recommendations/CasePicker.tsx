@@ -35,11 +35,11 @@ export function CasePicker() {
             <div className="relative flex items-center justify-between gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card/80 p-5 shadow-sm backdrop-blur transition hover:shadow-md">
               <span aria-hidden="true" className={cn('absolute inset-y-0 left-0 w-1', SEV_META[c.severity].bar)} />
               <div className="flex min-w-0 items-center gap-3">
-                <Monogram name={c.supplier_name} className="h-10 w-10" />
+                <Monogram name={c.supplier_name ?? c.supplier_id} className="h-10 w-10" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{c.title}</p>
                   <p className="text-xs text-muted">
-                    {c.id} · {c.supplier_name} · {c.status.replace(/_/g, ' ').toLowerCase()}
+                    {c.id} · {c.supplier_name ?? c.supplier_id} · {c.status.replace(/_/g, ' ').toLowerCase()}
                   </p>
                   <p className="mt-1 flex items-center gap-2 text-xs">
                     <SeverityBadge severity={c.severity} />

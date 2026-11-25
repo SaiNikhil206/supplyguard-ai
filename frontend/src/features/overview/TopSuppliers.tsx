@@ -15,7 +15,7 @@ export function TopSuppliers() {
     queryKey: queryKeys.suppliers(FILTERS),
     queryFn: () => listSuppliers(FILTERS),
   });
-  const top = data ? [...data.results].sort((a, b) => b.risk_score - a.risk_score).slice(0, 5) : [];
+  const top = data ? [...data.results].sort((a, b) => (b.risk_score ?? 0) - (a.risk_score ?? 0)).slice(0, 5) : [];
   return (
     <section
       aria-label="Top suppliers at risk"

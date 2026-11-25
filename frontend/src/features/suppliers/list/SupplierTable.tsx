@@ -7,7 +7,9 @@ import { SUPPLIER_STATUS } from '../status';
 import { RiskBar, SupplierMonogram } from './parts';
 import { LEVEL_BAR, flagFor } from './risk';
 
-const HEADERS = ['Supplier', 'Country', 'Category', 'Status', 'Risk', 'Open POs', 'On-time %'];
+const LEVEL_RANK: Record<Supplier['risk_level'], number> = { LOW: 0, MEDIUM: 1, HIGH: 2, CRITICAL: 3 };
+
+const HEADERS =['Supplier', 'Country', 'Category', 'Status', 'Risk', 'Open POs', 'On-time %'];
 
 function OnTime({ pct }: { pct: number }) {
   const tone = pct >= 90 ? 'LOW' : pct >= 75 ? 'MEDIUM' : 'CRITICAL';
@@ -60,7 +62,12 @@ export function SupplierTable({ suppliers, loading }: { suppliers?: Supplier[]; 
               </TR>
             ))
           : [...(suppliers ?? [])]
-              .sort((a, b) => b.risk_score - a.risk_score)
+              .sort(
+                (a, b) =>
+                  LEVEL_RANK[b.risk_level] - LEVEL_RANK[a.risk_level] ||
+                  (b.risk_score ?? 0) - (a.risk_score ?? 0) ||
+                  a.name.localeCompare(b.name),
+              )
               .map((s) => (
                 <TR key={s.id} className="group h-14">
                   <TD>

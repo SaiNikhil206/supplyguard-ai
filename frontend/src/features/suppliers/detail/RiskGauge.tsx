@@ -9,7 +9,8 @@ const COLOR: Record<RiskLevel, string> = {
 };
 
 /** Radial 0-100 risk gauge exposed as an accessible meter. */
-export function RiskGauge({ score, level }: { score: number; level: RiskLevel }) {
+export function RiskGauge({ score, level }: { score?: number | null; level: RiskLevel }) {
+  if (score == null) return null;
   const v = Math.max(0, Math.min(100, score));
   return (
     <div

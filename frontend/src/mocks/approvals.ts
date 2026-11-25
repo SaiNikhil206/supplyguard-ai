@@ -26,6 +26,11 @@ import { riskCaseDetail, riskCaseList, users } from './fixtures';
 export const DEFAULT_EXECUTION_DELAY_MS = 400;
 export const FAILING_DEMO_RECOMMENDATION = 'REC-000102';
 const DECIDERS = ['ADMIN', 'PROCUREMENT_MANAGER'];
+const SEVERITIES = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+const CASE_STATES: string[] = [
+  'RECEIVED', 'ANALYZING', 'RECOMMENDATION_READY', 'PENDING_APPROVAL', 'APPROVED',
+  'REJECTED', 'EXECUTING', 'EXECUTION_FAILED', 'RECOVERED', 'CLOSED',
+];
 const PENDING: RiskCaseState[] = ['PENDING_APPROVAL', 'RECOMMENDATION_READY'];
 
 interface ExecRec {
@@ -182,10 +187,12 @@ function authed(request: Request): { name: string; role: string } | Response {
   return errorResponse(401, 'UNAUTHENTICATED', 'Authentication credentials were not provided or are invalid.', request);
 }
 
-function paginate<T>(items: T[], url: URL): Paginated<T> {
+/** DRF PageNumberPagination: default page size 25, 404 for a page past the end (same as handlers.ts). */
+function paginate<T>(items: T[], url: URL, request: Request): Paginated<T> | Response {
   const page = Math.max(1, Number(url.searchParams.get('page')) || 1);
-  const size = Math.min(100, Math.max(1, Number(url.searchParams.get('page_size')) || 10));
+  const size = Math.min(100, Math.max(1, Number(url.searchParams.get('page_size')) || 25));
   const start = (page - 1) * size;
+  if (page > 1 && start >= items.length) return errorResponse(404, 'NOT_FOUND', 'Invalid page.', request);
   return {
     count: items.length,
     next: start + size < items.length ? `${url.origin}${url.pathname}?page=${page + 1}` : null,
@@ -210,16 +217,30 @@ export const approvalHandlers: HttpHandler[] = [
     const url = new URL(request.url);
     const status = url.searchParams.get('status');
     const severity = url.searchParams.get('severity');
-    const from = url.searchParams.get('from');
-    const to = url.searchParams.get('to');
-    const filtered = listView().filter(
-      (c) =>
+    // Backend answers 400 VALIDATION_ERROR for an enum value / date it cannot parse (same as handlers.ts).
+    const bound = (raw: string | null) =>
+      raw ? Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T00:00:00Z` : raw) : null;
+    const from = bound(url.searchParams.get('from'));
+    const to = bound(url.searchParams.get('to'));
+    const details: Record<string, string[]> = {};
+    if (status && !CASE_STATES.includes(status)) details.status = [`"${status}" is not a valid choice.`];
+    if (severity && !SEVERITIES.includes(severity)) details.severity = [`"${severity}" is not a valid choice.`];
+    if (from !== null && Number.isNaN(from)) details.from = ['Enter a valid date.'];
+    if (to !== null && Number.isNaN(to)) details.to = ['Enter a valid date.'];
+    if (Object.keys(details).length) {
+      return errorResponse(400, 'VALIDATION_ERROR', 'Invalid filter value.', request, details);
+    }
+    const filtered = listView().filter((c) => {
+      const t = Date.parse(c.created_at);
+      return (
         (!status || c.status === status) &&
         (!severity || c.severity === severity) &&
-        (!from || c.created_at >= from) &&
-        (!to || c.created_at <= to),
-    );
-    return HttpResponse.json(paginate(filtered, url));
+        (from === null || t >= from) &&
+        (to === null || t < to)
+      );
+    });
+    const result = paginate(filtered, url, request);
+    return result instanceof Response ? result : HttpResponse.json(result);
   }),
 
   http.get(`${API}/risk-cases/:id`, ({ request, params }) => {
