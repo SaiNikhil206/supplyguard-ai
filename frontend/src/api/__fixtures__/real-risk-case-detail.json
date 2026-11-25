@@ -1,0 +1,119 @@
+{
+    "id": "RC-000001",
+    "status": "PENDING_APPROVAL",
+    "severity": "CRITICAL",
+    "supplier_id": "SUP-1001",
+    "supplier_name": "Summit Bearings Pvt Ltd",
+    "event_type": "FACTORY_OUTAGE",
+    "title": "Factory_Outage - Summit Bearings Pvt Ltd",
+    "risk_score": 92,
+    "affected_po_count": 1,
+    "exposure": {
+        "amount": "1250000.00",
+        "currency": "INR"
+    },
+    "created_at": "2026-11-25T10:58:34.552674Z",
+    "updated_at": "2026-11-25T10:58:34.574691Z",
+    "event": {
+        "event_id": "EVT-1",
+        "tenant_id": "TEN-ACME",
+        "supplier_id": "SUP-1001",
+        "event_type": "FACTORY_OUTAGE",
+        "severity": "CRITICAL",
+        "event_time": "2026-11-25T10:58:34.529385Z",
+        "expected_duration_hours": null,
+        "description": "FACTORY_OUTAGE at Summit Bearings Pvt Ltd",
+        "source_system": "SIM",
+        "correlation_id": "18ae81f5-96e0-411b-a27a-3cf37e7c573f"
+    },
+    "affected_pos": [
+        {
+            "po_id": "PO-D001",
+            "item_id": "ITEM-1",
+            "item_name": "",
+            "qty": 10,
+            "value": {
+                "amount": "100.00",
+                "currency": "INR"
+            },
+            "due_date": "2026-12-01",
+            "days_late_estimate": 6.0,
+            "stock_cover_days": null,
+            "shortage": true
+        }
+    ],
+    "analysis": {
+        "risk_case_id": "RC-000001",
+        "risk_level": "CRITICAL",
+        "risk_score": 92,
+        "summary": "Outage threatens 2 POs.",
+        "affected_entities": [
+            {
+                "type": "SUPPLIER",
+                "id": "SUP-1001"
+            }
+        ],
+        "evidence": [
+            {
+                "source": "EVENT",
+                "entity": "EVT-1",
+                "field": "severity",
+                "value": "CRITICAL"
+            }
+        ],
+        "facts": [
+            "Supplier offline"
+        ],
+        "estimates": [
+            {
+                "statement": "6 day delay",
+                "basis": "event"
+            }
+        ],
+        "assumptions": [],
+        "missing_data": [],
+        "confidence": "HIGH"
+    },
+    "recommendations": [
+        {
+            "id": "REC-000001",
+            "round": 1,
+            "rank": 3,
+            "option_type": "REVISED_SCHEDULE",
+            "status": "PENDING",
+            "unsupported": false,
+            "unsupported_reasons": [],
+            "proposed_action": {
+                "po_id": "PO-D001",
+                "change": {
+                    "expected_date": "2026-12-20"
+                }
+            },
+            "action_steps": [
+                "Ask supplier"
+            ],
+            "estimated_lead_time_days": null,
+            "estimated_cost_delta": null,
+            "trade_offs": [
+                "Late"
+            ],
+            "evidence": [],
+            "assumptions": [],
+            "data_gaps": []
+        }
+    ],
+    "no_viable_option_reason": null,
+    "data_quality_flags": [
+        "MISSING_ETA"
+    ],
+    "approvals": [],
+    "executions": [],
+    "timeline": [
+        {
+            "at": "2026-11-25T10:58:34.696719Z",
+            "actor": "SYSTEM",
+            "action": "case.created",
+            "detail": "created"
+        }
+    ]
+}

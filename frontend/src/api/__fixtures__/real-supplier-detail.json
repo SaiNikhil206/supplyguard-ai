@@ -1,0 +1,21 @@
+{
+    "id": "SUP-1008",
+    "name": "Shakti Components Pvt Ltd",
+    "country": "IN",
+    "category": "Packaging",
+    "status": "ACTIVE",
+    "risk_level": "MEDIUM",
+    "open_po_count": 3,
+    "on_time_delivery_pct": 83.1,
+    "contact_email": "orders@sup-1008.example.com",
+    "kpis": {
+        "on_time_delivery_pct": 83.1,
+        "avg_lead_time_days": 36.5,
+        "open_po_value": {
+            "amount": "671400.00",
+            "currency": "INR"
+        },
+        "disruptions_last_12m": 0
+    },
+    "disruption_history": []
+}
