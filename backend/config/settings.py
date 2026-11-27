@@ -210,7 +210,8 @@ WORKFLOW_EXECUTION_TRIGGER = env(
     "WORKFLOW_EXECUTION_TRIGGER", default="apps.workflow.hooks.StubExecutionTrigger"
 )
 WORKFLOW_ANALYSIS_TRIGGER = env(
-    "WORKFLOW_ANALYSIS_TRIGGER", default="apps.workflow.hooks.StubAnalysisTrigger"
+    "WORKFLOW_ANALYSIS_TRIGGER",
+    default="apps.intelligence.agents.orchestrator.AgentAnalysisTrigger",
 )
 
 for _name in ("WORKFLOW_EXECUTION_TRIGGER", "WORKFLOW_ANALYSIS_TRIGGER"):

@@ -68,7 +68,7 @@ def case_body(case: RiskCase, affected_po_count: int | None = None) -> dict:
 
 def move_to_analyzing(case: RiskCase, event: DisruptionEvent, actor) -> None:
     """RECEIVED -> ANALYZING (Trigger SYS_IMPACT) through the workflow state machine."""
-    from apps.workflow.services import transition
+    from apps.workflow.services import schedule_analysis, transition
 
     transition(
         case,
@@ -77,6 +77,7 @@ def move_to_analyzing(case: RiskCase, event: DisruptionEvent, actor) -> None:
         reason="impact computed",
         correlation_id=event.correlation_id,
     )
+    schedule_analysis(case)  # N-09: run the agents after the commit
 
 
 def _heal(case: RiskCase, event: DisruptionEvent, actor) -> RiskCase:

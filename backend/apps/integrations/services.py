@@ -19,6 +19,7 @@ from django.db import IntegrityError, transaction
 
 from apps.audit import record
 from apps.core.models import DisruptionEvent, RiskCase, Supplier
+from apps.intelligence.agents.offline import correlate_offline
 
 from . import boomi
 from .serializers import DisruptionEventInputSerializer
@@ -217,6 +218,7 @@ def _publish(tenant, actor, event: DisruptionEvent) -> None:
         client = boomi.get_boomi_client()
     except boomi.BoomiNotConfigured:
         audit("event.publish_skipped", {"reason": "boomi_not_configured"})
+        correlate_offline(tenant, actor, event)  # N-09: offline demo (mock backend only)
         return
     try:
         client.publish_event(canonical_event(event), str(event.correlation_id))
