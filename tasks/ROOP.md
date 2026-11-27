@@ -135,7 +135,7 @@
 - **Notes:** Redesign with shadcn/ui on Tailwind (user request). Base = collaboration + R-05/R-07/R-08 merged. Plan: shadcn foundation (theme, `src/components/ui` rebuilt on shadcn with same exports, app shell + command palette) | nested session | sonnet/medium | `roop/R-10-polish--foundation`; then in parallel: overview+suppliers screens | session | sonnet/medium | `--screens-insight`; risk+recommendations+approvals | session | sonnet/medium | `--screens-risk`; what-if+integrations+audit+settings+login | session | sonnet/medium | `--screens-admin`; final UI review | reviewer | opus/high | -. v2 pass (2026-11-23, user: "whole UI unprofessional"): foundation-v2 merged; screens restyled to docs/DESIGN_DIRECTION.md v2 | overview+suppliers+shared patterns | session | sonnet/medium | `--v2-insight`; risk+recommendations+approvals | session | sonnet/medium | `--v2-risk`; what-if+integrations+audit+settings | session | sonnet/medium | `--v2-admin`; test-runner haiku/low; reviewer-lite sonnet/medium. 2026-11-25: v2 restyle reverted at owner request (prefers colorful v1, branch `--restore-v1`); set to review to land the v1 UI (and the R-05/R-07/R-08 screens it carries) in collaboration; still open: demo reset button (ADMIN), Marketplace screenshots, zero-console-error click-through (401 on reload from token refresh).
 
 ### R-11: Demo script, deck, video storyboard
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S6 (27-31 Dec) | **Est:** 2d | **Depends:** S-03
 - **Branch:** `roop/R-11-demo-script`
 - **Model hint:** opus / high for the story, haiku / low for formatting
@@ -144,7 +144,7 @@
   - [ ] Two timed rehearsals under 8 min
   - [ ] Every Boomi service has a visible moment
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Drafts done (script, deck outline, shot list, Q&A); needs S-03 dry run + 2 timed rehearsals. Piece: script | session | opus/medium | roop/R-11-demo-script--script.
 
 ### R-12: Marketplace accelerator package
 - **Status:** todo
