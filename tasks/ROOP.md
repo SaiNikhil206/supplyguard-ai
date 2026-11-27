@@ -91,15 +91,15 @@
 - **Notes:** -
 
 ### R-07: What-if Simulator UI
-- **Status:** review
+- **Status:** done
 - **Sprint:** S4 (15-17 Dec) | **Est:** 1.5d | **Depends:** N-11, R-01
 - **Branch:** `roop/R-07-what-if-ui`
 - **Model hint:** sonnet / medium
 - **Deliverables:** supplier picker, duration slider, event type; results: affected POs, inventory gap chart, exposure, best option, assumptions panel.
 - **Acceptance:**
-  - [ ] "Supplier A out 7 days" renders in < 3 s
-- **Done in:** -
-- **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to real N-11 (`POST /what-if`: scenario, affected_pos, inventory gaps/items/coverage, best_option_estimate, data_gaps); request sends supplier_id, event_type, duration_days, optional start; chart renamed InventoryCoverageChart; reviewer-lite APPROVE. Stays `review`: "Supplier A out 7 days in < 3 s" not timed live against Django yet - tick after a live run on the seeded backend.
+  - [x] "Supplier A out 7 days" renders in < 3 s
+- **Done in:** `roop/R-07-what-if-ui` (in collaboration; live check 2026-11-27 on real Django + seed: `POST /what-if` SUP-1008 7 days 0.74 s cold, ~0.37 s warm; all response fields match the UI types)
+- **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to real N-11 (`POST /what-if`: scenario, affected_pos, inventory gaps/items/coverage, best_option_estimate, data_gaps); request sends supplier_id, event_type, duration_days, optional start; chart renamed InventoryCoverageChart; reviewer-lite APPROVE. Live check done 2026-11-27 (see Done in). Note: backend requires `event_type` in the request (UI sends it).
 
 ### R-08: Integration Center, Audit Center, Tenant Settings
 - **Status:** review
@@ -110,7 +110,7 @@
 - **Acceptance:**
   - [ ] Searching a correlation id shows event -> analysis -> approval -> execution in order (AC-07)
 - **Done in:** -
-- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to the real backend shapes (`GET /integrations/status`, `GET /audit?correlation_id=`, `GET/PATCH /settings`, `GET/POST /users`, `GET /me`); reviewer-lite APPROVE; 205 tests green. Stays `review`: AC-07 correlation trace not tried live (client orders `/audit` events by timestamp; no dedicated trace endpoint). Backend gaps for Uday: no tenant-roles endpoint, no user-update/role-change route (UI shows roles read-only, controls disabled with a note), per-service health missing from `/integrations/status`, `listUsers` shows first page (25) only.
+- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to the real backend shapes (`GET /integrations/status`, `GET /audit?correlation_id=`, `GET/PATCH /settings`, `GET/POST /users`, `GET /me`); reviewer-lite APPROVE; 205 tests green. Live check 2026-11-27 (real Django + seed): integrations, settings, users, audit shapes match. AC-07 stays unticked: `/audit?correlation_id=` returns the full chain in order (event -> analysis x2 -> decision -> status changes -> execution) only when the Boomi/internal callbacks forward `X-Correlation-ID`; without it the analysis callbacks get fresh ids and drop out of the trace. Gap for Nikhil (AnalysisView: default callback correlation id to the case/event id) and Uday (Boomi processes forward the header; add `entity_id`/`actor` audit filters; no distinct execution.succeeded action; /audit is newest-first so the UI sorts ascending). Earlier note: AC-07 trace not tried live (client orders `/audit` events by timestamp; no dedicated trace endpoint). Backend gaps for Uday: no tenant-roles endpoint, no user-update/role-change route (UI shows roles read-only, controls disabled with a note), per-service health missing from `/integrations/status`, `listUsers` shows first page (25) only.
 
 ### R-09: CI pipeline
 - **Status:** review
