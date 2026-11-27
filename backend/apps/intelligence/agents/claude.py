@@ -17,14 +17,23 @@ from pathlib import Path
 
 from apps.intelligence.validation import _schema_dir
 
-from .config import AgentConfigError, AgentError, AgentOutputError, conf, conf_float, conf_int
+from .config import (
+    AgentConfigError,
+    AgentError,
+    AgentOutputError,
+    conf,
+    conf_float,
+    conf_int,
+    remaining,
+)
 from .payload import RECOVERY_PLANNER, RISK_ANALYST, build_agent_input
 from .prompts import system_prompt
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL = "claude-sonnet-5-5"
-MAX_TOKENS = 8000
+# Room for the JSON (about 3-4k tokens) plus adaptive thinking, which counts against max_tokens.
+MAX_TOKENS = 16000
 _SCHEMA_FILE = {RISK_ANALYST: "risk_analysis", RECOVERY_PLANNER: "recovery_plan"}
 # Keywords structured outputs do not accept; the full schema is enforced by N-07 afterwards.
 _DROP = {
@@ -130,7 +139,8 @@ def _call(agent: str, case, risk_analysis, feedback: str) -> dict:
         "system": system_prompt(agent),
         "messages": [{"role": "user", "content": content}],
         "output_config": {
-            "format": {"type": "json_schema", "schema": output_schema(agent, str(_schema_dir()))}
+            "effort": str(conf("AGENT_CLAUDE_EFFORT", "medium")),
+            "format": {"type": "json_schema", "schema": output_schema(agent, str(_schema_dir()))},
         },
     }
     retries = conf_int("AGENT_CLAUDE_RETRIES", 2)
@@ -144,7 +154,9 @@ def _call(agent: str, case, risk_analysis, feedback: str) -> dict:
     attempt = 0
     while True:
         try:
-            response = client.messages.create(**request)
+            response = client.messages.create(
+                **request, timeout=remaining(conf_float("AGENT_CLAUDE_TIMEOUT", 60.0))
+            )
             break
         except anthropic.BadRequestError as exc:
             if "output_config" in request and "schema" in str(exc).lower():
@@ -158,12 +170,12 @@ def _call(agent: str, case, risk_analysis, feedback: str) -> dict:
                 raise AgentError(
                     f"Claude call failed after {attempt} attempts ({type(exc).__name__})"
                 ) from None
-            time.sleep(backoff * 2 ** (attempt - 1))
+            time.sleep(min(backoff * 2 ** (attempt - 1), remaining(backoff * 2**attempt)))
         except anthropic.APIError as exc:
             raise AgentError(f"Claude call failed ({type(exc).__name__})") from None
     text = _text(response)
     if getattr(response, "stop_reason", None) in ("refusal", "max_tokens"):
-        raise AgentOutputError(f"Claude stopped with {response.stop_reason}", text)
+        raise AgentOutputError(f"Claude stopped with stop_reason={response.stop_reason}", text)
     try:
         out = json.loads(text)
     except ValueError:

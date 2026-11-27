@@ -10,10 +10,11 @@ without it AgentConfigError is raised. Nothing secret or any payload is logged o
 
 import json
 import logging
+from urllib.parse import urlsplit
 
 import httpx
 
-from .config import AgentConfigError, AgentError, AgentOutputError, conf, conf_float
+from .config import AgentConfigError, AgentError, AgentOutputError, conf, conf_float, remaining
 from .payload import RECOVERY_PLANNER, RISK_ANALYST, build_agent_input
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,13 @@ def _config(agent: str) -> tuple[str, tuple[str, str], str]:
             "AGENT_BACKEND=boomi is not configured; missing: " + ", ".join(missing)
         )
     host = str(conf("AGENTSTUDIO_EXECUTE_URL")).rstrip("/")
+    parts = urlsplit(host)
+    if parts.scheme != "https" and not (
+        parts.scheme == "http" and parts.hostname in ("localhost", "127.0.0.1", "::1")
+    ):
+        raise AgentConfigError(
+            "AGENTSTUDIO_EXECUTE_URL must be an https URL (credentials are sent)"
+        )
     url = f"{host}/execute/api/v1/{conf('BOOMI_ACCOUNT_ID')}/session"
     auth = (f"BOOMI_TOKEN.{conf('BOOMI_USERNAME')}", str(conf("BOOMI_API_TOKEN")))
     return url, auth, str(conf(_DEPLOYMENT_SETTING[agent]))
@@ -44,12 +52,11 @@ def _config(agent: str) -> tuple[str, tuple[str, str], str]:
 def _call(agent: str, case, risk_analysis, feedback: str) -> dict:
     url, auth, deployment = _config(agent)
     message = build_agent_input(case, agent, risk_analysis)
-    if feedback:
-        message["user_message"] = feedback
+    # Structured mode takes exactly agent_input.schema.json as `message`; reviewer feedback has no
+    # place in it, so the boomi backend does not forward it (the claude backend does).
+    budget = remaining(conf_float("AGENTSTUDIO_SESSION_TIMEOUT", 120.0))
     try:
-        with httpx.Client(
-            timeout=conf_float("AGENTSTUDIO_SESSION_TIMEOUT", 120.0), transport=_transport()
-        ) as client:
+        with httpx.Client(timeout=httpx.Timeout(budget), transport=_transport()) as client:
             response = client.post(
                 url, auth=auth, json={"message": message, "deployment_id": deployment}
             )

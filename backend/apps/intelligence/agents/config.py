@@ -5,12 +5,16 @@ Secrets (ANTHROPIC_API_KEY, BOOMI_API_TOKEN) are read here only and are never lo
 """
 
 import os
+import time
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 
 from django.conf import settings
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 BACKENDS = ("boomi", "claude", "mock")
+NONE = "none"  # unset: no agent output at all, the trigger only logs + audits (the stub)
 
 
 def conf(name: str, default=None):
@@ -42,10 +46,38 @@ def conf_bool(name: str, default: bool) -> bool:
 
 
 def backend_name() -> str:
-    name = str(conf("AGENT_BACKEND", "mock")).strip().lower()
-    if name not in BACKENDS:
-        raise AgentConfigError(f"AGENT_BACKEND must be one of {', '.join(BACKENDS)} (got {name!r})")
+    """`none` (the default) = analysis is not run; otherwise boomi | claude | mock."""
+    name = str(conf("AGENT_BACKEND", NONE)).strip().lower()
+    if name not in (*BACKENDS, NONE):
+        raise AgentConfigError(
+            f"AGENT_BACKEND must be one of {', '.join(BACKENDS)} or {NONE} (got {name!r})"
+        )
     return name
+
+
+_deadline: ContextVar[float | None] = ContextVar("agent_deadline", default=None)
+
+
+@contextmanager
+def deadline(seconds: float):
+    """Hard total time budget for everything run inside the block (all agent calls, retries)."""
+    token = _deadline.set(time.monotonic() + seconds)
+    try:
+        yield
+    finally:
+        _deadline.reset(token)
+
+
+def remaining(cap: float) -> float:
+    """Seconds a single call may still take: `cap`, or what is left of the deadline.
+    Raises AgentTimeout when the deadline has passed."""
+    end = _deadline.get()
+    if end is None:
+        return cap
+    left = end - time.monotonic()
+    if left <= 0:
+        raise AgentTimeout("agent run exceeded its total time budget")
+    return min(cap, left)
 
 
 def repo_path(setting: str, *default: str) -> Path:
@@ -55,6 +87,10 @@ def repo_path(setting: str, *default: str) -> Path:
 
 class AgentError(Exception):
     """An agent call failed (transport, auth, timeout). No payload or secret in the message."""
+
+
+class AgentTimeout(AgentError):
+    """The run's total deadline (AGENT_TOTAL_TIMEOUT_SECONDS) passed."""
 
 
 class AgentConfigError(AgentError):

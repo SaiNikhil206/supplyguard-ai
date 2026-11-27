@@ -13,10 +13,18 @@ from functools import lru_cache
 
 from .config import repo_path
 
-# supplier -> reference answers. SUP-1008 = demo (and TC-06/07/08); SUP-1040 = TC-05 (no option).
+# Reference answers are only valid for the scenario they were recorded for, so a fixture is chosen
+# by (tenant, supplier, event type, duration, affected PO set). Anything else (e.g. a 30 h
+# SUP-1008 event) gets the minimal answer, which ends the case CLOSED instead of mis-citing.
 _FIXTURES = {
-    "SUP-1008": "demo.json",
-    "SUP-1040": "tc05.json",
+    (
+        "TEN-ACME",
+        "SUP-1008",
+        "FACTORY_OUTAGE",
+        48,
+        ("PO-1001", "PO-1002"),
+    ): "demo.json",  # + TC-06/07/08
+    ("TEN-ACME", "SUP-1040", "FACTORY_OUTAGE", 96, ("PO-1015",)): "tc05.json",  # TC-05
 }
 _BANDS = ((85, "CRITICAL"), (65, "HIGH"), (40, "MEDIUM"), (0, "LOW"))
 
@@ -33,8 +41,20 @@ def _load(agent_dir: str, name: str, root: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _fixture(agent_dir: str, supplier_id: str):
-    name = _FIXTURES.get(supplier_id)
+def _scenario_key(case) -> tuple:
+    event = case.event
+    hours = event.expected_duration_hours
+    return (
+        case.tenant_id,
+        event.supplier_erp_id,
+        event.event_type,
+        int(hours) if hours is not None and hours == int(hours) else hours,
+        tuple(sorted(case.impact.get("affected_po_ids", []))),
+    )
+
+
+def _fixture(agent_dir: str, case):
+    name = _FIXTURES.get(_scenario_key(case))
     if not name:
         return None
     root = str(repo_path("AGENT_FIXTURE_DIR", "boomi", "agents"))
@@ -125,12 +145,12 @@ def _minimal_risk_analysis(case) -> dict:
 
 
 def run_risk_analyst(case, **_) -> dict:
-    out = _fixture("risk_analyst", case.event.supplier_erp_id)
+    out = _fixture("risk_analyst", case)
     return _align_risk_analysis(out, case) if out else _minimal_risk_analysis(case)
 
 
 def run_recovery_planner(case, risk_analysis, **_) -> dict:
-    out = _fixture("recovery_planner", case.event.supplier_erp_id)
+    out = _fixture("recovery_planner", case)
     if out is None:
         return {
             "risk_case_id": case.id,

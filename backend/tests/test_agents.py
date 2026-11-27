@@ -54,6 +54,8 @@ def case(acme, monkeypatch):
 def offline(monkeypatch):
     monkeypatch.setenv("OFFLINE_CORRELATION", "1")
     monkeypatch.setenv("AGENT_BACKEND", "mock")
+    monkeypatch.setenv("AGENT_RUN_SYNC", "1")
+    monkeypatch.setenv("AGENT_RUN_SYNC", "1")
 
 
 def simulate(acme, scenario, capture):
@@ -133,7 +135,7 @@ def test_mock_outputs_are_valid_for_the_demo_case(case):
 def test_agent_input_uses_the_stored_snapshot_and_impact(case):
     risk = mock_backend.run_risk_analyst(case)
     ra = build_agent_input(case, "RISK_ANALYST")
-    assert ra["risk_case_id"] == case.id and ra["impact"] == case.impact
+    assert ra["risk_case_id"] == case.id and ra["impact"]["risk_score"] == case.impact["risk_score"]
     assert ra["snapshot"]["purchase_orders"] == case.snapshot["purchase_orders"]
     assert ra["event"]["event_id"] == case.event.event_id and "risk_analysis" not in ra
     rp = build_agent_input(case, "RECOVERY_PLANNER", risk)
@@ -408,7 +410,7 @@ def test_boomi_failure_leaves_case_analyzing(case, boomi_agents):
 # --- switching + orchestrator safety -----------------------------------------------------------
 def test_backend_is_switched_by_the_env_var_alone(case, monkeypatch):
     monkeypatch.delenv("AGENT_BACKEND", raising=False)
-    assert agents.config.backend_name() == "mock"  # default
+    assert agents.config.backend_name() == "none"  # default: no agent output
     sentinel = {"who": None}
     for name in ("mock", "claude", "boomi"):
         module = getattr(agents, name)
@@ -421,6 +423,9 @@ def test_backend_is_switched_by_the_env_var_alone(case, monkeypatch):
         monkeypatch.setenv("AGENT_BACKEND", name)
         agents.run_risk_analyst(case)
         assert sentinel["who"] == name
+    monkeypatch.delenv("AGENT_BACKEND")
+    with pytest.raises(agents.AgentConfigError, match="not set"):
+        agents.run_risk_analyst(case)
     monkeypatch.setenv("AGENT_BACKEND", "gpt")
     with pytest.raises(agents.AgentConfigError):
         agents.run_risk_analyst(case)
@@ -456,3 +461,270 @@ def test_trigger_setting_points_at_the_real_trigger(settings):
     from django.conf import settings as dj
 
     assert dj.WORKFLOW_ANALYSIS_TRIGGER.endswith("agents.orchestrator.AgentAnalysisTrigger")
+
+
+# --- review fixes ------------------------------------------------------------------------------
+import threading  # noqa: E402
+
+from django.core.management import call_command as _call_command  # noqa: E402
+
+from apps.intelligence.agents import runner  # noqa: E402
+from apps.intelligence.agents.orchestrator import AgentAnalysisTrigger  # noqa: E402
+from apps.intelligence.agents.payload import AgentInputInvalid, validate_input  # noqa: E402
+from apps.workflow.hooks import AnalysisRequest  # noqa: E402
+
+
+def request_for(case, round_=None):
+    return AnalysisRequest(
+        tenant_id=case.tenant_id,
+        risk_case_id=case.id,
+        round=round_ or case.analysis_round,
+        reason="t",
+        feedback="",
+        correlation_id=str(case.correlation_id),
+    )
+
+
+def test_agent_input_matches_agent_input_schema_exactly(case):
+    for agent in ("RISK_ANALYST", "RECOVERY_PLANNER"):
+        risk = mock_backend.run_risk_analyst(case) if agent == "RECOVERY_PLANNER" else None
+        payload = build_agent_input(case, agent, risk)
+        assert validate_input(payload) == []
+        assert "shipment_id" not in payload["event"] and "po_id" not in payload["event"]
+        assert set(payload["impact"]) == {"risk_score", "total_exposure", "affected_pos"}
+        for po in payload["impact"]["affected_pos"]:
+            assert "due_date" not in po and "line_nos" not in po
+        assert "shipments" not in payload["snapshot"]
+
+
+def test_invalid_agent_input_is_audited_and_the_agent_is_not_called(case, fake_claude):
+    messages = fake_claude(reply({}))
+    RiskCase.objects.filter(pk=case.pk).update(impact={})
+    with pytest.raises(AgentInputInvalid):
+        build_agent_input(RiskCase.objects.get(pk=case.pk), "RISK_ANALYST")
+    assert run_analysis_for_case(case) is False
+    assert messages.calls == []
+    (row,) = audits("analysis.input_invalid")
+    assert row.data["agent"] == "RISK_ANALYST" and row.data["errors"]
+    assert AgentRun.objects.count() == 0
+
+
+def test_claude_request_has_headroom_and_effort(case, fake_claude):
+    messages = fake_claude(reply(mock_backend.run_risk_analyst(case)))
+    agents.run_risk_analyst(case)
+    (call,) = messages.calls
+    assert call["max_tokens"] >= 16000 and call["output_config"]["effort"] == "medium"
+    assert 0 < call["timeout"] <= 60
+
+
+@pytest.mark.parametrize("reason", ["max_tokens", "refusal"])
+def test_claude_stop_reason_is_stored_as_an_invalid_agent_run(case, fake_claude, reason):
+    fake_claude(reply('{"risk_case_id": "RC-0000', stop_reason=reason))
+    assert run_analysis_for_case(case) is False
+    (run,) = AgentRun.objects.filter(risk_case=case)
+    assert run.valid is False and f"stop_reason={reason}" in run.raw["error"]
+
+
+def test_boomi_body_is_only_message_and_deployment_and_ignores_feedback(case, boomi_agents):
+    out = mock_backend.run_risk_analyst(case)
+    seen = boomi_agents(lambda r: httpx.Response(200, json={"data": out}))
+    agents.run_risk_analyst(case, feedback="please change")
+    body = json.loads(seen[0].content)
+    assert set(body) == {"message", "deployment_id"} and "user_message" not in body["message"]
+    assert validate_input(body["message"]) == []
+
+
+def test_boomi_requires_https_except_localhost(case, boomi_agents, monkeypatch):
+    out = mock_backend.run_risk_analyst(case)
+    seen = boomi_agents(lambda r: httpx.Response(200, json={"data": out}))
+    monkeypatch.setenv("AGENTSTUDIO_EXECUTE_URL", "http://execute.example.test")
+    with pytest.raises(agents.AgentConfigError, match="https"):
+        agents.run_risk_analyst(case)
+    assert seen == []
+    monkeypatch.setenv("AGENTSTUDIO_EXECUTE_URL", "http://localhost:9000")
+    assert agents.run_risk_analyst(case)
+
+
+def test_boomi_call_is_bounded_by_the_total_deadline(case, boomi_agents, monkeypatch):
+    from apps.intelligence.agents.config import deadline
+
+    boomi_agents(lambda r: httpx.Response(200, json={"data": {"x": 1}}))
+    captured = {}
+    real = boomi_backend.httpx.Timeout
+
+    def spy(value):
+        captured["t"] = value
+        return real(value)
+
+    monkeypatch.setattr(boomi_backend.httpx, "Timeout", spy)
+    with deadline(7):
+        agents.run_risk_analyst(case)
+    assert captured["t"] <= 7
+    with deadline(0), pytest.raises(agents.AgentTimeout):
+        agents.run_risk_analyst(case)
+
+
+def test_total_deadline_audits_a_timeout_and_keeps_the_case_analyzing(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    monkeypatch.setenv("AGENT_TOTAL_TIMEOUT_SECONDS", "0")
+    assert run_analysis_for_case(case) is False
+    case.refresh_from_db()
+    assert case.status == "ANALYZING" and audits("analysis.timeout").count() == 1
+
+
+def test_run_is_audited_start_and_completion(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    assert run_analysis_for_case(case) is True
+    assert audits("analysis.started").count() == 1
+    assert audits("analysis.completed").count() == 1
+
+
+def test_default_backend_none_only_logs_and_audits_through_the_stub(
+    case, monkeypatch, django_capture_on_commit_callbacks
+):
+    from apps.workflow.hooks import get_analysis_trigger
+    from apps.workflow.services import schedule_analysis
+
+    monkeypatch.delenv("AGENT_BACKEND", raising=False)
+    monkeypatch.setenv("AGENT_RUN_SYNC", "1")
+    assert type(get_analysis_trigger()).__name__ == "AgentAnalysisTrigger"
+    with django_capture_on_commit_callbacks(execute=True):
+        schedule_analysis(case)
+    assert audits("analysis.request_stubbed").count() == 1
+    assert AgentRun.objects.count() == 0
+    case.refresh_from_db()
+    assert case.status == "ANALYZING"
+
+
+def test_trigger_returns_at_once_and_runs_the_job_in_a_daemon_thread(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "claude")
+    monkeypatch.delenv("AGENT_RUN_SYNC", raising=False)
+    started, release = threading.Event(), threading.Event()
+
+    def slow_job(request):
+        started.set()
+        release.wait(5)
+
+    monkeypatch.setattr(runner, "run_job", slow_job)
+    t0 = time.perf_counter()
+    AgentAnalysisTrigger().request_analysis(request_for(case))
+    elapsed = time.perf_counter() - t0
+    try:
+        assert started.wait(2) and elapsed < 1
+        (worker,) = [t for t in threading.enumerate() if t.name == f"analysis-{case.id}"]
+        assert worker.daemon
+    finally:
+        release.set()
+
+
+def test_sync_flag_runs_inline(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    monkeypatch.setenv("AGENT_RUN_SYNC", "1")
+    AgentAnalysisTrigger().request_analysis(request_for(case))
+    case.refresh_from_db()
+    assert case.status == "PENDING_APPROVAL"
+
+
+def test_stale_round_request_is_ignored(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    monkeypatch.setenv("AGENT_RUN_SYNC", "1")
+    runner.submit(request_for(case, round_=case.analysis_round + 1))
+    assert AgentRun.objects.count() == 0
+
+
+def stale(case):
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    RiskCase.objects.filter(pk=case.pk).update(updated_at=timezone.now() - timedelta(hours=1))
+
+
+def test_run_pending_analysis_recovers_a_stuck_case(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    stale(case)
+    _call_command("run_pending_analysis", "--older-than", "60", stdout=mock.MagicMock())
+    case.refresh_from_db()
+    assert case.status == "PENDING_APPROVAL"
+
+
+def test_run_pending_analysis_skips_fresh_cases_and_reuses_stored_risk_analysis(case, monkeypatch):
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    _call_command("run_pending_analysis", stdout=mock.MagicMock())  # fresh: untouched
+    assert AgentRun.objects.count() == 0
+    # the planner failed earlier: only the risk analysis exists
+    with monkeypatch.context() as m:
+        m.setattr(
+            "apps.intelligence.agents.orchestrator.run_recovery_planner",
+            lambda *a, **k: (_ for _ in ()).throw(agents.AgentError("down")),
+        )
+        assert run_analysis_for_case(case) is False
+    assert AgentRun.objects.filter(agent="RISK_ANALYST").count() == 1
+    monkeypatch.setattr(
+        "apps.intelligence.agents.orchestrator.run_risk_analyst",
+        lambda *a, **k: pytest.fail("risk analyst must not be called again"),
+    )
+    stale(case)
+    _call_command("run_pending_analysis", "--older-than", "60", stdout=mock.MagicMock())
+    case.refresh_from_db()
+    assert case.status == "PENDING_APPROVAL"
+    assert AgentRun.objects.filter(agent="RISK_ANALYST").count() == 1
+
+
+def test_run_pending_analysis_does_nothing_without_a_backend(case, monkeypatch):
+    monkeypatch.delenv("AGENT_BACKEND", raising=False)
+    stale(case)
+    _call_command("run_pending_analysis", "--older-than", "60", stdout=mock.MagicMock())
+    assert AgentRun.objects.count() == 0
+
+
+def test_mock_fixture_is_only_used_for_the_recorded_scenario(acme, monkeypatch):
+    """A 30 h SUP-1008 event is not the demo: minimal answer, the case ends CLOSED."""
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    key = api_key_client(acme)
+    event = {
+        **DEMO["event"],
+        "event_id": "EVT-000950",
+        "expected_duration_hours": 30,
+        "correlation_id": "0f6c1c2e-0000-4000-8000-000000000950",
+    }
+    assert key.post(EVENTS, event, format="json").status_code == 202
+    r = key.post(CASES, {"event_id": "EVT-000950", "snapshot": demo_snapshot()}, format="json")
+    assert r.status_code == 201, r.content
+    case = RiskCase.objects.get(pk=r.json()["risk_case_id"])
+    assert run_analysis_for_case(case) is True
+    case.refresh_from_db()
+    assert case.status == "CLOSED"
+    runs = AgentRun.objects.filter(risk_case=case)
+    assert runs.count() == 2 and all(x.valid for x in runs)
+    assert runs.get(agent="RECOVERY_PLANNER").raw["options"] == []
+
+
+def test_startup_warns_loudly_when_mock_is_active(monkeypatch, caplog):
+    from django.apps import apps
+
+    monkeypatch.setenv("AGENT_BACKEND", "mock")
+    with caplog.at_level("WARNING"):
+        apps.get_app_config("intelligence").ready()
+    assert any("CANNED FIXTURE DATA" in r.message for r in caplog.records)
+
+
+def test_u06_callback_returns_fast_whatever_the_backend(
+    acme, monkeypatch, django_capture_on_commit_callbacks
+):
+    monkeypatch.setenv("AGENT_BACKEND", "claude")
+    monkeypatch.delenv("AGENT_RUN_SYNC", raising=False)
+    release = threading.Event()
+    monkeypatch.setattr(runner, "run_job", lambda request: release.wait(5))
+    key = api_key_client(acme)
+    assert key.post(EVENTS, DEMO["event"], format="json").status_code == 202
+    t0 = time.perf_counter()
+    with django_capture_on_commit_callbacks(execute=True):
+        r = key.post(
+            CASES,
+            {"event_id": DEMO["event"]["event_id"], "snapshot": demo_snapshot()},
+            format="json",
+        )
+    elapsed = time.perf_counter() - t0
+    release.set()
+    assert r.status_code == 201 and elapsed < 1
