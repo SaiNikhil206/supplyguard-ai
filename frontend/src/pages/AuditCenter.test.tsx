@@ -108,4 +108,24 @@ describe('Audit Center', () => {
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
   });
+
+  it('rejects a non-UUID correlation id client-side without calling the API', async () => {
+    const { router } = renderWithProviders({ path: '/audit' });
+    await screen.findByRole('table', { name: 'Audit events' });
+    await userEvent.type(screen.getByLabelText('Correlation ID'), 'not-a-uuid');
+    await userEvent.click(screen.getByRole('button', { name: 'Search' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/not a valid correlation id/i);
+    expect(router.state.location.search).not.toContain('view=trace');
+  });
+
+  it('offers only server-supported filters and the real actions', async () => {
+    renderWithProviders({ path: '/audit' });
+    await screen.findByRole('table', { name: 'Audit events' });
+    expect(screen.queryByLabelText(/entity id/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^actor/i)).not.toBeInTheDocument();
+    const action = screen.getByLabelText('Action');
+    for (const label of ['Event publish skipped', 'API key created', 'API key rejected']) {
+      expect(within(action).getByRole('option', { name: label })).toBeInTheDocument();
+    }
+  });
 });

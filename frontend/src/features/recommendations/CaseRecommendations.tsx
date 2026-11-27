@@ -39,6 +39,15 @@ export function CaseRecommendations({ caseId }: { caseId: string }) {
           </Link>
         </Button>
       </div>
+      {!c.analysis && recs.length > 0 && (
+        <Alert variant="warning">
+          <TriangleAlert aria-hidden="true" />
+          <AlertTitle>Analysis pending</AlertTitle>
+          <AlertDescription>
+            The risk analysis has not arrived yet. These options are shown without its supporting summary.
+          </AlertDescription>
+        </Alert>
+      )}
       {recs.length === 0 ? (
         c.no_viable_option_reason ? (
           <Alert variant="warning">

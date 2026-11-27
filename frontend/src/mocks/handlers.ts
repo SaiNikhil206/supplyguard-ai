@@ -279,9 +279,17 @@ export const handlers: HttpHandler[] = [
       const { eventId } = addSimulatedCase(scenario);
       return HttpResponse.json(
         {
+          scenario: scenario.name,
           event_id: eventId,
-          correlation_id: request.headers.get('X-Correlation-ID') ?? crypto.randomUUID(),
-          status: 'RECEIVED',
+          sent: [
+            {
+              http_status: 202,
+              event_id: eventId,
+              correlation_id: request.headers.get('X-Correlation-ID') ?? crypto.randomUUID(),
+              status: 'RECEIVED',
+              risk_case_id: null,
+            },
+          ],
         },
         { status: 202 },
       );
