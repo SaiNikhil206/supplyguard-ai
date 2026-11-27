@@ -248,3 +248,12 @@ Template:
 - Next: confirm auto-merge of R-05/R-07/R-08; live checks; R-06 Flow build in Boomi UI
 - Blockers: backend gaps (executions retry, approvals queue, roles, user update) for Nikhil/Uday; U-07 chain for R-04 simulate AC
 - Models used: advisor opus; 4 nested sessions + R-06 session sonnet/medium; implementer subagents; test-runner haiku; reviewer-lite sonnet
+
+## 2026-11-27 - roop - all Roop tasks closed, repo moved to new origin
+- Branch: roop/R-08-admin-screens (all roop/* pushed to SaiNikhil206/supplyguard-ai)
+- Did: live API check on seeded Django; livefix (simulate type, audit labels, analysis-pending); R-07/R-10 done; R-06/R-11/R-12 docs landed; R-04, R-06, R-08, R-09, R-11, R-12 closed as done WITH DEFERRED acceptance items (unticked, listed in Notes); origin switched to new repo, old repo kept as `oldrepo`
+- Tests: Vitest 213/213 on merged R-07; frontend 220 on livefix; backend 1233 + portal 38; demo path 0 console errors (mock mode); not run live: R-06 Flow, R-04 5 s, R-08 AC-07 (needs teammates)
+- Status now: all 12 done (6 with deferred acceptance)
+- Next: Flow build in Boomi UI; re-check R-04/R-08 after U-07/U-10/N-08/N-09; S-03 + rehearsals; ci-ok rule on main (Nikhil)
+- Blockers: see Handoff block (Uday U-07/U-10/U-11 + endpoints; Nikhil N-08/N-09 + correlation default)
+- Models used: advisor opus; sonnet nested sessions and implementer subagents; test-runner haiku; reviewer-lite sonnet

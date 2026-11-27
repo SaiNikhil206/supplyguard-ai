@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 6 | 3 | 3 | 0 | 0 | 0 | 50% | R-06 |
+| Roop | 12 | 0 | 0 | 0 | 0 | 0 | 100% | - |
 | Nikhil | 0 | 0 | 11 | 0 | 3 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -26,7 +26,7 @@
 | U-03 | Core data model + seed loader | Uday | S0 (21-23 Nov) | review ⚠ overdue | 4/4 | - |
 | N-04 | Deterministic impact + risk scoring engine | Nikhil | S1 (25-30 Nov) | review | 4/4 | - |
 | R-02 | Read APIs for the UI (Django `apps/portal`) | Roop | S1 (26-30 Nov) | done | 3/3 | 3ffed0f |
-| R-09 | CI pipeline | Roop | S1 (24-26 Nov) | review | 0/1 | - |
+| R-09 | CI pipeline | Roop | S1 (24-26 Nov) | done | 0/1 | collaboration (`.github/workflows/ci.yml`, ESLint 9, run_checks gate) |
 | U-04 | Auth, tenant isolation, RBAC, users + settings APIs | Uday | S1 (24-27 Nov) | review | 3/3 | - |
 | U-05 | Audit service + correlation-id middleware | Uday | S1 (24-26 Nov) | review | 2/2 | - |
 | U-06 | Event intake + Boomi client (Django `apps/integrations`) | Uday | S1 (26-30 Nov) | review | 5/5 | - |
@@ -38,36 +38,36 @@
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | review | 2/2 | - |
 | R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | done | 1/1 | `roop/R-04-risk-center` (wire session, 2026-11-25; run against real Django, sqlite + `load_seed --demo-users`, `VITE_API_MOCK=false`) |
-| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 1/2 | - |
+| R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | done | 1/2 | collaboration (R-04 wired to real API, live-checked 2026-11-27) |
 | U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | review | 1/2 | review 2026-11-24 on `uday/U-08-event-streams`: topics, subscription, publisher (shipment routing), subscriber (placeholder for N-08), Basic auth, Django end to end. Known gaps: no Boomi-side duplicate/header/tenant checks (see Notes), failure path / Event Streams down / SG_Disruption_Direct fallback not run, subscriber does not yet start N-08 (cross-account decision open). |
 | U-09 | Boomi API Management | Uday | S2 (3-7 Dec) | todo | 0/2 | - |
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
 | R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | done | 2/2 | `roop/R-05-approvals` (`--wire` d3f96ee merged; reviewer-lite APPROVE on combined diff, 2026-11-25) |
-| R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | in-progress | 0/2 | - |
+| R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | done | 0/2 | collaboration (`boomi/flow/`: approval-flow-spec.md, test-plan.md, README.md, values.example.json; aligned to the real flat decision API) |
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
 | R-07 | What-if Simulator UI | Roop | S4 (15-17 Dec) | done | 1/1 | `roop/R-07-what-if-ui` (in collaboration; live check 2026-11-27 on real Django + seed: `POST /what-if` SUP-1008 7 days 0.74 s cold, ~0.37 s warm; all response fields match the UI types) |
-| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | review | 0/1 | - |
+| R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | done | 0/1 | collaboration (wired to real API, live-checked 2026-11-27) |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | done | 1/1 | `roop/R-10-polish` (in collaboration; click-through 2026-11-27 in mock/demo mode: login admin + manager, all 9 screens, simulate -> new case 265 ms, approve -> execution Succeeded -> Recovered, what-if 536 ms; 0 console errors, 0 alert banners) |
-| R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | in-progress | 0/1 | - |
+| R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | done | 0/1 | collaboration (`boomi/marketplace/`: listing, install guide, config templates, architecture, components list, dry-run checklist) |
 | S-03 | End-to-end demo dry run | Shared | S5 (24 Dec) | todo | 0/1 | - |
 | S-04 | Security review | Shared | S5 (22-23 Dec) | todo | 0/1 | - |
-| R-11 | Demo script, deck, video storyboard | Roop | S6 (27-31 Dec) | in-progress | 0/2 | - |
+| R-11 | Demo script, deck, video storyboard | Roop | S6 (27-31 Dec) | done | 0/2 | collaboration (`docs/DEMO_SCRIPT.md`, `docs/demo/`: DECK_OUTLINE, QA_PREP, VIDEO_SHOT_LIST) |
 | S-05 | Final submission package | Shared | S6 (27-31 Dec) | todo | 0/1 | - |
 
 ## Where each member left off
 
 ### Roop
-- **Last updated:** 2026-11-25 (real-API wiring of R-03/04/05/07/08 done; R-06 docs aligned)
-- **Current task:** - (R-01, R-02, R-03, R-05 `done`; R-04, R-07, R-08, R-09, R-10 `review`; R-06 docs done, Flow build manual, still `todo` on collaboration)
-- **Branch:** `roop/R-08-admin-screens` (task branches R-04, R-05, R-07, R-08 pushed; R-04 already in collaboration; `roop/R-06-flow-approval` `5408f6e` pushed; `--wire` and `--stability` sub branches merged)
-- **Where I left off:** Screens run against real API shapes (decision flat 201, what-if, audit, settings/users, portal); R-03 + R-04 auth/read checked live on seeded Django (VITE_API_MOCK=false). Combined branch check: tsc, lint, build, backend 1233 + portal 38 pass; Vitest was flaky (CPU contention), fixed in `--stability` (asyncUtilTimeout 5 s, maxWorkers 4; 5 green runs of 200). reviewer-lite APPROVE. NOT run live: R-05 decision, R-07 <3 s, R-08 AC-07 trace. R-05/R-07/R-08 pushes await auto-merge (gh not logged in here, Actions not checked).
-- **Next step:** check Actions / `/merge-prs` so R-05, R-07, R-08 land in collaboration; set R-06 to `in-progress` on its own branch; live-run what-if, decision and audit trace on seeded Django; then R-06 Boomi Flow build (manual in Boomi UI). R-11/R-12 wait on S-03, U-10, N-09. Delete `tmp/roop-integ-check` + worktree `D:/hackathon/sg-integ`.
-- **Blockers:** Backend gaps (Nikhil/Uday): no `POST /executions/{id}/retry` (`workflow.services.retry_execution` has no route), no approvals-queue endpoint, no tenant-roles endpoint, no user-update route, `/integrations/status` lacks per-service health. R-04 simulate-to-case 5 s needs U-07 -> N-08/N-09 chain. Uday still to confirm R-02 edits in his files; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning. Nested sessions refused on automated turns (visible ones worked on user request).
+- **Last updated:** 2026-11-27 (all 12 Roop tasks closed; repo moved to SaiNikhil206/supplyguard-ai)
+- **Current task:** - (R-01..R-12 `done`; R-04, R-06, R-08, R-09, R-11, R-12 closed WITH DEFERRED ACCEPTANCE items, see each Notes)
+- **Branch:** `roop/R-08-admin-screens` (all Roop branches pushed to the new repo `origin`; old repo nexbit-labs is only the `oldrepo` backup remote)
+- **Where I left off:** Frontend wired to real API and live-checked (what-if 0.74 s, decision 201/403, audit order needs X-Correlation-ID); demo path clicked through in demo mode with 0 console errors; Flow/demo/marketplace docs landed. Unticked acceptance: R-04 5 s simulate-to-case, R-06 both (Flow not built in Boomi), R-08 AC-07 trace, R-09 required check, R-11 rehearsals, R-12 dry run.
+- **Next step:** build the Flow app in Boomi UI from `boomi/flow/README.md`; re-check R-04 5 s and R-08 trace after Uday U-07/U-10 and Nikhil N-08/N-09 + correlation header; run S-03 dry run (needs U-10) then 2 timed rehearsals; ask Nikhil (repo admin) for the `ci-ok` rule on `main`.
+- **Blockers:** Uday: U-07, U-10, U-11, `POST /executions/{id}/retry`, roles + user-update endpoints, per-service integration health, X-Correlation-ID forwarding, U-12 tunnel, S-01 freeze, confirm my R-02 edits. Nikhil: N-08, N-09, callback correlation-id default, approvals-queue decision, ruleset on main. Team decisions: timeline visibility, REJECTED-as-open, recovered_value, retry manager-only.
 
 ### Nikhil
 - **Last updated:** 2026-11-23 (N-07 validator built + reviewed, in review)
