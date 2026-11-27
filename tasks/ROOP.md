@@ -79,7 +79,7 @@
 - **Notes:** 2026-11-25 wired to the real API: flat decision response (`POST /recommendations/{id}/decision` 201), `canDecide` = PROCUREMENT_MANAGER only (ADMIN excluded, as backend), unsupported or null cost/lead-time options not approvable. Checked by reading serializers/views + contract tests, NOT yet run live against Django. Backend gaps (not mine, tell Nikhil/Uday): no `POST /executions/{id}/retry` route (`workflow.services.retry_execution` exists without an endpoint; UI degrades with a clear message on 404/405), no approvals-queue endpoint (queue derives from GET /risk-cases). Confirm retry should be manager-only once the endpoint exists. Earlier pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
 
 ### R-06: Boomi Flow approval workflow
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S3 (9-14 Dec) | **Est:** 2.5d | **Depends:** N-07, N-10, U-01
 - **Branch:** `roop/R-06-flow-approval`
 - **Model hint:** sonnet / medium via `boomi-builder` (Claude explains Flow as "a low-code screen + form builder with a state diagram")
@@ -88,7 +88,7 @@
   - [ ] Approve in Flow -> execution starts; Reject -> no execution
   - [ ] Decision visible in the SaaS Approval Center and audit within 5 s
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Docs delivered: boomi/flow/ README, approval-flow-spec, test-plan, values.example.json, now verified against the real N-10 endpoint (flat 201, user JWT only - API key/ADMIN get 403, per-option recommendation id, 409 reasons, 422 UNSUPPORTED_OPTION, Reject keeps case PENDING_APPROVAL while options remain). Acceptance boxes stay unchecked: they need the Flow built in Boomi. MANUAL Boomi steps: licence check (U-01), build app/service/pages/swimlane/escalation Wait, run test-plan. Open for Uday: how Boomi starts the Flow, how the manager JWT reaches Flow, API Mgmt forwarding Authorization. Open for Nikhil: escalation audit event (APPROVAL_ESCALATED) endpoint. Piece: flow-spec | session | sonnet/medium | roop/R-06-flow-approval--flow-spec.
 
 ### R-07: What-if Simulator UI
 - **Status:** done

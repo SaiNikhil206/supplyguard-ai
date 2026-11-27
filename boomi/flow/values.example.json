@@ -1,0 +1,21 @@
+{
+  "_comment": "Placeholders only. Real values live in Boomi / the team secret store, never in git.",
+  "django_base_url": "https://<api-management-gateway-host>/api/v1",
+  "auth_mode": "user_jwt",
+  "required_role": "PROCUREMENT_MANAGER",
+  "escalation_hours": 24,
+  "escalation_hours_demo": 0.033,
+  "escalation_contact_role": "ADMIN",
+  "request_timeout_seconds": 15,
+  "max_retries": 3,
+  "flow": {
+    "app_name": "SupplyGuard Approval",
+    "flow_id": "<flow-id-after-publish>",
+    "tenant_id": "<boomi-flow-tenant-id>"
+  },
+  "start_inputs": [
+    "riskCaseId",
+    "recommendationId",
+    "correlationId"
+  ]
+}
