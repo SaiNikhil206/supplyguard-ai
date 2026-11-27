@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | f409715 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
+| 2026-11-27 | 9ef1529 | roop | R-09 | review | docs(tasks): R-09 note - required check not enforceable on current GitHub plan |
 | 2026-11-27 | 425f32c | nikhil | N-09 | review | merge: N-09 agent backends into task branch |
 | 2026-11-27 | e3c56e3 | nikhil | N-09 | review | merge: N-09 Agent invocation wiring + offline fallback (auto-merge) |
 | 2026-11-27 | 29c0bf7 | nikhil | N-09 | review | fix(intelligence): N-09 review fixes |
@@ -107,5 +109,3 @@
 | 2026-11-27 | 0b24a7a | roop | R-07 | done | docs(tasks): R-07 done (live check), R-08 live findings |
 | 2026-11-25 | a818286 | roop | R-07 | review | merge: R-07 What-if Simulator UI (auto-merge) |
 | 2026-11-25 | ccaf1f2 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
-| 2026-11-25 | 9c91b0b | roop | R-08 | review | chore(tasks): handoff R-08 - wiring done, R-05/R-07/R-08 pushed |
-| 2026-11-25 | cd20334 | roop | R-08 | review | docs(tasks): R-08 review (admin screens on real API) |
