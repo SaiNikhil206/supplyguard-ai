@@ -89,6 +89,10 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | 2428de9 | nikhil | N-08 | in-progress | merge: N-08 build spec into task branch |
+| 2026-11-27 | 2188bec | nikhil | N-07 | review | merge: N-07 validator fixes F-01/F-02 into task branch |
+| 2026-11-27 | 18e9f16 | nikhil | N-07 | review | merge: N-07 Agent output validator + persistence (auto-merge) |
+| 2026-11-27 | fe33394 | nikhil | N-07 | review | fix(validation): flag invented capacity in option text and shortage-free alternates |
 | 2026-11-27 | 11e3d85 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-27 | f1f05f6 | nikhil | N-08 | in-progress | docs(boomi): N-08 SG_Disruption_Correlate build spec |
 | 2026-11-27 | 7b476c4 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
@@ -105,7 +109,3 @@
 | 2026-11-25 | 0cb4af9 | roop | R-07 | review | docs(tasks): R-07 review (wired to real what-if API) |
 | 2026-11-25 | cba509a | roop | R-05 | done | docs(tasks): R-05 done (real decision API, role gating) |
 | 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
-| 2026-11-25 | 988f3f5 | roop | R-04 | review | docs(tasks): R-03 done, R-04 wired to real API (review) |
-| 2026-11-25 | 1f36254 | roop | R-04 | in-progress | test(frontend): stabilize Vitest under load (asyncUtilTimeout 5s, cap workers) |
-| 2026-11-25 | 5408f6e | roop | R-06 | in-progress | docs(flow): align R-06 spec and test plan with real decision API |
-| 2026-11-25 | e707608 | roop | R-04 | in-progress | feat(frontend): run against real backend (VITE_API_MOCK=false), real-API contract tests |
