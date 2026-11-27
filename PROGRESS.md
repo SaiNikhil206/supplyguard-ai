@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | 2871b2d | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
+| 2026-11-27 | 0b24a7a | roop | R-07 | done | docs(tasks): R-07 done (live check), R-08 live findings |
 | 2026-11-25 | a818286 | roop | R-07 | review | merge: R-07 What-if Simulator UI (auto-merge) |
 | 2026-11-25 | ccaf1f2 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-25 | 9c91b0b | roop | R-08 | review | chore(tasks): handoff R-08 - wiring done, R-05/R-07/R-08 pushed |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 87b3031 | roop | R-04 | in-progress | wip(frontend): R-04 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | feecf63 | roop | R-07 | in-progress | wip(frontend): R-07 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | 843c9af | roop | R-05 | in-progress | wip(frontend): R-05 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | 16a3d2c | roop | R-08 | in-progress | wip(frontend): R-08 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | c99b0e8 | roop | R-10 | review | merge: R-10 UX polish + demo mode (auto-merge) |
