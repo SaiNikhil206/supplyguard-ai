@@ -38,10 +38,16 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-supplyguard}:${POSTGRES_PASSWORD:-supplyguard}@db:5432/${POSTGRES_DB:-supplyguard}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
       SG_SCHEMA_DIR: /app/ai/schemas
+      # N-09 demo: canned mock agents + offline case creation (unset AGENT_BACKEND = no analysis)
+      AGENT_BACKEND: ${AGENT_BACKEND:-mock}
+      OFFLINE_CORRELATION: ${OFFLINE_CORRELATION:-1}
+      AGENT_INSTRUCTIONS_DIR: /app/boomi/agents
+      AGENT_FIXTURE_DIR: /app/boomi/agents
     volumes:
       - ./backend:/app
       - ./data:/data:ro
       - ./ai:/app/ai:ro
+      - ./boomi/agents:/app/boomi/agents:ro
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
