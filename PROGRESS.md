@@ -7,7 +7,7 @@
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
 | Roop | 6 | 3 | 3 | 0 | 0 | 0 | 50% | R-06 |
-| Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
+| Nikhil | 0 | 0 | 11 | 0 | 3 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
 
@@ -36,7 +36,7 @@
 | N-06 | Recovery Planning agent (Agentstudio) | Nikhil | S2 (3-6 Dec) | review | 3/3 | - |
 | N-07 | Agent output validator + persistence | Nikhil | S2 (4-7 Dec) | review | 3/3 | - |
 | N-08 | Boomi correlation + impact orchestration process | Nikhil | S2 (3-7 Dec) | todo | 0/2 | - |
-| N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | todo | 0/2 | - |
+| N-09 | Agent invocation wiring + offline fallback | Nikhil | S2-S3 (6-10 Dec) | review | 2/2 | - |
 | R-03 | Executive Overview + Supplier Intelligence screens | Roop | S2 (1-5 Dec) | done | 1/1 | `roop/R-04-risk-center` (wire session, 2026-11-25; run against real Django, sqlite + `load_seed --demo-users`, `VITE_API_MOCK=false`) |
 | R-04 | Risk Command Center + case detail | Roop | S2-S3 (4-10 Dec) | review | 1/2 | - |
 | U-08 | Event Streams topics + disruption subscriber | Uday | S2 (1-3 Dec) | review | 1/2 | review 2026-11-24 on `uday/U-08-event-streams`: topics, subscription, publisher (shipment routing), subscriber (placeholder for N-08), Basic auth, Django end to end. Known gaps: no Boomi-side duplicate/header/tenant checks (see Notes), failure path / Event Streams down / SG_Disruption_Direct fallback not run, subscriber does not yet start N-08 (cross-account decision open). |
@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | 425f32c | nikhil | N-09 | review | merge: N-09 agent backends into task branch |
+| 2026-11-27 | e3c56e3 | nikhil | N-09 | review | merge: N-09 Agent invocation wiring + offline fallback (auto-merge) |
 | 2026-11-27 | 29c0bf7 | nikhil | N-09 | review | fix(intelligence): N-09 review fixes |
 | 2026-11-27 | e8b9caf | nikhil | N-09 | in-progress | feat(intelligence): agent runner with mock, claude and boomi backends |
 | 2026-11-27 | 2428de9 | nikhil | N-08 | in-progress | merge: N-08 build spec into task branch |
@@ -107,5 +109,3 @@
 | 2026-11-25 | ccaf1f2 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-25 | 9c91b0b | roop | R-08 | review | chore(tasks): handoff R-08 - wiring done, R-05/R-07/R-08 pushed |
 | 2026-11-25 | cd20334 | roop | R-08 | review | docs(tasks): R-08 review (admin screens on real API) |
-| 2026-11-25 | 41c3d43 | roop | R-05 | done | merge: R-05 AI Recommendations + Approval Center (auto-merge) |
-| 2026-11-25 | 0cb4af9 | roop | R-07 | review | docs(tasks): R-07 review (wired to real what-if API) |
