@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 5 | 0 | 4 | 0 | 3 | 0 | 42% | R-06 |
+| Roop | 6 | 0 | 3 | 0 | 3 | 0 | 50% | R-06 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -52,7 +52,7 @@
 | R-08 | Integration Center, Audit Center, Tenant Settings | Roop | S4 (16-20 Dec) | review | 0/1 | - |
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
-| R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | review | 0/1 | - |
+| R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | done | 1/1 | `roop/R-10-polish` (in collaboration; click-through 2026-11-27 in mock/demo mode: login admin + manager, all 9 screens, simulate -> new case 265 ms, approve -> execution Succeeded -> Recovered, what-if 536 ms; 0 console errors, 0 alert banners) |
 | R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | todo | 0/1 | - |
 | S-03 | End-to-end demo dry run | Shared | S5 (24 Dec) | todo | 0/1 | - |
 | S-04 | Security review | Shared | S5 (22-23 Dec) | todo | 0/1 | - |
@@ -89,6 +89,7 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | b46f71b | roop | R-08 | review | fix(frontend): align simulate result, audit actions/filters and null analysis with live backend |
 | 2026-11-27 | 2871b2d | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-27 | 0b24a7a | roop | R-07 | done | docs(tasks): R-07 done (live check), R-08 live findings |
 | 2026-11-25 | a818286 | roop | R-07 | review | merge: R-07 What-if Simulator UI (auto-merge) |
@@ -108,4 +109,3 @@
 | 2026-11-25 | d3f96ee | roop | R-05 | in-progress | feat(frontend): R-05 real decision shape, decider role, retry degrade test |
 | 2026-11-25 | 87b3031 | roop | R-04 | in-progress | wip(frontend): R-04 real-API wiring (partial, subagent stopped) |
 | 2026-11-25 | feecf63 | roop | R-07 | in-progress | wip(frontend): R-07 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | 843c9af | roop | R-05 | in-progress | wip(frontend): R-05 real-API wiring (partial, subagent stopped) |
