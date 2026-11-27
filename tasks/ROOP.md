@@ -147,7 +147,7 @@
 - **Notes:** Drafts done (script, deck outline, shot list, Q&A); needs S-03 dry run + 2 timed rehearsals. Piece: script | session | opus/medium | roop/R-11-demo-script--script.
 
 ### R-12: Marketplace accelerator package
-- **Status:** todo
+- **Status:** in-progress
 - **Sprint:** S5-S6 (24-30 Dec) | **Est:** 2d | **Depends:** U-10, R-06, N-09
 - **Branch:** `roop/R-12-marketplace`
 - **Model hint:** haiku / low for docs assembly, opus / high final review
@@ -155,4 +155,4 @@
 - **Acceptance:**
   - [ ] Package installs into a clean Boomi account following only the guide (dry run by Nikhil or Uday)
 - **Done in:** -
-- **Notes:** -
+- **Notes:** Draft package (listing, install guide, config templates, architecture, components list, dry-run checklist) done; waits for U-10/N-09 exports + R-10 screenshots + dry run. Piece: package | session | sonnet/medium | roop/R-12-marketplace--package.
