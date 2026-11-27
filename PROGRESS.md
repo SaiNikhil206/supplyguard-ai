@@ -6,7 +6,7 @@
 
 | Member | Done | In progress | Review | Blocked | Pending | Overdue | % | Next |
 |---|---|---|---|---|---|---|---|---|
-| Roop | 6 | 0 | 3 | 0 | 3 | 0 | 50% | R-06 |
+| Roop | 6 | 3 | 3 | 0 | 0 | 0 | 50% | R-06 |
 | Nikhil | 0 | 0 | 10 | 0 | 4 | 2 | 0% | N-12 |
 | Uday | 1 | 0 | 6 | 0 | 5 | 2 | 8% | U-07 |
 | Shared | 0 | 1 | 0 | 0 | 4 | 1 | 0% | S-01 |
@@ -44,7 +44,7 @@
 | N-10 | Workflow app - state machine + decisions | Nikhil | S3 (8-11 Dec) | review | 3/3 | - |
 | N-11 | What-if simulator backend | Nikhil | S3 (11-14 Dec) | review | 2/2 | - |
 | R-05 | AI Recommendations + Approval Center | Roop | S3 (8-12 Dec) | done | 2/2 | `roop/R-05-approvals` (`--wire` d3f96ee merged; reviewer-lite APPROVE on combined diff, 2026-11-25) |
-| R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | todo | 0/2 | - |
+| R-06 | Boomi Flow approval workflow | Roop | S3 (9-14 Dec) | in-progress | 0/2 | - |
 | U-10 | Approved-action execution process | Uday | S3 (9-14 Dec) | todo | 0/2 | - |
 | U-11 | Error handling, retry, dead-letter | Uday | S3-S4 (12-17 Dec) | todo | 0/3 | - |
 | N-12 | Data Hub supplier golden record (OPTIONAL) | Nikhil | S4 (15-20 Dec) | todo | 0/2 | - |
@@ -53,10 +53,10 @@
 | N-13 | AI governance + approval tests | Nikhil | S5 (21-24 Dec) | review | 2/2 | nikhil/N-13-ai-tests--tests |
 | N-14 | End-to-end integration tests | Nikhil | S5 (22-26 Dec) | todo | 0/2 | - |
 | R-10 | UX polish + demo mode | Roop | S5 (21-26 Dec) | done | 1/1 | `roop/R-10-polish` (in collaboration; click-through 2026-11-27 in mock/demo mode: login admin + manager, all 9 screens, simulate -> new case 265 ms, approve -> execution Succeeded -> Recovered, what-if 536 ms; 0 console errors, 0 alert banners) |
-| R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | todo | 0/1 | - |
+| R-12 | Marketplace accelerator package | Roop | S5-S6 (24-30 Dec) | in-progress | 0/1 | - |
 | S-03 | End-to-end demo dry run | Shared | S5 (24 Dec) | todo | 0/1 | - |
 | S-04 | Security review | Shared | S5 (22-23 Dec) | todo | 0/1 | - |
-| R-11 | Demo script, deck, video storyboard | Roop | S6 (27-31 Dec) | todo | 0/2 | - |
+| R-11 | Demo script, deck, video storyboard | Roop | S6 (27-31 Dec) | in-progress | 0/2 | - |
 | S-05 | Final submission package | Shared | S6 (27-31 Dec) | todo | 0/1 | - |
 
 ## Where each member left off
@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | 29c0bf7 | nikhil | N-09 | review | fix(intelligence): N-09 review fixes |
+| 2026-11-27 | e8b9caf | nikhil | N-09 | in-progress | feat(intelligence): agent runner with mock, claude and boomi backends |
 | 2026-11-27 | 2428de9 | nikhil | N-08 | in-progress | merge: N-08 build spec into task branch |
 | 2026-11-27 | 2188bec | nikhil | N-07 | review | merge: N-07 validator fixes F-01/F-02 into task branch |
 | 2026-11-27 | 18e9f16 | nikhil | N-07 | review | merge: N-07 Agent output validator + persistence (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | cd20334 | roop | R-08 | review | docs(tasks): R-08 review (admin screens on real API) |
 | 2026-11-25 | 41c3d43 | roop | R-05 | done | merge: R-05 AI Recommendations + Approval Center (auto-merge) |
 | 2026-11-25 | 0cb4af9 | roop | R-07 | review | docs(tasks): R-07 review (wired to real what-if API) |
-| 2026-11-25 | cba509a | roop | R-05 | done | docs(tasks): R-05 done (real decision API, role gating) |
-| 2026-11-25 | f9caad6 | roop | R-04 | review | merge: R-04 Risk Command Center + case detail (auto-merge) |
