@@ -212,12 +212,6 @@ def test_invented_fact_in_recovery_plan(system, pm_client, triggers, case, mutat
     assert_nothing_executed(triggers)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F-01: capacity figures stated in a recovery option's free text "
-    "(assumptions / trade_offs / action_steps) are not fact-checked; only the risk analysis "
-    "text is scanned (CAPACITY_INVENTED). The saved v1.3.0 DEMO run itself carries such a line.",
-)
 def test_invented_capacity_in_recovery_plan_free_text(system, case):
     plan = demo_plan(case.id)
     invented_capacity_free_text(plan)

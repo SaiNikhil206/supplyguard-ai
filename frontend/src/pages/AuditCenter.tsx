@@ -16,7 +16,7 @@ import {
 } from "@/components/ui";
 import { AdminError } from "@/features/admin/ui/AdminError";
 import { PageHeader } from "@/features/admin/ui/PageHeader";
-import { AUDIT_ACTIONS, AUDIT_ENTITY_TYPES, useAudit } from "@/api/admin/audit";
+import { AUDIT_ACTIONS, AUDIT_ENTITY_TYPES, actionLabel, isUuid, useAudit } from "@/api/admin/audit";
 import { AuditTable } from "@/features/admin/audit/AuditTable";
 import { TraceView } from "@/features/admin/audit/TraceView";
 
@@ -30,6 +30,7 @@ export default function AuditCenter() {
   const page = Math.max(1, Number(get("page")) || 1);
 
   const [search, setSearch] = useState(correlationId);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const update = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(params);
@@ -57,6 +58,11 @@ export default function AuditCenter() {
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
     const id = search.trim();
+    if (id && !isUuid(id)) {
+      setSearchError("That is not a valid correlation id. It looks like 3f2b8c1e-0a4d-4c52-9e1b-7d6f5a4b3c21.");
+      return;
+    }
+    setSearchError(null);
     if (id) update({ correlation_id: id, view: "trace" });
     else update({ correlation_id: null, view: null });
   };
@@ -69,6 +75,7 @@ export default function AuditCenter() {
     get(k),
   );
   const clear = () => {
+    setSearchError(null);
     setSearch("");
     setParams(new URLSearchParams());
   };
@@ -116,7 +123,7 @@ export default function AuditCenter() {
               <option value="">All</option>
               {AUDIT_ACTIONS.map((a) => (
                 <option key={a} value={a}>
-                  {a}
+                  {actionLabel(a)}
                 </option>
               ))}
             </Select>
@@ -143,11 +150,20 @@ export default function AuditCenter() {
           <Field label="Correlation ID" className="min-w-72 flex-1">
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setSearchError(null);
+              }}
+              aria-invalid={searchError ? true : undefined}
               placeholder="Paste a correlation id"
               className="font-mono"
             />
           </Field>
+          {searchError && (
+            <p role="alert" className="w-full text-sm font-medium text-danger">
+              {searchError}
+            </p>
+          )}
           <Button type="submit">
             <Search className="h-4 w-4" aria-hidden="true" />
             Search

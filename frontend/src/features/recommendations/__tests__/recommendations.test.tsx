@@ -69,4 +69,12 @@ describe('AI Recommendations', () => {
     renderWithProviders({ path: '/recommendations?case=RC-999999' });
     expect(await screen.findByRole('alert')).toBeInTheDocument();
   });
+
+  it('renders recommendations with an analysis-pending note when analysis is null', async () => {
+    const d = { ...riskCaseDetail45, analysis: null, status: 'PENDING_APPROVAL' as const };
+    server.use(http.get('*/api/v1/risk-cases/RC-000045', () => HttpResponse.json(d)));
+    renderWithProviders({ path: '/recommendations?case=RC-000045' });
+    expect(await screen.findAllByRole('article')).toHaveLength(4);
+    expect(screen.getByText('Analysis pending')).toBeInTheDocument();
+  });
 });

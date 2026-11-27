@@ -120,6 +120,16 @@ def _request_analysis(case_id, tenant_id, round_, reason, feedback, correlation_
             logger.exception("audit of analysis.request_failed failed")
 
 
+def schedule_analysis(case: RiskCase, reason: str = "impact computed") -> None:
+    """After the outermost commit, ask the AnalysisTrigger to analyse `case` in its current round.
+    Called when a case is first moved to ANALYZING (U-06 intake); re-analysis rounds use the
+    `requests_analysis` edges instead."""
+    _after_commit(
+        _request_analysis, case.pk, case.tenant_id, case.analysis_round, reason, "",
+        case.correlation_id,
+    )
+
+
 def transition(
     case: RiskCase, to_state: str, *, actor, reason: str, correlation_id=None, **ctx
 ) -> TransitionResult:

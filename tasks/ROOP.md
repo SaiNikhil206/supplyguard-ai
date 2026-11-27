@@ -9,12 +9,12 @@
 
 ## Handoff
 <!-- Overwrite this block at the end of EVERY session (run /handoff). Newest state only; history goes to progress/SESSION_LOG.md -->
-- **Last updated:** 2026-11-25 (real-API wiring of R-03/04/05/07/08 done; R-06 docs aligned)
-- **Current task:** - (R-01, R-02, R-03, R-05 `done`; R-04, R-07, R-08, R-09, R-10 `review`; R-06 docs done, Flow build manual, still `todo` on collaboration)
-- **Branch:** `roop/R-08-admin-screens` (task branches R-04, R-05, R-07, R-08 pushed; R-04 already in collaboration; `roop/R-06-flow-approval` `5408f6e` pushed; `--wire` and `--stability` sub branches merged)
-- **Where I left off:** Screens run against real API shapes (decision flat 201, what-if, audit, settings/users, portal); R-03 + R-04 auth/read checked live on seeded Django (VITE_API_MOCK=false). Combined branch check: tsc, lint, build, backend 1233 + portal 38 pass; Vitest was flaky (CPU contention), fixed in `--stability` (asyncUtilTimeout 5 s, maxWorkers 4; 5 green runs of 200). reviewer-lite APPROVE. NOT run live: R-05 decision, R-07 <3 s, R-08 AC-07 trace. R-05/R-07/R-08 pushes await auto-merge (gh not logged in here, Actions not checked).
-- **Next step:** check Actions / `/merge-prs` so R-05, R-07, R-08 land in collaboration; set R-06 to `in-progress` on its own branch; live-run what-if, decision and audit trace on seeded Django; then R-06 Boomi Flow build (manual in Boomi UI). R-11/R-12 wait on S-03, U-10, N-09. Delete `tmp/roop-integ-check` + worktree `D:/hackathon/sg-integ`.
-- **Blockers:** Backend gaps (Nikhil/Uday): no `POST /executions/{id}/retry` (`workflow.services.retry_execution` has no route), no approvals-queue endpoint, no tenant-roles endpoint, no user-update route, `/integrations/status` lacks per-service health. R-04 simulate-to-case 5 s needs U-07 -> N-08/N-09 chain. Uday still to confirm R-02 edits in his files; team to confirm timeline visibility, REJECTED-as-open, recovered_value meaning. Nested sessions refused on automated turns (visible ones worked on user request).
+- **Last updated:** 2026-11-27 (all 12 Roop tasks closed; repo moved to SaiNikhil206/supplyguard-ai)
+- **Current task:** - (R-01..R-12 `done`; R-04, R-06, R-08, R-09, R-11, R-12 closed WITH DEFERRED ACCEPTANCE items, see each Notes)
+- **Branch:** `roop/R-08-admin-screens` (all Roop branches pushed to the new repo `origin`; old repo nexbit-labs is only the `oldrepo` backup remote)
+- **Where I left off:** Frontend wired to real API and live-checked (what-if 0.74 s, decision 201/403, audit order needs X-Correlation-ID); demo path clicked through in demo mode with 0 console errors; Flow/demo/marketplace docs landed. Unticked acceptance: R-04 5 s simulate-to-case, R-06 both (Flow not built in Boomi), R-08 AC-07 trace, R-09 required check, R-11 rehearsals, R-12 dry run.
+- **Next step:** build the Flow app in Boomi UI from `boomi/flow/README.md`; re-check R-04 5 s and R-08 trace after Uday U-07/U-10 and Nikhil N-08/N-09 + correlation header; run S-03 dry run (needs U-10) then 2 timed rehearsals; ask Nikhil (repo admin) for the `ci-ok` rule on `main`.
+- **Blockers:** Uday: U-07, U-10, U-11, `POST /executions/{id}/retry`, roles + user-update endpoints, per-service integration health, X-Correlation-ID forwarding, U-12 tunnel, S-01 freeze, confirm my R-02 edits. Nikhil: N-08, N-09, callback correlation-id default, approvals-queue decision, ruleset on main. Team decisions: timeline visibility, REJECTED-as-open, recovered_value, retry manager-only.
 ---
 
 ### R-01: Frontend scaffold + design system
@@ -55,7 +55,7 @@
 - **Notes:** Started early on MSW mocks (R-02 waits on U-03/U-04). Built in 3 visible parallel sessions: `--overview` (6 KPI tiles + Recharts exposure/cases trends), `--supplier-list` (URL filters search/status/risk, risk badges, pagination), `--supplier-detail` (`/suppliers/:id`, KPIs, disruption history, 404 view), all merged; lint/typecheck/96 tests/build green; reviewer-lite APPROVE WITH NITS. Polish session (`--polish`) fixed all nits: shared `src/features/suppliers/status.ts` + `src/lib/format.ts`, sr-only chart summaries, fake-timer debounce test, out-of-range `?page` clamp, severity-tinted risk meter; 101 tests green. Left: after R-02 swap to real API + check field names, tick "real seed data". (Nits were: one supplier-status meta shared by list+detail, shared date/INR formatters in `src/lib/format.ts`, sr-only text summary for charts, fake timers in list debounce test, clamp out-of-range `?page`.) Note for R-04: case links use `/risk?case=<RC-id>`. Landed in collaboration on mocks (status review); real-data acceptance items stay unticked until backend APIs exist.
 
 ### R-04: Risk Command Center + case detail
-- **Status:** review
+- **Status:** done
 - **Sprint:** S2-S3 (4-10 Dec) | **Est:** 2.5d | **Depends:** R-02, U-06
 - **Branch:** `roop/R-04-risk-center`
 - **Model hint:** sonnet / medium
@@ -63,8 +63,8 @@
 - **Acceptance:**
   - [ ] New case appears within 5 s of the simulate click
   - [x] Estimates and missing data visibly labelled (AC-03)
-- **Done in:** -
-- **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. Landed in collaboration on mocks (status review). 2026-11-25 wired to the real API (`--wire`; read APIs + auth run live against seeded Django; contract tests in `realContract.test.ts`; test flake fixed in `--stability`: asyncUtilTimeout 5 s, vitest maxWorkers 4). Stays `review`: "new case within 5 s of simulate click" not tried live yet. `POST /demo/simulate-disruption` exists (apps/integrations, U-06) but it only creates an event; the case appears after correlation + analysis (N-08/N-09, waiting on U-07), so tick it once that chain works end to end.
+- **Done in:** collaboration (R-04 wired to real API, live-checked 2026-11-27)
+- **Notes:** Started early on MSW mocks (R-02, U-06 not done); swap to real API later. Plan: inbox (`/risk` list, severity/status URL filters, 3 s poll, ADMIN simulate button, `?case=` redirect; owns `src/api/queries.ts` poll option + stateful simulate mock) | nested session | sonnet/medium | `roop/R-04-risk-center--inbox`; case detail (`/risk/:id`: header, event, affected POs, approvals/executions, status timeline) | nested session | sonnet/medium | `roop/R-04-risk-center--detail`; AI analysis panel (facts/estimates/assumptions/missing data distinct, evidence list, AC-03) | nested session | sonnet/medium | `roop/R-04-risk-center--analysis`; wire panel into detail after merge | message `--detail` session | sonnet/medium | `--detail`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. Landed in collaboration on mocks (status review). 2026-11-25 wired to the real API (`--wire`; read APIs + auth run live against seeded Django; contract tests in `realContract.test.ts`; test flake fixed in `--stability`: asyncUtilTimeout 5 s, vitest maxWorkers 4). Stays `review`: "new case within 5 s of simulate click" not tried live yet. `POST /demo/simulate-disruption` exists (apps/integrations, U-06) but it only creates an event; the case appears after correlation + analysis (N-08/N-09, waiting on U-07), so tick it once that chain works end to end. CLOSED 2026-11-27 by Roop with ONE ACCEPTANCE ITEM DEFERRED (left unticked): 'new case within 5 s of simulate click'. Works in mock/demo mode (265 ms); on the real backend it needs the Boomi chain: Uday U-07 (ERP read) then Nikhil N-08 + N-09. Follow-up owner: Uday/Nikhil; Roop re-checks live once the chain works.
 
 ### R-05: AI Recommendations + Approval Center
 - **Status:** done
@@ -79,7 +79,7 @@
 - **Notes:** 2026-11-25 wired to the real API: flat decision response (`POST /recommendations/{id}/decision` 201), `canDecide` = PROCUREMENT_MANAGER only (ADMIN excluded, as backend), unsupported or null cost/lead-time options not approvable. Checked by reading serializers/views + contract tests, NOT yet run live against Django. Backend gaps (not mine, tell Nikhil/Uday): no `POST /executions/{id}/retry` route (`workflow.services.retry_execution` exists without an endpoint; UI degrades with a clear message on 404/405), no approvals-queue endpoint (queue derives from GET /risk-cases). Confirm retry should be manager-only once the endpoint exists. Earlier pieces: recommendations | session | sonnet/medium | roop/R-05-approvals--recommendations; approvals | session | sonnet/medium | roop/R-05-approvals--approvals.
 
 ### R-06: Boomi Flow approval workflow
-- **Status:** todo
+- **Status:** done
 - **Sprint:** S3 (9-14 Dec) | **Est:** 2.5d | **Depends:** N-07, N-10, U-01
 - **Branch:** `roop/R-06-flow-approval`
 - **Model hint:** sonnet / medium via `boomi-builder` (Claude explains Flow as "a low-code screen + form builder with a state diagram")
@@ -87,8 +87,8 @@
 - **Acceptance:**
   - [ ] Approve in Flow -> execution starts; Reject -> no execution
   - [ ] Decision visible in the SaaS Approval Center and audit within 5 s
-- **Done in:** -
-- **Notes:** -
+- **Done in:** collaboration (`boomi/flow/`: approval-flow-spec.md, test-plan.md, README.md, values.example.json; aligned to the real flat decision API)
+- **Notes:** Docs delivered: boomi/flow/ README, approval-flow-spec, test-plan, values.example.json, now verified against the real N-10 endpoint (flat 201, user JWT only - API key/ADMIN get 403, per-option recommendation id, 409 reasons, 422 UNSUPPORTED_OPTION, Reject keeps case PENDING_APPROVAL while options remain). Acceptance boxes stay unchecked: they need the Flow built in Boomi. MANUAL Boomi steps: licence check (U-01), build app/service/pages/swimlane/escalation Wait, run test-plan. Open for Uday: how Boomi starts the Flow, how the manager JWT reaches Flow, API Mgmt forwarding Authorization. Open for Nikhil: escalation audit event (APPROVAL_ESCALATED) endpoint. Piece: flow-spec | session | sonnet/medium | roop/R-06-flow-approval--flow-spec. CLOSED 2026-11-27 by Roop as DOCS-COMPLETE; BOTH ACCEPTANCE ITEMS DEFERRED (left unticked): the Flow app is not yet built in the Boomi UI (manual, follows boomi/flow/README.md) so 'approve in Flow -> execution starts' and 'decision visible in SaaS Approval Center + audit within 5 s' are untested. Needs a Boomi Flow tenant + U-10 execution. Fallback stands: SaaS Approval Center (R-05, done).
 
 ### R-07: What-if Simulator UI
 - **Status:** done
@@ -102,40 +102,40 @@
 - **Notes:** Started early on MSW mocks (N-11 not done; what-if response shape PROVISIONAL, own types file `src/api/whatif.ts`). Plan: what-if form + results | nested session | sonnet/medium | `roop/R-07-what-if-ui--simulator`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to real N-11 (`POST /what-if`: scenario, affected_pos, inventory gaps/items/coverage, best_option_estimate, data_gaps); request sends supplier_id, event_type, duration_days, optional start; chart renamed InventoryCoverageChart; reviewer-lite APPROVE. Live check done 2026-11-27 (see Done in). Note: backend requires `event_type` in the request (UI sends it).
 
 ### R-08: Integration Center, Audit Center, Tenant Settings
-- **Status:** review
+- **Status:** done
 - **Sprint:** S4 (16-20 Dec) | **Est:** 2d | **Depends:** U-04, U-05, U-06
 - **Branch:** `roop/R-08-admin-screens`
 - **Model hint:** sonnet / medium
 - **Deliverables:** connection health cards (`/integrations/status`); audit table with filters + correlation-id trace view; settings (risk thresholds, users, roles) for ADMIN.
 - **Acceptance:**
   - [ ] Searching a correlation id shows event -> analysis -> approval -> execution in order (AC-07)
-- **Done in:** -
-- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to the real backend shapes (`GET /integrations/status`, `GET /audit?correlation_id=`, `GET/PATCH /settings`, `GET/POST /users`, `GET /me`); reviewer-lite APPROVE; 205 tests green. Live check 2026-11-27 (real Django + seed): integrations, settings, users, audit shapes match. AC-07 stays unticked: `/audit?correlation_id=` returns the full chain in order (event -> analysis x2 -> decision -> status changes -> execution) only when the Boomi/internal callbacks forward `X-Correlation-ID`; without it the analysis callbacks get fresh ids and drop out of the trace. Gap for Nikhil (AnalysisView: default callback correlation id to the case/event id) and Uday (Boomi processes forward the header; add `entity_id`/`actor` audit filters; no distinct execution.succeeded action; /audit is newest-first so the UI sorts ascending). Earlier note: AC-07 trace not tried live (client orders `/audit` events by timestamp; no dedicated trace endpoint). Backend gaps for Uday: no tenant-roles endpoint, no user-update/role-change route (UI shows roles read-only, controls disabled with a note), per-service health missing from `/integrations/status`, `listUsers` shows first page (25) only.
+- **Done in:** collaboration (wired to real API, live-checked 2026-11-27)
+- **Notes:** Started early on MSW mocks (U-04/U-05/U-06 not done; response shapes PROVISIONAL, own files `src/api/admin.ts`, `src/mocks/admin.ts`). Plan: integration health cards | nested session | sonnet/medium | `roop/R-08-admin-screens--integrations`; audit table + correlation trace (AC-07) | nested session | sonnet/medium | `roop/R-08-admin-screens--audit`; tenant settings (thresholds, users, roles; ADMIN) | nested session | sonnet/medium | `roop/R-08-admin-screens--settings`; tests | test-runner | haiku/low | -; review | reviewer-lite | sonnet/medium | -. 2026-11-25 wired to the real backend shapes (`GET /integrations/status`, `GET /audit?correlation_id=`, `GET/PATCH /settings`, `GET/POST /users`, `GET /me`); reviewer-lite APPROVE; 205 tests green. Live check 2026-11-27 (real Django + seed): integrations, settings, users, audit shapes match. AC-07 stays unticked: `/audit?correlation_id=` returns the full chain in order (event -> analysis x2 -> decision -> status changes -> execution) only when the Boomi/internal callbacks forward `X-Correlation-ID`; without it the analysis callbacks get fresh ids and drop out of the trace. Gap for Nikhil (AnalysisView: default callback correlation id to the case/event id) and Uday (Boomi processes forward the header; add `entity_id`/`actor` audit filters; no distinct execution.succeeded action; /audit is newest-first so the UI sorts ascending). Earlier note: AC-07 trace not tried live (client orders `/audit` events by timestamp; no dedicated trace endpoint). Backend gaps for Uday: no tenant-roles endpoint, no user-update/role-change route (UI shows roles read-only, controls disabled with a note), per-service health missing from `/integrations/status`, `listUsers` shows first page (25) only. CLOSED 2026-11-27 by Roop with ONE ACCEPTANCE ITEM DEFERRED (left unticked): AC-07 correlation trace. Backend returns the full chain in order only if callbacks forward X-Correlation-ID. Follow-up: Nikhil (AnalysisView defaults callback correlation id to case/event id), Uday (Boomi processes forward the header; entity_id/actor audit filters; roles + user-update endpoints).
 
 ### R-09: CI pipeline
-- **Status:** review
+- **Status:** done
 - **Sprint:** S1 (24-26 Nov) | **Est:** 0.5d | **Depends:** R-01, U-02
 - **Branch:** `roop/R-09-ci`
 - **Model hint:** haiku / low
 - **Deliverables:** `.github/workflows/ci.yml`: backend ruff + pytest with Postgres service, frontend lint + typecheck + test + build, mock-erp tests; runs on PRs to `collaboration` and `main`.
 - **Acceptance:**
   - [ ] CI green on `collaboration`; added as required check on both protected branches
-- **Done in:** -
-- **Notes:** Built on nested branches `--lint`, `--workflow`, `--gate` (subagents). `ci.yml` jobs: backend (ruff + pytest on Postgres 16), frontend (lint/typecheck/test/build, Node from `.nvmrc`), python-suites matrix (ai, data, mock-erp), `ci-ok` aggregate. Triggers: task-branch pushes, PRs + pushes to collaboration/main, nightly 02:00 UTC, manual. ESLint 9 flat config added (`npm run lint`, 0 warnings). Auto-merge gate (`scripts/run_checks.py`) now also runs frontend lint + backend ruff. Opus review x2: CHANGES REQUIRED -> APPROVE WITH NITS (nits fixed). Local `run_checks.py`: all 5 suites PASS. Why `review` not `done`: acceptance "required check on both protected branches" conflicts with bots pushing directly to collaboration (GITHUB_TOKEN cannot bypass) -> proposed SHARED change: require `ci-ok` on `main` only; prove collaboration green via nightly/manual run. Deferred: bot `[skip ci]` in `scripts/gitflow.py` + `progress.yml` blocks milestone PR checks (team); ruff unpinned in `backend/requirements-dev.txt` (Uday).
+- **Done in:** collaboration (`.github/workflows/ci.yml`, ESLint 9, run_checks gate)
+- **Notes:** Built on nested branches `--lint`, `--workflow`, `--gate` (subagents). `ci.yml` jobs: backend (ruff + pytest on Postgres 16), frontend (lint/typecheck/test/build, Node from `.nvmrc`), python-suites matrix (ai, data, mock-erp), `ci-ok` aggregate. Triggers: task-branch pushes, PRs + pushes to collaboration/main, nightly 02:00 UTC, manual. ESLint 9 flat config added (`npm run lint`, 0 warnings). Auto-merge gate (`scripts/run_checks.py`) now also runs frontend lint + backend ruff. Opus review x2: CHANGES REQUIRED -> APPROVE WITH NITS (nits fixed). Local `run_checks.py`: all 5 suites PASS. 2026-11-27: tried to add the required-check rule in GitHub (Settings > Rules). GitHub shows "rulesets won't be enforced on this private repository until you upgrade this organization account to GitHub Team", so no branch protection or required check can be enforced on this plan (classic rules likewise). Nothing was created. CI itself is built and green; the enforced gate today is the auto-merge check `scripts/run_checks.py` (ruff, lint, typecheck, tests, build). Options for the team: upgrade `nexbit-labs` to GitHub Team (billing owner), make the repo public, or accept the auto-merge gate as the check. Stays `review` until the team picks. Why `review` not `done`: acceptance "required check on both protected branches" conflicts with bots pushing directly to collaboration (GITHUB_TOKEN cannot bypass) -> proposed SHARED change: require `ci-ok` on `main` only; prove collaboration green via nightly/manual run. Deferred: bot `[skip ci]` in `scripts/gitflow.py` + `progress.yml` blocks milestone PR checks (team); ruff unpinned in `backend/requirements-dev.txt` (Uday). CLOSED 2026-11-27 by Roop with ONE ACCEPTANCE ITEM DEFERRED (left unticked): 'required check on both protected branches'. Needs a ruleset created by the repo owner (admin) on SaiNikhil206/supplyguard-ai; require `ci-ok` on `main` only (bots push to collaboration). Current gate is scripts/run_checks.py in auto-merge. Follow-up owner: Nikhil (repo admin).
 
 ### R-10: UX polish + demo mode
-- **Status:** review
+- **Status:** done
 - **Sprint:** S5 (21-26 Dec) | **Est:** 1.5d | **Depends:** R-03, R-04, R-05, R-07, R-08
 - **Branch:** `roop/R-10-polish`
 - **Model hint:** sonnet / medium; opus / high for a final UI review
 - **Deliverables:** consistent spacing/typography, responsive down to 1280 px, skeleton loaders, toasts, "illustrative synthetic data" label, demo reset button (ADMIN), screenshots for the Marketplace listing.
 - **Acceptance:**
-  - [ ] Full demo path clicked through with zero console errors
-- **Done in:** -
+  - [x] Full demo path clicked through with zero console errors
+- **Done in:** `roop/R-10-polish` (in collaboration; click-through 2026-11-27 in mock/demo mode: login admin + manager, all 9 screens, simulate -> new case 265 ms, approve -> execution Succeeded -> Recovered, what-if 536 ms; 0 console errors, 0 alert banners)
 - **Notes:** Redesign with shadcn/ui on Tailwind (user request). Base = collaboration + R-05/R-07/R-08 merged. Plan: shadcn foundation (theme, `src/components/ui` rebuilt on shadcn with same exports, app shell + command palette) | nested session | sonnet/medium | `roop/R-10-polish--foundation`; then in parallel: overview+suppliers screens | session | sonnet/medium | `--screens-insight`; risk+recommendations+approvals | session | sonnet/medium | `--screens-risk`; what-if+integrations+audit+settings+login | session | sonnet/medium | `--screens-admin`; final UI review | reviewer | opus/high | -. v2 pass (2026-11-23, user: "whole UI unprofessional"): foundation-v2 merged; screens restyled to docs/DESIGN_DIRECTION.md v2 | overview+suppliers+shared patterns | session | sonnet/medium | `--v2-insight`; risk+recommendations+approvals | session | sonnet/medium | `--v2-risk`; what-if+integrations+audit+settings | session | sonnet/medium | `--v2-admin`; test-runner haiku/low; reviewer-lite sonnet/medium. 2026-11-25: v2 restyle reverted at owner request (prefers colorful v1, branch `--restore-v1`); set to review to land the v1 UI (and the R-05/R-07/R-08 screens it carries) in collaboration; still open: demo reset button (ADMIN), Marketplace screenshots, zero-console-error click-through (401 on reload from token refresh).
 
 ### R-11: Demo script, deck, video storyboard
-- **Status:** todo
+- **Status:** done
 - **Sprint:** S6 (27-31 Dec) | **Est:** 2d | **Depends:** S-03
 - **Branch:** `roop/R-11-demo-script`
 - **Model hint:** opus / high for the story, haiku / low for formatting
@@ -143,16 +143,16 @@
 - **Acceptance:**
   - [ ] Two timed rehearsals under 8 min
   - [ ] Every Boomi service has a visible moment
-- **Done in:** -
-- **Notes:** -
+- **Done in:** collaboration (`docs/DEMO_SCRIPT.md`, `docs/demo/`: DECK_OUTLINE, QA_PREP, VIDEO_SHOT_LIST)
+- **Notes:** Drafts done (script, deck outline, shot list, Q&A); needs S-03 dry run + 2 timed rehearsals. Piece: script | session | opus/medium | roop/R-11-demo-script--script. CLOSED 2026-11-27 by Roop as DRAFTS-COMPLETE; ACCEPTANCE DEFERRED (left unticked): needs the S-03 end-to-end dry run (needs U-10) and 2 timed rehearsals by people. Click path verified in demo mode 2026-11-27 (login, simulate, case, approve, what-if, audit).
 
 ### R-12: Marketplace accelerator package
-- **Status:** todo
+- **Status:** done
 - **Sprint:** S5-S6 (24-30 Dec) | **Est:** 2d | **Depends:** U-10, R-06, N-09
 - **Branch:** `roop/R-12-marketplace`
 - **Model hint:** haiku / low for docs assembly, opus / high final review
 - **Deliverables:** `boomi/marketplace/`: listing text, install guide, config templates, sample data, architecture diagram, screenshots; Boomi packaged components list (Uday and Nikhil package their own processes/agents, Roop assembles).
 - **Acceptance:**
   - [ ] Package installs into a clean Boomi account following only the guide (dry run by Nikhil or Uday)
-- **Done in:** -
-- **Notes:** -
+- **Done in:** collaboration (`boomi/marketplace/`: listing, install guide, config templates, architecture, components list, dry-run checklist)
+- **Notes:** Draft package (listing, install guide, config templates, architecture, components list, dry-run checklist) done; waits for U-10/N-09 exports + R-10 screenshots + dry run. Piece: package | session | sonnet/medium | roop/R-12-marketplace--package. CLOSED 2026-11-27 by Roop as DRAFT-COMPLETE; ACCEPTANCE DEFERRED (left unticked): clean-account install dry run by Nikhil or Uday; needs U-10/N-09 exports and R-06 Flow export + screenshots.
