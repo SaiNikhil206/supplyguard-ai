@@ -136,7 +136,11 @@ export function AnalysisPanel({ analysis, status }: AnalysisPanelProps) {
         </div>
       );
     }
-    return <p className="text-sm text-muted">No analysis available</p>;
+    return (
+      <p role="status" className="rounded-xl border border-dashed border-border p-4 text-sm text-muted">
+        Analysis pending: the risk analysis has not arrived for this case yet. Recovery options, if any, are shown below.
+      </p>
+    );
   }
 
   const a = analysis;

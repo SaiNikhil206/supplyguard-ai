@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, Zap } from 'lucide-react';
 import { useSimulateDisruption } from '@/api/queries';
+import { simulatedEventId } from '@/api/types';
 import { ApiError } from '@/api/client';
 import {
   Button,
@@ -37,7 +38,8 @@ export function SimulateDisruption() {
     mutation.mutate(scenario, {
       onSuccess: (res) => {
         setOpen(false);
-        setNote(`Disruption event ${res.event_id} accepted. The new case appears below in a moment.`);
+        const id = simulatedEventId(res);
+        setNote(`Disruption event${id ? ` ${id}` : ''} accepted. The new case appears below in a moment.`);
       },
     });
   };
