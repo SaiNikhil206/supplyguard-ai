@@ -368,6 +368,62 @@ def _range_reasons(option: dict) -> list[dict]:
     return out
 
 
+def _states_capacity(sentence: str) -> bool:
+    """True when the sentence states a capacity figure (ids, dates, event names stripped)."""
+    cleaned = _CAPACITY_EVENT.sub("", _DATE_TOKEN.sub("", _ID_TOKEN.sub("", sentence)))
+    return bool(_CAPACITY_FIGURE.search(cleaned) or _CAPACITY_TALK.search(cleaned))
+
+
+def _null_capacity_suppliers(c: _Ctx) -> set[str]:
+    out = {
+        a["supplier_id"]
+        for a in c.alternates
+        if a.get("supplier_id") and "capacity" in a and a.get("capacity") is None
+    }
+    if c.disrupted_supplier and _capacity_null(c):
+        out.add(c.disrupted_supplier)
+    return out
+
+
+def _option_capacity_reasons(option: dict, c: _Ctx) -> list[dict]:
+    """F-01: free text of an option must not state a capacity figure for a supplier whose
+    capacity is null in the snapshot (a sentence without a supplier is about the option's own
+    alternate supplier)."""
+    nulls = _null_capacity_suppliers(c)
+    if not nulls:
+        return []
+    own = ((option.get("proposed_action") or {}).get("change") or {}).get("supplier_id")
+    texts = [
+        t
+        for f in ("assumptions", "trade_offs", "action_steps")
+        for t in option.get(f) or []
+        if isinstance(t, str)
+    ]
+    # the order quantity is not a capacity claim ("confirm capacity for 4000 units")
+    po_id = (option.get("proposed_action") or {}).get("po_id")
+    order_qtys = {_int(r.get("affected_qty")) for r in c.affected_rows(po_id)}
+    order_qtys.add(_int(((option.get("proposed_action") or {}).get("change") or {}).get("qty")))
+    order_qtys.discard(None)
+
+    def _drop_order_qty(m):
+        digits = m.group(0).replace(",", "")
+        return "" if digits.isdigit() and int(digits) in order_qtys else m.group(0)
+
+    out = []
+    for text in texts:
+        for sentence in re.split(r"(?<=[.;])\s+", text):
+            named = set(re.findall(r"SUP-\d+", sentence)) or ({own} if own else set())
+            plain = re.sub(r"(?<![\w.-])\d[\d,]*(?![\w])", _drop_order_qty, sentence)
+            if named & nulls and _states_capacity(plain):
+                out.append(
+                    reason(
+                        "CAPACITY_INVENTED",
+                        f"states a capacity figure the snapshot lacks: {sentence!r}",
+                    )
+                )
+    return out
+
+
 def _check_option(option: dict, c: _Ctx) -> list[dict]:
     reasons: list[dict] = _range_reasons(option)
     action = option["proposed_action"]
@@ -457,12 +513,21 @@ def _check_option(option: dict, c: _Ctx) -> list[dict]:
             # no qty = the whole affected line: recompute the cost delta on that
             cost_qty = qty if qty is not None else (target or {}).get("affected_qty")
             reasons += _check_alt_numbers(option, c, po_id, alt, cost_qty)
+            if target is not None and target.get("shortage") is False:
+                reasons.append(
+                    reason(
+                        "NO_SHORTAGE_FOR_ITEM",
+                        f"impact shows no shortage for {target['item_id']} on {po_id}: stock "
+                        f"covers the delay, no supplier switch is justified",
+                    )
+                )
     elif otype == "INVENTORY_TRANSFER":
         reasons += _qty_limit_reason(qty, affected, change.get("item_id"), po_id)
         reasons += _check_transfer(option, c, change, items, qty, po_id)
     elif otype == "REVISED_SCHEDULE":
         reasons += _check_revised(option, c, po_id, target, change)
 
+    reasons += _option_capacity_reasons(option, c)
     reasons += check_evidence(option["evidence"], c)
     return reasons
 
@@ -801,10 +866,7 @@ def _fact_check_risk_analysis(
             for sentence in re.split(r"(?<=[.;])\s+", text):
                 other_supplier = re.findall(r"SUP-\d+", sentence)
                 about_disrupted = c.disrupted_supplier in other_supplier or not other_supplier
-                cleaned = _CAPACITY_EVENT.sub("", _DATE_TOKEN.sub("", _ID_TOKEN.sub("", sentence)))
-                if about_disrupted and (
-                    _CAPACITY_FIGURE.search(cleaned) or _CAPACITY_TALK.search(cleaned)
-                ):
+                if about_disrupted and _states_capacity(sentence):
                     out.append(
                         reason(
                             "CAPACITY_INVENTED",
