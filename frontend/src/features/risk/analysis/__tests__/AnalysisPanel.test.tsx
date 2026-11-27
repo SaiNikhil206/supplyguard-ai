@@ -50,7 +50,7 @@ describe('AnalysisPanel', () => {
     expect(screen.getByText('AI analysis in progress…')).toBeInTheDocument();
     unmount();
     render(ui(null, 'CLOSED'));
-    expect(screen.getByText('No analysis available')).toBeInTheDocument();
+    expect(screen.getByText(/Analysis pending/)).toBeInTheDocument();
   });
 
   it('labels null evidence value as missing', () => {

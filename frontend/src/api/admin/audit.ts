@@ -34,10 +34,22 @@ export const AUDIT_ENTITY_TYPES = [
 ] as const;
 
 /** Action names the backend writes today (apps.* record() calls). */
+export const AUDIT_ACTION_LABELS: Record<string, string> = {
+  'event.publish_skipped': 'Event publish skipped',
+  'api_key.created': 'API key created',
+  'security.api_key_rejected': 'API key rejected',
+};
+
+export const actionLabel = (a: string): string => AUDIT_ACTION_LABELS[a] ?? a;
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const isUuid = (s: string): boolean => UUID_RE.test(s.trim());
+
 export const AUDIT_ACTIONS = [
   'event.received',
   'event.duplicate',
   'event.flagged_data_correction',
+  'event.publish_skipped',
   'risk_case.created',
   'risk_case.status_changed',
   'analysis.recorded',
@@ -48,6 +60,8 @@ export const AUDIT_ACTIONS = [
   'execution.dispatch_stubbed',
   'settings.updated',
   'user.created',
+  'api_key.created',
+  'security.api_key_rejected',
   'what_if.run',
   'auth.login',
   'auth.login_failed',

@@ -333,8 +333,23 @@ export interface SimulateScenario {
   scenario: string;
 }
 
-export interface SimulateResult {
+export interface SimulateSent {
+  http_status: number;
   event_id: string;
   correlation_id: string;
-  status: 'RECEIVED';
+  status: string;
+  risk_case_id?: string | null;
 }
+
+/** Real wire shape of POST /demo/simulate-disruption. */
+export interface SimulateResult {
+  scenario: string;
+  event_id?: string;
+  sent: SimulateSent[];
+  /** Legacy flat fields (older mock); prefer `simulatedEventId()`. */
+  correlation_id?: string;
+  status?: string;
+}
+
+/** Event id of a simulate response: top-level when present, else the first sent event. */
+export const simulatedEventId = (r: SimulateResult): string | undefined => r.event_id ?? r.sent?.[0]?.event_id;

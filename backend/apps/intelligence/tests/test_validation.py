@@ -722,3 +722,46 @@ def test_rank_out_of_range_is_a_plan_error(plan, demo):
     opt(plan, 1)["rank"] = 10**12
     r = run_plan(plan, demo)
     assert not r["valid"] and "RANK_OUT_OF_RANGE" in {e["code"] for e in r["fact_errors"]}
+
+
+# ----------------------------------------------------- F-01 / F-02 (N-13 findings)
+
+
+def test_option_free_text_invented_capacity(plan, demo):
+    # F-01: SUP-2002 capacity is null in the snapshot
+    opt(plan, 3)["assumptions"].append("SUP-2002 can supply 8000 units per week.")
+    r = run_plan(plan, demo)
+    assert "CAPACITY_INVENTED" in codes(r, 3) and r["options"][2]["unsupported"]
+
+
+@pytest.mark.parametrize("field", ["assumptions", "trade_offs", "action_steps"])
+def test_option_free_text_invented_capacity_any_field(plan, demo, field):
+    opt(plan, 3)[field].append("SUP-2002 has a capacity of 8000 units.")
+    assert "CAPACITY_INVENTED" in codes(run_plan(plan, demo), 3)
+
+
+def test_option_free_text_capacity_without_supplier_uses_option_supplier(plan, demo):
+    opt(plan, 3)["trade_offs"].append("Weekly capacity is 8000 units.")  # option 3 = SUP-2002
+    assert "CAPACITY_INVENTED" in codes(run_plan(plan, demo), 3)
+
+
+def test_option_free_text_capacity_known_supplier_not_flagged(plan, demo):
+    opt(plan, 1)["assumptions"].append("SUP-2001 can supply 5000 units per week.")
+    assert "CAPACITY_INVENTED" not in codes(run_plan(plan, demo), 1)
+
+
+def test_option_free_text_capacity_no_number_passes(plan, demo):
+    opt(plan, 3)["assumptions"].append("SUP-2002 has sufficient capacity available for this order.")
+    assert "CAPACITY_INVENTED" not in codes(run_plan(plan, demo), 3)
+
+
+def test_alternate_where_no_shortage_is_flagged(plan, demo):
+    # F-02 (TC-04): stock covers the delay, a supplier switch is not justified
+    for row in demo["impact"]["affected_pos"]:
+        row["shortage"] = False
+    r = run_plan(plan, demo)
+    assert "NO_SHORTAGE_FOR_ITEM" in codes(r, 1) and r["options"][0]["unsupported"]
+
+
+def test_alternate_where_shortage_not_flagged(plan, demo):
+    assert "NO_SHORTAGE_FOR_ITEM" not in codes(run_plan(plan, demo), 1)
