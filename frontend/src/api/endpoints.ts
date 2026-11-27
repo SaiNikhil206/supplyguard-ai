@@ -2,6 +2,7 @@ import { apiFetch } from './client';
 import type {
   DashboardSummary,
   Me,
+  MeResponse,
   Paginated,
   RiskCaseDetail,
   RiskCaseFilters,
@@ -22,7 +23,14 @@ export function qs(params: object = {}): string {
   return s ? `?${s}` : '';
 }
 
-export const getMe = () => apiFetch<Me>('/me');
+export async function getMe(): Promise<Me> {
+  const r = await apiFetch<MeResponse>('/me');
+  return {
+    user: { id: r.id, full_name: r.name || r.email, email: r.email },
+    tenant: r.tenant,
+    role: r.role,
+  };
+}
 
 export const listSuppliers = (filters: SupplierFilters = {}) =>
   apiFetch<Paginated<Supplier>>(`/suppliers${qs(filters)}`);

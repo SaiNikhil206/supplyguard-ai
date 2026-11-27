@@ -1,0 +1,97 @@
+import { Link, useParams } from 'react-router-dom';
+import { useRiskCase } from '@/api/queries';
+import { ApiError } from '@/api/client';
+import { ErrorState } from '@/components/ui';
+import { AffectedPosTable } from '@/features/risk/detail/AffectedPosTable';
+import { AnalysisSlot } from '@/features/risk/detail/AnalysisSlot';
+import { ApprovalsExecutions } from '@/features/risk/detail/ApprovalsExecutions';
+import { CaseDetailSkeleton } from '@/features/risk/detail/CaseDetailSkeleton';
+import { CaseHeader } from '@/features/risk/detail/CaseHeader';
+import { EventCard } from '@/features/risk/detail/EventCard';
+import { RecommendationsSummary } from '@/features/risk/detail/RecommendationsSummary';
+import { StatusTimeline } from '@/features/risk/detail/StatusTimeline';
+
+export default function RiskCaseDetail() {
+  const { id } = useParams<{ id: string }>();
+  const q = useRiskCase(id);
+
+  const crumb = (
+    <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
+      <Link className="hover:underline" to="/risk">
+        Risk Command Center
+      </Link>
+      <span aria-hidden="true"> / </span>
+      <span aria-current="page" className="text-text">
+        {id}
+      </span>
+    </nav>
+  );
+
+  if (q.isPending) {
+    return (
+      <div className="min-w-0">
+        {crumb}
+        <CaseDetailSkeleton />
+      </div>
+    );
+  }
+  if (q.isError) {
+    const err = q.error;
+    const api = err instanceof ApiError ? err : null;
+    if (api?.status === 404) {
+      return (
+        <div>
+          {crumb}
+          <ErrorState title="Risk case not found" message={`No risk case with id ${id} exists for your tenant.`} />
+          <p className="text-center">
+            <Link className="text-primary hover:underline" to="/risk">
+              ← Back to Risk Command Center
+            </Link>
+          </p>
+        </div>
+      );
+    }
+    return (
+      <div>
+        {crumb}
+        <ErrorState
+          message={err.message || 'Could not load this risk case.'}
+          correlationId={api?.correlationId ?? undefined}
+          onRetry={() => void q.refetch()}
+        />
+      </div>
+    );
+  }
+
+  const d = q.data;
+  return (
+    <div className="min-w-0 animate-in fade-in-0 space-y-6 duration-300">
+      <div className="space-y-4">
+        {crumb}
+        <CaseHeader detail={d} />
+      </div>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
+          <AnalysisSlot caseId={d.id} status={d.status} analysis={d.analysis} />
+          <AffectedPosTable pos={d.affected_pos} />
+          {d.data_quality_flags && d.data_quality_flags.length > 0 && (
+            <div role="note" aria-label="Data quality flags" className="rounded-md border border-warning/40 bg-warning/10 p-3 text-sm">
+              <p className="font-medium text-text">Data quality flags</p>
+              <ul className="mt-1 list-disc pl-5 text-muted">
+                {d.data_quality_flags.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <EventCard event={d.event} />
+          <RecommendationsSummary detail={d} />
+        </div>
+        <div className="min-w-0 space-y-6 lg:sticky lg:top-4 lg:self-start">
+          <StatusTimeline status={d.status} timeline={d.timeline} />
+          <ApprovalsExecutions approvals={d.approvals} executions={d.executions} />
+        </div>
+      </div>
+    </div>
+  );
+}

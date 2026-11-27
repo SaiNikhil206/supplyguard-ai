@@ -26,6 +26,16 @@ describe('endpoints (mock backend)', () => {
     expect(p3.previous).toContain('page=2');
   });
 
+  it('answers 404 NOT_FOUND for a page past the end and 400 for a bad filter', async () => {
+    await expect(listSuppliers({ page: 9, page_size: 5 })).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' });
+    await expect(listRiskCases({ page: 9 })).rejects.toMatchObject({ status: 404, code: 'NOT_FOUND' });
+    await expect(listSuppliers({ status: 'NOPE' as never })).rejects.toMatchObject({
+      status: 400,
+      code: 'VALIDATION_ERROR',
+    });
+    await expect(listRiskCases({ from: 'not-a-date' })).rejects.toMatchObject({ status: 400 });
+  });
+
   it('filters suppliers by status, risk_level, search', async () => {
     const hold = await listSuppliers({ status: 'ON_HOLD' });
     expect(hold.results.map((s) => s.id)).toEqual(['SUP-1007']);
@@ -69,9 +79,11 @@ describe('endpoints (mock backend)', () => {
   });
 
   it('simulate requires ADMIN', async () => {
-    const r = await simulateDisruption('factory-outage');
-    expect(r.status).toBe('RECEIVED');
+    const r = await simulateDisruption('shipment_delay');
+    expect(r.sent[0].status).toBe('RECEIVED');
+    expect(r.scenario).toBe('shipment_delay');
+    await expect(simulateDisruption('no_such_scenario')).rejects.toMatchObject({ code: 'VALIDATION_ERROR', status: 400 });
     await login('manager', 'demo123');
-    await expect(simulateDisruption('factory-outage')).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(simulateDisruption('shipment_delay')).rejects.toMatchObject({ code: 'FORBIDDEN' });
   });
 });

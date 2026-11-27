@@ -17,6 +17,7 @@ export type ErrorCode =
   | 'CONFLICT'
   | 'BUSINESS_RULE'
   | 'DOWNSTREAM_ERROR'
+  | 'RATE_LIMITED'
   | 'DOWNSTREAM_TIMEOUT'
   | 'NETWORK_ERROR'; // client-side only: fetch failed / non-JSON body
 
@@ -43,9 +44,18 @@ export interface TokenPair {
   refresh: string;
 }
 
-/** PROVISIONAL until U-02 ships `/me`. */
+/** Wire shape of `GET /me` (CONTRACTS s5 / accounts.MeSerializer): flat, no username. */
+export interface MeResponse {
+  id: string;
+  email: string;
+  name: string;
+  role: Role;
+  tenant: { id: string; name: string };
+}
+
+/** UI shape of the signed-in user, built from `MeResponse` by `getMe()`. */
 export interface Me {
-  user: { id: string; username: string; full_name: string; email: string };
+  user: { id: string; full_name: string; email: string };
   tenant: { id: string; name: string };
   role: Role;
 }
@@ -54,22 +64,26 @@ export interface Me {
 export type SupplierStatus = 'ACTIVE' | 'ON_HOLD' | 'INACTIVE';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
+/** Backed by `core.Supplier`; `id` is the ERP id (`SUP-1008`), not the DB pk. */
 export interface Supplier {
   id: string;
   name: string;
-  country: string;
+  country: string; // ISO-3166 alpha-2, e.g. "IN"
   category: string;
   status: SupplierStatus;
   risk_level: RiskLevel;
-  risk_score: number; // 0-100
-  open_po_count: number;
-  on_time_delivery_pct: number;
+  /** No such column on Supplier: only present if the API computes one. UI falls back to risk_level. */
+  risk_score?: number | null; // 0-100
+  open_po_count: number; // annotation: OPEN purchase orders
+  on_time_delivery_pct: number; // 0-100
 }
 
 export interface SupplierKpis {
   on_time_delivery_pct: number;
-  quality_pass_pct: number;
-  avg_lead_time_days: number;
+  /** Not returned by the API (no source): UI must handle it missing. */
+  quality_pass_pct?: number | null;
+  /** Average of (expected_date - order_date) over the supplier's POs; null when it has no POs. */
+  avg_lead_time_days?: number | null;
   open_po_value: Money;
   disruptions_last_12m: number;
 }
@@ -144,19 +158,24 @@ export interface DisruptionEvent {
   event_type: EventType;
   severity: Severity;
   event_time: string;
-  expected_duration_hours: number;
+  expected_duration_hours: number | null; // DisruptionEvent.expected_duration_hours is nullable
   description: string;
   source_system: string;
   correlation_id: string;
 }
 
-/** PROVISIONAL list item. */
+/**
+ * List item backed by `core.RiskCase` (+ event + supplier joins).
+ * `severity` = RiskCase.risk_level; `exposure` = {exposure_amount, currency};
+ * `supplier_id` = event.supplier_erp_id; `supplier_name` is null when the supplier is
+ * unknown or foreign (RiskCase.supplier is nullable).
+ */
 export interface RiskCaseListItem {
   id: string;
   status: RiskCaseState;
   severity: Severity;
   supplier_id: string;
-  supplier_name: string;
+  supplier_name: string | null;
   event_type: EventType;
   title: string;
   risk_score: number;
@@ -175,15 +194,21 @@ export interface RiskCaseFilters {
   page_size?: number;
 }
 
+/**
+ * One row per PO line (unique on po_id + item_id), from `core.AffectedPO`:
+ * qty=affected_qty, value={exposure_amount,currency}, days_late_estimate=estimated_delay_days,
+ * stock_cover_days=inventory_coverage_days (null when inventory is unknown).
+ */
 export interface AffectedPO {
   po_id: string;
   item_id: string;
   item_name: string;
   qty: number;
   value: Money;
-  due_date: string;
+  due_date: string; // YYYY-MM-DD
   days_late_estimate: number;
-  stock_cover_days: number;
+  stock_cover_days: number | null;
+  shortage?: boolean;
 }
 
 export type EvidenceSource = 'ERP' | 'EVENT' | 'IMPACT';
@@ -231,10 +256,17 @@ export type OptionType =
   | 'REVISED_SCHEDULE'
   | 'SPLIT_ORDER';
 
+export type RecommendationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CHANGES_REQUESTED';
+
 /** CONTRACTS section 6: Recovery option, plus `id` (REC-...) added by Django. */
 export interface Recommendation {
   id: string;
   rank: number;
+  round?: number;
+  /** Recommendation.status; APPROVED never together with unsupported. */
+  status?: RecommendationStatus;
+  unsupported?: boolean;
+  unsupported_reasons?: { code: string; message: string }[];
   option_type: OptionType;
   proposed_action: { po_id: string; change: ProposedChange };
   action_steps: string[];
@@ -249,9 +281,10 @@ export interface Recommendation {
 
 export type ApprovalDecision = 'APPROVE' | 'REJECT' | 'REQUEST_CHANGES';
 
-/** PROVISIONAL. */
+/** From `core.Approval`; decided_by is a display name/username of the deciding user. */
 export interface Approval {
   id: string; // APR-...
+  round?: number;
   recommendation_id: string;
   decision: ApprovalDecision;
   comments: string;
@@ -261,18 +294,18 @@ export interface Approval {
 
 export type ExecutionStatus = 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED';
 
-/** PROVISIONAL. */
+/** From `core.Execution`; recommendation_id comes via execution.approval.recommendation. */
 export interface Execution {
   id: string; // EXE-...
   recommendation_id: string;
   status: ExecutionStatus;
-  started_at: string;
+  started_at: string | null; // null while PENDING
   finished_at: string | null;
   error: string | null;
-  retryable: boolean;
+  retryable: boolean; // Execution.retryable property
 }
 
-/** PROVISIONAL. */
+/** From `audit.AuditEvent` rows for the case: at=timestamp, actor, action, detail=summary of `data`. */
 export interface TimelineEntry {
   at: string;
   actor: string;
@@ -281,6 +314,8 @@ export interface TimelineEntry {
 }
 
 export interface RiskCaseDetail extends RiskCaseListItem {
+  /** Missing/odd source data noticed by the impact engine; shown on the case page. */
+  data_quality_flags?: string[];
   event: DisruptionEvent;
   affected_pos: AffectedPO[];
   analysis: RiskAnalysis | null;
@@ -298,8 +333,23 @@ export interface SimulateScenario {
   scenario: string;
 }
 
-export interface SimulateResult {
+export interface SimulateSent {
+  http_status: number;
   event_id: string;
   correlation_id: string;
-  status: 'RECEIVED';
+  status: string;
+  risk_case_id?: string | null;
 }
+
+/** Real wire shape of POST /demo/simulate-disruption. */
+export interface SimulateResult {
+  scenario: string;
+  event_id?: string;
+  sent: SimulateSent[];
+  /** Legacy flat fields (older mock); prefer `simulatedEventId()`. */
+  correlation_id?: string;
+  status?: string;
+}
+
+/** Event id of a simulate response: top-level when present, else the first sent event. */
+export const simulatedEventId = (r: SimulateResult): string | undefined => r.event_id ?? r.sent?.[0]?.event_id;
