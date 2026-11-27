@@ -80,13 +80,6 @@ def test_tc04_plan_claiming_a_shortage_is_unsupported(system, pm_client, trigger
     assert not Approval.objects.exists() and not Execution.objects.exists()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="FINDING F-02: the validator checks an alternate-supplier option against supplier / "
-    "price / capacity facts only. It does not flag an option that fixes a PO whose impact says "
-    "shortage=false (stock covers the outage), so TC-04 is enforced for options that CLAIM a "
-    "shortage (evidence), not for ones that merely imply it.",
-)
 def test_tc04_alternate_where_stock_covers_the_need_is_flagged(system, tc04):
     plan = _plan(
         tc04.id,
