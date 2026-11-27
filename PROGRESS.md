@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | 8adbe00 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
+| 2026-11-27 | b46f71b | roop | R-08 | review | fix(frontend): align simulate result, audit actions/filters and null analysis with live backend |
 | 2026-11-27 | 2871b2d | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-27 | 0b24a7a | roop | R-07 | done | docs(tasks): R-07 done (live check), R-08 live findings |
 | 2026-11-25 | a818286 | roop | R-07 | review | merge: R-07 What-if Simulator UI (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 75f2cd4 | roop | R-07 | in-progress | fix(frontend): R-07 what-if test matches real heading |
 | 2026-11-25 | d3f96ee | roop | R-05 | in-progress | feat(frontend): R-05 real decision shape, decider role, retry degrade test |
 | 2026-11-25 | 87b3031 | roop | R-04 | in-progress | wip(frontend): R-04 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | feecf63 | roop | R-07 | in-progress | wip(frontend): R-07 real-API wiring (partial, subagent stopped) |
-| 2026-11-25 | 843c9af | roop | R-05 | in-progress | wip(frontend): R-05 real-API wiring (partial, subagent stopped) |
