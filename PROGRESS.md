@@ -89,6 +89,8 @@
 
 | Date | Commit | Member | Task | Status | Subject |
 |---|---|---|---|---|---|
+| 2026-11-27 | 11e3d85 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
+| 2026-11-27 | f1f05f6 | nikhil | N-08 | in-progress | docs(boomi): N-08 SG_Disruption_Correlate build spec |
 | 2026-11-27 | 7b476c4 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
 | 2026-11-27 | 4cedf0a | roop | R-10 | done | docs(tasks): R-10 done (demo path clicked through, 0 console errors) |
 | 2026-11-27 | 8adbe00 | roop | R-08 | review | merge: R-08 Integration Center, Audit Center, Tenant Settings (auto-merge) |
@@ -107,5 +109,3 @@
 | 2026-11-25 | 1f36254 | roop | R-04 | in-progress | test(frontend): stabilize Vitest under load (asyncUtilTimeout 5s, cap workers) |
 | 2026-11-25 | 5408f6e | roop | R-06 | in-progress | docs(flow): align R-06 spec and test plan with real decision API |
 | 2026-11-25 | e707608 | roop | R-04 | in-progress | feat(frontend): run against real backend (VITE_API_MOCK=false), real-API contract tests |
-| 2026-11-25 | 1d1cac8 | roop | R-08 | review | feat(frontend): R-08 wire admin screens to real backend shapes |
-| 2026-11-25 | 75f2cd4 | roop | R-07 | in-progress | fix(frontend): R-07 what-if test matches real heading |
