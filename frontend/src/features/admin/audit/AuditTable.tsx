@@ -19,7 +19,7 @@ import {
   TableEmptyRow,
   toast,
 } from "@/components/ui";
-import type { AuditEvent } from "@/api/admin/audit";
+import { actionLabel, type AuditEvent } from "@/api/admin/audit";
 import { cn } from "@/lib/utils";
 import { formatTime } from "./stages";
 
@@ -197,7 +197,7 @@ export function AuditTable({
               </TD>
               <TD>
                 <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-xs font-medium text-foreground ring-1 ring-border">
-                  {e.action}
+                  {actionLabel(e.action)}
                 </span>
               </TD>
               <TD>

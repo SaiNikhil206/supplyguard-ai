@@ -91,6 +91,15 @@ describe('Risk case detail /risk/:id', () => {
     expect(screen.getByText('No affected purchase orders')).toBeInTheDocument();
   });
 
+  it('renders an analysis-pending state when analysis is null but recommendations exist', async () => {
+    const d = { ...riskCaseDetail45, analysis: null, status: 'PENDING_APPROVAL' as const };
+    server.use(http.get(URL, () => HttpResponse.json(d)));
+    renderWithProviders({ path: '/risk/RC-000045' });
+    const slot = await screen.findByTestId('analysis-slot');
+    expect(slot).toHaveTextContent(/Analysis pending/);
+    expect(screen.getByText('4 recovery options proposed')).toBeInTheDocument();
+  });
+
   it('shows not found for an unknown case', async () => {
     renderWithProviders({ path: '/risk/RC-999999' });
     expect(await screen.findByText('Risk case not found')).toBeInTheDocument();
